@@ -1,0 +1,25 @@
+#version 130
+
+in vec2 position;
+in vec2 coord;
+in vec2 texcoord;
+
+out float textured;
+out vec4 color;
+out vec2 vertexCoordinate;
+out vec2 textureCoordinate;
+
+uniform float settings[];
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main() {
+	float alpha = settings[0];
+    textured = settings[1];
+    color = vec4(settings[2], settings[3], settings[4], settings[5] * alpha);    
+    vertexCoordinate = coord;
+    textureCoordinate = texcoord;
+    mat4 mvp = projection * view * model;
+    gl_Position = mvp * vec4(position, 0.0, 1.0);
+}

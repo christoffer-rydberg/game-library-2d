@@ -1,0 +1,32 @@
+#version 420
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform float alpha;
+uniform vec4 colorFactor;
+
+in layout (location = 0) vec4 position; // position (x, y, z) and rotation
+in layout (location = 1) vec4 color; // color (r, g, b, a)
+in layout (location = 2) vec2 scale; // scale (x, y)
+
+out vData
+{
+    vec4 color;
+    vec2 scale;
+    float rotation;    
+} outputData;
+
+void main() 
+{
+	mat4 mvp = projection * view * model;
+	gl_Position = mvp * vec4(position.x, position.y, 0.0, 1.0);
+    outputData.color = vec4(
+        color[0] * colorFactor[0],
+        color[1] * colorFactor[1],
+        color[2] * colorFactor[2],
+        color[3] * colorFactor[3] * alpha);
+    outputData.scale = scale;
+    outputData.rotation = position[3];
+}

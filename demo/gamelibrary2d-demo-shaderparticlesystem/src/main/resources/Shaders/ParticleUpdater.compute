@@ -1,0 +1,85 @@
+#version 430
+
+//Size of compute shader local work group - x=32, y=32, z=1(default)
+//layout( local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+layout( local_size_x = 512, local_size_y = 1, local_size_z = 1) in;
+
+struct State {
+   vec4 Pos; // PosX, PosY, Padding, Time
+   vec4 Color;
+};
+
+struct Update {
+   vec4 OriginalPos; // PosX, PosY, Angle, Duration
+   vec4 OriginalColor;
+   vec4 GoalColor;
+};  
+
+layout (std140, binding = 0) buffer VertexBuffer {
+   State state[];
+};
+
+layout (std140, binding = 1) buffer Buffer {
+   Update update[];
+};
+
+uniform float cycleTime;
+uniform float distanceFactor;
+uniform float deltaTime;
+
+void main(void)
+{
+	//uint index = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+	uint index = gl_GlobalInvocationID.x;
+
+	State s = state[index];
+	Update u = update[index];
+	
+	// Increment time
+	s.Pos[3] += deltaTime;
+	
+	if(s.Pos[3] >= u.OriginalPos[3]) 
+	{
+		// The particle is finished:
+		s.Pos.x = u.OriginalPos.x;
+		s.Pos.y = u.OriginalPos.y;
+		s.Color = u.GoalColor;
+		
+		if(s.Pos[3] >= cycleTime)
+		{
+			// The cycle is finished:
+			s.Pos[3] -= cycleTime;
+			vec4 tmp = u.GoalColor;
+			u.GoalColor = u.OriginalColor;
+			u.OriginalColor = tmp;
+			update[index] = u;		
+		}
+	}
+	else
+	{
+		float interpolation = s.Pos[3] / u.OriginalPos[3];
+		
+		if(s.Pos[3] < u.OriginalPos[3]/2) {
+			float factor = interpolation * 2;
+			s.Pos.x = u.OriginalPos.x + factor * (cos(u.OriginalPos[2]) * distanceFactor * u.OriginalPos[3]);
+			s.Pos.y = u.OriginalPos.y + factor * (sin(u.OriginalPos[2]) * distanceFactor * u.OriginalPos[3]);
+		}
+		else {
+			float factor = (1.0 - interpolation) * 2;
+			s.Pos.x = u.OriginalPos.x + factor * (cos(u.OriginalPos[2]) * distanceFactor * u.OriginalPos[3]);
+			s.Pos.y = u.OriginalPos.y + factor * (sin(u.OriginalPos[2]) * distanceFactor * u.OriginalPos[3]);
+		}
+		
+		float deltaR = u.GoalColor[0] - u.OriginalColor[0];
+		float deltaG = u.GoalColor[1] - u.OriginalColor[1];
+		float deltaB = u.GoalColor[2] - u.OriginalColor[2];
+		float deltaA = u.GoalColor[3] - u.OriginalColor[3];
+		
+		s.Color[0] = u.OriginalColor[0] + deltaR * interpolation; 
+		s.Color[1] = u.OriginalColor[1] + deltaG * interpolation;
+		s.Color[2] = u.OriginalColor[2] + deltaB * interpolation;
+		s.Color[3] = u.OriginalColor[3] + deltaA * interpolation;
+	}
+	
+	state[index] = s;
+}

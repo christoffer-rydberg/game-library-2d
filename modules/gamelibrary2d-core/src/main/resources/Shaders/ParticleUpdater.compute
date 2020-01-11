@@ -1,0 +1,488 @@
+#version 430
+
+#define M_PI 3.1415926535897932384626433832795
+
+layout( local_size_x = 512, local_size_y = 1, local_size_z = 1) in;
+
+struct Init {
+   vec4 Part0; // Life, LifeVar, Delay, DelayVar
+   vec4 Part1; // Speed, SpeedVar, EndSpeedFactor, EndSpeedFactorVar
+   vec4 Part2; // InitialYaw, InitialYawVar, InitialPitch, InitialPitchVar
+   vec4 Part3; // InitialDirFromGravityCenter, ScaleX, ScaleY, UpdateScale
+   vec4 Part4; // ScaleVar, EndScaleX, EndScaleY, EndScaleVar
+   vec4 Part5; // AccX, AccY, AccZ, AccXVar
+   vec4 Part6; // AccYVar, AccZVar, RadialAcc, RadialAccVar
+   vec4 Part7; // TangentialAcc, TangentialAccVar, UpdateColor, ColorR
+   vec4 Part8; // ColorG, ColorB, ColorRVar, ColorGVar
+   vec4 Part9; // ColorBVar, EndColorR, EndColorG, EndColorB
+   vec4 Part10; // EndColorRVar, EndColorGVar, EndColorBVar, Alpha 
+   vec4 Part11; // AlphaVar, EndAlpha, EndAlphaVar, RotatedForward
+   vec4 Part12; // Rotation, RotationVar, RotationSpeed, RotationSpeedVar
+   vec4 Part13; // RotationAcceleration, RotationAccelerationVar, PADDING, PADDING
+};
+
+struct State {
+   vec4 Part0; // PosX, PosY, PosZ, Rotation
+   vec4 Part1; // ColorR, ColorG, ColorB, ColorA
+   vec4 Part2; // ScaleX, ScaleY, Time, PADDING
+};
+
+struct Update {
+   vec4 Part0; // DeltaX, DeltaY, DeltaZ, Initialized
+   vec4 Part1; // Life, ExternalSpeedX, ExternalSpeedY, ExternalSpeedZ
+   vec4 Part2; // Delay, PADDING, EndSpeedFactor, RotationAcc
+   vec4 Part3; // GravityCenterX, GravityCenterY, GravityCenterZ, RotatedForward
+   vec4 Part4; // AccelerationX, AccelerationY, AccelerationZ, RadialAcc
+   vec4 Part5; // TangentialAcc, DeltaScaleX, DeltaScaleY, DeltaRotation
+   vec4 Part6; // DeltaColorR, DeltaColorG, DeltaColorB, DeltaColorA,
+};
+
+layout(binding = 0) uniform atomic_uint atomicCounter;
+
+layout (std140, binding = 1) buffer Input0 {
+   Init initInput;
+};
+
+layout (std140, binding = 2) buffer Input1 {
+   State renderInput[];
+};
+
+layout (std140, binding = 3) buffer Input2 {
+   Update updateInput[];
+};
+
+layout (std140, binding = 4) buffer Output1 {
+   State renderOutput[];
+};
+
+layout (std140, binding = 5) buffer Output2 {
+   Update updateOutput[];
+};
+
+uniform int randomSeed;
+uniform float deltaTime;
+uniform int particleCount;
+uniform int particlesInGpu;
+
+uniform vec3 position;
+uniform vec3 externalSpeed;
+uniform vec3 externalAcceleration;
+
+uint wang_hash(uint seed)
+{
+    seed = (seed ^ 61) ^ (seed >> 16);
+    seed *= 9;
+    seed = seed ^ (seed >> 4);
+    seed *= 0x27d4eb2d;
+    seed = seed ^ (seed >> 15);
+    return seed;
+}
+
+float randomFloat(uint seed) {
+	return float(wang_hash(seed)) * (1.0 / 4294967296.0);
+}
+
+float random11(uint seed) {
+	return 2 * randomFloat(seed) - 1;
+}
+
+void main(void)
+{
+	//uint index = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+	
+	uint index = gl_GlobalInvocationID.x;
+	
+	if(index >= particleCount) {
+		return;
+	}
+	
+	State s = renderInput[index];
+	Update u = updateInput[index];
+	
+	uint seed = wang_hash(randomSeed + index);
+	
+	if(index >= particlesInGpu) {
+	
+		// Position and gravity center is set by spawn settings (TODO: Implement in Shader)
+		float posX = position[0];
+		float posY = position[1];
+		float posZ = position[2];
+		
+		float gravityCenterX = position[0];
+		float gravityCenterY = position[1];
+		float gravityCenterZ = position[2];
+		
+		s.Part0[0] = posX; // Pos x
+		s.Part0[1] = posY; // Pos y
+		s.Part0[2] = posZ;   // Pos z
+		u.Part3[0] = gravityCenterX; // GravityCenterX
+		u.Part3[1] = gravityCenterY; // GravityCenterY
+		u.Part3[2] = gravityCenterZ; // GravityCenterZ
+	
+		float life = initInput.Part0[0];
+		float lifeVar = initInput.Part0[1];
+		float delay = initInput.Part0[2];
+		float delayVar = initInput.Part0[3];
+		
+		float speed = initInput.Part1[0];
+		float speedVar = initInput.Part1[1];
+		float endSpeedFactor = initInput.Part1[2];
+		float endSpeedFactorVar = initInput.Part1[3];
+		
+		float initialYaw = initInput.Part2[0];
+		float initialYawVar = initInput.Part2[1];
+		float initialPitch = initInput.Part2[2];
+		float initialPitchVar = initInput.Part2[3];
+		
+		float initialDirFromGravityCenter = initInput.Part3[0];
+		float scaleX = initInput.Part3[1];
+		float scaleY = initInput.Part3[2];
+		float updateScale = initInput.Part3[3];
+		
+		float scaleVar = initInput.Part4[0];
+		float endScaleX = initInput.Part4[1];
+		float endScaleY = initInput.Part4[2];
+		float endScaleVar = initInput.Part4[3];
+		
+		float accelerationX = initInput.Part5[0];
+		float accelerationY = initInput.Part5[1];
+		float accelerationZ = initInput.Part5[2];
+		float accelerationXVar = initInput.Part5[3];
+		
+		float accelerationYVar = initInput.Part6[0];
+		float accelerationZVar = initInput.Part6[1];
+		float radialAcc = initInput.Part6[2];
+		float radialAccVar = initInput.Part6[3];
+		
+		float tangentialAcc = initInput.Part7[0];
+		float tangentialAccVar = initInput.Part7[1];
+		float updateColor = initInput.Part7[2];
+		float colorR = initInput.Part7[3];
+		
+		float colorG = initInput.Part8[0];
+		float colorB = initInput.Part8[1];
+		float colorRVar = initInput.Part8[2];
+		float colorGVar = initInput.Part8[3];
+		
+		float colorBVar = initInput.Part9[0];
+		float endColorR = initInput.Part9[1];
+		float endColorG = initInput.Part9[2];
+		float endColorB = initInput.Part9[3];
+		
+		float endColorRVar = initInput.Part10[0];
+		float endColorGVar = initInput.Part10[1];
+		float endColorBVar = initInput.Part10[2];
+		float alpha = initInput.Part10[3];
+		
+		float alphaVar = initInput.Part11[0];
+		float endAlpha = initInput.Part11[1];
+		float endAlphaVar = initInput.Part11[2];
+		float rotatedForward = initInput.Part11[3];
+		
+		float rotation = initInput.Part12[0];
+		float rotationVar = initInput.Part12[1];
+		float rotationSpeed = initInput.Part12[2];
+		float rotationSpeedVar = initInput.Part12[3];
+		
+		float rotationAcceleration = initInput.Part13[0];
+		float rotationAccelerationVar = initInput.Part13[1];
+	
+		//////// INIT ////////////////
+	
+		// Time
+		s.Part2[2] = 0; // Time
+		
+		// Life
+		float emittedLife = life + lifeVar * random11(++seed);
+		u.Part1[0] = emittedLife;
+		
+		float emittedScaleVar = scaleVar * random11(++seed);
+		float emittedScaleX = scaleX + emittedScaleVar;
+		float emittedScaleY = scaleY + emittedScaleVar;
+		
+		// Scale
+		s.Part2[0] = emittedScaleX;
+		s.Part2[1] = emittedScaleY;
+		
+		float emittedSpeed = speed + speedVar * random11(++seed);
+
+		float emittedAcceleration = tangentialAcc + tangentialAccVar * random11(++seed);
+		
+		bool speedSet = false;
+		
+		if (initialDirFromGravityCenter == 1) {
+			
+			float dirX = posX - gravityCenterX;
+			float dirY = posY - gravityCenterY;
+			float dirZ = posZ - gravityCenterZ;
+
+			if (dirX != 0 && dirY != 0 && dirZ != 0) {
+				
+				float length = sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+				
+				u.Part0[0] = (dirX / length) * speed;
+				u.Part0[1] = (dirY / length) * speed;
+				u.Part0[2] = (dirZ / length) * speed;
+				
+				speedSet = true;				
+			}			
+		}
+		
+		if (!speedSet) {
+			float yaw = initialYaw + initialYawVar * random11(++seed);
+			float pitch = initialPitch + initialPitchVar * random11(++seed);
+			float initialYaw = (yaw - 90.0) * M_PI / 180;
+			float initialPitch = pitch * M_PI / 180;
+			float cosPitchTimesSpeed = cos(initialPitch) * speed;
+			
+			float deltaX = cos(initialYaw) * cosPitchTimesSpeed;
+			float deltaY = -sin(initialYaw) * cosPitchTimesSpeed;
+			float deltaZ = sin(initialPitch) * speed;
+			
+			// Velocity
+			u.Part0[0] = deltaX;
+			u.Part0[1] = deltaY;
+			u.Part0[2] = deltaZ;
+		}
+		
+		// Delay
+		u.Part2[0] = delay + delayVar * random11(++seed);
+		
+		// End speed factor
+		u.Part2[2] = endSpeedFactor + endSpeedFactorVar * random11(++seed);
+
+		// Acceleration along X,Y,Z axis
+		u.Part4[0] = accelerationX + accelerationXVar * random11(++seed);
+		u.Part4[1] = accelerationY + accelerationYVar * random11(++seed);
+		u.Part4[2] = accelerationZ + accelerationZVar * random11(++seed);
+
+		// RadialAcc
+		u.Part4[3] = radialAcc + radialAccVar * random11(++seed);
+
+		// TangentialAcc
+		u.Part5[0] = tangentialAcc + tangentialAccVar * random11(++seed);
+
+		if (updateScale == 1) {
+			
+			float randomizedEndScaleVar = endScaleVar * random11(++seed);
+			
+			// Delta scale
+			u.Part5[1] = ((endScaleX + randomizedEndScaleVar) - emittedScaleX) / emittedLife;
+			u.Part5[2] = ((endScaleY + randomizedEndScaleVar) - emittedScaleY) / emittedLife;
+			
+		} else {
+		
+			// Delta scale
+			u.Part5[1] = 0;
+			u.Part5[2] = 0;
+		}
+
+		float emittedColorR = colorR + colorRVar * random11(++seed);
+		float emittedColorG = colorG + colorGVar * random11(++seed);
+		float emittedColorB = colorB + colorBVar * random11(++seed);
+		float emittedAlpha = alpha + alphaVar * random11(++seed);
+		
+		// Color
+		s.Part1[0] = emittedColorR / 255;
+		s.Part1[1] = emittedColorG / 255;
+		s.Part1[2] = emittedColorB / 255;
+		s.Part1[3] = emittedAlpha;
+
+		if (updateColor == 1) {
+			// Delta Color
+			float divisor = 255 * emittedLife;
+			u.Part6[0] = ((endColorR + endColorRVar * random11(++seed)) - emittedColorR) / divisor;
+			u.Part6[1] = ((endColorG + endColorGVar * random11(++seed)) - emittedColorG) / divisor;
+			u.Part6[2] = ((endColorB + endColorBVar * random11(++seed)) - emittedColorB) / divisor;			
+		} else {
+			// Delta Color
+			u.Part6[0] = 0;
+			u.Part6[1] = 0;
+			u.Part6[2] = 0;
+		}
+		
+		// Delta alpha
+		u.Part6[3] = ((endAlpha + endAlphaVar * random11(++seed)) - emittedAlpha) / emittedLife;
+
+		if (rotatedForward == 1) {
+			u.Part3[3] = 1; // RotatedForward
+		} else {
+			s.Part0[3] = rotation + rotationVar * random11(++seed);
+			u.Part5[3] = rotationSpeed + rotationSpeedVar * random11(++seed);
+			u.Part2[3] = rotationAcceleration + rotationAccelerationVar * random11(++seed);
+		}
+		
+		// Initialized
+		u.Part0[3] = 0; 
+		
+		// External speed
+		u.Part1[1] = externalSpeed[0];
+		u.Part1[2] = externalSpeed[1];
+		u.Part1[3] = externalSpeed[2];
+	}
+	
+	float life = u.Part1[0];
+	
+	float delay = u.Part2[0];
+	float initialSpeed = u.Part2[1];
+	float endSpeedFactor = u.Part2[2];
+	float rotationAcc = u.Part2[3];
+	
+	float gravityCenterX = u.Part3[0];
+	float gravityCenterY = u.Part3[1];
+	float gravityCenterZ = u.Part3[2];
+	float rotatedForward = u.Part3[3];
+	
+	float accelerationX = u.Part4[0];
+	float accelerationY = u.Part4[1];
+	float accelerationZ = u.Part4[2];
+	float radialAcc = u.Part4[3];
+	
+	float tangentialAcc = u.Part5[0];
+	float deltaScaleX = u.Part5[1];
+	float deltaScaleY = u.Part5[2];
+	float deltaRotation = u.Part5[3];
+	
+	float deltaColorR = u.Part6[0];
+	float deltaColorG = u.Part6[1];
+	float deltaColorB = u.Part6[2];
+	float deltaColorA = u.Part6[3];
+	
+	float deltaX, deltaY, deltaZ;
+	if (u.Part0[3] == 0) {
+
+		float time = s.Part2[2];
+		if (time < delay) {
+			
+			s.Part2[2] = time + deltaTime;
+			
+			u.Part1[1] += externalAcceleration[0] * deltaTime;
+			u.Part1[2] += externalAcceleration[1] * deltaTime;
+			u.Part1[3] += externalAcceleration[2] * deltaTime;
+			
+			float externalSpeedX = u.Part1[1];
+			float externalSpeedY = u.Part1[2];
+			float externalSpeedZ = u.Part1[3];
+			
+			// Update position based on external speed
+			s.Part0[0] += externalSpeedX * deltaTime;
+			s.Part0[1] += externalSpeedY * deltaTime;
+			s.Part0[2] += externalSpeedZ * deltaTime;
+
+			if (rotatedForward != 0) {
+				if (externalSpeedX != 0 || externalSpeedY != 0) {
+					float rotation = atan(externalSpeedY, externalSpeedX);
+					s.Part0[3] = -(rotation * 180.0 / M_PI) + 90;
+				}
+			}
+
+			// Update buffers
+			uint newIndex = atomicCounterIncrement(atomicCounter);
+			renderOutput[newIndex] = s;
+			updateOutput[newIndex] = u;
+			return;
+		}
+
+		s.Part2[2] = 0; // time
+		deltaX = u.Part0[0] + u.Part1[1];
+		deltaY = u.Part0[1] + u.Part1[2];
+		deltaZ = u.Part0[2] + u.Part1[3];
+		u.Part0[3] = 1; // initialized
+	} else {
+		deltaX = u.Part0[0];
+		deltaY = u.Part0[1];
+		deltaZ = u.Part0[2];
+	}
+
+	// Increment time
+	s.Part2[2] += deltaTime;
+	float time = s.Part2[2];
+	
+	float posX = s.Part0[0];
+	float posY = s.Part0[1];
+	float posZ = s.Part0[2];
+	
+	float radialDirX, radialDirY, radialDirZ;
+	if (gravityCenterX == posX && gravityCenterY == posY && gravityCenterZ == posZ) {
+
+		float initialYaw = -atan(deltaY, deltaX);
+		float initialPitch = atan(deltaZ, sqrt(deltaX * deltaX + deltaY * deltaY));
+
+		// Get radial direction from initial direction
+		float cosPitch = cos(initialPitch);
+		radialDirX = cos(initialYaw) * cosPitch;
+		radialDirY = -sin(initialYaw) * cosPitch;
+		radialDirZ = sin(initialPitch);
+
+	} else {
+
+		// Calculate radial direction
+		radialDirX = gravityCenterX - posX;
+		radialDirY = gravityCenterY - posY;
+		radialDirZ = gravityCenterZ - posZ;
+
+		// Calculate distance to origin
+		float distance = sqrt(radialDirX * radialDirX + radialDirY * radialDirY + radialDirZ * radialDirZ);
+
+		// Normalize radial direction
+		radialDirX = radialDirX / distance;
+		radialDirY = radialDirY / distance;
+		radialDirZ = radialDirZ / distance;
+	}
+	
+	// Get tangential direction
+	float tangentialDirX = -radialDirY;
+	float tangentialDirY = radialDirX;
+	
+	// Get acceleration sums of radial and tangential accelerations
+	float accSumX = radialDirX * radialAcc + tangentialDirX * tangentialAcc;
+	float accSumY = radialDirY * radialAcc + tangentialDirY * tangentialAcc;
+	float accSumZ = radialDirZ * radialAcc;
+	
+	// Update velocity
+	deltaX += (accSumX + externalAcceleration[0] + accelerationX) * deltaTime;
+	deltaY += (accSumY + externalAcceleration[1] + accelerationY) * deltaTime;
+	deltaZ += (accSumZ + externalAcceleration[2] + accelerationZ) * deltaTime;
+	u.Part0[0] = deltaX;
+	u.Part0[1] = deltaY;
+	u.Part0[2] = deltaZ;
+	
+	// Update velocity factor
+	float progress = time / life;
+	float velocityFactor = (1.0 - progress) + progress * endSpeedFactor;
+	
+	// Update position
+	float velocityFactorTimesDeltaTime = velocityFactor * deltaTime;
+	s.Part0[0] = posX + deltaX * velocityFactorTimesDeltaTime;
+	s.Part0[1] = posY + deltaY * velocityFactorTimesDeltaTime;
+	s.Part0[2] = posZ + deltaZ * velocityFactorTimesDeltaTime;
+	
+	// Update color
+	s.Part1[0] += deltaColorR * deltaTime;
+	s.Part1[1] += deltaColorG * deltaTime;
+	s.Part1[2] += deltaColorB * deltaTime;
+	s.Part1[3] += deltaColorA * deltaTime;
+
+	// Update scale
+	s.Part2[0] += deltaScaleX * deltaTime;
+	s.Part2[1] += deltaScaleY * deltaTime;
+	
+	// Update rotation
+	if (rotatedForward == 0) {
+		float rotationSpeed = deltaRotation + rotationAcc * deltaTime;
+		u.Part5[3] = rotationSpeed;
+		s.Part0[3] += rotationSpeed * deltaTime;
+	} else {
+		if (deltaX != 0 || deltaY != 0) {
+			float rotation = atan(deltaY, deltaX);
+			s.Part0[3] = -(rotation * 180.0 / M_PI) + 90;
+		}		
+	}
+	
+	// Update buffers if still alive
+	if(s.Part2[2] <= u.Part1[0]) {
+		uint newIndex = atomicCounterIncrement(atomicCounter);
+		renderOutput[newIndex] = s;
+		updateOutput[newIndex] = u;
+	}
+}

@@ -1,0 +1,32 @@
+#version 130
+
+in vec4 color;
+in vec2 textureCoordinate;
+
+flat in int alphaMapCols;
+flat in int alphaMapRows;
+
+out vec4 fragColor;
+
+uniform sampler2D texImage;
+
+float getAlpha(float u0, float v0) {
+	
+	float colWidth = 1.0 / alphaMapCols;
+	float rowHeight = 1.0 / alphaMapRows;
+
+	float u1 = u0 * alphaMapCols - int(u0 * alphaMapCols);
+	float v1 = v0 * alphaMapRows - int(v0 * alphaMapRows);
+
+	// Interpolate alpha between the four corners of current cell 
+	float alphaUL = texture(texImage, vec2(u0, v0))[0] * (1-u1) * (1-v1);
+	float alphaUR = texture(texImage, vec2(u0+colWidth, v0))[0] * u1 * (1-v1);
+	float alphaLR = texture(texImage, vec2(u0+colWidth, v0+rowHeight))[0] * u1 * v1;
+	float alphaLL = texture(texImage, vec2(u0, v0+rowHeight))[0] * (1-u1) * v1;
+	return 1 - (alphaUL + alphaUR + alphaLR + alphaLL);
+}
+
+void main() {
+	float alpha = color[3] * getAlpha(textureCoordinate[0], textureCoordinate[1]);
+	fragColor = vec4(color[0], color[1], color[2], alpha);
+}

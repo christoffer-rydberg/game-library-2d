@@ -1,0 +1,26 @@
+#version 420
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform float alpha;
+uniform vec4 colorFactor;
+
+in layout (location = 0) vec2 position;
+
+out vData
+{
+    vec4 color;
+} outputData;
+
+void main()
+{
+	mat4 mvp = projection * view * model;
+	gl_Position = mvp * vec4(position.x, position.y, 0.0, 1.0);
+	outputData.color = vec4(
+	    colorFactor[0],
+	    colorFactor[1],
+	    colorFactor[2],
+	    colorFactor[3] * alpha);
+}

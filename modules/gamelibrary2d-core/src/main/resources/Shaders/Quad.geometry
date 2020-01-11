@@ -1,0 +1,57 @@
+#version 430 core
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 4) out;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform vec4 bounds;
+
+in vData
+{
+	vec4 color;
+} inputData[];
+
+out vData
+{
+    vec4 color;
+	vec2 vertexCoordinate;
+} outputData;
+
+void main(void)
+{
+    mat4 mvp = projection * view * model;
+
+    int i = 0;
+    for (i = 0; i < gl_in.length(); i++)
+    {
+	    vec4 lowerLeft = mvp * vec4(bounds[0], bounds[1], 0.0, 0.0);
+	    vec4 lowerRight = mvp * vec4(bounds[2], bounds[1], 0.0, 0.0);
+	    vec4 upperLeft = mvp * vec4(bounds[0], bounds[3], 0.0, 0.0);
+	    vec4 upperRight = mvp * vec4(bounds[2], bounds[3], 0.0, 0.0);
+
+		gl_Position = gl_in[i].gl_Position + lowerLeft;
+		outputData.color = inputData[i].color;
+        outputData.vertexCoordinate = vec2(0, 0);
+        EmitVertex();
+
+		gl_Position = gl_in[i].gl_Position + lowerRight;
+		outputData.color = inputData[i].color;
+        outputData.vertexCoordinate = vec2(1, 0);
+        EmitVertex();
+
+        gl_Position = gl_in[i].gl_Position + upperLeft;
+        outputData.color = inputData[i].color;
+        outputData.vertexCoordinate = vec2(0, 1);
+        EmitVertex();
+
+		gl_Position = gl_in[i].gl_Position + upperRight;
+		outputData.color = inputData[i].color;
+        outputData.vertexCoordinate = vec2(1, 1);
+        EmitVertex();
+
+        EndPrimitive();
+    }
+}

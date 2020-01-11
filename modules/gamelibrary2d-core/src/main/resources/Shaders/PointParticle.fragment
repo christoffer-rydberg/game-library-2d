@@ -1,0 +1,10 @@
+#version 420
+
+in vec4 particleColor;
+out vec4 fragColor;
+
+uniform sampler2D texImage;
+
+void main() {
+	fragColor = particleColor;
+}

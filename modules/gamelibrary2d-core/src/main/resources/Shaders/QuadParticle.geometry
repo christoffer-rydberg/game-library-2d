@@ -1,0 +1,92 @@
+#version 430 core
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 4) out;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+#define M_PI 3.1415926535897932384626433832795
+
+uniform vec4 bounds;
+
+in vData
+{
+	vec4 color;
+    vec2 scale;
+    float rotation;
+} inputData[];
+
+out vData
+{
+    vec4 color;
+	vec2 vertexCoordinate;
+} outputData;
+
+void main(void)
+{
+    int i = 0;
+    int points = 0;
+    
+    mat4 mvp = projection * view * model;
+
+    for ( i = 0; i < gl_in.length(); i++)
+    {
+    	float scaledXMin = bounds[0] * inputData[i].scale.x;
+    	float scaledYMin = bounds[1] * inputData[i].scale.y;
+    	float scaledXMax = bounds[2] * inputData[i].scale.x;
+    	float scaledYMax = bounds[3] * inputData[i].scale.y;
+    	
+    	float rotationRadians = inputData[i].rotation * M_PI / 180.0;
+	    float sinRotation = sin(rotationRadians);
+		float cosRotation = cos(rotationRadians);
+		
+		float scaledXMinTimesCos = scaledXMin * cosRotation;
+		float scaledXMinTimesSin = scaledXMin * sinRotation;
+		float scaledYMinTimesCos = scaledYMin * cosRotation;
+		float scaledYMinTimesSin = scaledYMin * sinRotation;
+		float scaledXMaxTimesCos = scaledXMax * cosRotation;
+		float scaledXMaxTimesSin = scaledXMax * sinRotation;
+		float scaledYMaxTimesCos = scaledYMax * cosRotation;
+		float scaledYMaxTimesSin = scaledYMax * sinRotation;
+		
+    	float rotatedLowerLeftX = scaledXMinTimesCos + scaledYMinTimesSin;
+    	float rotatedLowerLeftY = -scaledXMinTimesSin + scaledYMinTimesCos;
+	    vec4 lowerLeft = mvp * vec4(rotatedLowerLeftX, rotatedLowerLeftY, 0.0, 0.0);
+	    
+	    float rotatedLowerRightX = scaledXMaxTimesCos + scaledYMinTimesSin;
+    	float rotatedLowerRightY = -scaledXMaxTimesSin + scaledYMinTimesCos;
+		vec4 lowerRight = mvp * vec4(rotatedLowerRightX, rotatedLowerRightY, 0.0, 0.0);
+		
+		float rotatedUpperLeftX = scaledXMinTimesCos + scaledYMaxTimesSin;
+    	float rotatedUpperLeftY = -scaledXMinTimesSin + scaledYMaxTimesCos;
+		vec4 upperLeft = mvp * vec4(rotatedUpperLeftX, rotatedUpperLeftY, 0.0, 0.0);
+		
+		float rotatedUpperRightX = scaledXMaxTimesCos + scaledYMaxTimesSin;
+    	float rotatedUpperRightY = -scaledXMaxTimesSin + scaledYMaxTimesCos;
+		vec4 upperRight = mvp * vec4(rotatedUpperRightX, rotatedUpperRightY, 0.0, 0.0);
+    
+		gl_Position = gl_in[i].gl_Position + lowerLeft;
+		outputData.color = inputData[i].color;
+		outputData.vertexCoordinate = vec2(0, 0);
+        EmitVertex();
+
+		gl_Position = gl_in[i].gl_Position + lowerRight;
+		outputData.color = inputData[i].color;
+		outputData.vertexCoordinate = vec2(1, 0);
+        EmitVertex();
+
+        gl_Position = gl_in[i].gl_Position + upperLeft;
+		outputData.color = inputData[i].color;
+		outputData.vertexCoordinate = vec2(0, 1);
+        EmitVertex();
+
+		gl_Position = gl_in[i].gl_Position + upperRight;
+		outputData.color = inputData[i].color;
+		outputData.vertexCoordinate = vec2(1, 1);
+        EmitVertex();
+
+        EndPrimitive();
+    }
+}
