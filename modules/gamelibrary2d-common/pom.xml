@@ -6,7 +6,7 @@
 
     <groupId>com.gamelibrary2d</groupId>
     <artifactId>gamelibrary2d-common</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -27,4 +27,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub christoffer-rydberg Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/christoffer-rydberg/game-library-2d</url>
+        </repository>
+    </distributionManagement>
+
 </project>
