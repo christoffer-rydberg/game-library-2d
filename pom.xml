@@ -10,22 +10,22 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>modules/gamelibrary2d-common</module>
-	  <module>modules/gamelibrary2d-collision</module>
-	  <module>modules/gamelibrary2d-framework</module>
-	  <module>modules/gamelibrary2d-framework-lwjgl</module>
-	  <module>modules/gamelibrary2d-core</module>
-	  <module>modules/gamelibrary2d-network-common</module>
-	  <module>modules/gamelibrary2d-network</module>
-	  <module>modules/gamelibrary2d-sound</module>
-	  <module>modules/gamelibrary2d-util</module>
-	  <module>tools/gamelibrary2d-tools-particlegenerator</module>
-	  <module>demo/gamelibrary2d-demo-gifviewer</module>
-    <module>demo/gamelibrary2d-demo-shaderparticlesystem</module>
-	  <module>demo/gamelibrary2d-demo-transparentwindow</module>
-	  <module>demo/gamelibrary2d-demo-clientserver</module>
-	  <module>demo/gamelibrary2d-demo-lightning</module>
-	  <module>demo/gamelibrary2d-demo-splitscreen</module>
+      <module>api/gamelibrary2d-common</module>
+	  <module>api/gamelibrary2d-collision</module>
+	  <module>api/gamelibrary2d-framework</module>
+	  <module>api/gamelibrary2d-framework-lwjgl</module>
+	  <module>api/gamelibrary2d-core</module>
+	  <module>api/gamelibrary2d-network-common</module>
+	  <module>api/gamelibrary2d-network</module>
+	  <module>api/gamelibrary2d-sound</module>
+	  <module>api/gamelibrary2d-util</module>
+	  <module>tools/particle-generator</module>
+	  <module>demos/gif-viewer-demo</module>
+	  <module>demos/shader-particle-system-demo</module>
+	  <module>demos/transparent-window-demo</module>
+	  <module>demos/client-server-demo</module>
+	  <module>demos/lightning-demo</module>
+	  <module>demos/split-screen-demo</module>
   </modules>
 
 </project>
