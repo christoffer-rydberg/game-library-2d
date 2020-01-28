@@ -19,28 +19,30 @@ public class DefaultEventPublisher<T> implements EventPublisher<T> {
     }
 
     @Override
-    public boolean publish(T event) {
+    public void publish(T event) {
         int size = listeners != null ? listeners.size() : 0;
-        if (size == 0)
-            return false;
-        populateIterationListIfEmpty();
-        for (int i = 0; i < size; ++i)
-            iterationList.get(i).onEvent(event);
-        return true;
+        if (size > 0) {
+            populateIterationListIfEmpty();
+            for (int i = 0; i < size; ++i)
+                iterationList.get(i).onEvent(event);
+        }
     }
 
     @Override
     public void addListener(EventListener<T> listener) {
         allocateListenersIfNull();
-        listeners.add(listener);
-        clearIterationList();
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+            clearIterationList();
+        }
     }
 
     @Override
     public void removeListener(EventListener<T> listener) {
-        allocateListenersIfNull();
-        listeners.remove(listener);
-        clearIterationList();
+        if (listeners != null) {
+            listeners.remove(listener);
+            clearIterationList();
+        }
     }
 
     private void allocateListenersIfNull() {

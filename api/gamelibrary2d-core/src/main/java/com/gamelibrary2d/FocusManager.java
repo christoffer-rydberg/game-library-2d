@@ -1,9 +1,10 @@
 package com.gamelibrary2d;
 
+import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.eventlisteners.FocusChangedListener;
-import com.gamelibrary2d.objects.Container;
-import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.objects.KeyAware;
+import com.gamelibrary2d.markers.Focusable;
+import com.gamelibrary2d.markers.KeyAware;
+import com.gamelibrary2d.markers.Parent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,37 +12,18 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The purpose of this class is to keep track of all focused objects. It
- * contains methods to focus or unfocus objects, and events when this happens.
- * All focused objects will be notified of keyboard events. Mouse events,
- * however, are unrelated to focus. They are typically routed to the concerned
- * objects by the holding containers. Nevertheless, focused objects will be
- * notified when a mouse button event has finished so that it, for example, can
- * unfocus itself.
+ * Used to focus or unfocus {@link Focusable} objects and route keyboard events to all focused objects implementing {@link KeyAware}.
  *
  * @author Christoffer Rydberg
  */
 public class FocusManager {
 
-    /**
-     * All focused objects. This list should never be exposed outside this class.
-     */
-    private static final List<KeyAware> focusedObjects = new ArrayList<>();
+    private static final List<Focusable> focusedObjects = new ArrayList<>();
 
-    /**
-     * Used when iterating during input events. This object can be reused since the
-     * mouse/keyboard methods are always called sequentially from the main thread.
-     */
-    private static final List<KeyAware> focusedObjectsIteration = new ArrayList<>();
+    private static final List<Focusable> iterationList = new ArrayList<>();
 
-    /**
-     * Used as return value so that the original list is not exposed.
-     */
-    private static final List<KeyAware> focusedObjectsReadonly = Collections.unmodifiableList(focusedObjects);
+    private static final List<Focusable> readOnlyList = Collections.unmodifiableList(focusedObjects);
 
-    /**
-     * Listeners for focus changes.
-     */
     private static final List<FocusChangedListener> focusChangedListeners = new CopyOnWriteArrayList<>();
 
     /**
@@ -50,19 +32,17 @@ public class FocusManager {
      * @param obj     The object to focus.
      * @param replace If true, old focus will be cleared.
      */
-    public static void focus(KeyAware obj, boolean replace) {
+    public static void focus(Focusable obj, boolean replace) {
+        if (replace) {
+            replaceFocus(obj);
+        }
 
-        if (replace)
-            clearFocus();
-
-        if (!obj.isFocused()) {
-            // Focus the object first. Doing this will call this method again
-            // (if the focus is accepted). Wait until then to add it to the list of
-            // focused objects.
-            obj.setFocused(true);
-        } else if (!focusedObjects.contains(obj)) {
+        if (!focusedObjects.contains(obj)) {
             focusedObjects.add(obj);
+            obj.setFocused(true);
             raiseFocusChangedEvent(obj, true);
+        } else {
+            obj.setFocused(true);
         }
     }
 
@@ -70,33 +50,35 @@ public class FocusManager {
      * Unfocuses the specified object and optionally all child objects.
      *
      * @param obj       The object to unfocus.
-     * @param recursive If is set to true and the object is of type Container, all child
-     *                  objects will also be unfocused. Likewise, if a child object is of
-     *                  type Container, the child objects of that object will be
+     * @param recursive If is set to true and the object is a {@link Parent} all child
+     *                  objects will also be unfocused. Likewise, if a child object is a
+     *                  {@link Parent}, the child objects of that object will be
      *                  unfocused, and so on.
      */
-    public static void unfocus(KeyAware obj, boolean recursive) {
+    public static void unfocus(Object obj, boolean recursive) {
+        if (obj instanceof Focusable) {
+            var focusable = (Focusable) obj;
 
-        if (obj.isFocused()) {
-            // Unfocus the object first. Doing this will call this method again
-            // (if the unfocus is accepted). Wait until then to add it to the list of
-            // focused objects.
-            obj.setFocused(false);
-        } else if (focusedObjects.remove(obj)) {
-            raiseFocusChangedEvent(obj, false);
+            var focused = focusable.isFocused();
+            var removed = focusedObjects.remove(obj);
+
+            if (focused) {
+                focusable.setFocused(false);
+            }
+
+            if (removed) {
+                raiseFocusChangedEvent(focusable, false);
+            }
         }
 
-        if (recursive && obj instanceof Container) {
-            unfocus((Container<?>) obj);
+        if (recursive && obj instanceof Parent) {
+            unfocus((Parent<?>) obj);
         }
     }
 
-    private static void unfocus(Container<?> container) {
-        var objects = container.getObjects();
-        for (int i = 0; i < objects.size(); ++i) {
-            GameObject obj = objects.get(i);
-            if (obj instanceof KeyAware)
-                unfocus((KeyAware) obj, true);
+    private static void unfocus(Parent<?> parent) {
+        for (Object child : parent.getChildren()) {
+            unfocus(child, true);
         }
     }
 
@@ -104,66 +86,93 @@ public class FocusManager {
      * @return Read-only list of all focused objects. This list is automatically
      * updated when focus changes.
      */
-    public static List<KeyAware> getFocusedObjects() {
-        return focusedObjectsReadonly;
+    public static List<Focusable> getFocusedObjects() {
+        return readOnlyList;
     }
 
     /**
      * Unfocus all objects.
      */
     public static void clearFocus() {
-        List<KeyAware> focused = new ArrayList<>(focusedObjects.size());
+        List<Focusable> focused = new ArrayList<>(focusedObjects.size());
         focused.addAll(focusedObjects);
         for (int i = 0; i < focused.size(); ++i) {
             unfocus(focused.get(i), false);
         }
     }
 
+    private static void replaceFocus(Focusable obj) {
+        List<Focusable> focused = new ArrayList<>(focusedObjects.size());
+        focused.addAll(focusedObjects);
+        for (int i = 0; i < focused.size(); ++i) {
+            var focusedObject = focused.get(i);
+            if (focusedObject != obj) {
+                unfocus(focused.get(i), false);
+            }
+        }
+    }
+
     static void keyDownEvent(int key, int scanCode, boolean repeat, int mods) {
         try {
-            focusedObjectsIteration.addAll(focusedObjects);
-            for (int i = 0; i < focusedObjectsIteration.size(); ++i) {
-                KeyAware obj = focusedObjectsIteration.get(i);
-                obj.keyDownEvent(key, scanCode, repeat, mods);
+            iterationList.addAll(focusedObjects);
+            for (int i = 0; i < iterationList.size(); ++i) {
+                Focusable obj = iterationList.get(i);
+                failIfUnfocusedButNotRemoved(obj);
+                if (obj instanceof KeyAware) {
+                    ((KeyAware) obj).keyDownEvent(key, scanCode, repeat, mods);
+                }
             }
         } finally {
-            focusedObjectsIteration.clear();
+            iterationList.clear();
         }
     }
 
     static void keyReleaseEvent(int key, int scanCode, int mods) {
         try {
-            focusedObjectsIteration.addAll(focusedObjects);
-            for (int i = 0; i < focusedObjectsIteration.size(); ++i) {
-                KeyAware obj = focusedObjectsIteration.get(i);
-                obj.keyReleaseEvent(key, scanCode, mods);
+            iterationList.addAll(focusedObjects);
+            for (int i = 0; i < iterationList.size(); ++i) {
+                var obj = iterationList.get(i);
+                failIfUnfocusedButNotRemoved(obj);
+                if (obj instanceof KeyAware) {
+                    ((KeyAware) obj).keyReleaseEvent(key, scanCode, mods);
+                }
             }
         } finally {
-            focusedObjectsIteration.clear();
+            iterationList.clear();
         }
     }
 
     static void charInputEvent(char charInput) {
         try {
-            focusedObjectsIteration.addAll(focusedObjects);
-            for (int i = 0; i < focusedObjectsIteration.size(); ++i) {
-                KeyAware obj = focusedObjectsIteration.get(i);
-                obj.charInputEvent(charInput);
+            iterationList.addAll(focusedObjects);
+            for (int i = 0; i < iterationList.size(); ++i) {
+                Focusable obj = iterationList.get(i);
+                failIfUnfocusedButNotRemoved(obj);
+                if (obj instanceof KeyAware) {
+                    ((KeyAware) obj).charInputEvent(charInput);
+                }
             }
         } finally {
-            focusedObjectsIteration.clear();
+            iterationList.clear();
         }
     }
 
     static void mouseButtonEventFinished(int button, int action, int mods) {
         try {
-            focusedObjectsIteration.addAll(focusedObjects);
-            for (int i = 0; i < focusedObjectsIteration.size(); ++i) {
-                KeyAware obj = focusedObjectsIteration.get(i);
-                obj.mouseEventFinished(button, action, mods);
+            iterationList.addAll(focusedObjects);
+            for (int i = 0; i < iterationList.size(); ++i) {
+                Focusable obj = iterationList.get(i);
+                failIfUnfocusedButNotRemoved(obj);
+                obj.mouseButtonEventFinished(button, action, mods);
             }
         } finally {
-            focusedObjectsIteration.clear();
+            iterationList.clear();
+        }
+    }
+
+    private static void failIfUnfocusedButNotRemoved(Focusable obj) {
+        if (!obj.isFocused() && focusedObjects.contains(obj)) {
+            throw new GameLibrary2DRuntimeException("Object must be unfocused using the FocusManager");
         }
     }
 
@@ -175,7 +184,7 @@ public class FocusManager {
         focusChangedListeners.remove(listener);
     }
 
-    private static void raiseFocusChangedEvent(KeyAware obj, boolean focused) {
+    private static void raiseFocusChangedEvent(Focusable obj, boolean focused) {
         for (FocusChangedListener listener : focusChangedListeners) {
             listener.onFocusChanged(obj, focused);
         }

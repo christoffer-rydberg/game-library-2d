@@ -3,7 +3,7 @@ package com.gamelibrary2d.objects;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.renderers.Renderer;
 
-public abstract class Slider extends AbstractInputObject {
+public abstract class Slider extends AbstractFocusableObject {
 
     private final InteractiveObject lever;
 
@@ -91,7 +91,6 @@ public abstract class Slider extends AbstractInputObject {
 
     @Override
     protected boolean onMouseClickEvent(int button, int mods, float projectedX, float projectedY) {
-
         if (lever.mouseButtonDownEvent(button, mods, projectedX, projectedY)) {
             onDragStart(projectedX, projectedY);
             return true;
@@ -128,7 +127,6 @@ public abstract class Slider extends AbstractInputObject {
     }
 
     public void setValue(float valueX, float valueY, boolean triggerSliderValueChanged) {
-
         valueX = horizontalSlider ? getValueWithinInterval(valueX, minValueX, maxValueX) : 0;
         valueY = verticalSlider ? getValueWithinInterval(valueY, minValueY, maxValueY) : 0;
         float posX = getActualValue(valueX, minValueX, maxValueX, bounds.getXMin(), bounds.getXMax());
@@ -171,7 +169,7 @@ public abstract class Slider extends AbstractInputObject {
     }
 
     @Override
-    protected void onRender(float alpha) {
+    protected void onRenderProjected(float alpha) {
         lever.render(alpha);
     }
 

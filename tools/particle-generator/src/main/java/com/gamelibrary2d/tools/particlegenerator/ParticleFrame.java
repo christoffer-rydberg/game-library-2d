@@ -1,9 +1,10 @@
 package com.gamelibrary2d.tools.particlegenerator;
 
 import com.gamelibrary2d.framework.Keyboard;
-import com.gamelibrary2d.objects.AbstractFrame;
-import com.gamelibrary2d.objects.FrameLayer;
+import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.layers.*;
 import com.gamelibrary2d.particle.settings.SettingsExtensions;
+import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.*;
 import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSettingsPanel;
@@ -17,9 +18,9 @@ public class ParticleFrame extends AbstractFrame {
 
     private ParticleSystemModel particleSystem;
 
-    private FrameLayer screenLayer;
-    private FrameLayer worldLayer;
-    private FrameLayer backgroundLayer;
+    private Layer<Renderable> screenLayer;
+    private Layer<ParticleSystem> particleLayer;
+    private Layer<Renderable> backgroundLayer;
 
     private EmitterPanel emitterPanel;
 
@@ -45,14 +46,13 @@ public class ParticleFrame extends AbstractFrame {
 
     @Override
     protected void onPrepare() {
-
         particleSystem = ParticleSystemModel.create(this);
 
-        screenLayer = new FrameLayer();
-        worldLayer = new FrameLayer();
-        worldLayer.foregroundParticles().add(particleSystem.getDefaultParticleSystem());
-        worldLayer.foregroundParticles().add(particleSystem.getShaderParticleSystem());
-        backgroundLayer = new FrameLayer();
+        screenLayer = new BasicLayer<>();
+        particleLayer = new BasicLayer<>();
+        particleLayer.add(particleSystem.getDefaultParticleSystem());
+        particleLayer.add(particleSystem.getShaderParticleSystem());
+        backgroundLayer = new BasicLayer<>();
 
         particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
         particleSettingsPanel.getPosition().set(WINDOW_MARGIN, getGame().getWindow().getHeight() - WINDOW_MARGIN);
@@ -85,7 +85,7 @@ public class ParticleFrame extends AbstractFrame {
         PosX = getGame().getWindow().getWidth() / 2f;
         PosY = getGame().getWindow().getHeight() / 2f;
         add(backgroundLayer);
-        add(worldLayer);
+        add(particleLayer);
         add(screenLayer);
         screenLayer.add(particleSettingsPanel);
         screenLayer.add(spawnSettingsPanel);
@@ -109,14 +109,15 @@ public class ParticleFrame extends AbstractFrame {
 
     @Override
     protected void onUpdate(float deltaTime) {
+        super.onUpdate(deltaTime);
         if (emitterPanel.isLaunchingSequential()) {
             particleEmitterTime = particleSystem.emitSequential(PosX, PosY, 0, particleEmitterTime, deltaTime);
         }
     }
 
     @Override
-    protected boolean onMouseClickEvent(int button, int mods, float projectedX, float projectedY) {
-        if (!super.onMouseClickEvent(button, mods, projectedX, projectedY)) {
+    public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
+        if (!super.mouseButtonDownEvent(button, mods, projectedX, projectedY)) {
             if (dragging == -1) {
                 dragging = button;
                 PosX = projectedX;
@@ -131,8 +132,8 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    protected boolean onMouseMoveEvent(float projectedX, float projectedY, boolean drag) {
-        if (!super.onMouseMoveEvent(projectedX, projectedY, drag)) {
+    public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
+        if (!super.mouseMoveEvent(projectedX, projectedY, drag)) {
             if (dragging != -1) {
                 PosX = projectedX;
                 PosY = projectedY;
@@ -146,11 +147,11 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onMouseReleaseEvent(int button, int mods, float projectedX, float projectedY) {
-        super.onMouseReleaseEvent(button, mods, projectedX, projectedY);
+    public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
         if (button == dragging) {
             dragging = -1;
         }
+        return super.mouseButtonReleaseEvent(button, mods, projectedX, projectedY);
     }
 
     @Override

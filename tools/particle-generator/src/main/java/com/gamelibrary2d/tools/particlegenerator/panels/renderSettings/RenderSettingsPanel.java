@@ -9,7 +9,7 @@ import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.objects.Panel;
+import com.gamelibrary2d.layers.Panel;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.IterativeParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
@@ -207,7 +207,7 @@ public class RenderSettingsPanel extends StackPanel {
 
     private void updateQuad() {
 
-        int prevouslyRegistered = quadDisposer.size();
+        int prevouslyRegistered = quadDisposer.getResourceCount();
 
         quad = Quad.create(Rectangle.centered(width, height), quadDisposer);
 
@@ -386,7 +386,7 @@ public class RenderSettingsPanel extends StackPanel {
 
     private MouseReleaseListener getTextureMouseListener() {
         return (obj, button, mods, projectedX, projectedY) -> {
-            if (button == Mouse.instance().mouseButton1() && obj.isPixelVisible(projectedX, projectedY)) {
+            if (button == Mouse.instance().mouseButton1()) {
                 loadTexture((Button) obj, quad);
             }
         };
@@ -425,7 +425,7 @@ public class RenderSettingsPanel extends StackPanel {
 
             textureURL = url;
 
-            int prevouslyRegistered = rendererDisposer.size();
+            int prevouslyRegistered = rendererDisposer.getResourceCount();
 
             // TODO: When should renderer be set? Should this always be true??
             boolean setRenderer = true;// particleSystem.getEmitter().getIndividualRenderer() == texturedRenderer;

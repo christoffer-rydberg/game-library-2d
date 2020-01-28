@@ -8,7 +8,7 @@ import com.gamelibrary2d.exceptions.LoadInterruptedException;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.objects.AbstractFrame;
+import com.gamelibrary2d.layers.AbstractFrame;
 
 import java.io.IOException;
 import java.util.*;
@@ -164,9 +164,9 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
     }
 
     @Override
-    public void update(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         networkClient.update(deltaTime);
-        super.update(deltaTime);
+        super.onUpdate(deltaTime);
         var communicator = getCommunicator();
         try {
             communicator.sendOutgoing();

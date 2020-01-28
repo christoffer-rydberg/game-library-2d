@@ -62,17 +62,16 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void onUpdate(float deltaTime) {
         if (params.updateIfChanged()) {
             for (int i = 0; i < textBoxes.size(); ++i) {
                 textBoxes.get(i).setText(toString(params.getParameter(i)));
             }
         }
-        super.update(deltaTime);
+        super.onUpdate(deltaTime);
     }
 
     private void update(TextBox textBox) {
-
         try {
             params.setParameter(textBoxes.indexOf(textBox), fromString(textBox.getText()));
             params.updateSetting();

@@ -1,7 +1,7 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.objects.Frame;
+import com.gamelibrary2d.layers.Frame;
 
 import java.util.List;
 

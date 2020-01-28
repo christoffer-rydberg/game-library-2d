@@ -1,9 +1,11 @@
 package com.gamelibrary2d.demos.shaderparticlesystem;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.objects.AbstractFrame;
-import com.gamelibrary2d.objects.FrameLayer;
+import com.gamelibrary2d.layers.AbstractFrame;
+import com.gamelibrary2d.layers.LayerObject;
+import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.resources.Texture;
 
 import java.awt.image.BufferedImage;
@@ -11,7 +13,7 @@ import java.io.IOException;
 
 public class DemoFrame extends AbstractFrame {
 
-    private FrameLayer layer;
+    private LayerObject<Renderable> layer;
 
     DemoFrame(Game game) {
         super(game);
@@ -34,10 +36,10 @@ public class DemoFrame extends AbstractFrame {
             float scaleY = Math.min(1f, 0.5f * windowHeight / init.getHeight());
             float scale = Math.min(scaleX, scaleY);
 
-            layer = new FrameLayer();
+            layer = new DynamicLayer<>();
             layer.getScale().set(scale, scale);
             layer.getScaleAndRotationCenter().set(windowWidth / 2, windowHeight / 2);
-            layer.backgroundParticles().add(particleSystem);
+            layer.add(particleSystem);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -65,11 +67,6 @@ public class DemoFrame extends AbstractFrame {
     public void onEnd() {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    protected void onUpdate(float deltaTime) {
-        // TODO Auto-generated method stub
     }
 
     @Override

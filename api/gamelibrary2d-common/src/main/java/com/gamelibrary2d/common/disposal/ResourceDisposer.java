@@ -43,10 +43,9 @@ public class ResourceDisposer implements Disposable, Disposer {
     }
 
     /**
-     * Gets the size, i.e. the number of registered disposable resources.
+     * The number of registered disposable resources.
      */
-    @Override
-    public int size() {
+    public int getResourceCount() {
         return registeredResources.size();
     }
 

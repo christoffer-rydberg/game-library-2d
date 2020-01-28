@@ -1,7 +1,7 @@
 package com.gamelibrary2d.util.sound;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.objects.Frame;
+import com.gamelibrary2d.layers.Frame;
 import com.gamelibrary2d.sound.SoundBuffer;
 import com.gamelibrary2d.sound.SoundManager;
 import com.gamelibrary2d.sound.SoundSource;

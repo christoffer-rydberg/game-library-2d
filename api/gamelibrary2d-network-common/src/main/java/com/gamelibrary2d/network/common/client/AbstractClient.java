@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.common.updating.UpdateTarget;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public abstract class AbstractClient implements Updatable {
+public abstract class AbstractClient implements UpdateTarget {
 
     private final DataBuffer inbox;
     CommunicatorWrapper communicator = new CommunicatorWrapper();

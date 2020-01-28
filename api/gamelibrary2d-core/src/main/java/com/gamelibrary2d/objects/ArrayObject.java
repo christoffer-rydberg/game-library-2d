@@ -13,7 +13,7 @@ public class ArrayObject<T extends VertexArray> extends AbstractGameObject {
     }
 
     @Override
-    protected void onRender(float alpha) {
+    protected void onRenderProjected(float alpha) {
         renderer.render(alpha, array);
     }
 }

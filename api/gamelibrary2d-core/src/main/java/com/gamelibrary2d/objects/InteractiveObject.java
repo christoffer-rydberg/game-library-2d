@@ -82,7 +82,7 @@ public class InteractiveObject extends AbstractInteractiveObject {
     }
 
     @Override
-    protected void onRender(float alpha) {
+    protected void onRenderProjected(float alpha) {
         if (isFocused() && focusedRenderer != null) {
             focusedRenderer.render(alpha);
         } else if (renderer != null) {

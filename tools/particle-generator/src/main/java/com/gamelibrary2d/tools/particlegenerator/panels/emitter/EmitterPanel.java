@@ -3,7 +3,7 @@ package com.gamelibrary2d.tools.particlegenerator.panels.emitter;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
-import com.gamelibrary2d.objects.AbstractPanel;
+import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.rendering.HorizontalAlignment;
@@ -73,10 +73,8 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
     private class LaunchEventHandler implements MouseReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods,
-                                   float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+            if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY, 0);
             }
         }
@@ -87,8 +85,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods,
                                    float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 launchSequentialButton.setToggled(!launchSequentialButton.isToggled());
             }
         }
@@ -99,8 +96,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods,
                                    float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY, 0);
             }
         }

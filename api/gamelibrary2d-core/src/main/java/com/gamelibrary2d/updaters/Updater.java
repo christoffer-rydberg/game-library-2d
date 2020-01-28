@@ -1,6 +1,6 @@
 package com.gamelibrary2d.updaters;
 
-import com.gamelibrary2d.objects.Frame;
+import com.gamelibrary2d.layers.Frame;
 import com.gamelibrary2d.updates.Update;
 
 /**

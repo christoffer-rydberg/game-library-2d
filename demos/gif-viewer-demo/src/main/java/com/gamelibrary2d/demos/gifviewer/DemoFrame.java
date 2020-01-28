@@ -6,8 +6,8 @@ import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.objects.AbstractFrame;
-import com.gamelibrary2d.objects.AnimatedObject;
+import com.gamelibrary2d.layers.AbstractFrame;
+import com.gamelibrary2d.animation.AnimatedObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.objects.TextObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
@@ -62,11 +62,6 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     public void onEnd() {
-
-    }
-
-    @Override
-    protected void onUpdate(float deltaTime) {
 
     }
 

@@ -1,7 +1,7 @@
 package com.gamelibrary2d.particle;
 
 import com.gamelibrary2d.common.Point;
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 
 public class SequentialParticleEmitter implements Updatable {

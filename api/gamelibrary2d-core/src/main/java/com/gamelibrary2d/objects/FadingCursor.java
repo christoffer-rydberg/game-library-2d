@@ -1,7 +1,7 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.renderers.Renderer;
 
 public class FadingCursor extends AbstractCursor implements Updatable {
@@ -72,7 +72,13 @@ public class FadingCursor extends AbstractCursor implements Updatable {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public final void update(float deltaTime) {
+        if (isEnabled()) {
+            onUpdate(deltaTime);
+        }
+    }
+
+    protected void onUpdate(float deltaTime) {
         if (visibilityTimer > 0) {
             visibilityTimer -= deltaTime;
             if (isHidden()) {

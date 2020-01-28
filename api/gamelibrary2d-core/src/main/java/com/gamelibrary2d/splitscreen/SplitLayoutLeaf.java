@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.ResourceContainer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.objects.AreaRenderer;
+import com.gamelibrary2d.renderers.AreaRenderer;
 import com.gamelibrary2d.objects.GameObject;
 
 public class SplitLayoutLeaf<T> implements SplitLayout {

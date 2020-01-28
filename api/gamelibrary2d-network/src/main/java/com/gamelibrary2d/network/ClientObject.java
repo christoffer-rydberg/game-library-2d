@@ -1,6 +1,6 @@
 package com.gamelibrary2d.network;
 
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.GameObject;
 
 public interface ClientObject extends GameObject, Updatable {

@@ -2,11 +2,11 @@ package com.gamelibrary2d.demos.lightning;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.layers.AbstractFrame;
+import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.lightning.*;
-import com.gamelibrary2d.objects.AbstractFrame;
-import com.gamelibrary2d.objects.BasicObject;
-import com.gamelibrary2d.objects.FrameLayer;
+import com.gamelibrary2d.objects.BasicGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
@@ -38,7 +38,7 @@ class DemoFrame extends AbstractFrame {
     private GameObject createBackground(Window window) throws IOException {
         var bounds = Rectangle.fromBottomLeft(window.getWidth(), window.getHeight());
         var renderer = createRenderer(bounds, "background.jpg");
-        return new BasicObject(renderer);
+        return new BasicGameObject(renderer);
     }
 
     private GameObject createTorch(DefaultParticleSystem particleSystem, DefaultDynamicLightMap lightMap) throws IOException {
@@ -65,12 +65,16 @@ class DemoFrame extends AbstractFrame {
             var window = getGame().getWindow();
             var particleSystem = createParticleSystem();
             var lightMap = new DefaultDynamicLightMap(new DefaultLightSpreadMatrix(20));
-            var frameLayer = new FrameLayer();
-            frameLayer.add(createBackground(window));
+            var frameLayer = new DynamicLayer<>();
+            frameLayer.getBackground().add(createBackground(window));
             frameLayer.add(createTorch(particleSystem, lightMap));
-            frameLayer.foregroundParticles().add(particleSystem);
+            frameLayer.getForeground().add(particleSystem);
             var lightRenderer = createLightRenderer(window, lightMap);
-            frameLayer.setLightRenderer(lightRenderer, lightRenderer::apply, lightRenderer::reset);
+            frameLayer.setOverlay(alpha -> {
+                lightRenderer.apply();
+                lightRenderer.render(alpha);
+                lightRenderer.reset();
+            });
             add(frameLayer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,11 +98,6 @@ class DemoFrame extends AbstractFrame {
 
     @Override
     public void onEnd() {
-
-    }
-
-    @Override
-    protected void onUpdate(float deltaTime) {
 
     }
 

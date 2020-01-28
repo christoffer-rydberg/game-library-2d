@@ -1,6 +1,7 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.renderers.Renderer;
 
 public abstract class AbstractCursor extends AbstractGameObject implements MouseAware {
@@ -19,7 +20,7 @@ public abstract class AbstractCursor extends AbstractGameObject implements Mouse
     }
 
     @Override
-    protected void onRender(float alpha) {
+    protected void onRenderProjected(float alpha) {
         if (game.hasCursorFocus() && renderer != null) {
             renderer.render(alpha);
         }
@@ -35,24 +36,20 @@ public abstract class AbstractCursor extends AbstractGameObject implements Mouse
 
     @Override
     public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
-        if (isEnabled())
-            onInteracted();
+        onInteracted();
         return false;
     }
 
     @Override
     public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
-        if (isEnabled()) {
-            onInteracted();
-            getPosition().set(projectedX, projectedY);
-        }
+        getPosition().set(projectedX, projectedY);
+        onInteracted();
         return false;
     }
 
     @Override
     public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
-        if (isEnabled())
-            onInteracted();
+        onInteracted();
         return false;
     }
 

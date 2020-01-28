@@ -4,9 +4,10 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.ResourceDisposer;
 import com.gamelibrary2d.objects.AbstractWrapperObject;
+import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.objects.GameObject;
 
-public class SplitLayer<T extends GameObject> extends AbstractWrapperObject<T> {
+public class SplitLayer<T extends GameObject> extends AbstractWrapperObject<T> implements Clearable {
     private final Rectangle renderArea;
     private final Disposer layoutDisposer;
     private SplitLayout layout;
@@ -44,7 +45,19 @@ public class SplitLayer<T extends GameObject> extends AbstractWrapperObject<T> {
     }
 
     @Override
-    public boolean isPixelVisible(float x, float y) {
-        return false; // TODO: Handle hit detection
+    public void clear() {
+        var wrapped = getWrapped();
+        if (wrapped instanceof Clearable) {
+            ((Clearable) wrapped).clear();
+        }
+    }
+
+    @Override
+    public boolean isAutoClearing() {
+        var wrapped = getWrapped();
+        if (wrapped instanceof Clearable) {
+            return ((Clearable) wrapped).isAutoClearing();
+        }
+        return false;
     }
 }

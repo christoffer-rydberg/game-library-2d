@@ -2,13 +2,13 @@ package com.gamelibrary2d.common.updating;
 
 public class UpdateLoop {
 
-    private Updatable updateTarget;
+    private UpdateTarget updateTarget;
     private double ups;
     private Timer timer;
 
     private boolean running;
 
-    public UpdateLoop(Updatable updateTarget, int ups) {
+    public UpdateLoop(UpdateTarget updateTarget, int ups) {
         this.updateTarget = updateTarget;
         this.ups = ups;
         timer = new Timer();

@@ -11,9 +11,9 @@ import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.objects.Frame;
-import com.gamelibrary2d.objects.FrameDisposal;
-import com.gamelibrary2d.objects.LoadingFrame;
+import com.gamelibrary2d.layers.Frame;
+import com.gamelibrary2d.layers.FrameDisposal;
+import com.gamelibrary2d.layers.LoadingFrame;
 import com.gamelibrary2d.resources.Shader;
 
 import java.util.ArrayDeque;
@@ -393,10 +393,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         if (!frame.isFinished()) {
             frame.finish();
         } else {
-            if (frame.isEnabled()) {
-                frame.update(frameNotUpdated ? 0 : deltaTime);
-                frameNotUpdated = false;
-            }
+            frame.update(frameNotUpdated ? 0 : deltaTime);
+            frameNotUpdated = false;
         }
     }
 

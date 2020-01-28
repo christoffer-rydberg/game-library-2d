@@ -1,7 +1,7 @@
 package com.gamelibrary2d.eventlisteners;
 
-import com.gamelibrary2d.objects.KeyAware;
+import com.gamelibrary2d.markers.Focusable;
 
 public interface FocusChangedListener {
-    void onFocusChanged(KeyAware object, boolean focused);
+    void onFocusChanged(Focusable object, boolean focused);
 }

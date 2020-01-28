@@ -4,7 +4,11 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.objects.*;
+import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.layers.*;
+import com.gamelibrary2d.objects.ArrayObject;
+import com.gamelibrary2d.objects.BasicGameObject;
+import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.QuadArrayRenderer;
 import com.gamelibrary2d.renderers.QuadShape;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
@@ -20,9 +24,9 @@ import java.util.ArrayList;
 
 class DemoFrame extends AbstractFrame {
     private final Rectangle gameBounds = new Rectangle(0, 0, 4000, 4000);
-    private SplitLayer<FrameLayer> splitLayer;
-    private GameObject background;
-    private FrameLayer viewLayer;
+    private Renderable background;
+    private SplitLayer<GameObject> splitLayer;
+    private DynamicLayer<Renderable> viewLayer;
     private ArrayList<SpaceCraft> spaceCrafts;
 
     DemoFrame(Game game) {
@@ -100,15 +104,15 @@ class DemoFrame extends AbstractFrame {
         return new SplitLayoutLeaf<>(viewLayer, this::prepareView, spaceCraft);
     }
 
-    private BasicObject createBackgroundColor(Color color) {
+    private BasicGameObject createBackgroundColor(Color color) {
         var quad = Quad.create(gameBounds, this);
         var renderer = new SurfaceRenderer(quad);
         renderer.updateSettings(RenderSettings.COLOR_R, color.getR(), color.getG(), color.getB(), color.getA());
-        return new BasicObject(renderer);
+        return new BasicGameObject(renderer);
     }
 
-    private GameObject createBackground() {
-        var backgroundLayer = new FrameLayer();
+    private Renderable createBackground() {
+        var backgroundLayer = new BasicLayer<>();
         backgroundLayer.setAutoClearing(false);
         backgroundLayer.add(createBackgroundColor(Color.BLACK));
         backgroundLayer.add(createStars(Math.round(gameBounds.getArea() * 0.0001f)));
@@ -119,7 +123,7 @@ class DemoFrame extends AbstractFrame {
     protected void onPrepare() {
         try {
             var window = getGame().getWindow();
-            viewLayer = new FrameLayer();
+            viewLayer = new DynamicLayer<>();
             background = createBackground();
             spaceCrafts = createSpaceCrafts(3);
             var viewArea = Rectangle.fromBottomLeft(window.getWidth(), window.getHeight());
@@ -131,7 +135,7 @@ class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onLoad() {
-        viewLayer.add(background);
+        viewLayer.getBackground().add(background);
         for (var spaceCraft : spaceCrafts)
             viewLayer.add(spaceCraft);
         splitLayer.setTarget(viewLayer);
@@ -150,11 +154,6 @@ class DemoFrame extends AbstractFrame {
 
     @Override
     public void onEnd() {
-
-    }
-
-    @Override
-    protected void onUpdate(float deltaTime) {
 
     }
 

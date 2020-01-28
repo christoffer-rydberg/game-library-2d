@@ -19,7 +19,6 @@ class InternalGameLoop {
     }
 
     public void start(Action onStart) {
-
         running = true;
 
         timer.init();

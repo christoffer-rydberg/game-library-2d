@@ -3,8 +3,8 @@ package com.gamelibrary2d.tools.particlegenerator;
 import com.gamelibrary2d.AbstractGame;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
-import com.gamelibrary2d.objects.Frame;
-import com.gamelibrary2d.objects.FrameDisposal;
+import com.gamelibrary2d.layers.Frame;
+import com.gamelibrary2d.layers.FrameDisposal;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
 
 public class ParticleGenerator extends AbstractGame {

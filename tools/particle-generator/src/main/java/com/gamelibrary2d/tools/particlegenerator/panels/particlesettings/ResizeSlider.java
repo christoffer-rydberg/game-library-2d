@@ -44,11 +44,6 @@ public class ResizeSlider extends Slider {
     }
 
     @Override
-    public void render(float alpha) {
-        super.render(alpha);
-    }
-
-    @Override
     protected void onDragEnd(float posX, float posY) {
         setLeverPos(0, 0, false);
     }

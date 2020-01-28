@@ -16,10 +16,6 @@ public class DemoGame extends AbstractGame {
         super.start(window);
     }
 
-    private void start() {
-        start(GlfwWindow.createWindowed("Shader Particle System"));
-    }
-
     @Override
     protected void onStart() {
         setFrame(new DemoFrame(this));

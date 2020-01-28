@@ -172,8 +172,8 @@ public class TextObject extends InteractiveObject {
     }
 
     @Override
-    protected void onRender(float alpha) {
-        super.onRender(alpha);
+    protected void onRenderProjected(float alpha) {
+        super.onRenderProjected(alpha);
         if (isFocused() && focusedTextRenderer != null) {
             onRender(focusedTextRenderer, focusedFontColor, alpha);
         } else if (textRenderer != null) {

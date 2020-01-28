@@ -1,6 +1,6 @@
 package com.gamelibrary2d.tools.particlegenerator.objects;
 
-import com.gamelibrary2d.objects.AbstractPanel;
+import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 
 public class StackPanel extends AbstractPanel<GameObject> {
@@ -18,7 +18,7 @@ public class StackPanel extends AbstractPanel<GameObject> {
     }
 
     public void add(GameObject item, float margin) {
-        positionObject(size(), item, margin);
+        positionObject(getChildren().size(), item, margin);
         super.add(item);
     }
 
@@ -34,7 +34,7 @@ public class StackPanel extends AbstractPanel<GameObject> {
     }
 
     @Override
-    public boolean remove(GameObject item) {
+    public boolean remove(Object item) {
         int index = indexOf(item);
         if (index == -1)
             return false;
@@ -50,7 +50,7 @@ public class StackPanel extends AbstractPanel<GameObject> {
     }
 
     private void pushObjects(int startIndex, float offset) {
-        for (int i = startIndex; i < size(); ++i) {
+        for (int i = startIndex; i < getChildren().size(); ++i) {
             GameObject obj = get(i);
             if (orientation == Orientation.HORIZONTAL) {
                 obj.getPosition().set(obj.getPosition().getX() + offset, obj.getPosition().getY());

@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
-import com.gamelibrary2d.objects.AbstractPanel;
+import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.settings.*;
 import com.gamelibrary2d.renderers.Renderer;
@@ -265,8 +265,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 saveParticleSystem();
             }
         }
@@ -276,8 +275,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 loadParticleSystem();
             }
         }
@@ -287,8 +285,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.setSpawnSettings(new BasicSpawnSettings());
                 particleSystem.setUpdateSettings(new ParticleUpdateSettings());
                 frame.changeSpawnSettings(SpawnSettingsType.BASIC);
@@ -300,8 +297,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         @Override
         public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
-            if (obj.isPixelVisible(projectedX, projectedY) && button == Mouse.instance().mouseButton1()) {
+            if (button == Mouse.instance().mouseButton1()) {
                 randomizeParticleSystem();
             }
         }

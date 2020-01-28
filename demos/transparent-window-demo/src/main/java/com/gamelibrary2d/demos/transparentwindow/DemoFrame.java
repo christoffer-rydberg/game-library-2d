@@ -3,8 +3,7 @@ package com.gamelibrary2d.demos.transparentwindow;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.animation.*;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.objects.AbstractFrame;
-import com.gamelibrary2d.objects.AnimatedObject;
+import com.gamelibrary2d.layers.AbstractFrame;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 
@@ -63,7 +62,8 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onUpdate(float deltaTime) {
-        var allAnimationsFinished = getObjects().stream()
+        super.onUpdate(deltaTime);
+        var allAnimationsFinished = getChildren().stream()
                 .filter(x -> x instanceof AnimatedObject)
                 .map(x -> (AnimatedObject) x)
                 .filter(x -> x.getRenderer() instanceof AnimationRenderer)

@@ -1,22 +1,12 @@
 package com.gamelibrary2d.objects;
 
+import com.gamelibrary2d.FocusManager;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.updates.UpdateObject;
 
-/**
- * Abstract implementation of a {@link com.gamelibrary2d.objects.GameObject
- * GameObject}. It contains methods to position, scale and rotate the rendered
- * object, as well as changing opacity or completely disabling it. The purpose
- * of this class is to provide the base implementation of a game object that
- * does not require mouse or keyboard input. If the object should handle input,
- * or at least be able to, consider extending the {@link AbstractInputObject}
- * class instead. It is also possible to implement {@link MouseAware} and
- * {@link KeyAware}, but this requires more own code.
- *
- * @author Christoffer Rydberg
- */
-public abstract class AbstractGameObject implements GameObject {
+public abstract class AbstractGameObject implements GameObject, UpdateObject {
 
     private final Point position = new Point();
     private final Point scale = new Point(1, 1);
@@ -24,9 +14,9 @@ public abstract class AbstractGameObject implements GameObject {
 
     private float rotation;
     private float opacity = 1.0f;
-    private boolean enabled = true;
 
     private Rectangle bounds = Rectangle.EMPTY;
+    private boolean enabled = true;
 
     @Override
     public float getOpacity() {
@@ -63,17 +53,6 @@ public abstract class AbstractGameObject implements GameObject {
         return scaleAndRotationCenter;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    @Override
     public boolean isPixelVisible(float projectedX, float projectedY) {
         return getBounds().isInside(projectedX, projectedY);
     }
@@ -88,16 +67,33 @@ public abstract class AbstractGameObject implements GameObject {
     }
 
     @Override
-    public void render(float alpha) {
-        if (isEnabled()) {
-            ModelMatrix.instance().pushMatrix();
-            projectTo();
-            onRender(alpha * opacity);
-            ModelMatrix.instance().popMatrix();
+    public final void render(float alpha) {
+        if (enabled) {
+            onRender(alpha);
         }
     }
 
-    protected void projectTo() {
+    protected void onRender(float alpha) {
+        ModelMatrix.instance().pushMatrix();
+        projectTo();
+        onRenderProjected(alpha * opacity);
+        ModelMatrix.instance().popMatrix();
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (!enabled) {
+                FocusManager.unfocus(this, true);
+            }
+        }
+    }
+
+    private void projectTo() {
         float centerX = getScaleAndRotationCenter().getX();
         float centerY = getScaleAndRotationCenter().getY();
 
@@ -112,5 +108,5 @@ public abstract class AbstractGameObject implements GameObject {
         }
     }
 
-    protected abstract void onRender(float alpha);
+    protected abstract void onRenderProjected(float alpha);
 }

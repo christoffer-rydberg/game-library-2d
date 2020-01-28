@@ -2,11 +2,11 @@ package com.gamelibrary2d;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.objects.Frame;
-import com.gamelibrary2d.objects.FrameDisposal;
+import com.gamelibrary2d.layers.Frame;
+import com.gamelibrary2d.layers.FrameDisposal;
 
 public interface Game extends Disposer, Updatable {
 

@@ -78,7 +78,7 @@ public class ToggleButton extends Button {
     }
 
     @Override
-    protected void onRender(float alpha) {
+    protected void onRenderProjected(float alpha) {
 
         if (toggled) {
             super.setRenderer(toggledRenderer);
@@ -90,7 +90,7 @@ public class ToggleButton extends Button {
             super.setFontColor(fontColor);
         }
 
-        super.onRender(alpha);
+        super.onRenderProjected(alpha);
 
         super.setRenderer(renderer);
         super.setTextRenderer(textRenderer);

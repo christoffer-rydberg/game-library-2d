@@ -2,10 +2,14 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.updating.Updatable;
+import com.gamelibrary2d.markers.Focusable;
+import com.gamelibrary2d.markers.KeyAware;
+import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.objects.GameObject;
 
 public class AbstractWrapperObject<T extends GameObject>
-        implements GameObject, MouseAware, KeyAware, Updatable, Clearable {
+        implements GameObject, MouseAware, Focusable, KeyAware, Updatable {
 
     private T wrapped;
 
@@ -32,16 +36,16 @@ public class AbstractWrapperObject<T extends GameObject>
 
     @Override
     public boolean isFocused() {
-        if (wrapped instanceof KeyAware) {
-            return ((KeyAware) wrapped).isFocused();
+        if (wrapped instanceof Focusable) {
+            return ((Focusable) wrapped).isFocused();
         }
         return false;
     }
 
     @Override
     public void setFocused(boolean focused) {
-        if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).setFocused(focused);
+        if (wrapped instanceof Focusable) {
+            ((Focusable) wrapped).setFocused(focused);
         }
     }
 
@@ -72,9 +76,9 @@ public class AbstractWrapperObject<T extends GameObject>
     }
 
     @Override
-    public void mouseEventFinished(int button, int action, int mods) {
-        if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).mouseEventFinished(button, action, mods);
+    public void mouseButtonEventFinished(int button, int action, int mods) {
+        if (wrapped instanceof Focusable) {
+            ((Focusable) wrapped).mouseButtonEventFinished(button, action, mods);
         }
     }
 
@@ -101,31 +105,6 @@ public class AbstractWrapperObject<T extends GameObject>
     @Override
     public void setRotation(float rotation) {
         wrapped.setRotation(rotation);
-    }
-
-    @Override
-    public boolean isPixelVisible(float projectedX, float projectedY) {
-        return wrapped.isPixelVisible(projectedX, projectedY);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return wrapped.isEnabled();
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        wrapped.setEnabled(enabled);
-    }
-
-    @Override
-    public float getOpacity() {
-        return wrapped.getOpacity();
-    }
-
-    @Override
-    public void setOpacity(float opacity) {
-        wrapped.setOpacity(opacity);
     }
 
     @Override
@@ -160,17 +139,22 @@ public class AbstractWrapperObject<T extends GameObject>
     }
 
     @Override
-    public void clear() {
-        if (wrapped instanceof Clearable) {
-            ((Clearable) wrapped).clear();
-        }
+    public boolean isEnabled() {
+        return wrapped.isEnabled();
     }
 
     @Override
-    public boolean isAutoClearing() {
-        if (wrapped instanceof Clearable) {
-            return ((Clearable) wrapped).isAutoClearing();
-        }
-        return false;
+    public void setEnabled(boolean enabled) {
+        wrapped.setEnabled(enabled);
+    }
+
+    @Override
+    public float getOpacity() {
+        return wrapped.getOpacity();
+    }
+
+    @Override
+    public void setOpacity(float opacity) {
+        wrapped.setOpacity(opacity);
     }
 }

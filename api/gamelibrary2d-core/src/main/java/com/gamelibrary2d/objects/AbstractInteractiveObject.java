@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * This class is an extension of {@link AbstractInputObject} that will raise
+ * This class is an extension of {@link AbstractFocusableObject} that will raise
  * events when it receives mouse or keyboard input. It provides functionality to
  * add and remove event listeners to handle different types of input events.
  *
  * @author Christoffer Rydberg
  */
-public abstract class AbstractInteractiveObject extends AbstractInputObject {
+public abstract class AbstractInteractiveObject extends AbstractFocusableObject {
 
     private final List<MouseClickListener> mouseClickListeners = new CopyOnWriteArrayList<>();
     private final List<MouseMoveListener> mouseMoveListeners = new CopyOnWriteArrayList<>();
@@ -74,7 +74,7 @@ public abstract class AbstractInteractiveObject extends AbstractInputObject {
     }
 
     @Override
-    protected boolean onMouseClickEvent(int button, int mods, float projectedX, float projectedY) {
+    protected final boolean onMouseClickEvent(int button, int mods, float projectedX, float projectedY) {
         for (MouseClickListener listener : mouseClickListeners) {
             listener.onMouseClick(this, button, mods, projectedX, projectedY);
         }
@@ -82,7 +82,7 @@ public abstract class AbstractInteractiveObject extends AbstractInputObject {
     }
 
     @Override
-    protected boolean onMouseMoveEvent(float projectedX, float projectedY, boolean drag) {
+    protected final boolean onMouseMoveEvent(float projectedX, float projectedY, boolean drag) {
         for (MouseMoveListener listener : mouseMoveListeners) {
             listener.onMouseMove(this, projectedX, projectedY, drag);
         }
@@ -90,28 +90,28 @@ public abstract class AbstractInteractiveObject extends AbstractInputObject {
     }
 
     @Override
-    protected void onMouseReleaseEvent(int button, int mods, float projectedX, float projectedY) {
+    protected final void onMouseReleaseEvent(int button, int mods, float projectedX, float projectedY) {
         for (MouseReleaseListener listener : mouseReleaseListeners) {
             listener.onMouseRelease(this, button, mods, projectedX, projectedY);
         }
     }
 
     @Override
-    public void charInputEvent(char charInput) {
+    public final void charInputEvent(char charInput) {
         for (CharInputListener listener : charInputListeners) {
             listener.onCharInput(this, charInput);
         }
     }
 
     @Override
-    public void keyDownEvent(int key, int scanCode, boolean repeat, int mods) {
+    public final void keyDownEvent(int key, int scanCode, boolean repeat, int mods) {
         for (KeyDownListener listener : keyDownListeners) {
             listener.onKeyDown(this, key, scanCode, repeat, mods);
         }
     }
 
     @Override
-    public void keyReleaseEvent(int key, int scanCode, int mods) {
+    public final void keyReleaseEvent(int key, int scanCode, int mods) {
         for (KeyReleaseListener listener : keyReleaseListeners) {
             listener.onKeyRelease(this, key, scanCode, mods);
         }

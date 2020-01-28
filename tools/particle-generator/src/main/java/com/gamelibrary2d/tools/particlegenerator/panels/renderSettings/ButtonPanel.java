@@ -2,7 +2,7 @@ package com.gamelibrary2d.tools.particlegenerator.panels.renderSettings;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
-import com.gamelibrary2d.objects.AbstractPanel;
+import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.objects.TextChangedListener;
 import com.gamelibrary2d.objects.TextObject;

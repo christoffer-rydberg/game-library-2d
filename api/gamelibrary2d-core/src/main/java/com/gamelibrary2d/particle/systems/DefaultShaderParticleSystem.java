@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.*;
-import com.gamelibrary2d.objects.ParticleUpdateListener;
+import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
 import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;

@@ -1,8 +1,8 @@
 package com.gamelibrary2d.demos.lightning;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.common.updating.Updatable;
 import com.gamelibrary2d.lightning.DefaultDynamicLightMap;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractCursor;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;

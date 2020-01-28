@@ -1,9 +1,9 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.objects.AbstractInputObject;
+import com.gamelibrary2d.objects.AbstractFocusableObject;
 
-public abstract class AbstractClientObject extends AbstractInputObject implements ClientObject {
+public abstract class AbstractClientObject extends AbstractFocusableObject implements ClientObject {
 
     private final GenericNetworkFrame<?, ?> frame;
 

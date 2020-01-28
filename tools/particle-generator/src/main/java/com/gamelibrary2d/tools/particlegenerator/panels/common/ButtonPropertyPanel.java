@@ -72,10 +72,8 @@ public abstract class ButtonPropertyPanel<T> extends StackPanel implements Mouse
     }
 
     @Override
-    public void update(float deltaTime) {
-
-        super.update(deltaTime);
-
+    public void onUpdate(float deltaTime) {
+        super.onUpdate(deltaTime);
         if (params.updateIfChanged()) {
             for (int i = 0; i < buttons.size(); ++i) {
                 buttons.get(i).setText(toString(params.getParameter(i)));
