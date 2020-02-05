@@ -4,15 +4,16 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.random.RandomInstance;
+import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.layers.*;
-import com.gamelibrary2d.objects.ArrayObject;
-import com.gamelibrary2d.objects.BasicGameObject;
+import com.gamelibrary2d.layers.BasicLayer;
+import com.gamelibrary2d.layers.DynamicLayer;
+import com.gamelibrary2d.util.QuadShape;
+import com.gamelibrary2d.util.RenderSettings;
+import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.QuadArrayRenderer;
-import com.gamelibrary2d.renderers.QuadShape;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.rendering.RenderSettings;
 import com.gamelibrary2d.resources.PositionArray;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
@@ -21,13 +22,14 @@ import com.gamelibrary2d.splitscreen.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 class DemoFrame extends AbstractFrame {
     private final Rectangle gameBounds = new Rectangle(0, 0, 4000, 4000);
     private Renderable background;
     private SplitLayer<GameObject> splitLayer;
     private DynamicLayer<Renderable> viewLayer;
-    private ArrayList<SpaceCraft> spaceCrafts;
+    private List<SpaceCraft> spaceCrafts;
 
     DemoFrame(Game game) {
         super(game);
@@ -57,7 +59,7 @@ class DemoFrame extends AbstractFrame {
         return spaceCrafts;
     }
 
-    private ArrayObject<PositionArray> createStars(int count) {
+    private BasicObject<Renderable> createStars(int count) {
         var random = RandomInstance.get();
         float[] positions = new float[count * 2];
         for (int i = 0; i < count; ++i) {
@@ -72,7 +74,8 @@ class DemoFrame extends AbstractFrame {
         var starsRenderer = new QuadArrayRenderer(Rectangle.centered(8f, 8f));
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
         starsRenderer.setColor(Color.LIGHT_YELLOW);
-        return new ArrayObject<>(starPositions, starsRenderer);
+
+        return new BasicObject<>(a -> starsRenderer.render(a, starPositions));
     }
 
     private SplitLayout createSplitLayout(float margin) {
@@ -104,11 +107,11 @@ class DemoFrame extends AbstractFrame {
         return new SplitLayoutLeaf<>(viewLayer, this::prepareView, spaceCraft);
     }
 
-    private BasicGameObject createBackgroundColor(Color color) {
+    private BasicObject createBackgroundColor(Color color) {
         var quad = Quad.create(gameBounds, this);
         var renderer = new SurfaceRenderer(quad);
         renderer.updateSettings(RenderSettings.COLOR_R, color.getR(), color.getG(), color.getB(), color.getA());
-        return new BasicGameObject(renderer);
+        return new BasicObject<>(renderer);
     }
 
     private Renderable createBackground() {

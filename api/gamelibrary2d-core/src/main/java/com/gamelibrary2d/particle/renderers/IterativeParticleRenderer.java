@@ -4,7 +4,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.resources.VertexArray;
 import com.gamelibrary2d.particle.systems.Particle;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 
 public class IterativeParticleRenderer implements ParticleRenderer {
 

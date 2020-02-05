@@ -1,7 +1,7 @@
 package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 
 public abstract class AbstractRenderer implements Renderer {
 

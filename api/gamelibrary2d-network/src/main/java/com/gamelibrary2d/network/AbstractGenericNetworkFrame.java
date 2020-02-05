@@ -8,7 +8,7 @@ import com.gamelibrary2d.exceptions.LoadInterruptedException;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.layers.AbstractFrame;
+import com.gamelibrary2d.frames.AbstractFrame;
 
 import java.io.IOException;
 import java.util.*;

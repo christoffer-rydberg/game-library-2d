@@ -1,13 +1,13 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.emitter;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
+import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.rendering.HorizontalAlignment;
-import com.gamelibrary2d.rendering.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
@@ -27,39 +27,45 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         Font font = Fonts.getMenuFont();
 
         Button launchButton = new Button();
-        launchButton.setVerticalAlignment(VerticalAlignment.TOP);
-        launchButton.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        launchButton.setTextRenderer(new TextRenderer(font));
-        launchButton.setFontColor(new Color(1, 1, 1, 1));
-        launchButton.setText("Launch");
-        launchButton.setBounds(font.textSize(launchButton.getText(),
-                launchButton.getHorizontalAlignment(), launchButton.getVerticalAlignment()));
+
+        var launchButtonContext = launchButton.getContent();
+        launchButtonContext.setVerticalAlignment(VerticalAlignment.TOP);
+        launchButtonContext.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        launchButtonContext.setTextRenderer(new TextRenderer(font));
+        launchButtonContext.setFontColor(new Color(1, 1, 1, 1));
+        launchButtonContext.setText("Launch");
+        launchButton.setBounds(font.textSize(launchButtonContext.getText(),
+                launchButtonContext.getHorizontalAlignment(), launchButtonContext.getVerticalAlignment()));
         launchButton.getPosition().set(0, 0);
-        launchButton.addMouseReleaseListener(new LaunchEventHandler());
+        launchButton.addMouseButtonReleaseListener(new LaunchEventHandler());
 
         launchSequentialButton = new ToggleButton();
-        launchSequentialButton.setText("Launch Sequential");
-        launchSequentialButton.setTextRenderer(new TextRenderer(font));
-        launchSequentialButton.setFontColor(new Color(1, 1, 1, 1));
-        launchSequentialButton.setToggledTextRenderer(new TextRenderer(font));
-        launchSequentialButton.setToggledFontColor(new Color(0, 1, 0, 1));
-        launchSequentialButton.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        launchSequentialButton.setVerticalAlignment(VerticalAlignment.TOP);
-        launchSequentialButton.setBounds(font.textSize(launchSequentialButton.getText(),
-                launchSequentialButton.getHorizontalAlignment(), launchSequentialButton.getVerticalAlignment()));
+
+        var seqContext = launchSequentialButton.getContent();
+        seqContext.setText("Launch Sequential");
+        seqContext.setTextRenderer(new TextRenderer(font));
+        seqContext.setFontColor(new Color(1, 1, 1, 1));
+        seqContext.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        seqContext.setVerticalAlignment(VerticalAlignment.TOP);
+
+        launchSequentialButton.setBounds(font.textSize(seqContext.getText(),
+                seqContext.getHorizontalAlignment(), seqContext.getVerticalAlignment()));
         launchSequentialButton.getPosition().set(0, -50);
-        launchSequentialButton.addMouseReleaseListener(new LaunchSequentialEventHandler());
+        launchSequentialButton.addMouseButtonReleaseListener(new LaunchSequentialEventHandler());
 
         Button launchAllButton = new Button();
-        launchAllButton.setText("Launch All");
-        launchAllButton.setTextRenderer(new TextRenderer(font));
-        launchAllButton.setFontColor(new Color(1, 1, 1, 1));
-        launchAllButton.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        launchAllButton.setVerticalAlignment(VerticalAlignment.TOP);
-        launchAllButton.setBounds(font.textSize(launchAllButton.getText(),
-                launchAllButton.getHorizontalAlignment(), launchAllButton.getVerticalAlignment()));
+
+        var launchContext = launchAllButton.getContent();
+        launchContext.setText("Launch All");
+        launchContext.setTextRenderer(new TextRenderer(font));
+        launchContext.setFontColor(new Color(1, 1, 1, 1));
+        launchContext.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        launchContext.setVerticalAlignment(VerticalAlignment.TOP);
+
+        launchAllButton.setBounds(font.textSize(launchContext.getText(),
+                launchContext.getHorizontalAlignment(), launchContext.getVerticalAlignment()));
         launchAllButton.getPosition().set(0, -100);
-        launchAllButton.addMouseReleaseListener(new LaunchAllEventHandler());
+        launchAllButton.addMouseButtonReleaseListener(new LaunchAllEventHandler());
 
         add(launchButton);
         add(launchSequentialButton);
@@ -70,20 +76,20 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         return launchSequentialButton.isToggled();
     }
 
-    private class LaunchEventHandler implements MouseReleaseListener {
+    private class LaunchEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY, 0);
             }
         }
     }
 
-    private class LaunchSequentialEventHandler implements MouseReleaseListener {
+    private class LaunchSequentialEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods,
+        public void onMouseButtonRelease(GameObject obj, int button, int mods,
                                    float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 launchSequentialButton.setToggled(!launchSequentialButton.isToggled());
@@ -91,10 +97,10 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         }
     }
 
-    private class LaunchAllEventHandler implements MouseReleaseListener {
+    private class LaunchAllEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods,
+        public void onMouseButtonRelease(GameObject obj, int button, int mods,
                                    float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY, 0);

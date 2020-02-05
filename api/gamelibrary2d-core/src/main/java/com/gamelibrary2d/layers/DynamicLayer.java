@@ -1,6 +1,5 @@
 package com.gamelibrary2d.layers;
 
-import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 
 public class DynamicLayer<T extends Renderable> extends AbstractLayerObject<T> {
@@ -18,11 +17,6 @@ public class DynamicLayer<T extends Renderable> extends AbstractLayerObject<T> {
 
     public void setOverlay(Renderable overlay) {
         this.overlay = overlay;
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return Rectangle.EMPTY;
     }
 
     @Override

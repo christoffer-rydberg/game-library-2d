@@ -1,10 +1,10 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.renderers.Renderer;
 
-public class FadingCursor extends AbstractCursor implements Updatable {
+public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implements Updatable {
 
     private float visibilityDuration = 5f;
 
@@ -16,8 +16,8 @@ public class FadingCursor extends AbstractCursor implements Updatable {
 
     private float visibilityTimer;
 
-    public FadingCursor(Game game, Renderer renderer) {
-        super(game, renderer);
+    public FadingCursor(Game game, T content) {
+        super(game, content);
     }
 
     public float getVisibilityDuration() {

@@ -6,7 +6,7 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.particle.systems.Particle;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
-import com.gamelibrary2d.rendering.PointSmoothing;
+import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.resources.VertexArray;
 

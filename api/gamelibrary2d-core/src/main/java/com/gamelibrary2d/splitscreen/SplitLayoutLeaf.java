@@ -4,15 +4,15 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.ResourceContainer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.renderers.AreaRenderer;
 import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.renderers.BitmapRenderer;
 
 public class SplitLayoutLeaf<T> implements SplitLayout {
     private final InternalTargetSettings internalTargetSettings;
     private final T param;
     private final PrepareUpdateAction<T> prepareUpdate;
     private final PrepareRenderAction<T> prepareRender;
-    private final ResourceContainer<AreaRenderer> areaRenderer = new ResourceContainer<>();
+    private final ResourceContainer<BitmapRenderer> areaRenderer = new ResourceContainer<>();
 
     private GameObject target;
 
@@ -66,7 +66,7 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
     public void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer) {
         this.target = target;
         if (!areaRenderer.hasResource() || !areaRenderer.getResource().getArea().equals(viewArea)) {
-            areaRenderer.createResource(d -> AreaRenderer.create(viewArea, d), disposer);
+            areaRenderer.createResource(d -> BitmapRenderer.create(viewArea, d), disposer);
         }
         updateTargetFromSettings();
         if (prepareUpdate != null)

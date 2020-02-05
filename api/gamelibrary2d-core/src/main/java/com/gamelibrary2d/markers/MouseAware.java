@@ -13,41 +13,33 @@ public interface MouseAware {
     /**
      * Handles mouse button down events.
      *
-     * @param button     The mouse button that was pressed.
-     * @param mods       Describes which modifier keys were held down.
-     * @param projectedX The x-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
-     * @param projectedY The y-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
+     * @param button The mouse button that was pressed.
+     * @param mods   Describes which modifier keys were held down.
+     * @param x      The x-coordinate of the mouse cursor projected to the parent of the object.
+     * @param y      The y-coordinate of the mouse cursor projected to the parent of the object.
      * @return True if the mouse event is handled and should not be routed to other
      * objects, false otherwise.
      */
-    boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY);
+    boolean onMouseButtonDown(int button, int mods, float x, float y);
 
     /**
      * Handles mouse move events.
      *
-     * @param projectedX The x-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
-     * @param projectedY The y-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
+     * @param x The x-coordinate of the mouse cursor projected to the parent of the object.
+     * @param y The y-coordinate of the mouse cursor projected to the parent of the object.
      * @return True if the mouse event is handled and should not be routed to other
      * objects, false otherwise.
      */
-    boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag);
+    boolean onMouseMove(float x, float y);
 
     /**
      * Handles mouse button release events.
      *
-     * @param button     The mouse button that was released.
-     * @param mods       Describes which modifier keys were held down.
-     * @param projectedX The x-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
-     * @param projectedY The y-coordinate of the mouse cursor projected to the orientation
-     *                   of the object.
-     * @return True if the mouse event is handled and should not be routed to other
-     * objects, false otherwise.
+     * @param button The mouse button that was released.
+     * @param mods   Describes which modifier keys were held down.
+     * @param x      The x-coordinate of the mouse cursor projected to the parent of the object.
+     * @param y      The y-coordinate of the mouse cursor projected to the parent of the object.
      */
-    boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY);
+    void onMouseButtonRelease(int button, int mods, float x, float y);
 
 }

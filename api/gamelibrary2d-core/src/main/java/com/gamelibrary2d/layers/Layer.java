@@ -10,7 +10,7 @@ import java.util.Comparator;
  *
  * @author Christoffer Rydberg
  */
-public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Enableable, Clearable, Updatable, MouseAware {
+public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Clearable, Updatable, MouseAware {
 
     T get(int index);
 
@@ -29,6 +29,10 @@ public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Enab
     float getOpacity();
 
     void setOpacity(float opacity);
+
+    boolean isEnabled();
+
+    void setEnabled(boolean enabled);
 
     /**
      * @return The comparator used to sort game objects before rendering.

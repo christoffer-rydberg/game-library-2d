@@ -266,4 +266,8 @@ public interface OpenGL {
     void glClearBufferiv(int buffer, int drawbuffer, IntBuffer color);
 
     void glBlendFuncSeparate(int sFactorRGB, int dFactorRGB, int sFactorAlpha, int dFactorAlpha);
+
+    void glGetTexImage(int glTexture2d, int i, int glRgba, int glUnsignedByte, ByteBuffer buffer);
+
+    void glReadBuffer(int src);
 }

@@ -2,6 +2,7 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.util.StackOrientation;
 
 import java.util.List;
 

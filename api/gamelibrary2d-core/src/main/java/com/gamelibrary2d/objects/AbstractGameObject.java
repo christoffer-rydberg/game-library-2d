@@ -3,20 +3,69 @@ package com.gamelibrary2d.objects;
 import com.gamelibrary2d.FocusManager;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.updates.UpdateObject;
+import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.markers.KeyAware;
 
-public abstract class AbstractGameObject implements GameObject, UpdateObject {
-
+public abstract class AbstractGameObject<T extends Renderable> implements KeyAware, ComposableObject<T> {
     private final Point position = new Point();
     private final Point scale = new Point(1, 1);
     private final Point scaleAndRotationCenter = new Point();
 
+    private T content;
     private float rotation;
     private float opacity = 1.0f;
-
-    private Rectangle bounds = Rectangle.EMPTY;
     private boolean enabled = true;
+    private Rectangle bounds;
+
+    public AbstractGameObject() {
+
+    }
+
+    public AbstractGameObject(T content) {
+        this.content = content;
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : getContentBounds();
+    }
+
+    protected void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
+    }
+
+    private Rectangle getContentBounds() {
+        if (content instanceof Bounded)
+            return ((Bounded) content).getBounds();
+        else
+            return Rectangle.EMPTY;
+    }
+
+    @Override
+    public void onCharInput(char charInput) {
+        var content = getContent();
+        if (content instanceof KeyAware) {
+            ((KeyAware) (content)).onCharInput(charInput);
+        }
+    }
+
+    @Override
+    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
+        var content = getContent();
+        if (content instanceof KeyAware) {
+            ((KeyAware) (content)).onKeyDown(key, scanCode, repeat, mods);
+        }
+    }
+
+    @Override
+    public void onKeyRelease(int key, int scanCode, int mods) {
+        var content = getContent();
+        if (content instanceof KeyAware) {
+            ((KeyAware) (content)).onKeyRelease(key, scanCode, mods);
+        }
+    }
 
     @Override
     public float getOpacity() {
@@ -53,18 +102,15 @@ public abstract class AbstractGameObject implements GameObject, UpdateObject {
         return scaleAndRotationCenter;
     }
 
-    public boolean isPixelVisible(float projectedX, float projectedY) {
-        return getBounds().isInside(projectedX, projectedY);
-    }
-
     @Override
-    public Rectangle getBounds() {
-        return bounds;
+    public T getContent() {
+        return content;
     }
 
-    protected void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
+    protected void setContent(T content) {
+        this.content = content;
     }
+
 
     @Override
     public final void render(float alpha) {
@@ -78,6 +124,12 @@ public abstract class AbstractGameObject implements GameObject, UpdateObject {
         projectTo();
         onRenderProjected(alpha * opacity);
         ModelMatrix.instance().popMatrix();
+    }
+
+    protected void onRenderProjected(float alpha) {
+        if (content != null) {
+            content.render(alpha);
+        }
     }
 
     public boolean isEnabled() {
@@ -107,6 +159,4 @@ public abstract class AbstractGameObject implements GameObject, UpdateObject {
             ModelMatrix.instance().translatef(-centerX, -centerY, 0);
         }
     }
-
-    protected abstract void onRenderProjected(float alpha);
 }

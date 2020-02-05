@@ -3,7 +3,7 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.PointSmoothing;
+import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.resources.PositionArray;
 
 public class PointArrayRenderer extends AbstractArrayRenderer<PositionArray> {

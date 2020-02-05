@@ -1,6 +1,5 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 
-import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.settings.SettingsExtensions;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
@@ -10,17 +9,11 @@ import com.gamelibrary2d.tools.particlegenerator.panels.common.PropertyParameter
 public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
 
     public EllipsoidSpawnSettingsPanel(ParticleFrame frame, ParticleSystemModel particleSystem) {
-
         super(frame, particleSystem);
-
         add(new FloatPropertyPanel("Radius", getRadiusParameters()));
         add(new FloatPropertyPanel("Radius Var", getRadiusVarParameters()));
         add(new FloatPropertyPanel("Position Yaw", getPositionYawParameters()));
         add(new FloatPropertyPanel("Position Pitch", getPositionPitchParameters()));
-
-        GameObject slider = new ResizeSlider(particleSystem, frame);
-        slider.getPosition().set(slider.getBounds().getWidth() / 2 + 10, 0);
-        add(slider, -slider.getBounds().getHeight() - ROW_HEIGHT);
     }
 
     private PropertyParameters<Float> getRadiusParameters() {

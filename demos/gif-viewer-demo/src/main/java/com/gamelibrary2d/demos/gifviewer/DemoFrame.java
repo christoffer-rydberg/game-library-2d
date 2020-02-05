@@ -1,15 +1,16 @@
 package com.gamelibrary2d.demos.gifviewer;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.animation.AnimatedObject;
 import com.gamelibrary2d.animation.AnimationFactory;
 import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.layers.AbstractFrame;
-import com.gamelibrary2d.animation.AnimatedObject;
+import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.objects.TextObject;
+import com.gamelibrary2d.objects.ObservableObject;
+import com.gamelibrary2d.renderable.Label;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
@@ -18,12 +19,27 @@ import com.gamelibrary2d.util.io.FileChooser;
 import java.io.IOException;
 
 public class DemoFrame extends AbstractFrame {
-
-    private final TextObject loadButton = new TextObject();
-    private final AnimatedObject animatedObject = new AnimatedObject();
+    private AnimatedObject animatedObject;
 
     DemoFrame(Game game) {
         super(game);
+    }
+
+    private GameObject createLoadButton() {
+        var font = Font.create(new java.awt.Font("Gabriola", java.awt.Font.BOLD, 48), this);
+
+        var loadButtonContext = new Label();
+        loadButtonContext.setTextRenderer(new TextRenderer(font));
+        loadButtonContext.setFontColor(Color.WHITE);
+        loadButtonContext.setText("Click here to load GIF");
+        var textBounds = font.textSize(loadButtonContext.getText(), loadButtonContext.getHorizontalAlignment(), loadButtonContext.getVerticalAlignment());
+
+        var loadButton = new ObservableObject<>();
+        loadButton.setContent(loadButtonContext);
+        loadButton.setBounds(textBounds);
+        loadButton.addMouseButtonReleaseListener(this::onLoadButtonClicked);
+
+        return loadButton;
     }
 
     @Override
@@ -31,23 +47,19 @@ public class DemoFrame extends AbstractFrame {
         final float windowWidth = getGame().getWindow().getWidth();
         final float windowHeight = getGame().getWindow().getHeight();
 
+        var loadButton = createLoadButton();
+        loadButton.getPosition().set(windowWidth / 2, windowHeight - windowHeight / 6);
+
+        animatedObject = new AnimatedObject();
         animatedObject.getPosition().set(windowWidth / 2, windowHeight / 2);
 
-        var font = Font.create(new java.awt.Font("Gabriola", java.awt.Font.BOLD, 48), this);
-        loadButton.setListeningToMouseClickEvents(true);
-        loadButton.setTextRenderer(new TextRenderer(font));
-        loadButton.setFontColor(Color.WHITE);
-        loadButton.setText("Click here to load GIF");
-        loadButton.getPosition().set(windowWidth / 2, windowHeight - windowHeight / 6);
-        var textBounds = font.textSize(loadButton.getText(), loadButton.getHorizontalAlignment(), loadButton.getVerticalAlignment());
-        loadButton.setBounds(textBounds);
-        loadButton.addMouseReleaseListener(this::onLoadButtonClicked);
+        add(animatedObject);
+        add(loadButton);
     }
 
     @Override
     protected void onLoad() {
-        add(animatedObject);
-        add(loadButton);
+
     }
 
     @Override

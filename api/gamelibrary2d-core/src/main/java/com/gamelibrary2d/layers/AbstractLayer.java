@@ -2,7 +2,6 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Clearable;
-import com.gamelibrary2d.markers.Enableable;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.markers.Updatable;
 
@@ -123,48 +122,59 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
+    public final boolean onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+        return isEnabled() ? handleMouseButtonDown(button, mods, projectedX, projectedY) : false;
+    }
+
+    protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
             MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.mouseButtonDownEvent(button, mods, projectedX, projectedY)) {
+            if (obj.onMouseButtonDown(button, mods, projectedX, projectedY)) {
                 mouseAwareIterationList.clear();
                 return true;
             }
         }
 
         mouseAwareIterationList.clear();
+
         return false;
     }
 
     @Override
-    public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
+    public final boolean onMouseMove(float projectedX, float projectedY) {
+        return isEnabled() ? handleMouseMove(projectedX, projectedY) : false;
+    }
+
+    protected boolean handleMouseMove(float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
             MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.mouseMoveEvent(projectedX, projectedY, drag)) {
+            if (obj.onMouseMove(projectedX, projectedY)) {
                 mouseAwareIterationList.clear();
                 return true;
             }
         }
 
         mouseAwareIterationList.clear();
+
         return false;
     }
 
     @Override
-    public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
+    public final void onMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
+        if (isEnabled()) {
+            handleMouseButtonRelease(button, mods, projectedX, projectedY);
+        }
+    }
+
+    protected void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.mouseButtonReleaseEvent(button, mods, projectedX, projectedY)) {
-                mouseAwareIterationList.clear();
-                return true;
-            }
+            mouseAwareIterationList.get(i).onMouseButtonRelease(button, mods, projectedX, projectedY);
         }
 
         mouseAwareIterationList.clear();
-        return false;
     }
 
     @Override
@@ -181,10 +191,7 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
 
         int size = objects.size();
         for (int i = 0; i < size; ++i) {
-            var obj = objects.get(i);
-            if (isEnabled(obj)) {
-                obj.render(alpha);
-            }
+            objects.get(i).render(alpha);
         }
     }
 
@@ -198,15 +205,8 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     protected void onUpdate(float deltaTime) {
         int size = updatableObjects.size();
         for (int i = 0; i < size; ++i) {
-            var obj = updatableObjects.get(i);
-            if (isEnabled(obj)) {
-                obj.update(deltaTime);
-            }
+            updatableObjects.get(i).update(deltaTime);
         }
-    }
-
-    private boolean isEnabled(Object obj) {
-        return !(obj instanceof Enableable) || ((Enableable) obj).isEnabled();
     }
 
     @Override

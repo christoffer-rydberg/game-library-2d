@@ -446,6 +446,11 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
+    public void glReadBuffer(int src) {
+        GL20.glReadBuffer(src);
+    }
+
+    @Override
     public void glGetIntegerv(int pname, IntBuffer params) {
         GL11.glGetIntegerv(pname, params);
     }
@@ -463,5 +468,10 @@ public class Lwjgl_OpenGL implements OpenGL {
     @Override
     public void glBlendFuncSeparate(int sFactorRGB, int dFactorRGB, int sFactorAlpha, int dFactorAlpha) {
         GL30.glBlendFuncSeparate(sFactorRGB, dFactorRGB, sFactorAlpha, dFactorAlpha);
+    }
+
+    @Override
+    public void glGetTexImage(int tex, int level, int format, int type, ByteBuffer pixels) {
+        GL30.glGetTexImage(tex, level, format, type, pixels);
     }
 }

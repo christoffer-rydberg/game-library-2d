@@ -1,95 +1,106 @@
 package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.util.Projection;
 import com.gamelibrary2d.objects.AbstractGameObject;
-import com.gamelibrary2d.objects.Projection;
 
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class AbstractLayerObject<T extends Renderable> extends AbstractGameObject implements LayerObject<T> {
-    private final Layer<T> layer = new BasicLayer<>();
+public abstract class AbstractLayerObject<T extends Renderable> extends AbstractGameObject<Layer<T>> implements LayerObject<T> {
+    protected AbstractLayerObject() {
+        setContent(new BasicLayer<>());
+    }
 
     @Override
     public int indexOf(Object obj) {
-        return layer.indexOf(obj);
+        return getContent().indexOf(obj);
     }
 
     @Override
     public Comparator<T> getRenderOrderComparator() {
-        return layer.getRenderOrderComparator();
+        return getContent().getRenderOrderComparator();
     }
 
     @Override
     public void setRenderOrderComparator(Comparator<T> renderOrderComparator) {
-        layer.setRenderOrderComparator(renderOrderComparator);
+        getContent().setRenderOrderComparator(renderOrderComparator);
     }
 
     @Override
     public boolean isAutoClearing() {
-        return layer.isAutoClearing();
+        return getContent().isAutoClearing();
     }
 
     public void setAutoClearing(boolean autoClearing) {
-        layer.setAutoClearing(autoClearing);
+        getContent().setAutoClearing(autoClearing);
     }
 
     @Override
     public void clear() {
-        layer.clear();
+        getContent().clear();
     }
 
     @Override
     public T get(int index) {
-        return layer.get(index);
+        return getContent().get(index);
     }
 
     @Override
     public void add(T obj) {
-        layer.add(obj);
+        getContent().add(obj);
     }
 
     @Override
     public void add(int index, T obj) {
-        layer.add(index, obj);
+        getContent().add(index, obj);
     }
 
     @Override
     public void remove(int index) {
-        layer.remove(index);
+        getContent().remove(index);
     }
 
     @Override
     public boolean remove(Object obj) {
-        return layer.remove(obj);
+        return getContent().remove(obj);
     }
 
     @Override
     public List<T> getChildren() {
-        return layer.getChildren();
+        return getContent().getChildren();
     }
 
     @Override
-    public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
-        return layer.mouseButtonDownEvent(button, mods, projected.getX(), projected.getY());
+    public final boolean onMouseButtonDown(int button, int mods, float x, float y) {
+        return isEnabled() ? handleMouseButtonDown(button, mods, x, y) : false;
+    }
+
+    protected boolean handleMouseButtonDown(int button, int mods, float x, float y) {
+        var projected = Projection.projectTo(this, x, y);
+        return getContent().onMouseButtonDown(button, mods, projected.getX(), projected.getY());
     }
 
     @Override
-    public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
-        return layer.mouseMoveEvent(projected.getX(), projected.getY(), drag);
+    public final boolean onMouseMove(float x, float y) {
+        return isEnabled() ? handleMouseMove(x, y) : false;
+    }
+
+    protected boolean handleMouseMove(float x, float y) {
+        var projected = Projection.projectTo(this, x, y);
+        return getContent().onMouseMove(projected.getX(), projected.getY());
     }
 
     @Override
-    public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
-        return layer.mouseButtonReleaseEvent(button, mods, projected.getX(), projected.getY());
+    public final void onMouseButtonRelease(int button, int mods, float x, float y) {
+        if (isEnabled()) {
+            handleMouseButtonRelease(button, mods, x, y);
+        }
     }
 
-    @Override
-    protected void onRenderProjected(float alpha) {
-        layer.render(alpha);
+    protected void handleMouseButtonRelease(int button, int mods, float x, float y) {
+        var projected = Projection.projectTo(this, x, y);
+        getContent().onMouseButtonRelease(button, mods, projected.getX(), projected.getY());
     }
 
     @Override
@@ -100,6 +111,6 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     protected void onUpdate(float deltaTime) {
-        layer.update(deltaTime);
+        getContent().update(deltaTime);
     }
 }

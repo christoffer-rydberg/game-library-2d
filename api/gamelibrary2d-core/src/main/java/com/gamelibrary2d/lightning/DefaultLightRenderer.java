@@ -11,7 +11,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
 import com.gamelibrary2d.resources.Texture;

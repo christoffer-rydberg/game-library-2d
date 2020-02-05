@@ -3,15 +3,15 @@ package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
+import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.settings.*;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.rendering.HorizontalAlignment;
-import com.gamelibrary2d.rendering.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
@@ -43,17 +43,20 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         addButton("Randomize", 300, 0, new RandomizeEventHandler());
     }
 
-    private void addButton(String text, float posX, float posY, MouseReleaseListener mouseEventHandler) {
+    private void addButton(String text, float posX, float posY, MouseButtonReleaseListener mouseEventHandler) {
         Button button = new Button();
-        button.setText(text);
-        button.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
-        button.setFontColor(Color.WHITE);
-        button.setVerticalAlignment(VerticalAlignment.BOTTOM);
-        button.setHorizontalAlignment(HorizontalAlignment.LEFT);
+
+        var buttonContext = button.getContent();
+        buttonContext.setText(text);
+        buttonContext.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
+        buttonContext.setFontColor(Color.WHITE);
+        buttonContext.setVerticalAlignment(VerticalAlignment.BOTTOM);
+        buttonContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
+
         button.getPosition().set(posX, posY);
-        button.setBounds(Fonts.getDefaultFont().textSize(button.getText(), button.getHorizontalAlignment(),
-                button.getVerticalAlignment()));
-        button.addMouseReleaseListener(mouseEventHandler);
+        button.setBounds(Fonts.getDefaultFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
+                buttonContext.getVerticalAlignment()));
+        button.addMouseButtonReleaseListener(mouseEventHandler);
         add(button);
     }
 
@@ -261,30 +264,30 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         return (int) (value * tmp) / (float) tmp;
     }
 
-    private class SaveEventHandler implements MouseReleaseListener {
+    private class SaveEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 saveParticleSystem();
             }
         }
     }
 
-    private class LoadEventHandler implements MouseReleaseListener {
+    private class LoadEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 loadParticleSystem();
             }
         }
     }
 
-    private class ResetEventHandler implements MouseReleaseListener {
+    private class ResetEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.setSpawnSettings(new BasicSpawnSettings());
                 particleSystem.setUpdateSettings(new ParticleUpdateSettings());
@@ -293,10 +296,10 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         }
     }
 
-    private class RandomizeEventHandler implements MouseReleaseListener {
+    private class RandomizeEventHandler implements MouseButtonReleaseListener {
 
         @Override
-        public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 randomizeParticleSystem();
             }

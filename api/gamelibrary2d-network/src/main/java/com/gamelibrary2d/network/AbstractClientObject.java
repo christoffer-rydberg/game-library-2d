@@ -1,9 +1,9 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.objects.AbstractFocusableObject;
+import com.gamelibrary2d.objects.AbstractMouseAwareObject;
 
-public abstract class AbstractClientObject extends AbstractFocusableObject implements ClientObject {
+public abstract class AbstractClientObject extends AbstractMouseAwareObject implements ClientObject {
 
     private final GenericNetworkFrame<?, ?> frame;
 
@@ -106,6 +106,21 @@ public abstract class AbstractClientObject extends AbstractFocusableObject imple
                 setRotation(rotation);
             }
         }
+    }
+
+    @Override
+    protected boolean isListeningToMouseClickEvents() {
+        return false;
+    }
+
+    @Override
+    protected boolean isListeningToMouseHoverEvents() {
+        return false;
+    }
+
+    @Override
+    protected boolean isListeningToMouseDragEvents() {
+        return false;
     }
 
     protected abstract void onUpdate(float deltaTime);

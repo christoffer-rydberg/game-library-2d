@@ -1,5 +1,7 @@
 package com.gamelibrary2d.updates;
 
+import com.gamelibrary2d.objects.GameObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class AttributeUpdateSet implements AttributeUpdate {
     }
 
     @Override
-    public void makeRelative(UpdateObject goal) {
+    public void makeRelative(GameObject goal) {
         for (int i = 0; i < targetUpdates.size(); ++i) {
             targetUpdates.get(i).makeRelative(goal);
         }

@@ -3,8 +3,8 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.BlendMode;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.util.RenderSettings;
 
 public abstract class AbstractShaderRenderer extends AbstractRenderer {
 

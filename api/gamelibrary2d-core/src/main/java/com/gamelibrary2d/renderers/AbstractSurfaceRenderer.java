@@ -2,7 +2,7 @@ package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
@@ -55,10 +55,5 @@ abstract class AbstractSurfaceRenderer extends AbstractShaderRenderer implements
             }
             surface.render(shaderProgram);
         }
-    }
-
-    @Override
-    public boolean isVisible(float x, float y) {
-        return InternalHitDetection.isVisible(surface, texture, x, y);
     }
 }

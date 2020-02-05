@@ -25,18 +25,17 @@ public class EnumPropertyPanel<T extends Enum<T>> extends ButtonPropertyPanel<T>
 
     @Override
     public void onTextChanged(GameObject obj, String before, String after) {
+        Button button = (Button) obj;
 
-        Button buttonObj = (Button) obj;
-
-        buttonObj.setBounds(buttonObj.getTextRenderer().getFont().textSize(buttonObj.getText(),
-                buttonObj.getHorizontalAlignment(), buttonObj.getVerticalAlignment()));
+        var buttonContext = button.getContent();
+        button.setBounds(buttonContext.getTextRenderer().getFont().textSize(buttonContext.getText(),
+                buttonContext.getHorizontalAlignment(), buttonContext.getVerticalAlignment()));
 
         recalculateBounds();
     }
 
     @Override
-    public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
+    public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
         int increment;
         if (button == Mouse.instance().mouseButton1())
             increment = 1;
@@ -47,13 +46,13 @@ public class EnumPropertyPanel<T extends Enum<T>> extends ButtonPropertyPanel<T>
 
         Button buttonObj = (Button) obj;
 
-        T currentValue = fromString(buttonObj.getText());
+        T currentValue = fromString(buttonObj.getContent().getText());
 
         T[] values = enumType.getEnumConstants();
 
         for (int i = 0; i < values.length; ++i) {
             if (currentValue.equals(values[i])) {
-                buttonObj.setText(toString(values[Math.floorMod(i + increment, values.length)]));
+                buttonObj.getContent().setText(toString(values[Math.floorMod(i + increment, values.length)]));
                 return;
             }
         }

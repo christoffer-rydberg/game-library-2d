@@ -4,24 +4,24 @@ import com.gamelibrary2d.animation.AnimationFactory;
 import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.ResourceDisposer;
-import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
+import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.layers.Panel;
+import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.IterativeParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
 import com.gamelibrary2d.renderers.AbstractShaderRenderer;
 import com.gamelibrary2d.renderers.AnimationRenderer;
-import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.rendering.BlendMode;
-import com.gamelibrary2d.rendering.PointSmoothing;
-import com.gamelibrary2d.resources.Surface;
+import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
+import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
@@ -145,9 +145,10 @@ public class RenderSettingsPanel extends StackPanel {
     }
 
     private static void setText(Button button, String text) {
-        button.setText(text);
-        button.setBounds(button.getTextRenderer().getFont().textSize(button.getText(), button.getHorizontalAlignment(),
-                button.getVerticalAlignment()));
+        var buttonContext = button.getContent();
+        buttonContext.setText(text);
+        button.setBounds(buttonContext.getTextRenderer().getFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
+                buttonContext.getVerticalAlignment()));
     }
 
     private PropertyParameters<Boolean> getUpdateOnGpuParameters() {
@@ -384,7 +385,7 @@ public class RenderSettingsPanel extends StackPanel {
         };
     }
 
-    private MouseReleaseListener getTextureMouseListener() {
+    private MouseButtonReleaseListener getTextureMouseListener() {
         return (obj, button, mods, projectedX, projectedY) -> {
             if (button == Mouse.instance().mouseButton1()) {
                 loadTexture((Button) obj, quad);

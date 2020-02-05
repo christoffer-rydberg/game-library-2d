@@ -1,17 +1,19 @@
 package com.gamelibrary2d.updates;
 
+import com.gamelibrary2d.objects.GameObject;
+
 abstract class AbstractAttributeUpdate implements AttributeUpdate {
 
-    private final UpdateObject target;
+    private final GameObject target;
 
     private final boolean scaleOverDuration;
 
-    protected AbstractAttributeUpdate(UpdateObject target, boolean scaleOverDuration) {
+    protected AbstractAttributeUpdate(GameObject target, boolean scaleOverDuration) {
         this.target = target;
         this.scaleOverDuration = scaleOverDuration;
     }
 
-    public UpdateObject getTarget() {
+    public GameObject getTarget() {
         return target;
     }
 

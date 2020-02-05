@@ -1,14 +1,15 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.renderSettings;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.eventlisteners.MouseReleaseListener;
+import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.layers.AbstractPanel;
+import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.objects.TextChangedListener;
-import com.gamelibrary2d.objects.TextObject;
+import com.gamelibrary2d.renderable.Label;
+import com.gamelibrary2d.eventlisteners.TextChangedListener;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.rendering.HorizontalAlignment;
-import com.gamelibrary2d.rendering.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
@@ -16,18 +17,20 @@ import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
 class ButtonPanel extends AbstractPanel<GameObject> {
 
     ButtonPanel(String propertyName, String buttonText,
-                MouseReleaseListener mouseListener, TextChangedListener textListener) {
+                MouseButtonReleaseListener mouseListener, TextChangedListener textListener) {
 
-        TextObject label = new TextObject();
-        label.setVerticalAlignment(VerticalAlignment.TOP);
-        label.setHorizontalAlignment(HorizontalAlignment.LEFT);
-        label.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
-        label.setFontColor(Color.WHITE);
-        label.setText(propertyName + ":");
-        label.setBounds(label.getTextRenderer().getFont().textSize(
-                label.getText(),
-                label.getHorizontalAlignment(),
-                label.getVerticalAlignment()));
+        var labelContext = new Label();
+        labelContext.setVerticalAlignment(VerticalAlignment.TOP);
+        labelContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        labelContext.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
+        labelContext.setFontColor(Color.WHITE);
+        labelContext.setText(propertyName + ":");
+
+        var label = new BasicObject<>(labelContext);
+        label.setBounds(labelContext.getTextRenderer().getFont().textSize(
+                labelContext.getText(),
+                labelContext.getHorizontalAlignment(),
+                labelContext.getVerticalAlignment()));
         add(label);
 
         int offset = 150;
@@ -35,16 +38,18 @@ class ButtonPanel extends AbstractPanel<GameObject> {
         Font font = Fonts.getDefaultFont();
 
         Button button = new Button();
-        button.setVerticalAlignment(VerticalAlignment.TOP);
-        button.setHorizontalAlignment(HorizontalAlignment.LEFT);
-        button.setTextRenderer(new TextRenderer(font));
-        button.setFontColor(Color.WHITE);
-        button.setText(buttonText);
+
+        var buttonContext = button.getContent();
+        buttonContext.setVerticalAlignment(VerticalAlignment.TOP);
+        buttonContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        buttonContext.setTextRenderer(new TextRenderer(font));
+        buttonContext.setFontColor(Color.WHITE);
+        buttonContext.setText(buttonText);
         button.getPosition().set(offset, 0);
-        button.setBounds(font.textSize(button.getText(),
-                button.getHorizontalAlignment(), button.getVerticalAlignment()));
-        button.addMouseReleaseListener(mouseListener);
-        if (textListener != null) button.addTextChangedListener(textListener);
+        button.setBounds(font.textSize(buttonContext.getText(),
+                buttonContext.getHorizontalAlignment(), buttonContext.getVerticalAlignment()));
+        button.addMouseButtonReleaseListener(mouseListener);
+        if (textListener != null) buttonContext.addTextChangedListener(textListener);
 
         add(button);
     }

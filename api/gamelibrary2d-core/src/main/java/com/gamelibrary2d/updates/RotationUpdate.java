@@ -1,16 +1,18 @@
 package com.gamelibrary2d.updates;
 
+import com.gamelibrary2d.objects.GameObject;
+
 public class RotationUpdate extends AbstractAttributeUpdate {
 
     private final float originalDeltaRotation;
 
     private float deltaRotation;
 
-    public RotationUpdate(UpdateObject target, float deltaRotation) {
+    public RotationUpdate(GameObject target, float deltaRotation) {
         this(target, deltaRotation, true);
     }
 
-    public RotationUpdate(UpdateObject target, float deltaRotation, boolean scaleOverDuration) {
+    public RotationUpdate(GameObject target, float deltaRotation, boolean scaleOverDuration) {
         super(target, scaleOverDuration);
         this.originalDeltaRotation = deltaRotation;
         this.deltaRotation = deltaRotation;
@@ -22,7 +24,7 @@ public class RotationUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    public void makeRelative(UpdateObject target) {
+    public void makeRelative(GameObject target) {
         deltaRotation = originalDeltaRotation - getTarget().getRotation() + target.getRotation();
     }
 

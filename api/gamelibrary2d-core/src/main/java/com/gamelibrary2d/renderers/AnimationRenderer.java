@@ -5,16 +5,12 @@ import com.gamelibrary2d.animation.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.ResourceDisposer;
-import com.gamelibrary2d.common.io.BufferUtils;
-import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
-
-import java.nio.ByteBuffer;
 
 public class AnimationRenderer extends AbstractShaderRenderer {
     private final Disposer disposer;
@@ -123,16 +119,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     }
 
     @Override
-    public boolean isVisible(float x, float y) {
-        var currentFrame = getCurrentFrame();
-        if (currentFrame != null && InternalHitDetection.isVisible(currentFrame.getQuad(), currentFrame.getTexture(), x, y)) {
-            return true;
-        }
-
-        return backgroundBuffer != null && backgroundBuffer.isVisible(x, y);
-    }
-
-    @Override
     protected void onRender(ShaderProgram shaderProgram) {
         var activeIndex = getCurrentFrameIndex();
         if (activeIndex < 0)
@@ -202,14 +188,13 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             var modelMatrix = ModelMatrix.instance();
             modelMatrix.pushMatrix();
             modelMatrix.clearMatrix();
-            shaderProgram.updateModelMatrix(ModelMatrix.instance());
 
             // Render to background buffer
+            shaderProgram.updateModelMatrix(ModelMatrix.instance());
             renderToFrameBuffer(shaderProgram, animation, activeIndex);
 
             // Restore model matrix
             modelMatrix.popMatrix();
-            shaderProgram.updateModelMatrix(ModelMatrix.instance());
 
             // Render frame buffer texture to the default frame buffer
             float alpha = shaderProgram.getSetting(RenderSettings.ALPHA);
@@ -258,15 +243,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
                 frameBufferRenderer = null;
                 backgroundQuads = null;
             }
-        }
-
-        boolean isVisible(float x, float y) {
-            frameBuffer.bind();
-            ByteBuffer pixels = BufferUtils.createByteBuffer(4);
-            OpenGL.instance().glReadPixels((int) x, (int) y, 1, 1, OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE, pixels);
-            var alpha = pixels.get(3) & 0xF;
-            frameBuffer.unbind(true);
-            return alpha > 0;
         }
     }
 }

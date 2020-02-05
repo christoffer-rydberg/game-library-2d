@@ -5,8 +5,7 @@ package com.gamelibrary2d.markers;
  * order to enable automatic clearing in recursive methods. For instance, when a
  * container is cleared it can access the clear-method of any child object that
  * implements this interface. To further control if the child object is
- * automatically cleared, this interface contains the {@link #isAutoClearing()
- * isAutoClearing} method.
+ * automatically cleared, this interface contains the {@link #isAutoClearing} method.
  *
  * @author Christoffer Rydberg
  */

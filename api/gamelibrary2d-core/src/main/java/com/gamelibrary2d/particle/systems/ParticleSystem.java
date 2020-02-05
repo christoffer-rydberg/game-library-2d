@@ -1,10 +1,10 @@
 package com.gamelibrary2d.particle.systems;
 
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.rendering.RenderableEffect;
 import com.gamelibrary2d.markers.Clearable;
 
-public interface ParticleSystem extends Updatable, Clearable, RenderableEffect {
+public interface ParticleSystem extends Updatable, Clearable, Renderable {
 
     int getParticleCount();
 

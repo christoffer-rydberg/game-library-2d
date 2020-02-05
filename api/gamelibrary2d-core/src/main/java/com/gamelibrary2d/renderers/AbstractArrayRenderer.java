@@ -5,7 +5,7 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.BlendMode;
+import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.resources.VertexArray;
 
 public abstract class AbstractArrayRenderer<T extends VertexArray> implements ArrayRenderer<T> {

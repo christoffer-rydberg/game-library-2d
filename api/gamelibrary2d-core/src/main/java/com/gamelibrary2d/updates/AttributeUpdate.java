@@ -1,8 +1,10 @@
 package com.gamelibrary2d.updates;
 
+import com.gamelibrary2d.objects.GameObject;
+
 /**
  * The {@link AttributeUpdate} is an {@link Update} applied to the attributes of
- * an {@link UpdateObject}.
+ * an {@link GameObject}.
  *
  * @author Christoffer Rydberg
  */
@@ -24,7 +26,7 @@ public interface AttributeUpdate extends Update {
      *
      * @param obj The object, which attributes the update will be set relative to.
      */
-    void makeRelative(UpdateObject obj);
+    void makeRelative(GameObject obj);
 
     /**
      * <p>

@@ -5,8 +5,8 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.layers.Frame;
-import com.gamelibrary2d.layers.FrameDisposal;
+import com.gamelibrary2d.frames.Frame;
+import com.gamelibrary2d.frames.FrameDisposal;
 
 public interface Game extends Disposer, Updatable {
 

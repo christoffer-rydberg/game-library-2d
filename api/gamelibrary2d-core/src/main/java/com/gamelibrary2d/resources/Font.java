@@ -5,8 +5,8 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.HorizontalAlignment;
-import com.gamelibrary2d.rendering.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

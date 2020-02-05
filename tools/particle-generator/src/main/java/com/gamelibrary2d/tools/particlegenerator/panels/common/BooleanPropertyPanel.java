@@ -22,32 +22,32 @@ public class BooleanPropertyPanel extends ButtonPropertyPanel<Boolean> {
 
     @Override
     public void onTextChanged(GameObject obj, String before, String after) {
+        Button button = (Button) obj;
 
-        Button buttonObj = (Button) obj;
-
-        if (fromString(buttonObj.getText())) {
-            buttonObj.setFontColor(Color.GREEN);
+        var buttonContext = button.getContent();
+        if (fromString(buttonContext.getText())) {
+            buttonContext.setFontColor(Color.GREEN);
         } else {
-            buttonObj.setFontColor(Color.WHITE);
+            buttonContext.setFontColor(Color.WHITE);
         }
 
-        buttonObj.setBounds(buttonObj.getTextRenderer().getFont().textSize(
-                buttonObj.getText(),
-                buttonObj.getHorizontalAlignment(),
-                buttonObj.getVerticalAlignment()));
+        button.setBounds(buttonContext.getTextRenderer().getFont().textSize(
+                buttonContext.getText(),
+                buttonContext.getHorizontalAlignment(),
+                buttonContext.getVerticalAlignment()));
 
         recalculateBounds();
     }
 
     @Override
-    public void onMouseRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
-
+    public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
         Button buttonObj = (Button) obj;
 
-        if (fromString(buttonObj.getText())) {
-            buttonObj.setText(toString(false));
+        var buttonContext = buttonObj.getContent();
+        if (fromString(buttonContext.getText())) {
+            buttonContext.setText(toString(false));
         } else {
-            buttonObj.setText(toString(true));
+            buttonContext.setText(toString(true));
         }
     }
 }

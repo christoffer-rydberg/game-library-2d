@@ -1,56 +1,40 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
-import com.gamelibrary2d.renderers.Renderer;
 
-public abstract class AbstractCursor extends AbstractGameObject implements MouseAware {
-
+public abstract class AbstractCursor<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
     private final Game game;
 
-    private Renderer renderer;
-
-    private AbstractCursor(Game game) {
+    public AbstractCursor(Game game, T content) {
+        super(content);
         this.game = game;
-    }
-
-    public AbstractCursor(Game game, Renderer renderer) {
-        this(game);
-        setRenderer(renderer);
     }
 
     @Override
     protected void onRenderProjected(float alpha) {
-        if (game.hasCursorFocus() && renderer != null) {
-            renderer.render(alpha);
+        if (game.hasCursorFocus()) {
+            super.onRenderProjected(alpha);
         }
     }
 
-    public Renderer getRenderer() {
-        return renderer;
-    }
-
-    public void setRenderer(Renderer renderer) {
-        this.renderer = renderer;
-    }
-
     @Override
-    public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
+    public boolean onMouseButtonDown(int button, int mods, float x, float y) {
         onInteracted();
         return false;
     }
 
     @Override
-    public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
-        getPosition().set(projectedX, projectedY);
+    public boolean onMouseMove(float x, float y) {
+        getPosition().set(x, y);
         onInteracted();
         return false;
     }
 
     @Override
-    public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
+    public void onMouseButtonRelease(int button, int mods, float x, float y) {
         onInteracted();
-        return false;
     }
 
     protected abstract void onInteracted();

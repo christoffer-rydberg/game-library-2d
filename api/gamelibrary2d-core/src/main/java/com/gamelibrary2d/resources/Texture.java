@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -19,9 +18,8 @@ public class Texture extends AbstractDisposable {
     private static int currentId;
 
     private int id;
-    private float imageWidth;
-    private float imageHeight;
-    private byte[][] alphaArray;
+    private int imageWidth;
+    private int imageHeight;
 
     private Texture() {
     }
@@ -96,57 +94,18 @@ public class Texture extends AbstractDisposable {
         return imageHeight;
     }
 
-    public boolean isVisible(int pixelX, int pixelY) {
-        return getAlpha(pixelX, pixelY) != 0;
-    }
-
-    public boolean hasAlpha() {
-        return alphaArray != null;
-    }
-
-    public byte getAlpha(int pixelX, int pixelY) {
-        if (!hasAlpha())
-            return Byte.MAX_VALUE;
-
-        if (0 <= pixelX && pixelX < imageWidth && 0 <= pixelY && pixelY < imageHeight) {
-            return alphaArray[pixelX][pixelY];
-        }
-
-        return 0;
-    }
-
     public void onDispose() {
         OpenGL.instance().glDeleteTextures(id);
     }
 
-    private byte[][] getAlpha(BufferedImage img) {
-        Raster raster = img.getAlphaRaster();
-        if (raster == null)
-            return null;
-        byte[][] alphaArray = new byte[raster.getWidth()][raster.getHeight()];
-
-        int[] alphaPixel = new int[raster.getNumBands()];
-        for (int x = 0; x < raster.getWidth(); x++) {
-            for (int y = 0; y < raster.getHeight(); y++) {
-                raster.getPixel(x, y, alphaPixel);
-                alphaArray[x][y] = (byte) alphaPixel[0];
-            }
-        }
-
-        return alphaArray;
-    }
-
     private void loadTexture(BufferedImage image) {
-        imageWidth = image.getWidth();
-        imageHeight = image.getHeight();
-        alphaArray = getAlpha(image);
+        var imageWidth = image.getWidth();
+        var imageHeight = image.getHeight();
 
-        int[] pixels = new int[image.getWidth() * image.getHeight()];
+        int[] pixels = new int[imageWidth * imageHeight];
+        image.getRGB(0, 0, imageWidth, imageHeight, pixels, 0, image.getWidth());
 
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4); // 4 for RGBA, 3 for
-        // RGB
+        var buffer = BufferUtils.createByteBuffer(imageWidth * imageHeight * 4);
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
@@ -160,10 +119,13 @@ public class Texture extends AbstractDisposable {
 
         buffer.flip();
 
-        loadTexture(buffer, image.getWidth(), image.getHeight());
+        loadTexture(buffer, imageWidth, imageHeight);
     }
 
     private void loadTexture(ByteBuffer buffer, int width, int height) {
+        imageWidth = width;
+        imageHeight = height;
+
         // Create a new texture object in memory and bind it
         id = OpenGL.instance().glGenTextures();
         bind();

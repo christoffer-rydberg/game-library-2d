@@ -3,8 +3,8 @@ package com.gamelibrary2d.demos.transparentwindow;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.animation.*;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.layers.AbstractFrame;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 
 import java.io.IOException;
@@ -13,8 +13,21 @@ import java.util.Collections;
 
 public class DemoFrame extends AbstractFrame {
 
+    private ComposableObject<AnimationRenderer> animationObj;
+
     DemoFrame(Game game) {
         super(game);
+    }
+
+    private Animation createAnimation() throws IOException {
+        var animation = AnimationFactory.create(DemoFrame.class.getResource("/Images/homer.gif"),
+                AnimationFormats.GIF, Rectangle.centered(1f, 1f), AnimationFactory.NO_CONSTRAINTS, this);
+        var frames = animation.getFrames();
+        var frameUpdate = new ArrayList<AnimationFrame>();
+        frames.forEach(frameUpdate::add);
+        Collections.reverse(frameUpdate);
+        frames.forEach(frameUpdate::add);
+        return new Animation(frameUpdate, animation.getBounds());
     }
 
     @Override
@@ -22,19 +35,10 @@ public class DemoFrame extends AbstractFrame {
         var game = getGame();
         var window = game.getWindow();
         try {
-            var animation = AnimationFactory.create(DemoFrame.class.getResource("/Images/homer.gif"),
-                    AnimationFormats.GIF, Rectangle.centered(1f, 1f), AnimationFactory.NO_CONSTRAINTS, this);
-            var frames = animation.getFrames();
-            var frameUpdate = new ArrayList<AnimationFrame>();
-            frames.forEach(frameUpdate::add);
-            Collections.reverse(frameUpdate);
-            frames.forEach(frameUpdate::add);
-
-            var animatedRenderer = new AnimationRenderer(new Animation(frameUpdate, animation.getBounds()), false, this);
-
-            GameObject animatedObject = new AnimatedObject(animatedRenderer);
-            animatedObject.getPosition().set(window.getWidth() / 2f, window.getHeight() / 2f);
-            add(animatedObject);
+            var animation = createAnimation();
+            animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
+            animationObj.getPosition().set(window.getWidth() / 2f, window.getHeight() / 2f);
+            add(animationObj);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,14 +67,7 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-        var allAnimationsFinished = getChildren().stream()
-                .filter(x -> x instanceof AnimatedObject)
-                .map(x -> (AnimatedObject) x)
-                .filter(x -> x.getRenderer() instanceof AnimationRenderer)
-                .map(x -> (AnimationRenderer) x.getRenderer())
-                .allMatch(AnimationRenderer::isAnimationFinished);
-
-        if (allAnimationsFinished) {
+        if (animationObj.getContent().isAnimationFinished()) {
             getGame().exit();
         }
     }

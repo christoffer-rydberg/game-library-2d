@@ -1,8 +1,10 @@
 package com.gamelibrary2d.tools.particlegenerator;
 
+import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.layers.*;
+import com.gamelibrary2d.layers.BasicLayer;
+import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.particle.settings.SettingsExtensions;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
@@ -116,8 +118,8 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    public boolean mouseButtonDownEvent(int button, int mods, float projectedX, float projectedY) {
-        if (!super.mouseButtonDownEvent(button, mods, projectedX, projectedY)) {
+    protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+        if (!super.handleMouseButtonDown(button, mods, projectedX, projectedY)) {
             if (dragging == -1) {
                 dragging = button;
                 PosX = projectedX;
@@ -132,8 +134,8 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    public boolean mouseMoveEvent(float projectedX, float projectedY, boolean drag) {
-        if (!super.mouseMoveEvent(projectedX, projectedY, drag)) {
+    protected boolean handleMouseMove(float projectedX, float projectedY) {
+        if (!super.handleMouseMove(projectedX, projectedY)) {
             if (dragging != -1) {
                 PosX = projectedX;
                 PosY = projectedY;
@@ -147,15 +149,15 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    public boolean mouseButtonReleaseEvent(int button, int mods, float projectedX, float projectedY) {
+    protected void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
         if (button == dragging) {
             dragging = -1;
         }
-        return super.mouseButtonReleaseEvent(button, mods, projectedX, projectedY);
+        super.handleMouseButtonRelease(button, mods, projectedX, projectedY);
     }
 
     @Override
-    public void keyDownEvent(int key, int scanCode, boolean repeat, int mods) {
+    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
         if (key == Keyboard.instance().keyTab()) {
             // TODO: Focus next textbox
             return;
@@ -174,7 +176,7 @@ public class ParticleFrame extends AbstractFrame {
             return;
         }
 
-        super.keyDownEvent(key, scanCode, repeat, mods);
+        super.onKeyDown(key, scanCode, repeat, mods);
     }
 
     @Override

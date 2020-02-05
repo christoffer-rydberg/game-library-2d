@@ -3,6 +3,7 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.util.QuadShape;
 import com.gamelibrary2d.resources.PositionArray;
 import com.gamelibrary2d.resources.Texture;
 

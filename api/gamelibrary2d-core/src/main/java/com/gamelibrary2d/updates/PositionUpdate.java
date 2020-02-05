@@ -1,5 +1,7 @@
 package com.gamelibrary2d.updates;
 
+import com.gamelibrary2d.objects.GameObject;
+
 public class PositionUpdate extends AbstractAttributeUpdate {
 
     private final float originalDeltaX;
@@ -8,11 +10,11 @@ public class PositionUpdate extends AbstractAttributeUpdate {
     private float deltaX;
     private float deltaY;
 
-    public PositionUpdate(UpdateObject target, float deltaX, float deltaY) {
+    public PositionUpdate(GameObject target, float deltaX, float deltaY) {
         this(target, deltaX, deltaY, true);
     }
 
-    public PositionUpdate(UpdateObject target, float deltaX, float deltaY, boolean scaleOverDuration) {
+    public PositionUpdate(GameObject target, float deltaX, float deltaY, boolean scaleOverDuration) {
         super(target, scaleOverDuration);
         this.originalDeltaX = deltaX;
         this.originalDeltaY = deltaY;
@@ -26,7 +28,7 @@ public class PositionUpdate extends AbstractAttributeUpdate {
         deltaY = originalDeltaY - getTarget().getPosition().getY();
     }
 
-    public void makeRelative(UpdateObject target) {
+    public void makeRelative(GameObject target) {
         deltaX = originalDeltaX - getTarget().getPosition().getX() + target.getPosition().getX();
         deltaY = originalDeltaY - getTarget().getPosition().getY() + target.getPosition().getY();
     }

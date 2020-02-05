@@ -5,15 +5,17 @@ import com.gamelibrary2d.common.disposal.AbstractDisposer;
 import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
+import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
+import com.gamelibrary2d.frames.Frame;
+import com.gamelibrary2d.frames.FrameDisposal;
+import com.gamelibrary2d.frames.LoadingFrame;
 import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.layers.Frame;
-import com.gamelibrary2d.layers.FrameDisposal;
-import com.gamelibrary2d.layers.LoadingFrame;
+import com.gamelibrary2d.input.KeyAction;
 import com.gamelibrary2d.resources.Shader;
 
 import java.util.ArrayDeque;
@@ -76,7 +78,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     /**
      * The main loop is responsible for maintaining a steady frame rate.
      */
-    private InternalGameLoop mainLoop;
+    private GameLoop mainLoop;
 
     /**
      * Speed factor each update, applied to deltatime
@@ -105,7 +107,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         createDefaultShaderProgram();
 
         invokeLater = new ArrayDeque<>();
-        mainLoop = new InternalGameLoop(this, window);
+        mainLoop = new GameLoop(this, window);
 
         mainLoop.start(this::onLoopStarted);
 
@@ -401,20 +403,20 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onKeyCallback(int key, int scancode, int action, int mods) {
         if (action == Keyboard.instance().actionPress()) {
-            getFrame().keyDownEvent(key, scancode, false, mods);
+            getFrame().onKeyDown(key, scancode, false, mods);
             FocusManager.keyDownEvent(key, scancode, false, mods);
         } else if (action == Keyboard.instance().actionRepeat()) {
-            getFrame().keyDownEvent(key, scancode, true, mods);
+            getFrame().onKeyDown(key, scancode, true, mods);
             FocusManager.keyDownEvent(key, scancode, true, mods);
         } else {
-            getFrame().keyReleaseEvent(key, scancode, mods);
+            getFrame().onKeyRelease(key, scancode, mods);
             FocusManager.keyReleaseEvent(key, scancode, mods);
         }
     }
 
     @Override
     public void onCharCallback(char charInput) {
-        getFrame().charInputEvent(charInput);
+        getFrame().onCharInput(charInput);
         FocusManager.charInputEvent(charInput);
     }
 
@@ -423,8 +425,9 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         cursorPosX = (float) xpos;
         cursorPosY = (float) ypos;
         var frame = getFrame();
-        if (frame != null)
-            frame.mouseMoveEvent(cursorPosX, cursorPosY, false);
+        if (frame != null) {
+            frame.onMouseMove(cursorPosX, cursorPosY);
+        }
     }
 
     @Override
@@ -435,12 +438,12 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onMouseButtonCallback(int button, int action, int mods) {
         if (action == Mouse.instance().actionPress()) {
-            getFrame().mouseButtonDownEvent(button, mods, cursorPosX, cursorPosY);
+            getFrame().onMouseButtonDown(button, mods, cursorPosX, cursorPosY);
+            FocusManager.mouseButtonEventFinished(button, KeyAction.PRESSED, mods);
         } else if (action == Mouse.instance().actionRelease()) {
-            getFrame().mouseButtonReleaseEvent(button, mods, cursorPosX, cursorPosY);
+            getFrame().onMouseButtonRelease(button, mods, cursorPosX, cursorPosY);
+            FocusManager.mouseButtonEventFinished(button, KeyAction.RELEASED, mods);
         }
-
-        FocusManager.mouseButtonEventFinished(button, action, mods);
     }
 
     @Override
@@ -451,4 +454,45 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     protected abstract void onStart();
 
     protected abstract void onExit();
+
+    private static class GameLoop {
+
+        private final Game game;
+        private final Window window;
+        private final Timer timer;
+
+        private boolean running;
+
+        GameLoop(Game game, Window window) {
+            this.game = game;
+            this.window = window;
+            timer = Timer.create();
+        }
+
+        public void start(Action onStart) {
+            running = true;
+
+            timer.init();
+
+            onStart.invoke();
+
+            while (running && !window.isCloseRequested()) {
+                game.update((float) timer.update());
+            }
+
+            running = false;
+        }
+
+        public void stop() {
+            running = false;
+        }
+
+        boolean isRunning() {
+            return running;
+        }
+
+        float getFPS() {
+            return (float) timer.getUPS();
+        }
+    }
 }

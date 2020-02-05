@@ -2,7 +2,7 @@ package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Font;
 
 public class TextRenderer extends AbstractShaderRenderer {
@@ -49,10 +49,5 @@ public class TextRenderer extends AbstractShaderRenderer {
     @Override
     public void onRender(ShaderProgram shaderProgram) {
         font.render(shaderProgram, text, start, end);
-    }
-
-    @Override
-    public boolean isVisible(float x, float y) {
-        return false;
     }
 }

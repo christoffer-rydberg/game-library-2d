@@ -7,8 +7,8 @@ public interface KeyAware {
      *
      * @param charInput The Unicode code point of the character.
      */
-    void charInputEvent(char charInput);
-
+    void onCharInput(char charInput);
+    
     /**
      * Handles key down events.
      *
@@ -17,7 +17,7 @@ public interface KeyAware {
      * @param repeat   True if the key action is repeat.
      * @param mods     Describes which modifier keys were held down.
      */
-    void keyDownEvent(int key, int scanCode, boolean repeat, int mods);
+    void onKeyDown(int key, int scanCode, boolean repeat, int mods);
 
     /**
      * Handles key release events.
@@ -26,6 +26,6 @@ public interface KeyAware {
      * @param scanCode The system-specific scancode of the key.
      * @param mods     Describes which modifier keys were held down.
      */
-    void keyReleaseEvent(int key, int scanCode, int mods);
+    void onKeyRelease(int key, int scanCode, int mods);
 
 }

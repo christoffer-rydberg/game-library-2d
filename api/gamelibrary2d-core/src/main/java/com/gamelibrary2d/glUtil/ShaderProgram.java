@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.rendering.RenderSettings;
+import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Shader;
 
 import java.nio.FloatBuffer;
