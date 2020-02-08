@@ -21,8 +21,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * will also handle their disposal. It also provides functionalty to create and
  * store {@link SoundBuffer SoundBuffers} and activate a {@link SoundListener}.
  * Basically, it manages most things related to sound.
- *
- * @author Christoffer Rydberg
  */
 public class SoundManager extends AbstractDisposer {
 

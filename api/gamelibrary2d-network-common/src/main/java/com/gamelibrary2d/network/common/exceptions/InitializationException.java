@@ -5,7 +5,6 @@ import com.gamelibrary2d.common.exceptions.GameLibrary2DException;
 public class InitializationException extends GameLibrary2DException {
 
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
 

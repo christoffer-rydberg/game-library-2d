@@ -2,8 +2,6 @@ package com.gamelibrary2d.input;
 
 /**
  * Describes the input type of an input binding.
- *
- * @author Christoffer Rydberg
  */
 public enum InputType {
 

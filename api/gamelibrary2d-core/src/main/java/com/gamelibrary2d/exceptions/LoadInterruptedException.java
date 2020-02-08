@@ -4,13 +4,10 @@ import com.gamelibrary2d.common.exceptions.GameLibrary2DException;
 
 /**
  * Occurs when a frame fails to load.
- *
- * @author Christoffer Rydberg
  */
 public class LoadInterruptedException extends GameLibrary2DException {
 
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
 

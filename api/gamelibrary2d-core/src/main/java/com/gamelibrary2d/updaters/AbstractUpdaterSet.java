@@ -7,8 +7,6 @@ import java.util.Deque;
  * Abstract implementation of an {@link UpdaterSet} holding a set of active and
  * finished updates. Derived classes decides when the updates are applied and
  * when they are finished.
- *
- * @author Christoffer Rydberg
  */
 abstract class AbstractUpdaterSet implements UpdaterSet {
 

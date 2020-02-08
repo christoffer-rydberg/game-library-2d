@@ -11,8 +11,6 @@ import java.util.List;
  * Updates {@link Collidable} objects and performs collision detection. A collision is defined as the bounds of two
  * registered {@link Collidable} instances overlapping. {@link CollisionAware} instances are alerted of collisions
  * in order to perform more fine grained collision detection and/or decide the aftermath of the collision.
- *
- * @author Christoffer Rydberg
  */
 public class CollisionDetection<T extends Collidable> {
     private final Pool<InternalQuadTreeNode> nodePool = new Pool<>();

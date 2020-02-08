@@ -11,8 +11,6 @@ import com.gamelibrary2d.framework.Renderable;
  * color for each pixel. This is done efficiently using shaders. No light
  * results in a fully opaque color and maximum light results in a fully
  * transparent color.
- *
- * @author Christoffer Rydberg
  */
 public interface LightRenderer extends Renderable {
 

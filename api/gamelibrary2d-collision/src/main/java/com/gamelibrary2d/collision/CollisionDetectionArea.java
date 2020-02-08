@@ -2,8 +2,6 @@ package com.gamelibrary2d.collision;
 
 /**
  * Area used to restrict where to update {@link Collidable} objects and to perform collision detection.
- *
- * @author Christoffer Rydberg
  */
 public interface CollisionDetectionArea extends InternalCollidable {
 

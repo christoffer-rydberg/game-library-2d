@@ -2,13 +2,10 @@ package com.gamelibrary2d.common.exceptions;
 
 /**
  * Base class for GameLibrary2D exceptions.
- *
- * @author Christoffer Rydberg
  */
 public class GameLibrary2DException extends Exception {
 
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
 

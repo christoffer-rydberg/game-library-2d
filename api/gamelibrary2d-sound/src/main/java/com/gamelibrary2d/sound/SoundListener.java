@@ -10,8 +10,6 @@ import static org.lwjgl.openal.AL10.*;
  * which are used to omit sound. The {@link SoundListener} is activated when
  * it's attached to the {@link SoundManager} by calling its
  * {@link SoundManager#setListener(SoundListener) setListener} method.
- *
- * @author Christoffer Rydberg
  */
 public class SoundListener {
 

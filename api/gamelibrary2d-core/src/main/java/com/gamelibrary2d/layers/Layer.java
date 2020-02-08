@@ -7,8 +7,6 @@ import java.util.Comparator;
 
 /**
  * Defines a layer of {@link Renderable} objects.
- *
- * @author Christoffer Rydberg
  */
 public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Clearable, Updatable, MouseAware {
 

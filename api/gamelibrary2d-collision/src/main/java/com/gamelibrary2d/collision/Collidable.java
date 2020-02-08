@@ -2,8 +2,6 @@ package com.gamelibrary2d.collision;
 
 /**
  * Derived classes are subjects to collision detection.
- *
- * @author Christoffer Rydberg
  */
 public interface Collidable extends InternalCollidable {
 

@@ -19,8 +19,6 @@ import java.net.URL;
  * which is done by serializing the object to the
  * {@link com.gamelibrary2d.common.io.DataBuffer DataBuffer} and then
  * deserializing a new instance. This class is threadsafe.
- *
- * @author Christoffer Rydberg
  */
 public class SaveLoadManager {
 

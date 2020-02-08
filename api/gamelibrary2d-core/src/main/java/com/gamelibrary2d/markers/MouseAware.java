@@ -5,8 +5,6 @@ import com.gamelibrary2d.objects.GameObject;
 /**
  * {@link GameObject Game objects} implementing this interface will receive mouse events routed by the parent
  * {@link Parent}. Mouse coordinates are projected to the position, scale and rotation of the object.
- *
- * @author Christoffer Rydberg
  */
 public interface MouseAware {
 

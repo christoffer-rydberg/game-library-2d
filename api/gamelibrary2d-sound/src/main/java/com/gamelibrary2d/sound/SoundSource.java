@@ -11,8 +11,6 @@ import static org.lwjgl.openal.AL10.*;
  * {@link SoundBuffer}. Speed and position are taken into account only if the
  * {@link SoundManager} has an attached {@link SoundListener}. A sound source
  * can be played by invoking {@link SoundManager#play(SoundSource)}.
- *
- * @author Christoffer Rydberg
  */
 public class SoundSource extends AbstractDisposable {
 

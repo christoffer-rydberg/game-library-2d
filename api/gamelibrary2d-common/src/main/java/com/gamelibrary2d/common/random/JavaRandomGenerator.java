@@ -5,8 +5,6 @@ import java.util.Random;
 /**
  * This is the default random generator which wraps the {@link java.util.Random
  * java.util.Random} class.
- *
- * @author Christoffer Rydberg
  */
 public class JavaRandomGenerator implements RandomGenerator {
 

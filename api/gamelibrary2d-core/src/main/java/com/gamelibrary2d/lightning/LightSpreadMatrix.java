@@ -3,8 +3,6 @@ package com.gamelibrary2d.lightning;
 /**
  * Represents a matrix structure used to decide the strength of spread light
  * depending on the distance from the source.
- *
- * @author Christoffer Rydberg
  */
 public interface LightSpreadMatrix {
 

@@ -8,8 +8,6 @@ import java.util.List;
 /**
  * An {@link AttributeUpdateSet} is used to groups several
  * {@link AttributeUpdate attribute updates} into one.
- *
- * @author Christoffer Rydberg
  */
 public class AttributeUpdateSet implements AttributeUpdate {
 

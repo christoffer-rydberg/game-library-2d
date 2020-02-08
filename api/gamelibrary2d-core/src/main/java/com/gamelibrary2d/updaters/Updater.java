@@ -6,8 +6,6 @@ import com.gamelibrary2d.updates.Update;
 /**
  * The {@link Updater} is used to apply one or more {@link Update updates}. You
  * can run an updater by invoking {@link Frame#run}.
- *
- * @author Christoffer Rydberg
  */
 public interface Updater {
 

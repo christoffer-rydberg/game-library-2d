@@ -24,8 +24,6 @@ import java.util.Deque;
 /**
  * An abstract implementation of the Game interface. This is a general
  * implementation and can be used as base class for all games.
- *
- * @author Christoffer Rydberg
  */
 public abstract class AbstractGame extends AbstractDisposer implements Game, CallbackHandler {
 

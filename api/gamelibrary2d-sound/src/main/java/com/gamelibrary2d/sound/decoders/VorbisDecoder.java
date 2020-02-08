@@ -16,8 +16,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * {@link AudioDecoder} for Vorbis OGG audio data.
- *
- * @author Christoffer Rydberg
  */
 public class VorbisDecoder extends AbstractAudioDecoder {
 

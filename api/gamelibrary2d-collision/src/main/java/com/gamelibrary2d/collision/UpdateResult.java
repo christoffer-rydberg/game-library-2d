@@ -2,8 +2,6 @@ package com.gamelibrary2d.collision;
 
 /**
  * Used to determine how to proceed with collision detection after an update.
- *
- * @author Christoffer Rydberg
  */
 public enum UpdateResult {
 

@@ -13,7 +13,6 @@ import com.gamelibrary2d.framework.Mouse;
  * This class contains methods to determine if the button/axis is pressed/tilted
  * and to update and retrieve the state to see when it is changed.
  *
- * @author Christoffer Rydberg
  * @see com.gamelibrary2d.input.InputBindings InputBindings
  */
 public class Input implements Serializable {

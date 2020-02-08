@@ -4,8 +4,6 @@ import com.gamelibrary2d.network.common.Communicator;
 
 /**
  * Configures the initialization process of a {@link Communicator}.
- *
- * @author Christoffer Rydberg
  */
 public interface CommunicationInitializer {
 

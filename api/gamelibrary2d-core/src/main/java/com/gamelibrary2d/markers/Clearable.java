@@ -6,8 +6,6 @@ package com.gamelibrary2d.markers;
  * container is cleared it can access the clear-method of any child object that
  * implements this interface. To further control if the child object is
  * automatically cleared, this interface contains the {@link #isAutoClearing} method.
- *
- * @author Christoffer Rydberg
  */
 public interface Clearable {
 

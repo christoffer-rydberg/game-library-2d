@@ -2,13 +2,10 @@ package com.gamelibrary2d.common.exceptions;
 
 /**
  * Base class for GameLibrary2D runtime exceptions.
- *
- * @author Christoffer Rydberg
  */
 public class GameLibrary2DRuntimeException extends RuntimeException {
 
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
 

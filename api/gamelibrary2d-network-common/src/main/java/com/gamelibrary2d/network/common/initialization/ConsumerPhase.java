@@ -6,8 +6,6 @@ import com.gamelibrary2d.network.common.exceptions.InitializationException;
 
 /**
  * Defines a phase that consumes messages during the initialization pipeline.
- *
- * @author Christoffer Rydberg
  */
 public interface ConsumerPhase extends InitializationPhase {
 

@@ -12,8 +12,6 @@ import com.gamelibrary2d.util.StackOrientation;
  * bounds. You can create a customized panel by extending {@link AbstractPanel}.
  * This abstract base class holds all basic panel functionality. The
  * {@link DefaultPanel} class can be used to instantiate a basic panel.
- *
- * @author Christoffer Rydberg
  */
 public interface Panel<T extends GameObject> extends LayerObject<T> {
 

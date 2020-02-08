@@ -5,7 +5,6 @@ package com.gamelibrary2d.collision;
  * detected and the instance's {@link CollisionAware#onCollisionWith onCollisionWith} method returns true.
  *
  * @param <T> The generic {@link CollisionAware} type that will be monitored for collisions.
- * @author Christoffer Rydberg
  */
 public interface CollidedAware<T extends CollisionAware<?>> extends Collidable {
 

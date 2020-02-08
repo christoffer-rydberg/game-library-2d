@@ -2,8 +2,6 @@ package com.gamelibrary2d.input;
 
 /**
  * Describes the current state of the input binding.
- *
- * @author Christoffer Rydberg
  */
 public enum InputState {
 

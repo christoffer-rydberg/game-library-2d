@@ -6,8 +6,6 @@ package com.gamelibrary2d.updaters;
  * duration, without a known goal, consider using the {@link DurationUpdater}
  * instead. The {@link ValueUpdater} is created by invoking one of its two
  * factory methods: {@link #fromDelta} or {@link #fromDuration}.
- *
- * @author Christoffer Rydberg
  */
 public class ValueUpdater implements Updater {
 

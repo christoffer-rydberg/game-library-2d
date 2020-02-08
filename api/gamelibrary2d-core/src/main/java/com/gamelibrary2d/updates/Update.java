@@ -14,8 +14,6 @@ import com.gamelibrary2d.updaters.Updater;
  * {@link Updater} can scale the duration of the {@link Update} when invoking
  * {@link #apply}.
  * </p>
- *
- * @author Christoffer Rydberg
  */
 public interface Update {
 

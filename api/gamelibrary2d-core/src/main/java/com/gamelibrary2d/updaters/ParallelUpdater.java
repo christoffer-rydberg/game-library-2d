@@ -5,8 +5,6 @@ import java.util.Deque;
 /**
  * The ParallelUpdater is an {@link UpdaterSet} running all updates in parallel.
  * The updater is finished once all updates have finished.
- *
- * @author Christoffer Rydberg
  */
 public class ParallelUpdater extends AbstractUpdaterSet {
 

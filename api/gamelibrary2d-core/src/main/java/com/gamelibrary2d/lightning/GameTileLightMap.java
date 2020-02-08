@@ -6,8 +6,6 @@ package com.gamelibrary2d.lightning;
  * sunlight. What differs sunlight from regular light is the
  * {@link #setSunlightFactor sunlight factor} which affects the strength of all
  * sunlight. This can, for example, be used to illustrate if it is day or night.
- *
- * @author Christoffer Rydberg
  */
 public interface GameTileLightMap extends LightMap {
 

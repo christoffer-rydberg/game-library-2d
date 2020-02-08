@@ -7,7 +7,6 @@ import java.util.List;
  * Pool to store and reuse objects in order to avoid unnecessary allocations and garbage collection.
  *
  * @param <T> The generic type of the objects in the pool.
- * @author Christoffer Rydberg
  */
 public class Pool<T> {
 

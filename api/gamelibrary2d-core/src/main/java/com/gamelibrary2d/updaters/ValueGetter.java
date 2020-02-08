@@ -2,8 +2,6 @@ package com.gamelibrary2d.updaters;
 
 /**
  * Float value getter used by the {@link ValueUpdater}.
- *
- * @author Christoffer Rydberg
  */
 public interface ValueGetter {
 

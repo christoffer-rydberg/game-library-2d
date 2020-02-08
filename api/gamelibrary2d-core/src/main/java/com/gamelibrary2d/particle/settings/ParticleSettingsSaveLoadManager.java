@@ -18,8 +18,6 @@ import java.net.URL;
  * {@link com.gamelibrary2d.common.io.DataBuffer DataBuffer} and then
  * deserializing a new instance. The buffer is owned by this class and should
  * not be kept/altered after the constructor call. This class is threadsafe.
- *
- * @author Christoffer Rydberg
  */
 public class ParticleSettingsSaveLoadManager {
 

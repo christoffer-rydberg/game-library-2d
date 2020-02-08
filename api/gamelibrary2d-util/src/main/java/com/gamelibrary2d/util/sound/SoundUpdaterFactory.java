@@ -10,8 +10,6 @@ import com.gamelibrary2d.updaters.ValueUpdater;
 /**
  * The class contains static methods to create various sound {@link Updater
  * updaters}.
- *
- * @author Christoffer Rydberg
  */
 public class SoundUpdaterFactory {
 

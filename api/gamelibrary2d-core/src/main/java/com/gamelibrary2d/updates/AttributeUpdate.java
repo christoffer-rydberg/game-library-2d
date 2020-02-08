@@ -5,8 +5,6 @@ import com.gamelibrary2d.objects.GameObject;
 /**
  * The {@link AttributeUpdate} is an {@link Update} applied to the attributes of
  * an {@link GameObject}.
- *
- * @author Christoffer Rydberg
  */
 public interface AttributeUpdate extends Update {
 

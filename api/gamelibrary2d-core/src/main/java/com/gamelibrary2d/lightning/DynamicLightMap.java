@@ -5,8 +5,6 @@ package com.gamelibrary2d.lightning;
  * cleared in the beginning of the update, when {@link LightMap#prepare prepare}
  * is invoked. The cells in the {@link DynamicLightMap} matches those of the
  * {@link LightRenderer} it is attached to.
- *
- * @author Christoffer Rydberg
  */
 public interface DynamicLightMap extends LightMap {
 

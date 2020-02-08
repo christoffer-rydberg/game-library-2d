@@ -19,8 +19,6 @@ import java.util.List;
  * This class is threadsafe and the implementation of the
  * {@link com.gamelibrary2d.common.random.RandomGenerator RandomGenerator} is also
  * expected to be threadsafe.
- *
- * @author Christoffer Rydberg
  */
 public class RandomInstance {
 

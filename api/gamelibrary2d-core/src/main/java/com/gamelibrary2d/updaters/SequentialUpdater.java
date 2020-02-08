@@ -6,8 +6,6 @@ import java.util.Deque;
  * The SequentialUpdater is an {@link UpdaterSet} running all updates
  * sequentially, in the order they were added. The updater is finished once all
  * updates have finished.
- *
- * @author Christoffer Rydberg
  */
 public class SequentialUpdater extends AbstractUpdaterSet {
 

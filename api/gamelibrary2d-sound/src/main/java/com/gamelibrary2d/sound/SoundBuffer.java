@@ -6,8 +6,6 @@ import static org.lwjgl.openal.AL10.alDeleteBuffers;
 
 /**
  * Represents an OpenAL sound buffer which is stored on the GPU.
- *
- * @author Christoffer Rydberg
  */
 public class SoundBuffer extends AbstractDisposable {
 

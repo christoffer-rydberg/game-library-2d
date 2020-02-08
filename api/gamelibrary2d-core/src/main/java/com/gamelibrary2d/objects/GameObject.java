@@ -5,8 +5,6 @@ import com.gamelibrary2d.markers.Bounded;
 
 /**
  * Defines a {@link Renderable} object that can be positioned, scaled and rotated.
- *
- * @author Christoffer Rydberg
  */
 public interface GameObject extends Transformable, Bounded, Renderable {
 

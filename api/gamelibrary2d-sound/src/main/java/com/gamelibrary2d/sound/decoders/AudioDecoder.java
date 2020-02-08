@@ -10,8 +10,6 @@ import java.nio.ByteBuffer;
 /**
  * An audio decoder is used to decode audio data to Pulse Coded Modulation (PCM)
  * format and buffer the data in OpenAL.
- *
- * @author Christoffer Rydberg
  */
 public interface AudioDecoder {
 

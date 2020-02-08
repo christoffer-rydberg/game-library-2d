@@ -4,7 +4,6 @@ package com.gamelibrary2d.collision;
  * Derived classes are made aware of collisions when updated.
  *
  * @param <T> The generic {@link Collidable} type that will be monitored for collisions.
- * @author Christoffer Rydberg
  */
 public interface CollisionAware<T extends Collidable> extends Collidable {
 

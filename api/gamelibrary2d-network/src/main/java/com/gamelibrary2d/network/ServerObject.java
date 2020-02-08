@@ -5,8 +5,6 @@ import com.gamelibrary2d.network.common.Message;
 
 /**
  * Server-side representation of a game object.
- *
- * @author Christoffer Rydberg
  */
 public interface ServerObject extends Message {
 

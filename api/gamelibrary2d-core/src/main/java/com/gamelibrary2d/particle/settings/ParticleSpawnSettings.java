@@ -8,8 +8,6 @@ import com.gamelibrary2d.particle.systems.Particle;
  * many particles are emitted by the particle system. Another responsibility is
  * to "emit" new particles by setting the initial position, gravity center, and
  * apply particle settings.
- *
- * @author Christoffer Rydberg
  */
 public interface ParticleSpawnSettings extends Serializable {
 
