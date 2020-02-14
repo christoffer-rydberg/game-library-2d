@@ -7,7 +7,8 @@ import com.gamelibrary2d.input.KeyAction;
 import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
 
-public final class InputObject<T extends Renderable> extends AbstractMouseAwareObject<T> implements FocusAware, MouseWhenFocusedAware {
+public final class InputObject<T extends Renderable> extends AbstractMouseAwareObject<T>
+        implements FocusAware, MouseWhenFocusedAware, ComposableObject<T> {
     private ParameterizedAction<T> onFocused;
     private ParameterizedAction<T> onUnfocused;
 
@@ -21,11 +22,6 @@ public final class InputObject<T extends Renderable> extends AbstractMouseAwareO
 
     public InputObject(T content) {
         super(content);
-    }
-
-    @Override
-    public void setContent(T content) {
-        super.setContent(content);
     }
 
     public void setFocusedHandler(ParameterizedAction<T> onFocused) {
@@ -79,7 +75,12 @@ public final class InputObject<T extends Renderable> extends AbstractMouseAwareO
     }
 
     @Override
-    protected boolean handleMouseMove(float projectedX, float projectedY, boolean drag) {
+    protected boolean handleMouseHover(float projectedX, float projectedY) {
+        return true;
+    }
+
+    @Override
+    protected boolean handleMouseDrag(float projectedX, float projectedY) {
         return true;
     }
 
@@ -97,5 +98,15 @@ public final class InputObject<T extends Renderable> extends AbstractMouseAwareO
             FocusManager.unfocus(this, false);
         }
         mouseEventHandled = false;
+    }
+
+    @Override
+    public T getContent() {
+        return super.getContent();
+    }
+
+    @Override
+    public void setContent(T content) {
+        super.setContent(content);
     }
 }

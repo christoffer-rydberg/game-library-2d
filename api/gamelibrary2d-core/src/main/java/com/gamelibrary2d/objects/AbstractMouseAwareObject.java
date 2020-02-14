@@ -5,8 +5,8 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.ResourceDisposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
-import com.gamelibrary2d.util.Projection;
 import com.gamelibrary2d.renderers.BitmapRenderer;
+import com.gamelibrary2d.util.Projection;
 
 public abstract class AbstractMouseAwareObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
     private final MouseButtonStates mouseButtonStates = new MouseButtonStates(5);
@@ -97,11 +97,11 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
         if (isEnabled()) {
             if (mouseButtonStates.hasActiveButtons() && isListeningToMouseDragEvents()) {
                 var projected = Projection.projectTo(this, x, y);
-                return handleMouseMove(projected.getX(), projected.getY(), true);
+                return handleMouseDrag(projected.getX(), projected.getY());
             } else if (isListeningToMouseHoverEvents()) {
                 var projected = Projection.projectTo(this, x, y);
                 if (isPixelVisible(projected.getX(), projected.getY())) {
-                    return handleMouseMove(projected.getX(), projected.getY(), false);
+                    return handleMouseHover(projected.getX(), projected.getY());
                 }
             }
         }
@@ -126,7 +126,9 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     protected abstract boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY);
 
-    protected abstract boolean handleMouseMove(float projectedX, float projectedY, boolean drag);
+    protected abstract boolean handleMouseHover(float projectedX, float projectedY);
+
+    protected abstract boolean handleMouseDrag(float projectedX, float projectedY);
 
     protected abstract void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY);
 

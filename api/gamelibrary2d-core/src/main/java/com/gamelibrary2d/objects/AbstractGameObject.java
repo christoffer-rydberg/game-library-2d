@@ -8,7 +8,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.markers.KeyAware;
 
-public abstract class AbstractGameObject<T extends Renderable> implements KeyAware, ComposableObject<T> {
+public abstract class AbstractGameObject<T extends Renderable> implements KeyAware, GameObject {
     private final Point position = new Point();
     private final Point scale = new Point(1, 1);
     private final Point scaleAndRotationCenter = new Point();
@@ -102,15 +102,13 @@ public abstract class AbstractGameObject<T extends Renderable> implements KeyAwa
         return scaleAndRotationCenter;
     }
 
-    @Override
-    public T getContent() {
+    protected T getContent() {
         return content;
     }
 
     protected void setContent(T content) {
         this.content = content;
     }
-
 
     @Override
     public final void render(float alpha) {

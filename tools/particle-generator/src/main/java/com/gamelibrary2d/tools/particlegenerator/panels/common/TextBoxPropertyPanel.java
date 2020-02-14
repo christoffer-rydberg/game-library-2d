@@ -2,16 +2,16 @@ package com.gamelibrary2d.tools.particlegenerator.panels.common;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.renderable.Label;
-import com.gamelibrary2d.renderable.TextBox;
 import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.objects.InputObject;
+import com.gamelibrary2d.renderable.Label;
+import com.gamelibrary2d.renderable.TextBox;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.objects.StackPanel;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,10 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
     private final List<InputObject<TextBox>> textBoxes = new ArrayList<>();
     private final PropertyParameters<T> params;
 
-    TextBoxPropertyPanel(String propertyName, PropertyParameters<T> params) {
+    private boolean valid;
+    private boolean focused;
 
+    TextBoxPropertyPanel(String propertyName, PropertyParameters<T> params) {
         super(Orientation.HORIZONTAL, MARGIN);
 
         this.params = params;
@@ -58,13 +60,27 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
             textBoxContext.setFontColor(Color.WHITE);
 
             var textBox = new InputObject<>(textBoxContext);
-            textBox.setFocusedHandler(content -> content.setFontColor(Color.GREEN));
-            textBox.setUnfocusedHandler(content -> content.setFontColor(Color.WHITE));
+            textBox.setFocusedHandler(content -> {
+                focused = true;
+                content.setFontColor(statusColor());
+            });
+            textBox.setUnfocusedHandler(content -> {
+                focused = false;
+                content.setFontColor(statusColor());
+            });
             textBoxContext.addTextChangedListener((sender, x, y) -> update(textBox));
             textBox.setBounds(font.textSize(textBoxContext.getText(), textBoxContext.getHorizontalAlignment(),
                     textBoxContext.getVerticalAlignment()));
             textBoxes.add(textBox);
             add(textBox, i == 0 ? 175 : MARGIN);
+        }
+    }
+
+    private Color statusColor() {
+        if (focused) {
+            return valid ? Color.GREEN : Color.ORANGE;
+        } else {
+            return valid ? Color.WHITE : Color.RED;
         }
     }
 
@@ -79,14 +95,15 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
     }
 
     private void update(InputObject<TextBox> textBox) {
-
         var textBoxContext = textBox.getContent();
         try {
             params.setParameter(textBoxes.indexOf(textBox), fromString(textBoxContext.getText()));
             params.updateSetting();
-            textBoxContext.setFontColor(Color.WHITE);
+            valid = true;
+            textBoxContext.setFontColor(statusColor());
         } catch (Exception e) {
-            textBoxContext.setFontColor(Color.RED);
+            valid = false;
+            textBoxContext.setFontColor(statusColor());
         }
 
         Rectangle textBounds = textBoxContext.getTextRenderer().getFont().textSize(textBoxContext.getText(),

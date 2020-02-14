@@ -9,7 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractObservableObject<T extends Renderable> extends AbstractMouseAwareObject<T> implements FocusAware {
     private final List<MouseButtonDownListener> mouseButtonDownListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseMoveListener> mouseMoveListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseMoveListener> mouseHoverListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseMoveListener> mouseDragListeners = new CopyOnWriteArrayList<>();
     private final List<MouseButtonReleaseListener> mouseButtonReleaseListeners = new CopyOnWriteArrayList<>();
     private final List<KeyDownListener> keyDownListeners = new CopyOnWriteArrayList<>();
     private final List<KeyReleaseListener> keyReleaseListeners = new CopyOnWriteArrayList<>();
@@ -36,12 +37,20 @@ public abstract class AbstractObservableObject<T extends Renderable> extends Abs
         mouseButtonDownListeners.remove(listener);
     }
 
-    public void addMouseMoveListener(MouseMoveListener listener) {
-        mouseMoveListeners.add(listener);
+    public void addMouseHoverListener(MouseMoveListener listener) {
+        mouseHoverListeners.add(listener);
     }
 
-    public void removeMouseMoveListener(MouseMoveListener listener) {
-        mouseMoveListeners.remove(listener);
+    public void removeMouseHoverListener(MouseMoveListener listener) {
+        mouseHoverListeners.remove(listener);
+    }
+
+    public void addMouseDragListener(MouseMoveListener listener) {
+        mouseDragListeners.add(listener);
+    }
+
+    public void removeMouseDragListener(MouseMoveListener listener) {
+        mouseDragListeners.remove(listener);
     }
 
     public void addMouseButtonReleaseListener(MouseButtonReleaseListener listener) {
@@ -86,21 +95,23 @@ public abstract class AbstractObservableObject<T extends Renderable> extends Abs
 
     @Override
     protected boolean isListeningToMouseClickEvents() {
-        return !(mouseButtonDownListeners.isEmpty() && mouseButtonReleaseListeners.isEmpty());
+        return !mouseButtonDownListeners.isEmpty() ||
+                !mouseButtonReleaseListeners.isEmpty() ||
+                isListeningToMouseDragEvents();
     }
 
     @Override
     protected boolean isListeningToMouseHoverEvents() {
-        return !mouseMoveListeners.isEmpty();
+        return !mouseHoverListeners.isEmpty();
     }
 
     @Override
     protected boolean isListeningToMouseDragEvents() {
-        return !mouseMoveListeners.isEmpty();
+        return !mouseDragListeners.isEmpty();
     }
 
     @Override
-    protected final boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+    protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
         for (var listener : mouseButtonDownListeners) {
             listener.onMouseButtonDown(this, button, mods, projectedX, projectedY);
         }
@@ -108,22 +119,30 @@ public abstract class AbstractObservableObject<T extends Renderable> extends Abs
     }
 
     @Override
-    protected final boolean handleMouseMove(float projectedX, float projectedY, boolean drag) {
-        for (var listener : mouseMoveListeners) {
-            listener.onMouseMove(this, projectedX, projectedY, drag);
+    protected boolean handleMouseHover(float projectedX, float projectedY) {
+        for (var listener : mouseHoverListeners) {
+            listener.onMouseMove(this, projectedX, projectedY, false);
         }
         return true;
     }
-    
+
     @Override
-    protected final void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
+    protected boolean handleMouseDrag(float projectedX, float projectedY) {
+        for (var listener : mouseDragListeners) {
+            listener.onMouseMove(this, projectedX, projectedY, true);
+        }
+        return true;
+    }
+
+    @Override
+    protected void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
         for (var listener : mouseButtonReleaseListeners) {
             listener.onMouseButtonRelease(this, button, mods, projectedX, projectedY);
         }
     }
 
     @Override
-    public final void onCharInput(char charInput) {
+    public void onCharInput(char charInput) {
         super.onCharInput(charInput);
         for (var listener : charInputListeners) {
             listener.onCharInput(this, charInput);
@@ -131,7 +150,7 @@ public abstract class AbstractObservableObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
         super.onKeyDown(key, scanCode, repeat, mods);
         for (var listener : keyDownListeners) {
             listener.onKeyDown(this, key, scanCode, repeat, mods);
@@ -139,7 +158,7 @@ public abstract class AbstractObservableObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final void onKeyRelease(int key, int scanCode, int mods) {
+    public void onKeyRelease(int key, int scanCode, int mods) {
         super.onKeyRelease(key, scanCode, mods);
         for (var listener : keyReleaseListeners) {
             listener.onKeyRelease(this, key, scanCode, mods);

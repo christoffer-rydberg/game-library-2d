@@ -2,11 +2,12 @@ package com.gamelibrary2d.animation;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.Renderer;
+import com.gamelibrary2d.util.RenderSettings;
 
-public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> implements Updatable {
+public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableObject<T>, Updatable {
     private float animationTime;
     private Rectangle bounds;
 
@@ -61,5 +62,10 @@ public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> im
 
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
+    }
+
+    @Override
+    public T getContent() {
+        return super.getContent();
     }
 }

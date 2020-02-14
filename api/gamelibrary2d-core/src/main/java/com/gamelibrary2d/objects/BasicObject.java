@@ -3,7 +3,7 @@ package com.gamelibrary2d.objects;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 
-public final class BasicObject<T extends Renderable> extends AbstractGameObject<T> {
+public final class BasicObject<T extends Renderable> extends AbstractGameObject<T> implements ComposableObject<T> {
 
     public BasicObject() {
 
@@ -21,6 +21,11 @@ public final class BasicObject<T extends Renderable> extends AbstractGameObject<
     @Override
     public void setBounds(Rectangle bounds) {
         super.setBounds(bounds);
+    }
+
+    @Override
+    public T getContent() {
+        return super.getContent();
     }
 
     @Override

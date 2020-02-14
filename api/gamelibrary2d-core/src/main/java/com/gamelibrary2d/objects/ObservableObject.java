@@ -2,7 +2,7 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.framework.Renderable;
 
-public final class ObservableObject<T extends Renderable> extends AbstractObservableObject<T> {
+public final class ObservableObject<T extends Renderable> extends AbstractObservableObject<T> implements ComposableObject<T> {
 
     public ObservableObject() {
 
@@ -10,6 +10,11 @@ public final class ObservableObject<T extends Renderable> extends AbstractObserv
 
     public ObservableObject(T content) {
         super(content);
+    }
+
+    @Override
+    public T getContent() {
+        return super.getContent();
     }
 
     @Override

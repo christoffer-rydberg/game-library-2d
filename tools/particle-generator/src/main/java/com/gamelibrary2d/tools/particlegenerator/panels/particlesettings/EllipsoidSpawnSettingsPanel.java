@@ -14,6 +14,10 @@ public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
         add(new FloatPropertyPanel("Radius Var", getRadiusVarParameters()));
         add(new FloatPropertyPanel("Position Yaw", getPositionYawParameters()));
         add(new FloatPropertyPanel("Position Pitch", getPositionPitchParameters()));
+
+        var slider = ResizeSlider.create(particleSystem, frame);
+        slider.getPosition().set(getBounds().getWidth() / 2 + 10, 0);
+        add(slider, -slider.getBounds().getHeight() - ROW_HEIGHT);
     }
 
     private PropertyParameters<Float> getRadiusParameters() {
