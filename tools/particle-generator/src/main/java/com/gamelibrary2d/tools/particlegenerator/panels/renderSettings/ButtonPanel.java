@@ -45,7 +45,7 @@ class ButtonPanel extends AbstractPanel<GameObject> {
         buttonContext.setTextRenderer(new TextRenderer(font));
         buttonContext.setFontColor(Color.WHITE);
         buttonContext.setText(buttonText);
-        button.getPosition().set(offset, 0);
+        button.position().set(offset, 0);
         button.setBounds(font.textSize(buttonContext.getText(),
                 buttonContext.getHorizontalAlignment(), buttonContext.getVerticalAlignment()));
         button.addMouseButtonReleaseListener(mouseListener);

@@ -68,7 +68,7 @@ public class ParticleSettingsPanel extends StackPanel {
         // Increase the with of the bounds a bit so that sub elements can grow without
         // having to recalculate the bounds of this panel.
         Rectangle bounds = getBounds();
-        setBounds(new Rectangle(bounds.getXMin(), bounds.getYMin(), bounds.getXMax() + 100, bounds.getYMax()));
+        setBounds(new Rectangle(bounds.xMin(), bounds.yMin(), bounds.xMax() + 100, bounds.yMax()));
     }
 
     private PropertyParameters<Float> getLifeParameters() {

@@ -28,7 +28,7 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
     @Override
     public void update(float deltaTime) {
         setRotation(delta.getAngleDegrees());
-        getPosition().add(delta.getX() * deltaTime, delta.getY() * deltaTime);
-        area.wrap(getPosition());
+        position().add(delta.getX() * deltaTime, delta.getY() * deltaTime);
+        area.wrap(position());
     }
 }

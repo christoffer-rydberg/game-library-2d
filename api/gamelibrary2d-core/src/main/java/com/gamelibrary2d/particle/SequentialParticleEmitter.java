@@ -39,7 +39,7 @@ public class SequentialParticleEmitter implements Updatable {
         this.interval = interval;
     }
 
-    public Point getPosition() {
+    public Point position() {
         return position;
     }
 

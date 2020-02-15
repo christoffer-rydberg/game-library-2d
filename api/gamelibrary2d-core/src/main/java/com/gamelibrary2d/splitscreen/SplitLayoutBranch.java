@@ -22,20 +22,34 @@ public class SplitLayoutBranch implements SplitLayout {
         return layouts;
     }
 
-    @Override
     public void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer) {
-        float width = viewArea.getWidth();
-        float height = viewArea.getHeight();
-        float childWidth = orientation == SplitOrientation.VERTICAL ? width : width / layouts.size();
-        float childHeight = orientation == SplitOrientation.HORIZONTAL ? height : height / layouts.size();
-        float dx = orientation == SplitOrientation.VERTICAL ? 0 : childWidth + margin;
-        float dy = orientation == SplitOrientation.HORIZONTAL ? 0 : childHeight + margin;
+        var childWidth = orientation == SplitOrientation.VERTICAL
+                ? viewArea.width()
+                : viewArea.width() / layouts.size() - margin;
+
+        var childHeight = orientation == SplitOrientation.HORIZONTAL
+                ? viewArea.height()
+                : viewArea.height() / layouts.size() - margin;
+
+        var dx = orientation == SplitOrientation.VERTICAL ? 0 : childWidth + margin;
+        var dy = orientation == SplitOrientation.HORIZONTAL ? 0 : childHeight + margin;
+
         for (int i = 0; i < layouts.size(); ++i) {
-            float xMin = viewArea.getXMin() + dx * i;
-            float xMax = xMin + childWidth;
-            float yMin = viewArea.getYMin() + dy * i;
-            float yMax = yMin + childHeight;
-            layouts.get(i).update(target, new Rectangle(xMin, yMin, xMax, yMax), deltaTime, disposer);
+            float xMin = viewArea.xMin() + dx * i;
+            float yMin = viewArea.yMin() + dy * i;
+
+            if (i == layouts.size() - 1) {
+                childWidth += orientation == SplitOrientation.VERTICAL ? 0 : 1;
+                childHeight += orientation == SplitOrientation.HORIZONTAL ? 0 : 1;
+            }
+
+            var childArea = new Rectangle(
+                    xMin,
+                    yMin,
+                    xMin + childWidth,
+                    yMin + childHeight);
+
+            layouts.get(i).update(target, childArea, deltaTime, disposer);
         }
     }
 

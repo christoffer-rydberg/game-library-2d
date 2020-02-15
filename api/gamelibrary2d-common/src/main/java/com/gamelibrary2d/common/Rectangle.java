@@ -35,14 +35,14 @@ public class Rectangle {
      * @param yMax The y-value of the upper right corner.
      */
     public Rectangle(float xMin, float yMin, float xMax, float yMax) {
-        this.xMin = getValidValue(xMin);
-        this.yMin = getValidValue(yMin);
-        this.xMax = getValidValue(xMax);
-        this.yMax = getValidValue(yMax);
+        this.xMin = restrict(xMin);
+        this.yMin = restrict(yMin);
+        this.xMax = restrict(xMax);
+        this.yMax = restrict(yMax);
     }
 
     public Rectangle(Rectangle rect) {
-        this(rect.getXMin(), rect.getYMin(), rect.getXMax(), rect.getYMax());
+        this(rect.xMin(), rect.yMin(), rect.xMax(), rect.yMax());
     }
 
     public static Rectangle fromBottomLeft(float width, float height) {
@@ -79,7 +79,7 @@ public class Rectangle {
         return distDecimals * width + min;
     }
 
-    private float getValidValue(float value) {
+    private float restrict(float value) {
         return Math.max(-INFINITE_VALUE, Math.min(INFINITE_VALUE, value));
     }
 
@@ -101,8 +101,8 @@ public class Rectangle {
     }
 
     public boolean intersects(Rectangle rect) {
-        return !(getXMin() > rect.getXMax() || getYMin() > rect.getYMax() || getXMax() < rect.getXMin()
-                || getYMax() < rect.getYMin());
+        return !(xMin() > rect.xMax() || yMin() > rect.yMax() || xMax() < rect.xMin()
+                || yMax() < rect.yMin());
     }
 
     public Rectangle move(Point offset) {
@@ -110,13 +110,7 @@ public class Rectangle {
     }
 
     public Rectangle move(float x, float y) {
-        return new Rectangle(getXMin() + x, getYMin() + y, getXMax() + x, getYMax() + y);
-    }
-
-    public Rectangle center() {
-        float halfWidth = getWidth() / 2;
-        float halfHeight = getHeight() / 2;
-        return new Rectangle(-halfWidth, -halfHeight, halfWidth, halfHeight);
+        return new Rectangle(xMin() + x, yMin() + y, xMax() + x, yMax() + y);
     }
 
     public Rectangle resize(float scale) {
@@ -140,22 +134,22 @@ public class Rectangle {
     }
 
     public Rectangle pad(float xMinPadding, float yMinPadding, float xMaxPadding, float yMaxPadding) {
-        return new Rectangle(getXMin() - xMinPadding, getYMin() - yMinPadding, getXMax() + xMaxPadding,
-                getYMax() + yMaxPadding);
+        return new Rectangle(xMin() - xMinPadding, yMin() - yMinPadding, xMax() + xMaxPadding,
+                yMax() + yMaxPadding);
     }
 
     public Rectangle resize(float scaleX, float scaleY, float hotSpotX, float hotSpotY) {
 
         // Current Center point
-        float centerX = xMin + getWidth() / 2;
-        float centerY = yMin + getHeight() / 2;
+        float centerX = xMin + width() / 2;
+        float centerY = yMin + height() / 2;
 
         // New center point
         float newCenterX = centerX + (hotSpotX - centerX) / scaleX;
         float newCenterY = centerY + (hotSpotY - centerY) / scaleY;
 
-        return new Rectangle(newCenterX - (getWidth() / 2) * scaleX, newCenterY - (getHeight() / 2) * scaleY,
-                newCenterX + (getWidth() / 2) * scaleX, newCenterY + (getHeight() / 2) * scaleY);
+        return new Rectangle(newCenterX - (width() / 2) * scaleX, newCenterY - (height() / 2) * scaleY,
+                newCenterX + (width() / 2) * scaleX, newCenterY + (height() / 2) * scaleY);
     }
 
     /**
@@ -166,15 +160,14 @@ public class Rectangle {
      * @param centerY  The Y-coordinate of the rotation's center point.
      * @return
      */
-    public Rectangle getRotatedBounds(float rotation, float centerX, float centerY) {
-
+    public Rectangle rotate(float rotation, float centerX, float centerY) {
         float xMin = Float.MAX_VALUE;
         float yMin = Float.MAX_VALUE;
         float xMax = Float.MIN_VALUE;
         float yMax = Float.MIN_VALUE;
 
         // Rotate lower left corner
-        Point rotationPoint = new Point(getXMin(), getYMin());
+        Point rotationPoint = new Point(xMin(), yMin());
         rotationPoint.rotate(rotation, centerX, centerY);
         xMin = Math.min(rotationPoint.getX(), xMin);
         xMax = Math.max(rotationPoint.getX(), xMax);
@@ -182,7 +175,7 @@ public class Rectangle {
         yMax = Math.max(rotationPoint.getY(), yMax);
 
         // Rotate upper left corner
-        rotationPoint.set(getXMin(), getYMax());
+        rotationPoint.set(xMin(), yMax());
         rotationPoint.rotate(rotation, centerX, centerY);
         xMin = Math.min(rotationPoint.getX(), xMin);
         xMax = Math.max(rotationPoint.getX(), xMax);
@@ -190,7 +183,7 @@ public class Rectangle {
         yMax = Math.max(rotationPoint.getY(), yMax);
 
         // Rotate upper right corner
-        rotationPoint.set(getXMax(), getYMax());
+        rotationPoint.set(xMax(), yMax());
         rotationPoint.rotate(rotation, centerX, centerY);
         xMin = Math.min(rotationPoint.getX(), xMin);
         xMax = Math.max(rotationPoint.getX(), xMax);
@@ -198,7 +191,7 @@ public class Rectangle {
         yMax = Math.max(rotationPoint.getY(), yMax);
 
         // Rotate lower right corner
-        rotationPoint.set(getXMax(), getYMin());
+        rotationPoint.set(xMax(), yMin());
         rotationPoint.rotate(rotation, centerX, centerY);
         xMin = Math.min(rotationPoint.getX(), xMin);
         xMax = Math.max(rotationPoint.getX(), xMax);
@@ -208,36 +201,36 @@ public class Rectangle {
         return new Rectangle(xMin, yMin, xMax, yMax);
     }
 
-    public float getArea() {
-        return getWidth() * getHeight();
+    public float area() {
+        return width() * height();
     }
 
-    public float getWidth() {
+    public float width() {
         return xMax - xMin;
     }
 
-    public float getHeight() {
+    public float height() {
         return yMax - yMin;
     }
 
-    public float getXMin() {
+    public float xMin() {
         return xMin;
     }
 
-    public float getYMin() {
+    public float yMin() {
         return yMin;
     }
 
-    public float getXMax() {
+    public float xMax() {
         return xMax;
     }
 
-    public float getYMax() {
+    public float yMax() {
         return yMax;
     }
 
-    public Point getCenter() {
-        return new Point(xMin + getWidth() / 2, yMin + getHeight() / 2);
+    public Point center() {
+        return new Point(xMin + width() / 2, yMin + height() / 2);
     }
 
     public void wrap(Point p) {

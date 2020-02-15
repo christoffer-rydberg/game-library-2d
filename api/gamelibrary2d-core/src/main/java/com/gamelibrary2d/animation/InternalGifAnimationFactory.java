@@ -39,8 +39,8 @@ class InternalGifAnimationFactory {
         int frameCount = images.size();
         var animationFrames = new ArrayList<AnimationFrame>(frameCount);
 
-        var scaleX = scale.getWidth();
-        var scaleY = scale.getHeight();
+        var scaleX = scale.width();
+        var scaleY = scale.height();
 
         var imageWidth = metadata.getWidth();
         var imageHeight = metadata.getHeight();
@@ -57,7 +57,7 @@ class InternalGifAnimationFactory {
             var xOffset = metadataItem.getLeftPosition();
             var yOffset = imageHeight - frameHeight - metadataItem.getTopPosition();
             var frameBounds = Rectangle.fromBottomLeft(frameWidth * scaleX, frameHeight * scaleY);
-            frameBounds = frameBounds.move(imageWidth * scale.getXMin(), imageHeight * scale.getYMin());
+            frameBounds = frameBounds.move(imageWidth * scale.xMin(), imageHeight * scale.yMin());
             frameBounds = frameBounds.move(xOffset * scaleX, yOffset * scaleY);
 
             // Ignore disposal method for last frame if no other frame require background buffer rendering

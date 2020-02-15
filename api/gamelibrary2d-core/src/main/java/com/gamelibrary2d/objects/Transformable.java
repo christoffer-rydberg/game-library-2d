@@ -10,7 +10,7 @@ public interface Transformable {
     /**
      * @return The object's position.
      */
-    Point getPosition();
+    Point position();
 
     /**
      * @return The object's scale.

@@ -88,8 +88,8 @@ public class RenderSettingsPanel extends StackPanel {
         iterativeParticleRenderer = new IterativeParticleRenderer();
 
         quad = Quad.create(defaultParticleRenderer.getBounds(), frame);
-        width = quad.getBounds().getWidth();
-        height = quad.getBounds().getHeight();
+        width = quad.getBounds().width();
+        height = quad.getBounds().height();
         defaultParticleRenderer.setPointSize(width);
         pointSize = defaultParticleRenderer.getPointSize();
 
@@ -439,8 +439,8 @@ public class RenderSettingsPanel extends StackPanel {
                     var animationRenderer = new AnimationRenderer(animation, true, rendererDisposer);
 
                     Rectangle size = animationRenderer.getBounds();
-                    originalWidth = size.getWidth();
-                    originalHeight = size.getHeight();
+                    originalWidth = size.width();
+                    originalHeight = size.height();
                     width = originalWidth;
                     height = originalHeight;
 
@@ -450,8 +450,8 @@ public class RenderSettingsPanel extends StackPanel {
                     var animationRenderer = new AnimationRenderer(animation, true, rendererDisposer);
 
                     Rectangle size = animationRenderer.getBounds();
-                    originalWidth = size.getWidth();
-                    originalHeight = size.getHeight();
+                    originalWidth = size.width();
+                    originalHeight = size.height();
 
                     texturedRenderer = animationRenderer;
                 }

@@ -98,14 +98,4 @@ class DemoFrame extends AbstractFrame {
     public void onEnd() {
 
     }
-
-    @Override
-    protected void onReset() {
-
-    }
-
-    @Override
-    protected void onDispose() {
-
-    }
 }

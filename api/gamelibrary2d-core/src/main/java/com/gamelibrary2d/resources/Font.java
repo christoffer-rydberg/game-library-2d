@@ -23,7 +23,7 @@ public class Font {
     public Font(Texture texture, Map<Character, Surface> quads) {
         this.texture = texture;
         this.quads = quads;
-        textHeight = quads.values().iterator().next().getBounds().getHeight();
+        textHeight = quads.values().iterator().next().getBounds().height();
     }
 
     public static Font create(java.awt.Font font, Disposer disposer) {
@@ -165,7 +165,7 @@ public class Font {
 
             quad.render(shaderProgram);
 
-            float width = quad.getBounds().getWidth();
+            float width = quad.getBounds().width();
 
             ModelMatrix.instance().translatef(width, 0, 0);
         }
@@ -196,8 +196,8 @@ public class Font {
             if (quad == null)
                 continue;
             Rectangle bounds = quad.getBounds();
-            width += bounds.getWidth();
-            height = Math.max(height, bounds.getHeight());
+            width += bounds.width();
+            height = Math.max(height, bounds.height());
         }
         diameterOutput.set(width, height);
     }
@@ -210,8 +210,8 @@ public class Font {
             if (quad == null)
                 continue;
             Rectangle bounds = quad.getBounds();
-            width += bounds.getWidth();
-            height = Math.max(height, bounds.getHeight());
+            width += bounds.width();
+            height = Math.max(height, bounds.height());
         }
         diameterOutput.set(width, height);
     }
@@ -223,7 +223,7 @@ public class Font {
             if (quad == null)
                 continue;
             Rectangle bounds = quad.getBounds();
-            width += bounds.getWidth();
+            width += bounds.width();
         }
         return width;
     }
@@ -246,7 +246,7 @@ public class Font {
                 break;
             Surface quad = quads.get(text.charAt(startIndex));
             if (quad != null)
-                pixelWidth -= quad.getBounds().getWidth();
+                pixelWidth -= quad.getBounds().width();
             if (pixelWidth > 0)
                 ++startIndex;
         }
@@ -262,7 +262,7 @@ public class Font {
             if (quad == null)
                 continue;
             Rectangle bounds = quad.getBounds();
-            width += bounds.getWidth();
+            width += bounds.width();
         }
         return width;
     }

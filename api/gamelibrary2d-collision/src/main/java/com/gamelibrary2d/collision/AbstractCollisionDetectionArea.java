@@ -20,14 +20,14 @@ public abstract class AbstractCollisionDetectionArea implements CollisionDetecti
         var bounds = getBounds();
         var posX = getPosX();
         var posY = getPosY();
-        var shrinkX = collidableBounds.getWidth() + maxCollidableSpeed;
-        var shrinkY = collidableBounds.getHeight() + maxCollidableSpeed;
+        var shrinkX = collidableBounds.width() + maxCollidableSpeed;
+        var shrinkY = collidableBounds.height() + maxCollidableSpeed;
 
         boolean activated =
-                !(bounds.getXMin() + shrinkX + posX > collidableBounds.getXMax() + collidablePosX
-                        || bounds.getYMin() + shrinkY + posY > collidableBounds.getYMax() + collidablePosY
-                        || bounds.getXMax() - shrinkX + posX < collidableBounds.getXMin() + collidablePosX
-                        || bounds.getYMax() - shrinkY + posY < collidableBounds.getYMin() + collidablePosY);
+                !(bounds.xMin() + shrinkX + posX > collidableBounds.xMax() + collidablePosX
+                        || bounds.yMin() + shrinkY + posY > collidableBounds.yMax() + collidablePosY
+                        || bounds.xMax() - shrinkX + posX < collidableBounds.xMin() + collidablePosX
+                        || bounds.yMax() - shrinkY + posY < collidableBounds.yMin() + collidablePosY);
 
         return activated ? activatedResult : ActivationResult.NOT_ACTIVATED;
     }

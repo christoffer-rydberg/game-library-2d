@@ -29,7 +29,7 @@ public class BitmapRenderer {
     private final ByteBuffer pixelReadBuffer = ByteBuffer.allocateDirect(4);
 
     private BitmapRenderer(Rectangle area, Disposer disposer) {
-        var texture = Texture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
+        var texture = Texture.create((int) area.width(), (int) area.height(), disposer);
         this.area = area;
         this.frameBuffer = FrameBuffer.create(texture, disposer);
         this.frameBufferRenderer = new SurfaceRenderer(Quad.create(area, disposer), frameBuffer.getTexture());
@@ -81,7 +81,7 @@ public class BitmapRenderer {
 
         ModelMatrix.instance().pushMatrix();
         ModelMatrix.instance().clearMatrix();
-        ModelMatrix.instance().translatef(-area.getXMin(), -area.getYMin(), 0);
+        ModelMatrix.instance().translatef(-area.xMin(), -area.yMin(), 0);
         renderAction.invoke();
         ModelMatrix.instance().popMatrix();
         frameBuffer.unbind(true);
@@ -90,8 +90,8 @@ public class BitmapRenderer {
     public boolean isVisible(float x, float y) {
         frameBuffer.bind();
         OpenGL.instance().glReadPixels(
-                (int) (x - area.getXMin()),
-                (int) (y - area.getYMin()),
+                (int) (x - area.xMin()),
+                (int) (y - area.yMin()),
                 1,
                 1,
                 OpenGL.GL_RGBA,

@@ -31,7 +31,7 @@ public abstract class AbstractServerObject implements ServerObject {
     }
 
     @Override
-    public Point getPosition() {
+    public Point position() {
         return position;
     }
 

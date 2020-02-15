@@ -36,7 +36,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         launchButtonContext.setText("Launch");
         launchButton.setBounds(font.textSize(launchButtonContext.getText(),
                 launchButtonContext.getHorizontalAlignment(), launchButtonContext.getVerticalAlignment()));
-        launchButton.getPosition().set(0, 0);
+        launchButton.position().set(0, 0);
         launchButton.addMouseButtonReleaseListener(new LaunchEventHandler());
 
         launchSequentialButton = new ToggleButton();
@@ -50,7 +50,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
 
         launchSequentialButton.setBounds(font.textSize(seqContext.getText(),
                 seqContext.getHorizontalAlignment(), seqContext.getVerticalAlignment()));
-        launchSequentialButton.getPosition().set(0, -50);
+        launchSequentialButton.position().set(0, -50);
         launchSequentialButton.addMouseButtonReleaseListener(new LaunchSequentialEventHandler());
 
         Button launchAllButton = new Button();
@@ -64,7 +64,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
 
         launchAllButton.setBounds(font.textSize(launchContext.getText(),
                 launchContext.getHorizontalAlignment(), launchContext.getVerticalAlignment()));
-        launchAllButton.getPosition().set(0, -100);
+        launchAllButton.position().set(0, -100);
         launchAllButton.addMouseButtonReleaseListener(new LaunchAllEventHandler());
 
         add(launchButton);

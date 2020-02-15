@@ -37,7 +37,7 @@ public class DemoFrame extends AbstractFrame {
         try {
             var animation = createAnimation();
             animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
-            animationObj.getPosition().set(window.getWidth() / 2f, window.getHeight() / 2f);
+            animationObj.position().set(window.getWidth() / 2f, window.getHeight() / 2f);
             add(animationObj);
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,13 +72,4 @@ public class DemoFrame extends AbstractFrame {
         }
     }
 
-    @Override
-    protected void onReset() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    protected void onDispose() {
-        // TODO Auto-generated method stub
-    }
 }

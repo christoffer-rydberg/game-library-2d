@@ -65,16 +65,4 @@ public class DemoFrame extends AbstractFrame {
         // TODO Auto-generated method stub
 
     }
-
-    @Override
-    protected void onReset() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void onDispose() {
-        // TODO Auto-generated method stub
-
-    }
 }

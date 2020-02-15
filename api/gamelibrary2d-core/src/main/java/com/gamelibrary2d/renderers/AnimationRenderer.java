@@ -160,13 +160,13 @@ public class AnimationRenderer extends AbstractShaderRenderer {
 
                 var quad = frame.getQuad();
                 var bounds = quad.getBounds();
-                var scaledWidth = bounds.getWidth();
-                var scaledHeight = bounds.getHeight();
+                var scaledWidth = bounds.width();
+                var scaledHeight = bounds.height();
 
                 var width = frame.getTexture().getImageWidth();
                 var height = frame.getTexture().getImageHeight();
-                var offsetX = Math.round((width / scaledWidth) * (bounds.getXMin() - animation.getBounds().getXMin()));
-                var offsetY = Math.round((height / scaledHeight) * (bounds.getYMin() - animation.getBounds().getYMin()));
+                var offsetX = Math.round((width / scaledWidth) * (bounds.xMin() - animation.getBounds().xMin()));
+                var offsetY = Math.round((height / scaledHeight) * (bounds.yMin() - animation.getBounds().yMin()));
 
                 var fullSizeBounds = new Rectangle(offsetX, offsetY, width + offsetX, height + offsetY);
                 quads[i] = Quad.create(fullSizeBounds, disposer);

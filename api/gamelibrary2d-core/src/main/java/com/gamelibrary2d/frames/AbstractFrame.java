@@ -105,7 +105,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     @Override
     public void reset() {
-        onReset();
         // Dispose all resources created after the preparation phase.
         disposer.disposeUntilBreak();
         commonCleanUp();
@@ -116,7 +115,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         if (isDisposed())
             return;
 
-        onDispose();
         disposer.dispose();
         commonCleanUp();
         prepared = false;
@@ -249,23 +247,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
      */
     public abstract void onEnd();
 
-    /**
-     * Called upon resetting the frame. This method is responsible for releasing
-     * resources and undoing changes, since the {@link #onPrepare} method was
-     * called. The purpose is to be able to reuse the frame, either directly (play
-     * again) or at a later stage. By keeping all resources allocated in the
-     * preparation stage, the frame can more efficiently be reused. If the frame is
-     * not to be reused, it should be {@link #dispose} instead of {@link #reset}.
-     */
-    protected abstract void onReset();
-
-    /**
-     * Called upon disposing the frame.
-     */
-    protected abstract void onDispose();
-
     private static class DisposerStack {
-
         private final static Disposable breakMark = () -> {
         };
 

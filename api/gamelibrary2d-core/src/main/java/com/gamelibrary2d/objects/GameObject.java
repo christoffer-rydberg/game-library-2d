@@ -24,8 +24,14 @@ public interface GameObject extends Transformable, Bounded, Renderable {
      */
     void setRotation(float rotation);
 
+    /**
+     * Checks if the object is enabled. Disabled objects are not rendered or updated.
+     */
     boolean isEnabled();
 
+    /**
+     * Sets if the object is {@link #isEnabled() enabled}.
+     */
     void setEnabled(boolean enabled);
 
 }

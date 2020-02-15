@@ -106,10 +106,10 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
         if (panelBounds.equals(Rectangle.EMPTY) || bounds.equals(Rectangle.INFINITE)) {
             setBounds(bounds);
         } else {
-            float xMin = Math.min(bounds.getXMin(), panelBounds.getXMin());
-            float yMin = Math.min(bounds.getYMin(), panelBounds.getYMin());
-            float xMax = Math.max(bounds.getXMax(), panelBounds.getXMax());
-            float yMax = Math.max(bounds.getYMax(), panelBounds.getYMax());
+            float xMin = Math.min(bounds.xMin(), panelBounds.xMin());
+            float yMin = Math.min(bounds.yMin(), panelBounds.yMin());
+            float xMax = Math.max(bounds.xMax(), panelBounds.xMax());
+            float yMax = Math.max(bounds.yMax(), panelBounds.yMax());
             setBounds(new Rectangle(xMin, yMin, xMax, yMax));
         }
     }
@@ -170,7 +170,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
             if (!objectBounds.equals(Rectangle.EMPTY)) {
                 stackExpandBounds(orientation, objectBounds, padding);
             } else {
-                stackExpandPoint(orientation, obj.getPosition().getX(), obj.getPosition().getY(), padding);
+                stackExpandPoint(orientation, obj.position().getX(), obj.position().getY(), padding);
             }
         }
 
@@ -197,27 +197,27 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
             return objectBounds;
         }
 
-        objectBounds = objectBounds.move(obj.getPosition().getX(), obj.getPosition().getY());
+        objectBounds = objectBounds.move(obj.position().getX(), obj.position().getY());
 
         if (obj.getScale().getX() != 1 || obj.getScale().getY() != 1) {
-            objectBounds = objectBounds.resize(obj.getScale().getX(), obj.getScale().getY(), obj.getPosition().getX(),
-                    obj.getPosition().getY());
+            objectBounds = objectBounds.resize(obj.getScale().getX(), obj.getScale().getY(), obj.position().getX(),
+                    obj.position().getY());
         }
         if (obj.getRotation() != 0) {
-            objectBounds = objectBounds.getRotatedBounds(obj.getRotation(), obj.getPosition().getX(),
-                    obj.getPosition().getY());
+            objectBounds = objectBounds.rotate(obj.getRotation(), obj.position().getX(),
+                    obj.position().getY());
         }
         return objectBounds;
     }
 
     private void stackObject(T obj, StackOrientation orientation, float offset) {
-        float posX = obj.getPosition().getX();
-        float posY = obj.getPosition().getY();
+        float posX = obj.position().getX();
+        float posY = obj.position().getY();
 
-        obj.getPosition().set(0, 0);
+        obj.position().set(0, 0);
         Rectangle objectBounds = getExtentInPanel(obj);
         if (objectBounds.equals(Rectangle.INFINITE)) {
-            obj.getPosition().set(posX, posY);
+            obj.position().set(posX, posY);
             throw new IllegalStateException("Stacked object must have valid bounds.");
         }
 
@@ -236,23 +236,23 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
                 break;
         }
 
-        obj.getPosition().set(posX, posY);
+        obj.position().set(posX, posY);
     }
 
     private float stackLeft(Rectangle objectBounds, float margin) {
-        return getBounds().getXMin() - objectBounds.getXMax() - margin;
+        return getBounds().xMin() - objectBounds.xMax() - margin;
     }
 
     private float stackUp(Rectangle objectBounds, float margin) {
-        return getBounds().getYMax() - objectBounds.getYMin() + margin;
+        return getBounds().yMax() - objectBounds.yMin() + margin;
     }
 
     private float stackRight(Rectangle objectBounds, float margin) {
-        return getBounds().getXMax() - objectBounds.getXMin() + margin;
+        return getBounds().xMax() - objectBounds.xMin() + margin;
     }
 
     private float stackDown(Rectangle objectBounds, float margin) {
-        return getBounds().getYMin() - objectBounds.getYMax() - margin;
+        return getBounds().yMin() - objectBounds.yMax() - margin;
     }
 
     private void stackExpandBounds(StackOrientation orientation, Rectangle bounds, float padding) {

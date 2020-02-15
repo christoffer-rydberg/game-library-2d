@@ -22,7 +22,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     protected AbstractClientObject(GenericNetworkFrame<?, ?> frame, DataBuffer buffer) {
         this.frame = frame;
         id = buffer.getInt();
-        getPosition().set(buffer.getFloat(), buffer.getFloat());
+        position().set(buffer.getFloat(), buffer.getFloat());
     }
 
     @Override
@@ -32,8 +32,8 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     @Override
     public void setGoalPosition(float x, float y) {
-        x0 = getPosition().getX();
-        y0 = getPosition().getY();
+        x0 = position().getX();
+        y0 = position().getY();
         x1 = x;
         y1 = y;
         interpolationAlpha = 0;
@@ -54,7 +54,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     public void instantPositionUpdate() {
         if (interpolationAlpha != -1) {
-            getPosition().set(x1, y1);
+            position().set(x1, y1);
             interpolationAlpha = -1;
         }
     }
@@ -72,7 +72,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     private void instantMovement() {
         if (interpolationAlpha != -1) {
-            getPosition().set(x1, y1);
+            position().set(x1, y1);
             interpolationAlpha = -1;
         }
 
@@ -87,11 +87,11 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
         if (interpolationAlpha != -1) {
             interpolationAlpha += deltaTime * ups;
             if (interpolationAlpha >= 1f) {
-                getPosition().set(x1, y1);
+                position().set(x1, y1);
                 interpolationAlpha = -1;
             } else {
-                getPosition().set(x0, y0);
-                getPosition().lerp(x1, y1, interpolationAlpha);
+                position().set(x0, y0);
+                position().lerp(x1, y1, interpolationAlpha);
             }
         }
 

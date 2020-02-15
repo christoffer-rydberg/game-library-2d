@@ -48,8 +48,8 @@ public class AnimationSheet {
         float frameHeight = height / rows;
 
         bounds = relativeBounds
-                ? new Rectangle(frameWidth * bounds.getXMin(), frameHeight * bounds.getYMin(),
-                frameWidth * bounds.getXMax(), frameHeight * bounds.getYMax())
+                ? new Rectangle(frameWidth * bounds.xMin(), frameHeight * bounds.yMin(),
+                frameWidth * bounds.xMax(), frameHeight * bounds.yMax())
                 : bounds;
 
         for (int col = 0; col < cols; ++col) {

@@ -32,8 +32,8 @@ public class CollisionDetection<T extends Collidable> {
         rootNode = new InternalQuadTreeNode(nodePool);
         updateList = new ArrayList<>();
         updateListReadOnly = Collections.unmodifiableList(updateList);
-        rootNode.setBounds(area.getXMin(), area.getYMin(), area.getXMax(), area.getYMax());
-        rootNode.setMaxDepth((int) Math.round(Math.log(area.getWidth() / minNodeWidth) / Math.log(2)));
+        rootNode.setBounds(area.xMin(), area.yMin(), area.xMax(), area.yMax());
+        rootNode.setMaxDepth((int) Math.round(Math.log(area.width() / minNodeWidth) / Math.log(2)));
         rootNode.setCapacity(nodeCapacity);
     }
 

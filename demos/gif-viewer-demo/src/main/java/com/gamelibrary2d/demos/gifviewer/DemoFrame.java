@@ -48,10 +48,10 @@ public class DemoFrame extends AbstractFrame {
         final float windowHeight = getGame().getWindow().getHeight();
 
         var loadButton = createLoadButton();
-        loadButton.getPosition().set(windowWidth / 2, windowHeight - windowHeight / 6);
+        loadButton.position().set(windowWidth / 2, windowHeight - windowHeight / 6);
 
         animatedObject = new AnimatedObject();
-        animatedObject.getPosition().set(windowWidth / 2, windowHeight / 2);
+        animatedObject.position().set(windowWidth / 2, windowHeight / 2);
 
         add(animatedObject);
         add(loadButton);
@@ -74,16 +74,6 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     public void onEnd() {
-
-    }
-
-    @Override
-    protected void onReset() {
-
-    }
-
-    @Override
-    protected void onDispose() {
 
     }
 

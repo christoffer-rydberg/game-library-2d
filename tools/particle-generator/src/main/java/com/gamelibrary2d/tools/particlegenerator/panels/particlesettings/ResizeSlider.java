@@ -31,7 +31,7 @@ class ResizeSlider extends Slider {
         });
         addDragStopListener(v -> setValue(0, false));
 
-        setBounds(Rectangle.centered(handle.getBounds().getWidth() + 200, handle.getBounds().getHeight()));
+        setBounds(Rectangle.centered(handle.getBounds().width() + 200, handle.getBounds().height()));
     }
 
     static ResizeSlider create(ParticleSystemModel particleSystem, Disposer disposer) {

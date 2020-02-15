@@ -44,7 +44,7 @@ public class AnimationFactory {
     }
 
     private static Rectangle applyConstraints(Rectangle bounds, Point imageSize, Point sizeConstraints) {
-        float scale = bounds.getWidth();
+        float scale = bounds.width();
         var aspect = bounds.resize(1f / scale);
         scale = Math.min(scale, sizeConstraints.getX() / imageSize.getX());
         scale = Math.min(scale, sizeConstraints.getY() / imageSize.getY());

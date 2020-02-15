@@ -59,8 +59,8 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public Point getPosition() {
-        return wrapped.getPosition();
+    public Point position() {
+        return wrapped.position();
     }
 
     @Override

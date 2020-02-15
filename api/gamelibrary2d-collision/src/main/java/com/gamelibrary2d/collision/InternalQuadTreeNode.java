@@ -39,10 +39,10 @@ class InternalQuadTreeNode {
     }
 
     private static boolean isColliding(Rectangle bounds, float xPos, float yPos, Rectangle bounds2, float xPos2, float yPos2) {
-        return !(bounds.getXMin() + xPos > bounds2.getXMax() + xPos2
-                || bounds.getYMin() + yPos > bounds2.getYMax() + yPos2
-                || bounds.getXMax() + xPos < bounds2.getXMin() + xPos2
-                || bounds.getYMax() + yPos < bounds2.getYMin() + yPos2);
+        return !(bounds.xMin() + xPos > bounds2.xMax() + xPos2
+                || bounds.yMin() + yPos > bounds2.yMax() + yPos2
+                || bounds.xMax() + xPos < bounds2.xMin() + xPos2
+                || bounds.yMax() + yPos < bounds2.yMin() + yPos2);
     }
 
     private static boolean isColliding(InternalCollidable updated, InternalCollidable other) {
@@ -90,10 +90,10 @@ class InternalQuadTreeNode {
 
     private int getQuadrantIndex(InternalCollidable collidable) {
         var bounds = collidable.getBounds();
-        float xMin = bounds.getXMin();
-        float yMin = bounds.getYMin();
-        float xMax = bounds.getXMax();
-        float yMax = bounds.getYMax();
+        float xMin = bounds.xMin();
+        float yMin = bounds.yMin();
+        float xMax = bounds.xMax();
+        float yMax = bounds.yMax();
 
         float verticalMidpoint = (xMin + xMax) / 2 - collidable.getPosX();
         float horizontalMidpoint = (yMin + yMax) / 2 - collidable.getPosY();

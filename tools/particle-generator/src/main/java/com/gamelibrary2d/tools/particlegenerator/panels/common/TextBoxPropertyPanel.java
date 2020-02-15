@@ -110,7 +110,7 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
                 textBoxContext.getHorizontalAlignment(), textBoxContext.getVerticalAlignment());
 
         // Make sure that the bounds are not too small (e.g. for empty string).
-        if (textBounds.getWidth() < minBounds.getWidth()) {
+        if (textBounds.width() < minBounds.width()) {
             textBounds = minBounds;
         }
 
