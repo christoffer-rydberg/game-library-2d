@@ -1,93 +1,58 @@
 package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.Layer;
+import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.updaters.Updater;
 
 public interface Frame extends Layer<Renderable>, KeyAware, Disposer {
 
     /**
-     * @return The instance of the game that is running the frame.
+     * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.
+     * Thread-safe and OpenGL-unrelated initialization is performed by the {@link #load} method.
      */
-    Game getGame();
+    void initialize();
 
     /**
-     * <p>
-     * Called prior to {@link #load} in order to perform non-thread-safe preparations, such
-     * as loading textures, which are independent of anything that happens in
-     * {@link #load}.
-     * </p>
-     * <p>
-     * This method is called from the main thread of the application.
-     * </p>
+     * @return True if the frame has been {@link #initialize initialized}, false otherwise.
      */
-    void prepare();
+    boolean isInitialized();
 
     /**
-     * @return True if the frame has been prepared by invoking {@link #prepare}, false otherwise.
-     */
-    boolean isPrepared();
-
-    /**
-     * <p>
-     * Called after {@link #prepare} but prior to {@link #finish} by the LoadingFrame in a
-     * separate thread. This allows the LoadingFrame to be updated and rendered
-     * while the next frame is loaded in the background.
-     * </p>
-     * <p>
-     * The drawback is that only thread-safe code is permitted in this method.
-     * Additionally, the background thread has no OpenGL-context. Any OpenGL-related
-     * functionality (such as loading textures) must be done in {@link #prepare} or
-     * {@link #finish}.
-     *
-     * @throws LoadInterruptedException The load was interrupted.
+     * Typically invoked from a separate thread by a {@link LoadingFrame}.
+     * No OpenGL context is available and the implementation of this method must be thread safe.
+     * This method is invoked after {@link #initialize}.
      */
     void load() throws LoadInterruptedException;
 
     /**
-     * @return True if the frame has been loaded by invoking {@link #load}, false otherwise.
+     * @return True if the frame has been {@link #load loaded}, false otherwise.
      */
     boolean isLoaded();
 
     /**
-     * <p>
-     * Called after to {@link #load} in order to perform non-thread-safe initializations,
-     * such as loading textures, which are dependent of what happens in {@link #load}.
-     * </p>
-     * <p>
-     * This method is called from the main thread of the application.
-     * </p>
+     * Invoked from the main thread after {@link #load} has completed.
+     * Performs any required OpenGL-related initialization after the frame has loaded.
      */
-    void finish();
+    void loadCompleted();
 
     /**
-     * @return True if the frame has been completed by invoking {@link #finish}, false otherwise.
+     * Invoked when the frame begins.
      */
-    boolean isFinished();
+    void begin();
 
     /**
-     * <p>
-     * Called when the frame begins, after any calls to {@link #prepare}, {@link #load} or {@link #finish}.
-     * </p>
-     * <p>
-     * This method is called from the main thread of the application.
-     * </p>
+     * Invoked when the frame ends.
      */
-    void onBegin();
+    void end();
 
     /**
-     * <p>
-     * Called when the frame ends, before any call to {@link #reset}.
-     * </p>
-     * <p>
-     * This method is called from the main thread of the application.
-     * </p>
+     * @return The game instance.
      */
-    void onEnd();
+    Game getGame();
 
     /**
      * Pauses the game.
@@ -105,21 +70,8 @@ public interface Frame extends Layer<Renderable>, KeyAware, Disposer {
     boolean isPaused();
 
     /**
-     * <p>
-     * Called when the frame is changed with the option FrameDisposal.Reset.
-     * </p>
-     * <p>
-     * The method should undo the preparations done in {@link #load} and {@link #finish},
-     * leaving only the initialization from {@link #prepare} intact (since it is
-     * independent of {@link #load}).
-     * </p>
-     * <p>
-     * The use-case is that a frame can be reloaded faster, for example when
-     * providing a "play again"-functionality.
-     * </p>
-     * <p>
-     * This method is called from the main thread of the application
-     * </p>
+     * Invoked when the frame is changed with the option FrameDisposal.Reset.
+     * {@link #isLoaded Loaded} is set to false but any initialization done in {@link #initialize} is left intact.
      */
     void reset();
 

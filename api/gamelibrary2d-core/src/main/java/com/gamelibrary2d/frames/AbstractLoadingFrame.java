@@ -1,6 +1,7 @@
 package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
 
 public abstract class AbstractLoadingFrame extends AbstractFrame implements LoadingFrame {
@@ -14,7 +15,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
 
     private volatile Frame frameAfterLoading;
 
-    private boolean loadingComplete;
+    private boolean loadFinished;
 
     public AbstractLoadingFrame(Game game) {
         super(game);
@@ -24,18 +25,18 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     @Override
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-        if (loadingComplete) return;
+        if (loadFinished) return;
         if (workerThread != null && !workerThread.isAlive()) {
-            loadingComplete = true;
+            loadFinished = true;
             if (frameAfterLoading == nextFrame) {
-                onLoadingComplete();
+                onLoadFinished();
             } else {
                 showLoadedFrame();
             }
         }
     }
 
-    protected void onLoadingComplete() {
+    protected void onLoadFinished() {
         showLoadedFrame();
     }
 
@@ -43,6 +44,10 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
      * Shows the next frame. This should only be called once loading has finished.
      */
     protected void showLoadedFrame() {
+        if (!loadFinished) {
+            throw new GameLibrary2DRuntimeException("Loading has not finished");
+        }
+        frameAfterLoading.loadCompleted();
         game.setFrame(frameAfterLoading, FrameDisposal.NONE);
     }
 
@@ -78,7 +83,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
 
     @Override
     public void loadNextFrame() {
-        loadingComplete = false;
+        loadFinished = false;
         frameAfterLoading = null;
 
         Runnable worker = () -> {

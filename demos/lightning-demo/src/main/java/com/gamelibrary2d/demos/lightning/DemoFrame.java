@@ -58,7 +58,7 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         try {
             var window = getGame().getWindow();
             var particleSystem = createParticleSystem();
@@ -77,25 +77,5 @@ class DemoFrame extends AbstractFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onLoad() {
-
-    }
-
-    @Override
-    protected void onFinish() {
-
-    }
-
-    @Override
-    public void onBegin() {
-
-    }
-
-    @Override
-    public void onEnd() {
-
     }
 }

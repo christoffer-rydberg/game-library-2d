@@ -278,8 +278,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             return;
         }
 
-        if (!frame.isPrepared()) {
-            frame.prepare();
+        if (!frame.isInitialized()) {
+            frame.initialize();
         }
         loadingFrame.setPreviousFrame(this.frame);
         loadingFrame.setNextFrame(frame);
@@ -297,9 +297,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         disposeFrame(previousFrameDisposal);
 
         if (frame != null) {
-
-            if (!frame.isPrepared()) {
-                frame.prepare();
+            if (!frame.isInitialized()) {
+                frame.initialize();
             }
 
             if (!frame.isLoaded()) {
@@ -309,10 +308,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
                     e.printStackTrace();
                     return;
                 }
-            }
 
-            if (!frame.isFinished()) {
-                frame.finish();
+                frame.loadCompleted();
             }
         }
 
@@ -336,14 +333,14 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     private void onFrameBegin(Frame frame) {
         frameChangedPublisher.publish(frame);
-        frame.onBegin();
+        frame.begin();
     }
 
     private void disposeFrame(FrameDisposal frameDisposal) {
         if (frame == null)
             return;
 
-        frame.onEnd();
+        frame.end();
 
         switch (frameDisposal) {
 
@@ -390,12 +387,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             return;
         }
 
-        if (!frame.isFinished()) {
-            frame.finish();
-        } else {
-            frame.update(frameNotUpdated ? 0 : deltaTime);
-            frameNotUpdated = false;
-        }
+        frame.update(frameNotUpdated ? 0 : deltaTime);
+        frameNotUpdated = false;
     }
 
     @Override

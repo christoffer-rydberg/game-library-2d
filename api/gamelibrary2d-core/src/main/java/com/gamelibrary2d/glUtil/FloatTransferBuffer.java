@@ -16,7 +16,7 @@ public class FloatTransferBuffer extends AbstractTransferBuffer {
         this.src = src;
         this.usage = usage;
         ioBuffer = BufferUtils.createFloatBuffer(src.length);
-        disposer.register(this);
+        disposer.registerDisposal(this);
     }
 
     public final float[] getSource() {

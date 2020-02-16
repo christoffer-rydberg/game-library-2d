@@ -82,7 +82,7 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         if (isLoaded())
             return;
 
-        if (!isPrepared()) {
+        if (!isInitialized()) {
             System.err.println("Must call initialize prior to load");
             return;
         }

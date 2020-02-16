@@ -14,7 +14,7 @@ public abstract class AbstractDisposer implements Disposer {
     }
 
     @Override
-    public void register(Disposable disposable) {
+    public void registerDisposal(Disposable disposable) {
         disposables.push(disposable);
     }
 

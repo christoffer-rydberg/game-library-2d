@@ -30,7 +30,7 @@ public class ShaderProgram implements Disposable {
 
     private ShaderProgram(Disposer disposer) {
         programId = OpenGL.instance().glCreateProgram();
-        disposer.register(this);
+        disposer.registerDisposal(this);
     }
 
     public static ShaderProgram create(Disposer disposer) {

@@ -84,7 +84,7 @@ class DemoFrame extends AbstractFrame {
         y = Math.min(GAME_BOUNDS.height() - viewArea.height() / 2, Math.max(y, viewArea.height() / 2));
         viewLayer.position().set(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
     }
-    
+
     private SplitLayout createSplitLayoutHelper(List<SpaceCraft> spaceCrafts, SplitOrientation orientation) {
         var size = spaceCrafts.size();
 
@@ -133,7 +133,7 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         try {
             var window = getGame().getWindow();
             viewLayer.getBackground().add(createBackground());
@@ -147,28 +147,10 @@ class DemoFrame extends AbstractFrame {
             var splitLayer = new SplitLayer<>(createSplitLayout(spaceCrafts), viewArea, this);
             splitLayer.setTarget(viewLayer);
             add(splitLayer);
+
+            onBegin(() -> getGame().setBackgroundColor(SPLIT_COLOR));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onLoad() {
-
-    }
-
-    @Override
-    protected void onFinish() {
-
-    }
-
-    @Override
-    public void onBegin() {
-        getGame().setBackgroundColor(SPLIT_COLOR);
-    }
-
-    @Override
-    public void onEnd() {
-
     }
 }

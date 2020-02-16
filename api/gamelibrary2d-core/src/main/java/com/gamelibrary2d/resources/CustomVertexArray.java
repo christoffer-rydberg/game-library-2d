@@ -11,7 +11,7 @@ public class CustomVertexArray extends AbstractVertexArray {
 
     public static CustomVertexArray create(TransferBuffer buffer, int elementSize, Disposer disposer) {
         var obj = new CustomVertexArray(buffer, elementSize);
-        disposer.register(obj);
+        disposer.registerDisposal(obj);
         return obj;
     }
 }

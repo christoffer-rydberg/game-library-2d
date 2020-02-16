@@ -41,7 +41,7 @@ public class Shader implements Disposable {
 
     public static Shader fromString(String src, ShaderType shaderType, Disposer disposer) {
         Shader shader = createShader(src, shaderType);
-        disposer.register(shader);
+        disposer.registerDisposal(shader);
         return shader;
     }
 

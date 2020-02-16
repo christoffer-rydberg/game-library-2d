@@ -31,7 +31,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         var game = getGame();
         var window = game.getWindow();
         try {
@@ -42,26 +42,6 @@ public class DemoFrame extends AbstractFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onLoad() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    protected void onFinish() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onBegin() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onEnd() {
-        // TODO Auto-generated method stub
     }
 
     @Override

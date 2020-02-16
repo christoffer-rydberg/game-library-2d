@@ -43,7 +43,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         final float windowWidth = getGame().getWindow().getWidth();
         final float windowHeight = getGame().getWindow().getHeight();
 
@@ -55,26 +55,6 @@ public class DemoFrame extends AbstractFrame {
 
         add(animatedObject);
         add(loadButton);
-    }
-
-    @Override
-    protected void onLoad() {
-
-    }
-
-    @Override
-    protected void onFinish() {
-
-    }
-
-    @Override
-    public void onBegin() {
-
-    }
-
-    @Override
-    public void onEnd() {
-
     }
 
     private void selectGif() throws IOException {

@@ -46,7 +46,7 @@ public class VorbisDecoder extends AbstractAudioDecoder {
             // Decode and create OpenAl buffer
             SoundBuffer soundBuffer = decodeAndCreateOpenAlBuffer(vorbisHandle, info);
 
-            disposer.register(soundBuffer);
+            disposer.registerDisposal(soundBuffer);
 
             return soundBuffer;
         }

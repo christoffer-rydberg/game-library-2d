@@ -24,7 +24,7 @@ public class IntTransferBuffer extends AbstractTransferBuffer {
 
         ioBuffer = BufferUtils.createIntBuffer(src.length);
 
-        disposer.register(this);
+        disposer.registerDisposal(this);
     }
 
     public void copy(int index, int destinationIndex) {

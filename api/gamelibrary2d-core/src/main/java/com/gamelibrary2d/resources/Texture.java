@@ -27,7 +27,7 @@ public class Texture extends AbstractDisposable {
     public static Texture create(int width, int height, Disposer disposer) {
         Texture texture = new Texture();
         texture.loadTexture(null, width, height);
-        disposer.register(texture);
+        disposer.registerDisposal(texture);
         return texture;
     }
 
@@ -38,7 +38,7 @@ public class Texture extends AbstractDisposable {
     public static Texture create(BufferedImage image, Disposer disposer) {
         Texture texture = new Texture();
         texture.loadTexture(createFlipped(image));
-        disposer.register(texture);
+        disposer.registerDisposal(texture);
         return texture;
     }
 

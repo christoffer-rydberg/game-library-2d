@@ -47,7 +47,7 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         particleSystem = ParticleSystemModel.create(this);
 
         screenLayer = new BasicLayer<>();
@@ -80,10 +80,11 @@ public class ParticleFrame extends AbstractFrame {
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
         saveLoadResetPanel.position().set(WINDOW_MARGIN, WINDOW_MARGIN);
+
+        onLoad(this::onLoad);
     }
 
-    @Override
-    protected void onLoad() {
+    private void onLoad() {
         PosX = getGame().getWindow().getWidth() / 2f;
         PosY = getGame().getWindow().getHeight() / 2f;
         add(backgroundLayer);
@@ -94,19 +95,6 @@ public class ParticleFrame extends AbstractFrame {
         screenLayer.add(renderSettingsPanel);
         screenLayer.add(emitterPanel);
         screenLayer.add(saveLoadResetPanel);
-    }
-
-    @Override
-    protected void onFinish() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onBegin() {
-    }
-
-    @Override
-    public void onEnd() {
     }
 
     @Override

@@ -107,14 +107,14 @@ public class Quad extends AbstractDisposable implements Surface {
     public static Quad create(Rectangle bounds, QuadShape shape, Disposer disposer) {
         Quad quad = new Quad(bounds, new Rectangle(0, 0, 1, 1), shape);
         quad.setup();
-        disposer.register(quad);
+        disposer.registerDisposal(quad);
         return quad;
     }
 
     public static Quad create(Rectangle bounds, QuadShape shape, Rectangle textureBounds, Disposer disposer) {
         Quad quad = new Quad(bounds, textureBounds, shape);
         quad.setup();
-        disposer.register(quad);
+        disposer.registerDisposal(quad);
         return quad;
     }
 

@@ -28,7 +28,7 @@ class ParticleVertexBuffer extends AbstractVertexArray {
 
     static ParticleVertexBuffer create(float[] array, Disposer disposer) {
         ParticleVertexBuffer buffer = new ParticleVertexBuffer(array, disposer);
-        disposer.register(buffer);
+        disposer.registerDisposal(buffer);
         return buffer;
     }
 

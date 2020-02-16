@@ -3,6 +3,7 @@ package com.gamelibrary2d.frames;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
+import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
@@ -22,44 +23,48 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     private boolean paused;
 
     private boolean disposed;
-    private boolean prepared;
+    private boolean initialized;
     private boolean loaded;
-    private boolean finished;
+
+    private LoadAction onLoad;
+    private Action onLoaded;
+    private Action onBegin;
+    private Action onEnd;
 
     protected AbstractFrame(Game game) {
         this.game = game;
     }
 
     @Override
-    public void register(Disposable disposable) {
+    public void registerDisposal(Disposable disposable) {
         disposer.push(disposable);
     }
 
     @Override
-    public void prepare() {
+    public void initialize() {
         if (isDisposed()) {
             throw new GameLibrary2DRuntimeException("This object has been disposed.");
         }
 
-        if (isPrepared())
+        if (isInitialized())
             return;
 
-        game.register(this);
+        game.registerDisposal(this);
 
         disposer = new DisposerStack();
 
         updaters = new ArrayDeque<>();
 
-        onPrepare();
+        onInitialize();
 
         disposer.pushBreak();
 
-        prepared = true;
+        initialized = true;
     }
 
     @Override
-    public boolean isPrepared() {
-        return prepared;
+    public boolean isInitialized() {
+        return initialized;
     }
 
     @Override
@@ -67,17 +72,19 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         if (isLoaded())
             return;
 
-        if (!isPrepared()) {
-            throw new LoadInterruptedException("Must call prepare prior to load");
+        if (!isInitialized()) {
+            throw new LoadInterruptedException("Frame has not been initialized");
         }
 
-        try {
-            onLoad();
-        } catch (Exception e) {
-            e.printStackTrace();
-            reset();
-            throw e instanceof LoadInterruptedException ? (LoadInterruptedException) e
-                    : new LoadInterruptedException(e.getMessage());
+        if (onLoad != null) {
+            try {
+                onLoad.invoke();
+            } catch (Exception e) {
+                e.printStackTrace();
+                reset();
+                throw e instanceof LoadInterruptedException ? (LoadInterruptedException) e
+                        : new LoadInterruptedException(e.getMessage());
+            }
         }
 
         loaded = true;
@@ -89,23 +96,19 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void finish() {
-        if (isFinished())
-            return;
-
+    public void loadCompleted() {
         if (!isLoaded()) {
-            System.err.println("Must call load() prior to complete()");
-            return;
+            throw new GameLibrary2DRuntimeException("Frame has not been loaded");
         }
 
-        onFinish();
-
-        finished = true;
+        if (onLoaded != null) {
+            onLoaded.invoke();
+        }
     }
 
     @Override
     public void reset() {
-        // Dispose all resources created after the preparation phase.
+        // Dispose all resources created after the initialization phase.
         disposer.disposeUntilBreak();
         commonCleanUp();
     }
@@ -117,7 +120,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
         disposer.dispose();
         commonCleanUp();
-        prepared = false;
+        initialized = false;
         disposed = true;
         game = null;
         disposer = null;
@@ -131,13 +134,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     private void commonCleanUp() {
         clear();
         updaters.clear();
-        finished = false;
         loaded = false;
-    }
-
-    @Override
-    public boolean isFinished() {
-        return finished;
     }
 
     protected void run(Updater updater) {
@@ -207,45 +204,68 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     /**
      * Called prior to {@link #load} in order to perform non-thread-safe
-     * initialization, which are independent of what happens during the loading
-     * phase. When {@link #reset resetting} this frame, the preparations done in
-     * this method will be kept intact so that the frame efficiently can be reused.
+     * initialization. When {@link #reset resetting} this frame, initialization done inside
+     * this method is be kept intact so that the frame can be efficiently reused.
      */
-    protected abstract void onPrepare();
+    protected abstract void onInitialize();
 
     /**
-     * Called after {@link #prepare} but prior to {@link #finish}. All
+     * The specified action is invoked after {@link #initialize} but prior to {@link #loaded}. All
      * initialization code (needed to reset the frame) should be placed here or in
-     * the {@link #onFinish} method. If a {@link LoadingFrame} is used, this method
+     * the {@link #onLoaded} method. If a {@link LoadingFrame} is used, this method
      * will not be invoked from the main thread. This allows the loading frame to be
      * updated and rendered while this frame is loaded in the background.
      * <p>
      * <b>Note:</b> The thread invoking this method from the loading frame has no
      * OpenGL-context. Any OpenGL-related functionality, such as loading textures,
-     * must be done in {@link #prepare} or {@link #finish}.
+     * must be done in {@link #initialize} or {@link #loaded}.
      * </p>
      *
      * @throws LoadInterruptedException Occurs if the frame fails to load.
      */
-    protected abstract void onLoad() throws LoadInterruptedException;
+    protected final void onLoad(LoadAction onLoad) {
+        this.onLoad = onLoad;
+    }
 
     /**
-     * Called after {@link #load} in order to perform initialization that isn't
+     * The specified action is invoked after {@link #load} in order to perform initialization that isn't
      * thread safe. Only code that needs to run after the frame has loaded should be
-     * placed here. In other case, consider placing it in {@link #onPrepare}.
+     * placed here. In other case, consider placing it in {@link #onInitialize}.
      */
-    protected abstract void onFinish();
+    protected final void onLoaded(Action onLoaded) {
+        this.onLoaded = onLoaded;
+    }
+
+    public void begin() {
+        if (onBegin != null) {
+            onBegin.invoke();
+        }
+    }
+
+    public void end() {
+        if (onEnd != null) {
+            onEnd.invoke();
+        }
+    }
 
     /**
-     * Called when the frame begins, after any calls to {@link #prepare},
-     * {@link #load} or {@link #finish}.
+     * The specified action is invoked when the frame begins, after any calls to {@link #initialize},
+     * {@link #load} or {@link #loaded}.
      */
-    public abstract void onBegin();
+    public final void onBegin(Action onBegin) {
+        this.onBegin = onBegin;
+    }
 
     /**
-     * Called when the frame ends before any call to {@link #reset}.
+     * The specified action is invoked when the frame ends before any call to {@link #reset}.
      */
-    public abstract void onEnd();
+    public final void onEnd(Action onEnd) {
+        this.onEnd = onEnd;
+    }
+
+    public interface LoadAction {
+        void invoke() throws LoadInterruptedException;
+    }
 
     private static class DisposerStack {
         private final static Disposable breakMark = () -> {

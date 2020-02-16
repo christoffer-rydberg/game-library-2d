@@ -17,7 +17,7 @@ public class PositionArray extends AbstractVertexArray {
         var transferBuffer = new FloatTransferBuffer(positions, STRIDE, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
         var buffer = new PositionArray(transferBuffer);
         buffer.updateGPU(0, buffer.getCapacity());
-        disposer.register(buffer);
+        disposer.registerDisposal(buffer);
         return buffer;
     }
 }

@@ -86,7 +86,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     public static DefaultShaderParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
                                                      ParticleUpdateSettings updateSettings, EfficientParticleRenderer renderer, Disposer disposer) {
-
         FloatTransferBuffer initBuffer = new FloatTransferBuffer(updateSettings.getInternalStateArray(),
                 ParticleUpdateSettings.STRIDE, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
@@ -178,7 +177,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
      * @param count The number of emitted particles.
      */
     public void emitAll(int count) {
-
         int remaining = capacity - particleCount;
         if (remaining < count) {
             count = remaining;
@@ -214,9 +212,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
      * was emitted.
      */
     public float emitSequential(float time, float deltaTime, float interval) {
-
         if (interval > 0) {
-
             time += deltaTime;
 
             int iterations = (int) (time / interval);
@@ -243,7 +239,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     @Override
     public void update(float deltaTime) {
-
         if (particleCount > 0) {
 
             // Reset atomic counter
@@ -263,7 +258,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     @Override
     protected void bindUdateBuffers() {
-
         OpenGL openGL = OpenGL.instance();
 
         updateGpuSettings(); // TODO: This is only needed if UpdateSettings has changed.
@@ -285,7 +279,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     }
 
     private void updateGpuSettings() {
-
         var updaterProgram = getUpdaterProgram();
 
         boolean updateProgramInUse = updaterProgram.inUse();
@@ -300,7 +293,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     @Override
     public void render(float alpha) {
-
         if (particlesInGpuBuffer == 0)
             return;
 

@@ -16,7 +16,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onPrepare() {
+    protected void onInitialize() {
         try {
             Window window = getGame().getWindow();
             float windowWidth = window.getWidth();
@@ -41,28 +41,5 @@ public class DemoFrame extends AbstractFrame {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onLoad() {
-
-    }
-
-    @Override
-    protected void onFinish() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onBegin() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onEnd() {
-        // TODO Auto-generated method stub
-
     }
 }

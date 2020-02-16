@@ -16,7 +16,7 @@ public class FrameBuffer implements Disposable {
     private FrameBuffer(int fbo, Texture texture, Disposer disposer) {
         this.fbo = fbo;
         this.texture = texture;
-        disposer.register(this);
+        disposer.registerDisposal(this);
     }
 
     public static FrameBuffer create(Texture texture, Disposer disposer) {

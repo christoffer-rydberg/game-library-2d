@@ -39,7 +39,7 @@ public class ResourceDisposer implements Disposable, Disposer {
      */
     public ResourceDisposer(Disposer disposer) {
         parentDisposer = disposer;
-        disposer.register(this);
+        disposer.registerDisposal(this);
     }
 
     /**
@@ -53,7 +53,7 @@ public class ResourceDisposer implements Disposable, Disposer {
      * Registers the specified disposable resource.
      */
     @Override
-    public void register(Disposable disposable) {
+    public void registerDisposal(Disposable disposable) {
         registeredResources.add(disposable);
     }
 
