@@ -32,13 +32,37 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-imaging</artifactId>
             <version>1.0-alpha1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/commons-imaging-1.0-alpha1/commons-imaging-1.0-alpha1-patched.jar</systemPath>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- The following plugin is used as a workaround to include a local jar.
+            TODO: Remove when commons-imaging make their next release. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install-external</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>
+                                ${project.basedir}/lib/commons-imaging-1.0-alpha1/commons-imaging-1.0-alpha1-patched.jar
+                            </file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>org.apache.commons</groupId>
+                            <artifactId>commons-imaging</artifactId>
+                            <version>1.0-alpha1</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
