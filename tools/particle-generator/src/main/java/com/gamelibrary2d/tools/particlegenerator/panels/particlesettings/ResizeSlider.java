@@ -6,7 +6,7 @@ import com.gamelibrary2d.objects.Slider;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
 import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
 import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;
-import com.gamelibrary2d.particle.settings.SettingsExtensions;
+import com.gamelibrary2d.particle.settings.ParticleSettingsUtils;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
@@ -26,8 +26,8 @@ class ResizeSlider extends Slider {
         });
         addValueChangedListener(value -> {
             float resizeValue = (value < 0 ? value : value * 2) + 100f;
-            SettingsExtensions.scaleSpawnSettings(originalSpawnSettings, resizeValue * 0.01f, particleSystem.getSpawnSettings());
-            SettingsExtensions.scaleUpdateSettings(originalUpdateSettings, resizeValue * 0.01f, particleSystem.getUpdateSettings());
+            ParticleSettingsUtils.scaleSpawnSettings(originalSpawnSettings, resizeValue * 0.01f, particleSystem.getSpawnSettings());
+            ParticleSettingsUtils.scaleUpdateSettings(originalUpdateSettings, resizeValue * 0.01f, particleSystem.getUpdateSettings());
         });
         addDragStopListener(v -> setValue(0, false));
 

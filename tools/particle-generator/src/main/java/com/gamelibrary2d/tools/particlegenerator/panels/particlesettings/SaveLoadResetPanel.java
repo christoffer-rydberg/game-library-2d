@@ -211,49 +211,49 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
             particleSettings.setRotationAccVar(0);
         }
 
-        if (SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()) != null) {
+        if (ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()) != null) {
             float count = round(random.nextFloat() * 1000, 1);
             float countVar = round(random.nextFloat() * count, 1);
-            SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()).setDefaultCount((int) count);
-            SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()).setDefaultCountVar((int) countVar);
-            SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()).setDefaultInterval(1.f / count);
-            SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()).setPulsating(false);
+            ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()).setDefaultCount((int) count);
+            ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()).setDefaultCountVar((int) countVar);
+            ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()).setDefaultInterval(1.f / count);
+            ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()).setPulsating(false);
             boolean localGravityCenter = random.nextInt(2) == 1;
-            SettingsExtensions.asAbstract(particleSystem.getSpawnSettings()).setLocalGravityCenter(localGravityCenter);
+            ParticleSettingsUtils.asAbstract(particleSystem.getSpawnSettings()).setLocalGravityCenter(localGravityCenter);
         }
 
-        if (SettingsExtensions.asBasic(particleSystem.getSpawnSettings()) != null) {
+        if (ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()) != null) {
 
-            SettingsExtensions.asBasic(particleSystem.getSpawnSettings()).setPositionVar(
-                    round(random.nextFloat() * frame.getGame().getWindow().getWidth() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().getHeight() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().getHeight() / 2, 0));
+            ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()).setPositionVar(
+                    round(random.nextFloat() * frame.game().window().width() / 2, 0),
+                    round(random.nextFloat() * frame.game().window().height() / 2, 0),
+                    round(random.nextFloat() * frame.game().window().height() / 2, 0));
 
-            SettingsExtensions.asBasic(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));
-            SettingsExtensions.asBasic(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionYawVar(round(random.nextFloat() * 180, 1));
 
-            SettingsExtensions.asBasic(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionPitch(round(random.nextFloat() * 360 - 180, 1));
-            SettingsExtensions.asBasic(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionPitchVar(round(random.nextFloat() * 180, 1));
 
-        } else if (SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()) != null) {
+        } else if (ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()) != null) {
 
-            SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(
-                    round(random.nextFloat() * frame.getGame().getWindow().getWidth() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().getHeight() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().getHeight() / 2, 0));
+            ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(
+                    round(random.nextFloat() * frame.game().window().width() / 2, 0),
+                    round(random.nextFloat() * frame.game().window().height() / 2, 0),
+                    round(random.nextFloat() * frame.game().window().height() / 2, 0));
 
-            SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));
-            SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionYawVar(round(random.nextFloat() * 180, 1));
 
-            SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionPitch(round(random.nextFloat() * 360 - 180, 1));
-            SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings())
+            ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionPitchVar(round(random.nextFloat() * 180, 1));
         }
 

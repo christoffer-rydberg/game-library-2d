@@ -2,20 +2,20 @@ package com.gamelibrary2d;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
-import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
+import com.gamelibrary2d.framework.Window;
+import com.gamelibrary2d.markers.Updatable;
 
 public interface Game extends Disposer, Updatable {
 
     /**
-     * Starts the game with the specified {@link Window}.
+     * Starts the game inside the specified {@link Window}.
      */
     void start(Window window);
 
-    Window getWindow();
+    Window window();
 
     void setViewPort(int x, int y, int width, int height);
 
@@ -65,7 +65,7 @@ public interface Game extends Disposer, Updatable {
 
     /**
      * The frame changed event occurs when a frame has been set, right before <@link
-     * {@link Frame#onBegin()} is invoked.
+     * {@link Frame#begin()} is invoked.
      */
     void addFrameChangedListener(FrameChangedListener listener);
 

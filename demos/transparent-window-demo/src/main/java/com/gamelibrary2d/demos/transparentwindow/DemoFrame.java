@@ -32,12 +32,12 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize() {
-        var game = getGame();
-        var window = game.getWindow();
+        var game = game();
+        var window = game.window();
         try {
             var animation = createAnimation();
             animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
-            animationObj.position().set(window.getWidth() / 2f, window.getHeight() / 2f);
+            animationObj.position().set(window.width() / 2f, window.height() / 2f);
             add(animationObj);
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class DemoFrame extends AbstractFrame {
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
         if (animationObj.getContent().isAnimationFinished()) {
-            getGame().exit();
+            game().exit();
         }
     }
 

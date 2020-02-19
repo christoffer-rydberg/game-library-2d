@@ -22,7 +22,7 @@ public class ParticleGenerator extends AbstractGame {
 
     @Override
     public void update(float deltaTime) {
-        getWindow().setTitle("Particle Generator (" + getFPS() + ")");
+        window().setTitle("Particle Generator (" + getFPS() + ")");
         super.update(deltaTime);
     }
 

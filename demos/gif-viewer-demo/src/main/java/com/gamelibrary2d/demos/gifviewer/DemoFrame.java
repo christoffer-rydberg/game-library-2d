@@ -44,8 +44,8 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize() {
-        final float windowWidth = getGame().getWindow().getWidth();
-        final float windowHeight = getGame().getWindow().getHeight();
+        final float windowWidth = game().window().width();
+        final float windowHeight = game().window().height();
 
         var loadButton = createLoadButton();
         loadButton.position().set(windowWidth / 2, windowHeight - windowHeight / 6);
@@ -61,8 +61,8 @@ public class DemoFrame extends AbstractFrame {
         var fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/particle_path.txt");
         var path = fileChooser.browse();
         if (path != null) {
-            final float windowWidth = getGame().getWindow().getWidth();
-            final float windowHeight = getGame().getWindow().getHeight();
+            final float windowWidth = game().window().width();
+            final float windowHeight = game().window().height();
             var animation = AnimationFactory.create(path.toURI().toURL(), AnimationFormats.GIF, Rectangle.centered(1f, 1f), new Point(windowWidth, windowHeight), this);
             var renderer = new AnimationRenderer(animation, true, this);
             animatedObject.setRenderer(renderer);
@@ -73,7 +73,7 @@ public class DemoFrame extends AbstractFrame {
         try {
             selectGif();
         } catch (IOException e) {
-            getGame().exit();
+            game().exit();
         }
     }
 }

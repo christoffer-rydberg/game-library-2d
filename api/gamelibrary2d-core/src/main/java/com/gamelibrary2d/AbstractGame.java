@@ -16,6 +16,7 @@ import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.input.KeyAction;
+import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.resources.Shader;
 
 import java.util.ArrayDeque;
@@ -94,11 +95,10 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void start(Window window) {
-
         this.window = window;
 
         window.initialize();
-        window.createWindow();
+        window.create();
         window.createCallBacks(this);
 
         initializeOpenGLSettings();
@@ -134,7 +134,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         defaultShaderProgram.attachShader(Shader.fromFile("Shaders/Default.fragment", ShaderType.FRAGMENT, this));
         defaultShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional, the shader only has one "out" variable
         defaultShaderProgram.initialize();
-        defaultShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        defaultShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setDefaultShaderProgram(defaultShaderProgram);
 
         ShaderProgram particleUpdaterProgram = ShaderProgram.create(this);
@@ -149,7 +149,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         pointParticleShaderProgram
                 .attachShader(Shader.fromFile("Shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
         pointParticleShaderProgram.initialize();
-        pointParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        pointParticleShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setPointParticleShaderProgram(pointParticleShaderProgram);
 
         ShaderProgram quadParticleShaderProgram = ShaderProgram.create(this);
@@ -160,7 +160,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadParticleShaderProgram
                 .attachShader(Shader.fromFile("Shaders/QuadParticle.fragment", ShaderType.FRAGMENT, this));
         quadParticleShaderProgram.initialize();
-        quadParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        quadParticleShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setQuadParticleShaderProgram(quadParticleShaderProgram);
 
         ShaderProgram pointShaderProgram = ShaderProgram.create(this);
@@ -169,7 +169,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         pointShaderProgram
                 .attachShader(Shader.fromFile("Shaders/Point.fragment", ShaderType.FRAGMENT, this));
         pointShaderProgram.initialize();
-        pointShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        pointShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setPointShaderProgram(pointShaderProgram);
 
         ShaderProgram quadShaderProgram = ShaderProgram.create(this);
@@ -180,7 +180,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadShaderProgram
                 .attachShader(Shader.fromFile("Shaders/Quad.fragment", ShaderType.FRAGMENT, this));
         quadShaderProgram.initialize();
-        quadShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        quadShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setQuadShaderProgram(quadShaderProgram);
     }
 
@@ -374,7 +374,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         loadingFrame = frame;
     }
 
-    public Window getWindow() {
+    public Window window() {
         return window;
     }
 
@@ -393,21 +393,26 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void onKeyCallback(int key, int scancode, int action, int mods) {
+        var frame = getFrame();
         if (action == Keyboard.instance().actionPress()) {
-            getFrame().onKeyDown(key, scancode, false, mods);
+            if (frame instanceof KeyAware)
+                ((KeyAware) frame).onKeyDown(key, scancode, false, mods);
             FocusManager.keyDownEvent(key, scancode, false, mods);
         } else if (action == Keyboard.instance().actionRepeat()) {
-            getFrame().onKeyDown(key, scancode, true, mods);
+            if (frame instanceof KeyAware)
+                ((KeyAware) frame).onKeyDown(key, scancode, true, mods);
             FocusManager.keyDownEvent(key, scancode, true, mods);
         } else {
-            getFrame().onKeyRelease(key, scancode, mods);
+            if (frame instanceof KeyAware)
+                ((KeyAware) frame).onKeyRelease(key, scancode, mods);
             FocusManager.keyReleaseEvent(key, scancode, mods);
         }
     }
 
     @Override
     public void onCharCallback(char charInput) {
-        getFrame().onCharInput(charInput);
+        if (frame instanceof KeyAware)
+            ((KeyAware) frame).onCharInput(charInput);
         FocusManager.charInputEvent(charInput);
     }
 
@@ -447,7 +452,6 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     protected abstract void onExit();
 
     private static class GameLoop {
-
         private final Game game;
         private final Window window;
         private final Timer timer;

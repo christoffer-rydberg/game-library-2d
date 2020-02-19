@@ -18,9 +18,9 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onInitialize() {
         try {
-            Window window = getGame().getWindow();
-            float windowWidth = window.getWidth();
-            float windowHeight = window.getHeight();
+            Window window = game().window();
+            float windowWidth = window.width();
+            float windowHeight = window.height();
             BufferedImage init = Texture.load(DemoFrame.class.getResource("/Images/before.jpg"));
             BufferedImage goal = Texture.load(DemoFrame.class.getResource("/Images/after.jpg"));
 

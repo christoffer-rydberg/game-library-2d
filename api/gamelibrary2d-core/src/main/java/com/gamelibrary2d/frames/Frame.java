@@ -5,10 +5,9 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.updaters.Updater;
 
-public interface Frame extends Layer<Renderable>, KeyAware, Disposer {
+public interface Frame extends Layer<Renderable>, Disposer {
 
     /**
      * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.
@@ -52,7 +51,7 @@ public interface Frame extends Layer<Renderable>, KeyAware, Disposer {
     /**
      * @return The game instance.
      */
-    Game getGame();
+    Game game();
 
     /**
      * Pauses the game.
@@ -85,5 +84,5 @@ public interface Frame extends Layer<Renderable>, KeyAware, Disposer {
      * @param reset   {@link Updater#reset} will be invoked to ensure the updater
      *                runs from the beginning, if this property is set to true.
      */
-    void run(Updater updater, boolean reset);
+    void runUpdater(Updater updater, boolean reset);
 }

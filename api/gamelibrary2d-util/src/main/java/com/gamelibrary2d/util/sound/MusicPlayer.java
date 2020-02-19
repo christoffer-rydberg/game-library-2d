@@ -13,20 +13,14 @@ import com.gamelibrary2d.updates.EmptyUpdate;
 import java.net.URL;
 
 public class MusicPlayer {
-
     private final SoundManager manager;
-
     private final SoundSource[] source;
-
     private final SequentialUpdater[] updaters;
-
     private final int channels;
 
-    private int channel;
-
-    private SoundBuffer activeBuffer;
-
     private Frame frame;
+    private int channel;
+    private SoundBuffer activeBuffer;
 
     private MusicPlayer(Frame frame, SoundManager manager, int channels) {
         this.manager = manager;
@@ -47,7 +41,6 @@ public class MusicPlayer {
     }
 
     private void setFrame(Frame frame) {
-
         if (this.frame == frame) {
             return;
         }
@@ -57,7 +50,7 @@ public class MusicPlayer {
         if (frame != null) {
             for (var updater : updaters) {
                 if (!updater.isFinished()) {
-                    frame.run(updater, false);
+                    frame.runUpdater(updater, false);
                 }
             }
         }
@@ -72,7 +65,6 @@ public class MusicPlayer {
     }
 
     public boolean stop(float fadeOutTime) {
-
         if (!isPlaying()) {
             return false;
         }
@@ -86,13 +78,12 @@ public class MusicPlayer {
 
         updater.add(SoundUpdaterFactory.createFadeOutUpdater(manager, source, fadeOutTime, false));
 
-        frame.run(updater, false);
+        frame.runUpdater(updater, false);
 
         return true;
     }
 
     public boolean pause(float fadeOutTime) {
-
         if (!isPlaying()) {
             return false;
         }
@@ -109,7 +100,7 @@ public class MusicPlayer {
 
         updater.add(SoundUpdaterFactory.createFadeOutUpdater(manager, source, fadeOutTime, true));
 
-        frame.run(updater, false);
+        frame.runUpdater(updater, false);
 
         moveToNextChannel();
 
@@ -117,17 +108,14 @@ public class MusicPlayer {
     }
 
     public boolean resume(URL musicUrl, float volume, float fadeInTime) {
-
         if (!canResume(musicUrl)) {
             return false;
         }
 
         return resume(volume, fadeInTime);
-
     }
 
     public boolean resume(float volume, float fadeInTime) {
-
         if (!canResume()) {
             return false;
         }
@@ -150,13 +138,12 @@ public class MusicPlayer {
 
         updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume, fadeInTime));
 
-        frame.run(updater, false);
+        frame.runUpdater(updater, false);
 
         return true;
     }
 
     public void play(URL url, float volume, float fadeInTime, boolean pausePrevious) {
-
         boolean stopped = pausePrevious ? pause(fadeInTime / 2) : stop(fadeInTime / 2);
 
         activeBuffer = manager.getSoundBuffer(url);
@@ -170,7 +157,7 @@ public class MusicPlayer {
         updater.add(new InstantUpdater((x, y) -> source.setSoundBuffer(activeBuffer)));
         updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume,
                 stopped ? fadeInTime / 2 : fadeInTime));
-        frame.run(updater, false);
+        frame.runUpdater(updater, false);
     }
 
     private boolean canResume() {

@@ -5,13 +5,14 @@ import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.particle.settings.SettingsExtensions;
+import com.gamelibrary2d.markers.KeyAware;
+import com.gamelibrary2d.particle.settings.ParticleSettingsUtils;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.*;
 import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSettingsPanel;
 
-public class ParticleFrame extends AbstractFrame {
+public class ParticleFrame extends AbstractFrame implements KeyAware {
 
     public static float PosX;
     public static float PosY;
@@ -57,25 +58,25 @@ public class ParticleFrame extends AbstractFrame {
         backgroundLayer = new BasicLayer<>();
 
         particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
-        particleSettingsPanel.position().set(WINDOW_MARGIN, getGame().getWindow().getHeight() - WINDOW_MARGIN);
+        particleSettingsPanel.position().set(WINDOW_MARGIN, game().window().height() - WINDOW_MARGIN);
 
         basicSpawnSettingsPanel = new BasicSpawnSettingsPanel(this, particleSystem);
         basicSpawnSettingsPanel.position().set(WINDOW_MARGIN,
-                getGame().getWindow().getHeight() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
+                game().window().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         ellipsoidSpawnSettingsPanel = new EllipsoidSpawnSettingsPanel(this, particleSystem);
         ellipsoidSpawnSettingsPanel.position().set(WINDOW_MARGIN,
-                getGame().getWindow().getHeight() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
+                game().window().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         spawnSettingsPanel = basicSpawnSettingsPanel;
 
         renderSettingsPanel = new RenderSettingsPanel(particleSystem, this);
         renderSettingsPanel.position().set(
-                getGame().getWindow().getWidth() - renderSettingsPanel.getBounds().width() - WINDOW_MARGIN,
-                getGame().getWindow().getHeight() - WINDOW_MARGIN);
+                game().window().width() - renderSettingsPanel.getBounds().width() - WINDOW_MARGIN,
+                game().window().height() - WINDOW_MARGIN);
 
         emitterPanel = new EmitterPanel(particleSystem);
-        emitterPanel.position().set(getGame().getWindow().getWidth() - WINDOW_MARGIN,
+        emitterPanel.position().set(game().window().width() - WINDOW_MARGIN,
                 emitterPanel.getBounds().height() + WINDOW_MARGIN);
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
@@ -85,8 +86,8 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     private void onLoad() {
-        PosX = getGame().getWindow().getWidth() / 2f;
-        PosY = getGame().getWindow().getHeight() / 2f;
+        PosX = game().window().width() / 2f;
+        PosY = game().window().height() / 2f;
         add(backgroundLayer);
         add(particleLayer);
         add(screenLayer);
@@ -145,6 +146,11 @@ public class ParticleFrame extends AbstractFrame {
     }
 
     @Override
+    public void onCharInput(char charInput) {
+
+    }
+
+    @Override
     public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
         if (key == Keyboard.instance().keyTab()) {
             // TODO: Focus next textbox
@@ -163,21 +169,24 @@ public class ParticleFrame extends AbstractFrame {
 
             return;
         }
+    }
 
-        super.onKeyDown(key, scanCode, repeat, mods);
+    @Override
+    public void onKeyRelease(int key, int scanCode, int mods) {
+
     }
 
     public void changeSpawnSettings(SpawnSettingsType type) {
         switch (type) {
             case BASIC:
                 screenLayer.remove(spawnSettingsPanel);
-                particleSystem.setSpawnSettings(SettingsExtensions.convertToBasic(particleSystem.getSpawnSettings()));
+                particleSystem.setSpawnSettings(ParticleSettingsUtils.convertToBasic(particleSystem.getSpawnSettings()));
                 spawnSettingsPanel = basicSpawnSettingsPanel;
                 screenLayer.add(spawnSettingsPanel);
                 break;
             case ELLIPSOID:
                 screenLayer.remove(spawnSettingsPanel);
-                particleSystem.setSpawnSettings(SettingsExtensions.convertToEllipsoid(particleSystem.getSpawnSettings()));
+                particleSystem.setSpawnSettings(ParticleSettingsUtils.convertToEllipsoid(particleSystem.getSpawnSettings()));
                 spawnSettingsPanel = ellipsoidSpawnSettingsPanel;
                 screenLayer.add(spawnSettingsPanel);
                 break;

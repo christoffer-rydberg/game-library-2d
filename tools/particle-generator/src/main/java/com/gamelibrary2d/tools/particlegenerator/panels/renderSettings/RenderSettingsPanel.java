@@ -103,8 +103,8 @@ public class RenderSettingsPanel extends StackPanel {
         defaultParticleShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional since the fragment shader only
         // have one "out" variable
         defaultParticleShaderProgram.initialize();
-        defaultParticleShaderProgram.initializeMvp(frame.getGame().getWindow().getWidth(),
-                frame.getGame().getWindow().getHeight());
+        defaultParticleShaderProgram.initializeMvp(frame.game().window().width(),
+                frame.game().window().height());
 
         defaultRenderer = new SurfaceRenderer(quad);
         defaultRenderer.setShaderProgram(defaultParticleShaderProgram);

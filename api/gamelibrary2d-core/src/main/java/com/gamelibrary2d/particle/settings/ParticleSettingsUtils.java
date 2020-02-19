@@ -1,6 +1,6 @@
 package com.gamelibrary2d.particle.settings;
 
-public class SettingsExtensions {
+public class ParticleSettingsUtils {
 
     public static AbstractSpawnSettings asAbstract(ParticleSpawnSettings spawnSettings) {
         return spawnSettings instanceof AbstractSpawnSettings ? (AbstractSpawnSettings) spawnSettings : null;
@@ -20,7 +20,6 @@ public class SettingsExtensions {
 
     public static void scaleUpdateSettings(ParticleUpdateSettings settings, float factor,
                                            ParticleUpdateSettings output) {
-
         output.setSpeed(settings.getSpeed() * factor);
         output.setSpeedVar(settings.getSpeedVar() * factor);
         output.setScale(settings.getScaleX() * factor, settings.getScaleY() * factor);
@@ -51,7 +50,6 @@ public class SettingsExtensions {
     }
 
     public static BasicSpawnSettings convertToBasic(ParticleSpawnSettings spawnSettings) {
-
         if (spawnSettings instanceof BasicSpawnSettings) {
             return (BasicSpawnSettings) spawnSettings;
         }
@@ -69,7 +67,6 @@ public class SettingsExtensions {
     }
 
     public static EllipsoidSpawnSettings convertToEllipsoid(ParticleSpawnSettings spawnSettings) {
-
         if (spawnSettings instanceof EllipsoidSpawnSettings) {
             return (EllipsoidSpawnSettings) spawnSettings;
         }
@@ -102,7 +99,6 @@ public class SettingsExtensions {
 
     private static void scaleEllipsoidSpawnSettings(EllipsoidSpawnSettings spawnSettings, float factor,
                                                     EllipsoidSpawnSettings output) {
-
         output.getRadius()[0] = spawnSettings.getRadius()[0] * factor;
         output.getRadius()[1] = spawnSettings.getRadius()[1] * factor;
         output.getRadius()[2] = spawnSettings.getRadius()[2] * factor;

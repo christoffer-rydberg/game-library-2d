@@ -1,6 +1,6 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 
-import com.gamelibrary2d.particle.settings.SettingsExtensions;
+import com.gamelibrary2d.particle.settings.ParticleSettingsUtils;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.panels.common.FloatPropertyPanel;
@@ -23,13 +23,13 @@ public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
     private PropertyParameters<Float> getRadiusParameters() {
         return new PropertyParameters<>(3) {
             public void updateSetting() {
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(getParameter(0), getParameter(1), getParameter(2));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(getParameter(0), getParameter(1), getParameter(2));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[0]);
-                changed |= setParameter(1, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[1]);
-                changed |= setParameter(2, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[2]);
+                boolean changed = setParameter(0, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[0]);
+                changed |= setParameter(1, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[1]);
+                changed |= setParameter(2, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadius()[2]);
                 return changed;
             }
         };
@@ -38,13 +38,13 @@ public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
     private PropertyParameters<Float> getRadiusVarParameters() {
         return new PropertyParameters<>(3) {
             public void updateSetting() {
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setRadiusVar(getParameter(0), getParameter(1), getParameter(2));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setRadiusVar(getParameter(0), getParameter(1), getParameter(2));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[0]);
-                changed |= setParameter(1, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[1]);
-                changed |= setParameter(2, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[2]);
+                boolean changed = setParameter(0, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[0]);
+                changed |= setParameter(1, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[1]);
+                changed |= setParameter(2, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getRadiusVar()[2]);
                 return changed;
             }
         };
@@ -53,13 +53,13 @@ public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
     private PropertyParameters<Float> getPositionYawParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setPositionYaw(getParameter(0));
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setPositionYawVar(getParameter(1));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setPositionYaw(getParameter(0));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setPositionYawVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getPositionYaw());
-                changed |= setParameter(1, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getPositionYawVar());
+                boolean changed = setParameter(0, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getPositionYaw());
+                changed |= setParameter(1, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getPositionYawVar());
                 return changed;
             }
         };
@@ -68,13 +68,13 @@ public class EllipsoidSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
     private PropertyParameters<Float> getPositionPitchParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setPositionPitch(getParameter(0));
-                SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).setPositionPitchVar(getParameter(1));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setPositionPitch(getParameter(0));
+                ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setPositionPitchVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getPositionPitch());
-                changed |= setParameter(1, SettingsExtensions.asEllipsoid(particleSystem.getSpawnSettings()).getPositionPitchVar());
+                boolean changed = setParameter(0, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getPositionPitch());
+                changed |= setParameter(1, ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).getPositionPitchVar());
                 return changed;
             }
         };

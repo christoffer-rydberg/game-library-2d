@@ -13,15 +13,12 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public abstract class AbstractFrame extends AbstractLayer<Renderable> implements Frame {
-
     private Game game;
 
     private DisposerStack disposer;
-
     private Deque<Updater> updaters;
 
     private boolean paused;
-
     private boolean disposed;
     private boolean initialized;
     private boolean loaded;
@@ -50,15 +47,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             return;
 
         game.registerDisposal(this);
-
         disposer = new DisposerStack();
-
         updaters = new ArrayDeque<>();
 
         onInitialize();
 
         disposer.pushBreak();
-
         initialized = true;
     }
 
@@ -137,12 +131,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         loaded = false;
     }
 
-    protected void run(Updater updater) {
-        run(updater, true);
+    protected void runUpdater(Updater updater) {
+        runUpdater(updater, true);
     }
 
     @Override
-    public void run(Updater updater, boolean reset) {
+    public void runUpdater(Updater updater, boolean reset) {
         if (!updaters.contains(updater))
             updaters.addLast(updater);
         if (reset) {
@@ -165,7 +159,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public Game getGame() {
+    public Game game() {
         return game;
     }
 
@@ -182,24 +176,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     @Override
     public boolean isPaused() {
         return paused;
-    }
-
-    @Override
-    public void onCharInput(char charInput) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onKeyRelease(int key, int scanCode, int mods) {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -220,8 +196,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
      * OpenGL-context. Any OpenGL-related functionality, such as loading textures,
      * must be done in {@link #initialize} or {@link #loaded}.
      * </p>
-     *
-     * @throws LoadInterruptedException Occurs if the frame fails to load.
      */
     protected final void onLoad(LoadAction onLoad) {
         this.onLoad = onLoad;

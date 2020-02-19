@@ -135,7 +135,7 @@ class DemoFrame extends AbstractFrame {
     @Override
     protected void onInitialize() {
         try {
-            var window = getGame().getWindow();
+            var window = game().window();
             viewLayer.getBackground().add(createBackground());
 
             List<SpaceCraft> spaceCrafts = createSpaceCrafts();
@@ -143,12 +143,12 @@ class DemoFrame extends AbstractFrame {
                 viewLayer.add(spaceCraft);
             }
 
-            var viewArea = Rectangle.fromBottomLeft(window.getWidth(), window.getHeight());
+            var viewArea = Rectangle.fromBottomLeft(window.width(), window.height());
             var splitLayer = new SplitLayer<>(createSplitLayout(spaceCrafts), viewArea, this);
             splitLayer.setTarget(viewLayer);
             add(splitLayer);
 
-            onBegin(() -> getGame().setBackgroundColor(SPLIT_COLOR));
+            onBegin(() -> game().setBackgroundColor(SPLIT_COLOR));
         } catch (IOException e) {
             e.printStackTrace();
         }

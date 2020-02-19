@@ -140,12 +140,12 @@ public class GlfwWindow implements Window {
     }
 
     @Override
-    public int getHeight() {
+    public int height() {
         return windowHeight;
     }
 
     @Override
-    public int getWidth() {
+    public int width() {
         return windowWidth;
     }
 
@@ -194,7 +194,7 @@ public class GlfwWindow implements Window {
     }
 
     @Override
-    public void createWindow() {
+    public void create() {
         if (!initialized) {
             throw new GameLibrary2DRuntimeException("Not initialized");
         }
