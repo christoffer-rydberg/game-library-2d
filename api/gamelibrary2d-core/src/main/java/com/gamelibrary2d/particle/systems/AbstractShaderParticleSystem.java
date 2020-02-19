@@ -17,7 +17,6 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
     private int glUniformParticleCount;
 
     protected AbstractShaderParticleSystem(ShaderProgram updaterProgram, EfficientParticleRenderer renderer) {
-
         this.updaterProgram = updaterProgram;
 
         this.renderer = renderer;
@@ -48,7 +47,6 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
     @Override
     public void update(float deltaTime) {
-
         OpenGL openGL = OpenGL.instance();
 
         int particleCount = getParticleCount();

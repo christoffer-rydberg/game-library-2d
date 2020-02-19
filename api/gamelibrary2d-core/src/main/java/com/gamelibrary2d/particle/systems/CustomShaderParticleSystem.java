@@ -22,8 +22,8 @@ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
 
     public static CustomShaderParticleSystem create(float[] state, float[] update, int stride,
                                                     ShaderProgram updateProgram, EfficientParticleRenderer renderer, Disposer disposer) {
-        FloatTransferBuffer updateBuffer = new FloatTransferBuffer(update, stride, OpenGL.GL_SHADER_STORAGE_BUFFER,
-                OpenGL.GL_STATIC_DRAW, disposer);
+        FloatTransferBuffer updateBuffer =
+                new FloatTransferBuffer(update, stride, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
         var arrayBuffer = CustomVertexArray.create(
                 new FloatTransferBuffer(state, stride, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer),
