@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
+import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleSettings;
 import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
@@ -46,9 +47,22 @@ public class DefaultParticleSystem implements ParticleSystem {
         particles = new Particle[capacity];
     }
 
+    public static DefaultParticleSystem create(int capacity, ParticleSettings settings, Disposer disposer) {
+        return create(capacity, settings.getSpawnSettings(), settings.getUpdateSettings(), new EfficientParticleRenderer(), disposer);
+    }
+
     public static DefaultParticleSystem create(int capacity, ParticleSettings settings, ParticleRenderer renderer,
                                                Disposer disposer) {
         return create(capacity, settings.getSpawnSettings(), settings.getUpdateSettings(), renderer, disposer);
+    }
+
+    public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
+                                               ParticleUpdateSettings updateSettings, Disposer disposer) {
+        float[] vertices = new float[capacity * ParticleVertexBuffer.STRIDE];
+        ParticleVertexBuffer vertexBuffer = ParticleVertexBuffer.create(vertices, disposer);
+        float[] updateArray = new float[capacity * ParticleUpdateBuffer.STRIDE];
+        ParticleUpdateBuffer updateBuffer = new ParticleUpdateBuffer(updateArray, disposer);
+        return new DefaultParticleSystem(capacity, new EfficientParticleRenderer(), spawnSettings, updateSettings, vertexBuffer, updateBuffer);
     }
 
     public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,

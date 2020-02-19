@@ -24,7 +24,6 @@ public class InstantUpdater implements Updater {
 
     @Override
     public float update(float deltaTime) {
-
         if (isFinished())
             return deltaTime;
 
