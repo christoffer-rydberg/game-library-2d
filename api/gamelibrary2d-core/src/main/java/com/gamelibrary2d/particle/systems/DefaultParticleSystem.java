@@ -24,7 +24,7 @@ public class DefaultParticleSystem implements ParticleSystem {
     private final Particle[] particles;
     private ParticleSpawnSettings spawnSettings;
     private ParticleUpdateSettings updateSettings;
-    private ParticleVertexBuffer vertexBuffer;
+    private InternalParticleBuffer vertexBuffer;
     private ParticleUpdateBuffer updateBuffer;
     private int particleCount;
 
@@ -37,7 +37,7 @@ public class DefaultParticleSystem implements ParticleSystem {
     private ParticleRenderer renderer;
 
     private DefaultParticleSystem(int capacity, ParticleRenderer renderer, ParticleSpawnSettings spawnSettings,
-                                  ParticleUpdateSettings updateSettings, ParticleVertexBuffer vertexBuffer,
+                                  ParticleUpdateSettings updateSettings, InternalParticleBuffer vertexBuffer,
                                   ParticleUpdateBuffer updateBuffer) {
         this.renderer = renderer;
         this.spawnSettings = spawnSettings;
@@ -58,19 +58,25 @@ public class DefaultParticleSystem implements ParticleSystem {
 
     public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
                                                ParticleUpdateSettings updateSettings, Disposer disposer) {
-        float[] vertices = new float[capacity * ParticleVertexBuffer.STRIDE];
-        ParticleVertexBuffer vertexBuffer = ParticleVertexBuffer.create(vertices, disposer);
-        float[] updateArray = new float[capacity * ParticleUpdateBuffer.STRIDE];
-        ParticleUpdateBuffer updateBuffer = new ParticleUpdateBuffer(updateArray, disposer);
-        return new DefaultParticleSystem(capacity, new EfficientParticleRenderer(), spawnSettings, updateSettings, vertexBuffer, updateBuffer);
+        var vertexBuffer = InternalParticleBuffer.create(capacity, disposer);
+
+        var updateBuffer = ParticleUpdateBuffer.create(capacity, disposer);
+
+        return new DefaultParticleSystem(
+                capacity,
+                new EfficientParticleRenderer(),
+                spawnSettings,
+                updateSettings,
+                vertexBuffer,
+                updateBuffer);
     }
 
     public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
                                                ParticleUpdateSettings updateSettings, ParticleRenderer renderer, Disposer disposer) {
-        float[] vertices = new float[capacity * ParticleVertexBuffer.STRIDE];
-        ParticleVertexBuffer vertexBuffer = ParticleVertexBuffer.create(vertices, disposer);
-        float[] updateArray = new float[capacity * ParticleUpdateBuffer.STRIDE];
-        ParticleUpdateBuffer updateBuffer = new ParticleUpdateBuffer(updateArray, disposer);
+        InternalParticleBuffer vertexBuffer = InternalParticleBuffer.create(capacity, disposer);
+
+        ParticleUpdateBuffer updateBuffer = ParticleUpdateBuffer.create(capacity, disposer);
+
         return new DefaultParticleSystem(capacity, renderer, spawnSettings, updateSettings, vertexBuffer, updateBuffer);
     }
 
@@ -236,14 +242,12 @@ public class DefaultParticleSystem implements ParticleSystem {
 
     public void update(float deltaTime) {
         if (particleCount > 0) {
-
             for (int i = 0; i < particleCount; ++i)
                 particles[i].update(externalAcceleration, deltaTime);
 
             int index = 0;
 
             while (index != particleCount) {
-
                 Particle particle = particles[index];
 
                 if (particle.hasExpired()) {
@@ -332,8 +336,8 @@ public class DefaultParticleSystem implements ParticleSystem {
         if (particleCount > 0) {
             int lastIndex = particleCount;
 
-            vertexBuffer.copy(lastIndex, index);
-            updateBuffer.copy(lastIndex, index);
+            vertexBuffer.copy(lastIndex, index, 1);
+            updateBuffer.copy(lastIndex, index, 1);
 
             Particle last = particles[lastIndex];
             Particle current = particles[index];

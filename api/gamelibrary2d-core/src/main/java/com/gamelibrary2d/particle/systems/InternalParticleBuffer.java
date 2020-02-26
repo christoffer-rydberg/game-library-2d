@@ -2,12 +2,12 @@ package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.FloatTransferBuffer;
-import com.gamelibrary2d.resources.AbstractVertexArray;
+import com.gamelibrary2d.glUtil.AbstractVertexArrayBuffer;
+import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
 
-class ParticleVertexBuffer extends AbstractVertexArray {
+class InternalParticleBuffer extends AbstractVertexArrayBuffer {
 
-    final static int STRIDE = 12;
+    private final static int STRIDE = 12;
     private final static int POS_X = 0;
     private final static int POS_Y = 1;
     private final static int POS_Z = 2;
@@ -21,15 +21,29 @@ class ParticleVertexBuffer extends AbstractVertexArray {
     private final static int TIME = 10;
     private final float[] internalState;
 
-    private ParticleVertexBuffer(float[] internalState, Disposer disposer) {
-        super(new FloatTransferBuffer(internalState, STRIDE, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
-        this.internalState = internalState;
+    private InternalParticleBuffer(OpenGLFloatBuffer internalState) {
+        super(internalState, STRIDE, 4);
+        this.internalState = internalState.data();
     }
 
-    static ParticleVertexBuffer create(float[] array, Disposer disposer) {
-        ParticleVertexBuffer buffer = new ParticleVertexBuffer(array, disposer);
+    static InternalParticleBuffer create(int capacity, Disposer disposer) {
+        var data = new float[capacity * STRIDE];
+        var buffer = new InternalParticleBuffer(
+                OpenGLFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
         disposer.registerDisposal(buffer);
         return buffer;
+    }
+
+    static InternalParticleBuffer[] createWithSharedData(int capacity, int count, Disposer disposer) {
+        var updateBuffer = new InternalParticleBuffer[count];
+        var data = new float[capacity * STRIDE];
+        for (int i = 0; i < count; ++i) {
+            var buffer = new InternalParticleBuffer(
+                    OpenGLFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
+            disposer.registerDisposal(buffer);
+            updateBuffer[i] = buffer;
+        }
+        return updateBuffer;
     }
 
     float getPosX(int offset) {

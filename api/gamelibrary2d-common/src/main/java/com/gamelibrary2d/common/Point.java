@@ -222,4 +222,8 @@ public class Point {
     public float getDistance(Point other) {
         return getLength(x - other.x, y - other.y);
     }
+
+    public float getDistance(float x, float y) {
+        return getLength(this.x - x, this.y - y);
+    }
 }

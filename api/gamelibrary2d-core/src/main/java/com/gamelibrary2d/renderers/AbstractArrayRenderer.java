@@ -5,19 +5,21 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.resources.VertexArray;
 
-public abstract class AbstractArrayRenderer<T extends VertexArray> implements ArrayRenderer<T> {
+public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements ArrayRenderer<T> {
     private final static String alphaUniformName = "alpha";
     private final static String colorUniformName = "colorFactor";
     private final float[] colorArray = new float[4];
+    private final DrawMode drawMode;
 
     private Color color;
     private boolean maskingOutBackground = false;
     private BlendMode blendMode = BlendMode.ADDITIVE;
 
-    protected AbstractArrayRenderer() {
+    protected AbstractArrayRenderer(DrawMode drawMode) {
+        this.drawMode = drawMode;
         setColor(Color.WHITE);
     }
 
@@ -56,11 +58,18 @@ public abstract class AbstractArrayRenderer<T extends VertexArray> implements Ar
         this.maskingOutBackground = maskingOutBackground;
     }
 
-    @Override
-    public void render(float alpha, T array) {
-        render(alpha, array, 0, array.getCapacity());
+    private int getOpenGlDrawMode() {
+        switch (drawMode) {
+            case POINTS:
+                return OpenGL.GL_POINTS;
+            case LINE:
+                return OpenGL.GL_LINE_STRIP;
+            default:
+                throw new IllegalStateException("Unexpected value: " + drawMode);
+        }
     }
 
+    @Override
     public void render(float alpha, T array, int offset, int len) {
         ShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.bind();
@@ -76,15 +85,17 @@ public abstract class AbstractArrayRenderer<T extends VertexArray> implements Ar
 
         array.bind();
 
+        var drawMode = getOpenGlDrawMode();
         if (blendMode != BlendMode.NONE && isMaskingOutBackground()) {
             OpenGLUtils.applyBlendMode(BlendMode.MASK);
-            OpenGL.instance().glDrawArrays(OpenGL.GL_POINTS, offset, len);
+            OpenGL.instance().glDrawArrays(drawMode, offset, len);
         }
 
         OpenGLUtils.applyBlendMode(blendMode);
-        OpenGL.instance().glDrawArrays(OpenGL.GL_POINTS, offset, len);
+        OpenGL.instance().glDrawArrays(drawMode, offset, len);
 
         // Cleanup
+        renderCleanup();
         array.unbind();
         OpenGLUtils.applyBlendMode(BlendMode.NONE);
     }
@@ -95,4 +106,8 @@ public abstract class AbstractArrayRenderer<T extends VertexArray> implements Ar
 
     protected abstract void renderCleanup();
 
+    protected enum DrawMode {
+        POINTS,
+        LINE
+    }
 }

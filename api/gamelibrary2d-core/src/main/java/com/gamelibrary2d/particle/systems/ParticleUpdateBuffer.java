@@ -2,11 +2,12 @@ package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.FloatTransferBuffer;
+import com.gamelibrary2d.glUtil.AbstractInterleavedBuffer;
+import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
 
-class ParticleUpdateBuffer extends FloatTransferBuffer {
+class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatBuffer> {
 
-    final static int STRIDE = 28;
+    private final static int STRIDE = 28;
     private final static int DELTA_X = 0;
     private final static int DELTA_Y = 1;
     private final static int DELTA_Z = 2;
@@ -37,9 +38,23 @@ class ParticleUpdateBuffer extends FloatTransferBuffer {
     private final static int DELTA_COLOR_A = 27;
     private final float[] internalState;
 
-    ParticleUpdateBuffer(float[] internalState, Disposer disposer) {
-        super(internalState, STRIDE, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
+    private ParticleUpdateBuffer(float[] internalState, Disposer disposer) {
+        super(OpenGLFloatBuffer.create(internalState, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer), STRIDE);
         this.internalState = internalState;
+    }
+
+    public static ParticleUpdateBuffer create(int capacity, Disposer disposer) {
+        var data = new float[capacity * STRIDE];
+        return new ParticleUpdateBuffer(data, disposer);
+    }
+
+    public static ParticleUpdateBuffer[] createWithSharedData(int capacity, int count, Disposer disposer) {
+        var result = new ParticleUpdateBuffer[count];
+        var data = new float[capacity * STRIDE];
+        for (int i = 0; i < count; ++i) {
+            result[i] = new ParticleUpdateBuffer(data, disposer);
+        }
+        return result;
     }
 
     float getExternalSpeedX(int offset) {

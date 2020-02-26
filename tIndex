@@ -1,0 +1,386 @@
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractInterleavedBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractInterleavedBuffer.java[m
+[1mindex 4af59ff..581f871 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractInterleavedBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractInterleavedBuffer.java[m
+[36m@@ -6,18 +6,15 @@[m [mimport com.gamelibrary2d.framework.OpenGL;[m
+ public class AbstractInterleavedBuffer extends AbstractDisposable implements TransferBuffer {[m
+     private final int glVao;[m
+     private final FloatTransferBuffer buffer;[m
+[32m+[m[32m    private final int stride;[m
+ [m
+[31m-    protected AbstractInterleavedBuffer(FloatTransferBuffer buffer) {[m
+[31m-        this(buffer, 4);[m
+[31m-    }[m
+[31m-[m
+[31m-    protected AbstractInterleavedBuffer(FloatTransferBuffer buffer, int elementSize) {[m
+[32m+[m[32m    protected AbstractInterleavedBuffer(FloatTransferBuffer buffer, int stride, int elementSize) {[m
+         OpenGL openGL = OpenGL.instance();[m
+         this.buffer = buffer;[m
+         this.glVao = openGL.glGenVertexArrays();[m
+[32m+[m[32m        this.stride = stride;[m
+ [m
+         bind();[m
+[31m-        int stride = buffer.stride();[m
+         int elements = stride / elementSize;[m
+         int byteStride = stride * Float.BYTES;[m
+         for (int i = 0; i < elements; ++i) {[m
+[36m@@ -55,26 +52,25 @@[m [mpublic class AbstractInterleavedBuffer extends AbstractDisposable implements Tra[m
+ [m
+     @Override[m
+     public void updateGPU(int offset, int len) {[m
+[31m-        buffer.updateGPU(offset, len);[m
+[32m+[m[32m        buffer.updateGPU(offset * stride, len * stride);[m
+     }[m
+ [m
+     @Override[m
+     public void updateCPU(int offset, int len) {[m
+[31m-        buffer.updateCPU(offset, len);[m
+[32m+[m[32m        buffer.updateCPU(offset * stride, len * stride);[m
+     }[m
+ [m
+[31m-    @Override[m
+     public int stride() {[m
+[31m-        return buffer.stride();[m
+[32m+[m[32m        return stride;[m
+     }[m
+ [m
+     @Override[m
+     public int capacity() {[m
+[31m-        return buffer.capacity();[m
+[32m+[m[32m        return buffer.capacity() / stride;[m
+     }[m
+ [m
+     @Override[m
+[31m-    public void copy(int index, int destinationIndex) {[m
+[31m-        buffer.copy(index, destinationIndex);[m
+[32m+[m[32m    public void copy(int offset, int destination, int len) {[m
+[32m+[m[32m        buffer.copy(offset * stride, destination * stride, len * stride);[m
+     }[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractTransferBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractTransferBuffer.java[m
+[1mindex da3c3c8..8d96fed 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractTransferBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/AbstractTransferBuffer.java[m
+[36m@@ -4,7 +4,6 @@[m [mimport com.gamelibrary2d.common.disposal.AbstractDisposable;[m
+ import com.gamelibrary2d.framework.OpenGL;[m
+ [m
+ public abstract class AbstractTransferBuffer extends AbstractDisposable implements TransferBuffer {[m
+[31m-    private final int stride;[m
+     private final int target;[m
+ [m
+     private int capacity;[m
+[36m@@ -12,13 +11,12 @@[m [mpublic abstract class AbstractTransferBuffer extends AbstractDisposable implemen[m
+     private boolean gpuInitialized;[m
+     private int glBuffer = -1;[m
+ [m
+[31m-    protected AbstractTransferBuffer(int stride, int target) {[m
+[31m-        this.stride = stride;[m
+[32m+[m[32m    protected AbstractTransferBuffer(int target) {[m
+         this.target = target;[m
+     }[m
+ [m
+     protected void ensureBufferSize(int bufferSize) {[m
+[31m-        var capacity = bufferSize / stride;[m
+[32m+[m[32m        var capacity = bufferSize;[m
+         if (this.capacity != capacity) {[m
+             this.capacity = capacity;[m
+             gpuInitialized = false;[m
+[36m@@ -34,10 +32,6 @@[m [mpublic abstract class AbstractTransferBuffer extends AbstractDisposable implemen[m
+         return capacity;[m
+     }[m
+ [m
+[31m-    public int stride() {[m
+[31m-        return stride;[m
+[31m-    }[m
+[31m-[m
+     public void bind() {[m
+         OpenGL openGL = OpenGL.instance();[m
+         openGL.glBindBuffer(target, glBuffer());[m
+[36m@@ -57,7 +51,7 @@[m [mpublic abstract class AbstractTransferBuffer extends AbstractDisposable implemen[m
+         if (!isBound)[m
+             bind();[m
+ [m
+[31m-        onUpdateCPU(target, offset * stride, len * stride);[m
+[32m+[m[32m        onUpdateCPU(target, offset, len);[m
+ [m
+         if (!isBound)[m
+             unbind();[m
+[36m@@ -72,7 +66,7 @@[m [mpublic abstract class AbstractTransferBuffer extends AbstractDisposable implemen[m
+         if (!gpuInitialized) {[m
+             initializeGPU();[m
+         } else {[m
+[31m-            onUpdateGPU(target, offset * stride, len * stride);[m
+[32m+[m[32m            onUpdateGPU(target, offset, len);[m
+         }[m
+ [m
+         if (!isBound)[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/FloatTransferBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/FloatTransferBuffer.java[m
+[1mindex e3967dd..6978831 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/FloatTransferBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/FloatTransferBuffer.java[m
+[36m@@ -12,8 +12,8 @@[m [mpublic class FloatTransferBuffer extends AbstractTransferBuffer {[m
+     private float[] data;[m
+     private FloatBuffer ioBuffer;[m
+ [m
+[31m-    public FloatTransferBuffer(int stride, int target, int usage, Disposer disposer) {[m
+[31m-        super(stride, target);[m
+[32m+[m[32m    public FloatTransferBuffer(int target, int usage, Disposer disposer) {[m
+[32m+[m[32m        super(target);[m
+         this.usage = usage;[m
+         disposer.registerDisposal(this);[m
+     }[m
+[36m@@ -30,11 +30,8 @@[m [mpublic class FloatTransferBuffer extends AbstractTransferBuffer {[m
+     }[m
+ [m
+     @Override[m
+[31m-    public void copy(int index, int destinationIndex) {[m
+[31m-        int stride = stride();[m
+[31m-        int origin = index * stride;[m
+[31m-        int destination = destinationIndex * stride;[m
+[31m-        System.arraycopy(data, origin, data, destination, stride);[m
+[32m+[m[32m    public void copy(int offset, int destination, int len) {[m
+[32m+[m[32m        System.arraycopy(data, offset, data, destination, len);[m
+     }[m
+ [m
+     @Override[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/IntTransferBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/IntTransferBuffer.java[m
+[1mindex e8fd0fe..b7ec9e9 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/IntTransferBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/IntTransferBuffer.java[m
+[36m@@ -13,8 +13,8 @@[m [mpublic class IntTransferBuffer extends AbstractTransferBuffer {[m
+     private int[] data;[m
+     private IntBuffer ioBuffer;[m
+ [m
+[31m-    public IntTransferBuffer(int stride, int target, int usage, Disposer disposer) {[m
+[31m-        super(stride, target);[m
+[32m+[m[32m    public IntTransferBuffer(int target, int usage, Disposer disposer) {[m
+[32m+[m[32m        super(target);[m
+         this.usage = usage;[m
+         disposer.registerDisposal(this);[m
+     }[m
+[36m@@ -35,11 +35,8 @@[m [mpublic class IntTransferBuffer extends AbstractTransferBuffer {[m
+     }[m
+ [m
+     @Override[m
+[31m-    public void copy(int index, int destinationIndex) {[m
+[31m-        int stride = stride();[m
+[31m-        int origin = index * stride;[m
+[31m-        int destination = destinationIndex * stride;[m
+[31m-        System.arraycopy(data, origin, data, destination, stride);[m
+[32m+[m[32m    public void copy(int offset, int destination, int len) {[m
+[32m+[m[32m        System.arraycopy(data, offset, data, destination, len);[m
+     }[m
+ [m
+     @Override[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/PositionBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/PositionBuffer.java[m
+[1mindex bd8941d..5cf8219 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/PositionBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/PositionBuffer.java[m
+[36m@@ -9,7 +9,7 @@[m [mpublic class PositionBuffer extends AbstractInterleavedBuffer {[m
+     private final FloatArrayList data;[m
+ [m
+     private PositionBuffer(FloatArrayList data, FloatTransferBuffer buffer) {[m
+[31m-        super(buffer, ELEMENT_SIZE);[m
+[32m+[m[32m        super(buffer, STRIDE, ELEMENT_SIZE);[m
+         this.data = data;[m
+     }[m
+ [m
+[36m@@ -22,7 +22,7 @@[m [mpublic class PositionBuffer extends AbstractInterleavedBuffer {[m
+     }[m
+ [m
+     public static PositionBuffer create(FloatArrayList positions, Disposer disposer) {[m
+[31m-        var transferBuffer = new FloatTransferBuffer(STRIDE, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m        var transferBuffer = new FloatTransferBuffer(OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         transferBuffer.setData(positions.internalArray());[m
+         var buffer = new PositionBuffer(positions, transferBuffer);[m
+         buffer.updateGPU(0, buffer.size());[m
+[36m@@ -42,6 +42,6 @@[m [mpublic class PositionBuffer extends AbstractInterleavedBuffer {[m
+         data.add(x);[m
+         data.add(y);[m
+         getBuffer().setData(data.internalArray());[m
+[31m-        getBuffer().updateGPU(size() - 1, 1);[m
+[32m+[m[32m        updateGPU(size() - 1, 1);[m
+     }[m
+ }[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/TransferBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/TransferBuffer.java[m
+[1mindex 5db0668..9f2aca9 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/TransferBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/glUtil/TransferBuffer.java[m
+[36m@@ -8,13 +8,11 @@[m [mpublic interface TransferBuffer {[m
+ [m
+     void updateCPU(int offset, int len);[m
+ [m
+[31m-    int stride();[m
+[31m-[m
+     int capacity();[m
+ [m
+     void bind();[m
+ [m
+     void unbind();[m
+ [m
+[31m-    void copy(int index, int destinationIndex);[m
+[32m+[m[32m    void copy(int offset, int destination, int len);[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/CustomShaderParticleSystem.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/CustomShaderParticleSystem.java[m
+[1mindex 0012f32..0441293 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/CustomShaderParticleSystem.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/CustomShaderParticleSystem.java[m
+[36m@@ -2,11 +2,11 @@[m [mpackage com.gamelibrary2d.particle.systems;[m
+ [m
+ import com.gamelibrary2d.common.disposal.Disposer;[m
+ import com.gamelibrary2d.framework.OpenGL;[m
+[32m+[m[32mimport com.gamelibrary2d.glUtil.AbstractInterleavedBuffer;[m
+ import com.gamelibrary2d.glUtil.FloatTransferBuffer;[m
+ import com.gamelibrary2d.glUtil.ShaderProgram;[m
+ import com.gamelibrary2d.glUtil.TransferBuffer;[m
+ import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;[m
+[31m-import com.gamelibrary2d.glUtil.AbstractInterleavedBuffer;[m
+ [m
+ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {[m
+ [m
+[36m@@ -23,15 +23,16 @@[m [mpublic class CustomShaderParticleSystem extends AbstractShaderParticleSystem {[m
+     public static CustomShaderParticleSystem create(float[] state, float[] update, int stride,[m
+                                                     ShaderProgram updateProgram, EfficientParticleRenderer renderer, Disposer disposer) {[m
+         var updateBuffer =[m
+[31m-                new FloatTransferBuffer(stride, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m                new FloatTransferBuffer(OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         updateBuffer.setData(update);[m
+ [m
+[31m-        var stateBuffer = new FloatTransferBuffer(stride, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m        var stateBuffer = new FloatTransferBuffer(OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         stateBuffer.setData(state);[m
+ [m
+         var arrayBuffer = CustomParticleBuffer.create([m
+                 stateBuffer,[m
+                 4,[m
+[32m+[m[32m                stride,[m
+                 disposer);[m
+ [m
+         updateBuffer.updateGPU(0, updateBuffer.capacity());[m
+[36m@@ -62,12 +63,12 @@[m [mpublic class CustomShaderParticleSystem extends AbstractShaderParticleSystem {[m
+     }[m
+ [m
+     private static class CustomParticleBuffer extends AbstractInterleavedBuffer {[m
+[31m-        private CustomParticleBuffer(FloatTransferBuffer buffer, int elementSize) {[m
+[31m-            super(buffer, elementSize);[m
+[32m+[m[32m        private CustomParticleBuffer(FloatTransferBuffer buffer, int elementSize, int stride) {[m
+[32m+[m[32m            super(buffer, elementSize, stride);[m
+         }[m
+ [m
+[31m-        public static CustomParticleBuffer create(FloatTransferBuffer buffer, int elementSize, Disposer disposer) {[m
+[31m-            var obj = new CustomParticleBuffer(buffer, elementSize);[m
+[32m+[m[32m        public static CustomParticleBuffer create(FloatTransferBuffer buffer, int elementSize, int stride, Disposer disposer) {[m
+[32m+[m[32m            var obj = new CustomParticleBuffer(buffer, elementSize, stride);[m
+             disposer.registerDisposal(obj);[m
+             return obj;[m
+         }[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultParticleSystem.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultParticleSystem.java[m
+[1mindex 672ddcc..cd48b30 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultParticleSystem.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultParticleSystem.java[m
+[36m@@ -58,11 +58,21 @@[m [mpublic class DefaultParticleSystem implements ParticleSystem {[m
+ [m
+     public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,[m
+                                                ParticleUpdateSettings updateSettings, Disposer disposer) {[m
+[31m-        float[] vertices = new float[capacity * InternalParticleBuffer.STRIDE];[m
+[31m-        InternalParticleBuffer vertexBuffer = InternalParticleBuffer.create(vertices, disposer);[m
+[31m-        float[] updateArray = new float[capacity * ParticleUpdateBuffer.STRIDE];[m
+[31m-        ParticleUpdateBuffer updateBuffer = new ParticleUpdateBuffer(updateArray, disposer);[m
+[31m-        return new DefaultParticleSystem(capacity, new EfficientParticleRenderer(), spawnSettings, updateSettings, vertexBuffer, updateBuffer);[m
+[32m+[m[32m        var vertexBuffer = InternalParticleBuffer.create([m
+[32m+[m[32m                new float[capacity * InternalParticleBuffer.STRIDE],[m
+[32m+[m[32m                disposer);[m
+[32m+[m
+[32m+[m[32m        var updateBuffer = new ParticleUpdateBuffer([m
+[32m+[m[32m                new float[capacity * ParticleUpdateBuffer.STRIDE],[m
+[32m+[m[32m                disposer);[m
+[32m+[m
+[32m+[m[32m        return new DefaultParticleSystem([m
+[32m+[m[32m                capacity,[m
+[32m+[m[32m                new EfficientParticleRenderer(),[m
+[32m+[m[32m                spawnSettings,[m
+[32m+[m[32m                updateSettings,[m
+[32m+[m[32m                vertexBuffer,[m
+[32m+[m[32m                updateBuffer);[m
+     }[m
+ [m
+     public static DefaultParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,[m
+[36m@@ -332,8 +342,8 @@[m [mpublic class DefaultParticleSystem implements ParticleSystem {[m
+         if (particleCount > 0) {[m
+             int lastIndex = particleCount;[m
+ [m
+[31m-            vertexBuffer.copy(lastIndex, index);[m
+[31m-            updateBuffer.copy(lastIndex, index);[m
+[32m+[m[32m            vertexBuffer.copy(index, lastIndex, 1);[m
+[32m+[m[32m            updateBuffer.copy(index, lastIndex, ParticleUpdateBuffer.STRIDE);[m
+ [m
+             Particle last = particles[lastIndex];[m
+             Particle current = particles[index];[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultShaderParticleSystem.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultShaderParticleSystem.java[m
+[1mindex b2aff2b..ecf5d27 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultShaderParticleSystem.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/DefaultShaderParticleSystem.java[m
+[36m@@ -67,8 +67,7 @@[m [mpublic class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {[m
+         this.updateBuffer = updateBuffer;[m
+         this.spawnSettings = spawnSettings;[m
+         this.updateSettings = updateSettings;[m
+[31m-        atomicBuffer = new IntTransferBuffer(1, OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW,[m
+[31m-                disposer);[m
+[32m+[m[32m        atomicBuffer = new IntTransferBuffer(OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         atomicBuffer.setData(atomicArray);[m
+ [m
+         boolean updateProgramInUse = updaterProgram.inUse();[m
+[36m@@ -91,7 +90,8 @@[m [mpublic class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {[m
+     public static DefaultShaderParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,[m
+                                                      ParticleUpdateSettings updateSettings, EfficientParticleRenderer renderer, Disposer disposer) {[m
+         FloatTransferBuffer initBuffer = new FloatTransferBuffer([m
+[31m-                ParticleUpdateSettings.STRIDE, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m                OpenGL.GL_SHADER_STORAGE_BUFFER,[m
+[32m+[m[32m                OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         initBuffer.setData(updateSettings.getInternalStateArray());[m
+ [m
+         float[] vertices = new float[capacity * InternalParticleBuffer.STRIDE];[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/InternalParticleBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/InternalParticleBuffer.java[m
+[1mindex 42e40a6..b2b3aaa 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/InternalParticleBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/InternalParticleBuffer.java[m
+[36m@@ -2,8 +2,8 @@[m [mpackage com.gamelibrary2d.particle.systems;[m
+ [m
+ import com.gamelibrary2d.common.disposal.Disposer;[m
+ import com.gamelibrary2d.framework.OpenGL;[m
+[31m-import com.gamelibrary2d.glUtil.FloatTransferBuffer;[m
+ import com.gamelibrary2d.glUtil.AbstractInterleavedBuffer;[m
+[32m+[m[32mimport com.gamelibrary2d.glUtil.FloatTransferBuffer;[m
+ [m
+ class InternalParticleBuffer extends AbstractInterleavedBuffer {[m
+ [m
+[36m@@ -22,12 +22,12 @@[m [mclass InternalParticleBuffer extends AbstractInterleavedBuffer {[m
+     private final float[] internalState;[m
+ [m
+     private InternalParticleBuffer(FloatTransferBuffer internalState) {[m
+[31m-        super(internalState);[m
+[32m+[m[32m        super(internalState, STRIDE, 4);[m
+         this.internalState = internalState.getData();[m
+     }[m
+ [m
+     static InternalParticleBuffer create(float[] array, Disposer disposer) {[m
+[31m-        var internal = new FloatTransferBuffer(STRIDE, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m        var internal = new FloatTransferBuffer(OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         internal.setData(array);[m
+         var buffer = new InternalParticleBuffer(internal);[m
+         disposer.registerDisposal(buffer);[m
+[1mdiff --git a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/ParticleUpdateBuffer.java b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/ParticleUpdateBuffer.java[m
+[1mindex 85d2a42..596e9ab 100644[m
+[1m--- a/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/ParticleUpdateBuffer.java[m
+[1m+++ b/api/gamelibrary2d-core/src/main/java/com/gamelibrary2d/particle/systems/ParticleUpdateBuffer.java[m
+[36m@@ -38,7 +38,7 @@[m [mclass ParticleUpdateBuffer extends FloatTransferBuffer {[m
+     private final float[] internalState;[m
+ [m
+     ParticleUpdateBuffer(float[] internalState, Disposer disposer) {[m
+[31m-        super(STRIDE, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+[32m+[m[32m        super(OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);[m
+         setData(internalState);[m
+         this.internalState = internalState;[m
+     }[m

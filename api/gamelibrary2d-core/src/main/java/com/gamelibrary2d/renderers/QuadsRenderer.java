@@ -3,11 +3,11 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.QuadShape;
-import com.gamelibrary2d.resources.PositionArray;
+import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.util.QuadShape;
 
-public class QuadArrayRenderer extends AbstractArrayRenderer<PositionArray> {
+public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
     private final static String boundsUniformName = "bounds";
     private final static String texturedUniformName = "textured";
     private final static String shapeUniformName = "shape";
@@ -17,12 +17,13 @@ public class QuadArrayRenderer extends AbstractArrayRenderer<PositionArray> {
     private Rectangle bounds;
     private QuadShape shape = QuadShape.RECTANGLE;
 
-    public QuadArrayRenderer(Rectangle bounds) {
+    public QuadsRenderer(Rectangle bounds) {
+        super(DrawMode.POINTS);
         setBounds(bounds);
     }
 
-    public QuadArrayRenderer(Rectangle bounds, Texture texture) {
-        setBounds(bounds);
+    public QuadsRenderer(Rectangle bounds, Texture texture) {
+        this(bounds);
         this.texture = texture;
     }
 

@@ -381,6 +381,11 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
+    public void glLineWidth(float width) {
+        GL11.glLineWidth(width);
+    }
+
+    @Override
     public void glViewport(int x, int y, int width, int height) {
         GL11.glViewport(x, y, width, height);
     }

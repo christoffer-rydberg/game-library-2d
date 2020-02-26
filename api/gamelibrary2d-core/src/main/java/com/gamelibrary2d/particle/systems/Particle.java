@@ -9,10 +9,10 @@ public class Particle {
     private int updateOffset;
     private Renderer renderer;
 
-    private ParticleVertexBuffer renderBuffer;
+    private InternalParticleBuffer renderBuffer;
     private ParticleUpdateBuffer updateBuffer;
 
-    Particle(ParticleVertexBuffer renderBuffer, ParticleUpdateBuffer updateBuffer, int index) {
+    Particle(InternalParticleBuffer renderBuffer, ParticleUpdateBuffer updateBuffer, int index) {
         this.renderBuffer = renderBuffer;
         this.updateBuffer = updateBuffer;
         setIndex(index);
@@ -186,7 +186,7 @@ public class Particle {
         return getTime() >= getLife();
     }
 
-    void setRenderBuffer(ParticleVertexBuffer renderBuffer) {
+    void setRenderBuffer(InternalParticleBuffer renderBuffer) {
         this.renderBuffer = renderBuffer;
     }
 
@@ -197,8 +197,8 @@ public class Particle {
     void setIndex(int index) {
         if (this.index != index) {
             this.index = index;
-            renderOffset = index * ParticleVertexBuffer.STRIDE;
-            updateOffset = index * ParticleUpdateBuffer.STRIDE;
+            renderOffset = index * renderBuffer.stride();
+            updateOffset = index * updateBuffer.stride();
         }
     }
 

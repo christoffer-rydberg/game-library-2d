@@ -4,7 +4,10 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.*;
+import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
+import com.gamelibrary2d.glUtil.OpenGLIntBuffer;
+import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
@@ -20,11 +23,11 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     private final int[] atomicArray = new int[1];
 
-    private final TransferBuffer atomicBuffer;
+    private final OpenGLIntBuffer atomicBuffer;
 
-    private final FloatTransferBuffer initBuffer;
+    private final OpenGLFloatBuffer initBuffer;
 
-    private final ParticleVertexBuffer[] vertexBuffer;
+    private final InternalParticleBuffer[] vertexBuffer;
 
     private final ParticleUpdateBuffer[] updateBuffer;
 
@@ -54,8 +57,8 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     private int capacity;
 
-    private DefaultShaderParticleSystem(int capacity, ShaderProgram updaterProgram, FloatTransferBuffer initBuffer,
-                                        ParticleUpdateBuffer[] updateBuffer, ParticleVertexBuffer[] vertexBuffer,
+    private DefaultShaderParticleSystem(int capacity, ShaderProgram updaterProgram, OpenGLFloatBuffer initBuffer,
+                                        ParticleUpdateBuffer[] updateBuffer, InternalParticleBuffer[] vertexBuffer,
                                         EfficientParticleRenderer renderer, ParticleSpawnSettings spawnSettings,
                                         ParticleUpdateSettings updateSettings, Disposer disposer) {
         super(updaterProgram, renderer);
@@ -64,8 +67,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         this.updateBuffer = updateBuffer;
         this.spawnSettings = spawnSettings;
         this.updateSettings = updateSettings;
-        atomicBuffer = new IntTransferBuffer(atomicArray, 1, OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW,
-                disposer);
+        atomicBuffer = OpenGLIntBuffer.create(atomicArray, OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
         boolean updateProgramInUse = updaterProgram.inUse();
         if (!updateProgramInUse)
@@ -86,20 +88,17 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     public static DefaultShaderParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
                                                      ParticleUpdateSettings updateSettings, EfficientParticleRenderer renderer, Disposer disposer) {
-        FloatTransferBuffer initBuffer = new FloatTransferBuffer(updateSettings.getInternalStateArray(),
-                ParticleUpdateSettings.STRIDE, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
+        OpenGLFloatBuffer initBuffer = OpenGLFloatBuffer.create(
+                updateSettings.getInternalStateArray(),
+                OpenGL.GL_SHADER_STORAGE_BUFFER,
+                OpenGL.GL_DYNAMIC_DRAW,
+                disposer);
 
-        float[] vertices = new float[capacity * ParticleVertexBuffer.STRIDE];
-        ParticleVertexBuffer[] vertexBuffer = new ParticleVertexBuffer[2];
-        vertexBuffer[0] = ParticleVertexBuffer.create(vertices, disposer);
-        vertexBuffer[1] = ParticleVertexBuffer.create(vertices, disposer);
+        var vertexBuffer = InternalParticleBuffer.createWithSharedData(capacity, 2, disposer);
         vertexBuffer[0].updateGPU(0, capacity);
         vertexBuffer[1].updateGPU(0, capacity);
 
-        float[] updateArray = new float[capacity * ParticleUpdateBuffer.STRIDE];
-        ParticleUpdateBuffer[] updateBuffer = new ParticleUpdateBuffer[2];
-        updateBuffer[0] = new ParticleUpdateBuffer(updateArray, disposer);
-        updateBuffer[1] = new ParticleUpdateBuffer(updateArray, disposer);
+        var updateBuffer = ParticleUpdateBuffer.createWithSharedData(capacity, 2, disposer);
         updateBuffer[0].updateGPU(0, capacity);
         updateBuffer[1].updateGPU(0, capacity);
 
@@ -133,7 +132,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     public void setUpdateSettings(ParticleUpdateSettings updateSettings) {
         this.updateSettings = updateSettings;
-        initBuffer.setSource(updateSettings.getInternalStateArray());
+        initBuffer.allocate(updateSettings.getInternalStateArray());
     }
 
     /**
@@ -260,35 +259,20 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     protected void bindUdateBuffers() {
         OpenGL openGL = OpenGL.instance();
 
-        updateGpuSettings(); // TODO: This is only needed if UpdateSettings has changed.
-
         openGL.glUniform1i(glUniformRandomSeed, RandomInstance.get().nextInt());
         openGL.glUniform1i(glUniformParticlesInGpu, particlesInGpuBuffer);
         openGL.glUniform3fv(glUniformPosition, position);
         openGL.glUniform3fv(glUniformExternalSpeed, externalSpeed);
         openGL.glUniform3fv(glUniformExternalAcceleration, externalAcceleration);
 
-        openGL.glBindBufferBase(OpenGL.GL_ATOMIC_COUNTER_BUFFER, 0, atomicBuffer.getGlBuffer());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, initBuffer.getGlBuffer());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 2, vertexBuffer[activeBuffer].getGlBuffer());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 3, updateBuffer[activeBuffer].getGlBuffer());
+        openGL.glBindBufferBase(OpenGL.GL_ATOMIC_COUNTER_BUFFER, 0, atomicBuffer.bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, initBuffer.bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 2, vertexBuffer[activeBuffer].bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 3, updateBuffer[activeBuffer].bufferId());
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 4,
-                vertexBuffer[activeBuffer == 1 ? 0 : 1].getGlBuffer());
+                vertexBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 5,
-                updateBuffer[activeBuffer == 1 ? 0 : 1].getGlBuffer());
-    }
-
-    private void updateGpuSettings() {
-        var updaterProgram = getUpdaterProgram();
-
-        boolean updateProgramInUse = updaterProgram.inUse();
-        if (!updateProgramInUse)
-            updaterProgram.bind();
-
-        initBuffer.updateGPU(0, 1);
-
-        if (!updateProgramInUse)
-            updaterProgram.unbind();
+                updateBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
     }
 
     @Override

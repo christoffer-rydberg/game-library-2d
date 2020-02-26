@@ -10,6 +10,8 @@ public interface OpenGL {
     int GL_TRIANGLES = 4;
     int GL_POINT = 6912;
     int GL_POINTS = 0;
+    int GL_LINES = 1;
+    int GL_LINE_STRIP = 3;
     int GL_UNSIGNED_BYTE = 5121;
     int GL_FLOAT = 5126;
     int GL_ARRAY_BUFFER = 34962;
@@ -232,6 +234,8 @@ public interface OpenGL {
     void glHint(int target, int hint);
 
     void glPointSize(float size);
+
+    void glLineWidth(float width);
 
     void glViewport(int x, int y, int width, int height);
 

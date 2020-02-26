@@ -4,13 +4,13 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.particle.systems.Particle;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
-import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.resources.VertexArray;
+import com.gamelibrary2d.util.PointSmoothing;
 
-public class EfficientParticleRenderer extends AbstractArrayRenderer implements ParticleRenderer {
+public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffer> implements ParticleRenderer {
 
     private final static String boundsUniformName = "bounds";
 
@@ -23,11 +23,12 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer implements 
     private Rectangle bounds;
 
     public EfficientParticleRenderer() {
+        super(DrawMode.POINTS);
         setBounds(Rectangle.centered(16f, 16f));
     }
 
     public EfficientParticleRenderer(Texture texture) {
-        setBounds(Rectangle.centered(16f, 16f));
+        this();
         setTexture(texture);
     }
 
@@ -76,7 +77,7 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer implements 
     }
 
     @Override
-    public void render(Particle[] particles, VertexArray vertexBuffer, boolean gpuOutdated, int offset, int len,
+    public void render(Particle[] particles, OpenGLBuffer vertexBuffer, boolean gpuOutdated, int offset, int len,
                        float alpha) {
         if (gpuOutdated) {
             vertexBuffer.bind();

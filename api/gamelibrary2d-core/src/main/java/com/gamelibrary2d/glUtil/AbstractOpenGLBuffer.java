@@ -3,42 +3,38 @@ package com.gamelibrary2d.glUtil;
 import com.gamelibrary2d.common.disposal.AbstractDisposable;
 import com.gamelibrary2d.framework.OpenGL;
 
-public abstract class AbstractTransferBuffer extends AbstractDisposable implements TransferBuffer {
-
-    private final int stride;
-
+public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements OpenGLBuffer {
     private final int target;
 
-    private final int capacity;
-
+    private int capacity;
     private boolean bound;
-
-    private boolean gpuInitialized;
-
     private int glBuffer = -1;
 
-    protected AbstractTransferBuffer(int bufferSize, int stride, int target) {
-        this.stride = stride;
+    protected AbstractOpenGLBuffer(int target) {
         this.target = target;
-        capacity = bufferSize / stride;
     }
 
-    private void initializeGPU() {
-        onInitializeGPU(target);
-        gpuInitialized = true;
+    protected void allocate(int capacity) {
+        this.capacity = capacity;
+
+        boolean isBound = bound;
+
+        if (!isBound)
+            bind();
+
+        onAllocate(target);
+
+        if (!isBound)
+            unbind();
     }
 
-    public int getCapacity() {
+    public int capacity() {
         return capacity;
-    }
-
-    public int getStride() {
-        return stride;
     }
 
     public void bind() {
         OpenGL openGL = OpenGL.instance();
-        openGL.glBindBuffer(target, getGlBuffer());
+        openGL.glBindBuffer(target, bufferId());
         bound = true;
     }
 
@@ -50,37 +46,30 @@ public abstract class AbstractTransferBuffer extends AbstractDisposable implemen
     }
 
     public void updateCPU(int offset, int len) {
-
         boolean isBound = bound;
 
         if (!isBound)
             bind();
 
-        onUpdateCPU(target, offset * stride, len * stride);
+        onUpdateCPU(target, offset, len);
 
         if (!isBound)
             unbind();
     }
 
     public void updateGPU(int offset, int len) {
-
         boolean isBound = bound;
 
         if (!isBound)
             bind();
 
-        if (!gpuInitialized) {
-            initializeGPU();
-        } else {
-            onUpdateGPU(target, offset * stride, len * stride);
-        }
+        onUpdateGPU(target, offset, len);
 
         if (!isBound)
             unbind();
     }
 
-    public int getGlBuffer() {
-
+    public int bufferId() {
         if (glBuffer == -1) {
             OpenGL openGL = OpenGL.instance();
             glBuffer = openGL.glGenBuffers();
@@ -95,7 +84,7 @@ public abstract class AbstractTransferBuffer extends AbstractDisposable implemen
         openGL.glDeleteBuffers(glBuffer);
     }
 
-    protected abstract void onInitializeGPU(int target);
+    protected abstract void onAllocate(int target);
 
     protected abstract void onUpdateGPU(int target, int offset, int len);
 

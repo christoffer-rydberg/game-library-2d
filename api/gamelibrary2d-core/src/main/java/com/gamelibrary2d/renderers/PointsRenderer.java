@@ -3,22 +3,24 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.util.PointSmoothing;
-import com.gamelibrary2d.resources.PositionArray;
 
-public class PointArrayRenderer extends AbstractArrayRenderer<PositionArray> {
+public class PointsRenderer extends AbstractArrayRenderer<PositionBuffer> {
     private float pointSize = 1f;
     private PointSmoothing pointSmoothing = PointSmoothing.FASTEST;
 
-    public PointArrayRenderer() {
-
+    public PointsRenderer() {
+        super(DrawMode.POINTS);
     }
 
-    public PointArrayRenderer(float pointSize) {
+    public PointsRenderer(float pointSize) {
+        this();
         this.pointSize = pointSize;
     }
 
-    public PointArrayRenderer(float pointSize, PointSmoothing pointSmoothing) {
+    public PointsRenderer(float pointSize, PointSmoothing pointSmoothing) {
+        this();
         this.pointSize = pointSize;
         this.pointSmoothing = pointSmoothing;
     }

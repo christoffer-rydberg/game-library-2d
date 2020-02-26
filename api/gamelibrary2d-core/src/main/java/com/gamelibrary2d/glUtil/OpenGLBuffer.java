@@ -1,20 +1,18 @@
 package com.gamelibrary2d.glUtil;
 
-public interface TransferBuffer {
+public interface OpenGLBuffer {
 
-    int getGlBuffer();
+    int bufferId();
 
     void updateGPU(int offset, int len);
 
     void updateCPU(int offset, int len);
 
-    int getStride();
-
-    int getCapacity();
+    int capacity();
 
     void bind();
 
     void unbind();
 
-    void copy(int index, int destinationIndex);
+    void copy(int offset, int destination, int len);
 }
