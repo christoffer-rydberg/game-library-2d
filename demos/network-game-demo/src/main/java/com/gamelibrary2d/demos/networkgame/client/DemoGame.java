@@ -1,0 +1,32 @@
+package com.gamelibrary2d.demos.networkgame.client;
+
+import com.gamelibrary2d.AbstractGame;
+import com.gamelibrary2d.framework.Window;
+import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
+import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
+import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
+
+public class DemoGame extends AbstractGame {
+
+    public DemoGame() {
+        super(new Lwjgl_Framework());
+    }
+
+    @Override
+    public void start(Window window) {
+        super.start(window);
+    }
+
+    @Override
+    protected void onStart() {
+        var networkFrame = new DemoFrame(this);
+        var communicator = new ClientSideCommunicator(new TcpConnectionSettings("localhost", 4444, true));
+        networkFrame.setCommunicator(communicator);
+        setFrame(networkFrame);
+    }
+
+    @Override
+    protected void onExit() {
+        // TODO Auto-generated method stub
+    }
+}

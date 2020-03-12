@@ -1,4 +1,4 @@
-package com.gamelibrary2d.demos.clientserver;
+package com.gamelibrary2d.demos.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;

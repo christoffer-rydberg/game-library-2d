@@ -2,6 +2,7 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposable;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
@@ -23,10 +24,10 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     private boolean initialized;
     private boolean loaded;
 
-    private LoadAction onLoad;
-    private Action onLoaded;
-    private Action onBegin;
-    private Action onEnd;
+    private LoadAction loadAction;
+    private Action loadedAction;
+    private Action beginAction;
+    private Action endAction;
 
     protected AbstractFrame(Game game) {
         this.game = game;
@@ -50,7 +51,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         disposer = new DisposerStack();
         updaters = new ArrayDeque<>();
 
-        onInitialize();
+        var frameInitializer = new FrameInitializer();
+        initializeFrame(frameInitializer);
+        loadAction = frameInitializer.load;
+        loadedAction = frameInitializer.loaded;
+        beginAction = frameInitializer.begin;
+        endAction = frameInitializer.end;
 
         disposer.pushBreak();
         initialized = true;
@@ -70,9 +76,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new LoadInterruptedException("Frame has not been initialized");
         }
 
-        if (onLoad != null) {
+        if (loadAction != null) {
             try {
-                onLoad.invoke();
+                loadAction.invoke();
             } catch (Exception e) {
                 e.printStackTrace();
                 reset();
@@ -95,8 +101,8 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new GameLibrary2DRuntimeException("Frame has not been loaded");
         }
 
-        if (onLoaded != null) {
-            onLoaded.invoke();
+        if (loadedAction != null) {
+            loadedAction.invoke();
         }
     }
 
@@ -178,67 +184,66 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         return paused;
     }
 
-    /**
-     * Called prior to {@link #load} in order to perform non-thread-safe
-     * initialization. When {@link #reset resetting} this frame, initialization done inside
-     * this method is be kept intact so that the frame can be efficiently reused.
-     */
-    protected abstract void onInitialize();
-
-    /**
-     * The specified action is invoked after {@link #initialize} but prior to {@link #loaded}. All
-     * initialization code (needed to reset the frame) should be placed here or in
-     * the {@link #onLoaded} method. If a {@link LoadingFrame} is used, this method
-     * will not be invoked from the main thread. This allows the loading frame to be
-     * updated and rendered while this frame is loaded in the background.
-     * <p>
-     * <b>Note:</b> The thread invoking this method from the loading frame has no
-     * OpenGL-context. Any OpenGL-related functionality, such as loading textures,
-     * must be done in {@link #initialize} or {@link #loaded}.
-     * </p>
-     */
-    protected final void onLoad(LoadAction onLoad) {
-        this.onLoad = onLoad;
-    }
-
-    /**
-     * The specified action is invoked after {@link #load} in order to perform initialization that isn't
-     * thread safe. Only code that needs to run after the frame has loaded should be
-     * placed here. In other case, consider placing it in {@link #onInitialize}.
-     */
-    protected final void onLoaded(Action onLoaded) {
-        this.onLoaded = onLoaded;
-    }
+    protected abstract void initializeFrame(FrameInitializer initializer);
 
     public void begin() {
-        if (onBegin != null) {
-            onBegin.invoke();
+        if (beginAction != null) {
+            beginAction.invoke();
         }
     }
 
     public void end() {
-        if (onEnd != null) {
-            onEnd.invoke();
+        if (endAction != null) {
+            endAction.invoke();
         }
-    }
-
-    /**
-     * The specified action is invoked when the frame begins, after any calls to {@link #initialize},
-     * {@link #load} or {@link #loaded}.
-     */
-    public final void onBegin(Action onBegin) {
-        this.onBegin = onBegin;
-    }
-
-    /**
-     * The specified action is invoked when the frame ends before any call to {@link #reset}.
-     */
-    public final void onEnd(Action onEnd) {
-        this.onEnd = onEnd;
     }
 
     public interface LoadAction {
         void invoke() throws LoadInterruptedException;
+    }
+
+    protected static class FrameInitializer {
+        private LoadAction load;
+        private Action loaded;
+        private Action begin;
+        private Action end;
+
+        /**
+         * The specified action is invoked when the frame is loaded. A frame should typically be reloadable after a
+         * {@link Frame#reset reset}. It is good practice to place initialization logic, such as initial objects
+         * and positions, inside this action.
+         * <br>
+         * <br>
+         * <strong>Important:</strong> The load-action is invoked by a {@link LoadingFrame} on a separate thread.
+         * Although no other code in the frame should run in parallel, thread-safety must be considered -
+         * especially in regards to thread caching. Another important note is that no OpenGL context is available.
+         * By convention, static "create"-methods accepting a {@link Disposer} requires an OpenGL context. Consider
+         * placing non-thread safe code or OpenGL-related calls in the {@link #onLoaded} action.
+         */
+        public final void onLoad(LoadAction action) {
+            this.load = action;
+        }
+
+        /**
+         * The specified action is invoked from the main thread when the frame has loaded.
+         */
+        public final void onLoaded(Action action) {
+            this.loaded = action;
+        }
+
+        /**
+         * The specified action is invoked when the frame begins.
+         */
+        public final void onBegin(Action action) {
+            this.begin = action;
+        }
+
+        /**
+         * The specified action is invoked when the frame ends.
+         */
+        public final void onEnd(Action action) {
+            this.end = action;
+        }
     }
 
     private static class DisposerStack {

@@ -31,7 +31,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void initializeFrame(FrameInitializer initializer) {
         var game = game();
         var window = game.window();
         try {

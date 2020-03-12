@@ -6,7 +6,6 @@ import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.network.common.initialization.IdentityConsumer;
 import com.gamelibrary2d.network.common.initialization.IdentityProducer;
 import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
 import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
@@ -20,9 +19,26 @@ public abstract class AbstractSecureLocalServer extends InternalAbstractServer i
         super.addCommunicator(new CommunicatorWrapper(communicator));
     }
 
+    private boolean initialize(Communicator communicator, DataBuffer inbox) throws InitializationException {
+        var reconnected = inbox.getBool();
+        if (reconnected) {
+            throw new InitializationException("Unexpected reconnect to local server");
+        }
+
+        onInitialize();
+
+        var communicatorWrapper = (CommunicatorWrapper) communicator;
+        var initializer = new InternalCommunicatorInitializer();
+        configureAuthentication(initializer);
+        onConfigureInitialization(initializer);
+        communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
+
+        return true;
+    }
+
     @Override
-    protected void configureInitialization(CommunicationInitializer initializer) {
-        initializer.add(this::initializeConnection);
+    protected final void configureInitialization(CommunicationInitializer initializer) {
+        initializer.add(this::initialize);
     }
 
     private void configureAuthentication(CommunicationInitializer initializer) throws InitializationException {
@@ -31,27 +47,12 @@ public abstract class AbstractSecureLocalServer extends InternalAbstractServer i
         initializer.add(this::onAuthenticated);
     }
 
-    private boolean initializeConnection(Communicator communicator, DataBuffer inbox) throws InitializationException {
-        var reconnected = inbox.getBool();
-        if (reconnected) {
-            new IdentityConsumer().run(communicator, inbox);
-        }
-        onConnected(communicator);
-        return true;
-    }
-
-    private void onConnected(Communicator communicator) throws InitializationException {
-        var communicatorWrapper = (CommunicatorWrapper) communicator;
-        var initializer = new InternalCommunicatorInitializer();
-        configureAuthentication(initializer);
-        onConfigureInitialization(initializer);
-        communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
-    }
-
-    protected void onAuthenticated(Communicator communicator) throws InitializationException {
+    private void onAuthenticated(Communicator communicator) {
         communicator.setAuthenticated();
-        communicator.getOutgoing().putBool(false);
+        communicator.getOutgoing().putBool(false); // Instruct client to not reconnect after authentication.
     }
+
+    protected abstract void onInitialize() throws InitializationException;
 
     protected abstract void onConfigureAuthentication(CommunicationInitializer initializer)
             throws InitializationException;

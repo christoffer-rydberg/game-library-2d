@@ -25,7 +25,8 @@
 	  <module>demos/particle-system-demo</module>
 	  <module>demos/shader-particle-system-demo</module>
 	  <module>demos/transparent-window-demo</module>
-	  <module>demos/client-server-demo</module>
+	  <module>demos/network-demo</module>
+	  <module>demos/network-game-demo</module>
 	  <module>demos/lightning-demo</module>
 	  <module>demos/split-screen-demo</module>
   </modules>

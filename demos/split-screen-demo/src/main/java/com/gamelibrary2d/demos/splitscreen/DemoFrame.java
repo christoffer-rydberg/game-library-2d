@@ -167,7 +167,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void initializeFrame(FrameInitializer initializer) {
         try {
             spacecraftLayer.getBackground().add(createBackground());
 
@@ -184,7 +184,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
             refreshSplitLayout(spaceCrafts);
 
-            onBegin(() -> game().setBackgroundColor(SPLIT_COLOR));
+            initializer.onBegin(() -> game().setBackgroundColor(SPLIT_COLOR));
         } catch (IOException e) {
             e.printStackTrace();
         }

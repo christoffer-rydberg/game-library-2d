@@ -48,7 +48,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void initializeFrame(FrameInitializer initializer) {
         particleSystem = ParticleSystemModel.create(this);
 
         screenLayer = new BasicLayer<>();
@@ -82,7 +82,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
         saveLoadResetPanel.position().set(WINDOW_MARGIN, WINDOW_MARGIN);
 
-        onLoad(this::onLoad);
+        initializer.onLoad(this::onLoad);
     }
 
     private void onLoad() {

@@ -14,10 +14,14 @@ public class BitParser {
     }
 
     public BitParser(ByteBuffer byteBuffer) {
-        wrap(byteBuffer);
+        setByteBuffer(byteBuffer);
     }
 
-    public void wrap(ByteBuffer byteBuffer) {
+    public ByteBuffer getByteBuffer() {
+        return byteBuffer;
+    }
+
+    public void setByteBuffer(ByteBuffer byteBuffer) {
         this.byteBuffer = byteBuffer;
         this.position(byteBuffer.position() * 8);
     }

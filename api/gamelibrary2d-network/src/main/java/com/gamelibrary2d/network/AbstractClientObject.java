@@ -5,7 +5,7 @@ import com.gamelibrary2d.objects.AbstractMouseAwareObject;
 
 public abstract class AbstractClientObject extends AbstractMouseAwareObject implements ClientObject {
 
-    private final GenericNetworkFrame<?, ?> frame;
+    private final NetworkFrame frame;
 
     private final int id;
 
@@ -19,7 +19,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     private float rotationDelta;
     private float rotationInterpolationAlpha = -1;
 
-    protected AbstractClientObject(GenericNetworkFrame<?, ?> frame, DataBuffer buffer) {
+    protected AbstractClientObject(NetworkFrame frame, DataBuffer buffer) {
         this.frame = frame;
         id = buffer.getInt();
         position().set(buffer.getFloat(), buffer.getFloat());

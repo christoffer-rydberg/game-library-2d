@@ -44,5 +44,8 @@ public abstract class AbstractServerObject implements ServerObject {
         buffer.putInt(id);
         buffer.putFloat(position.getX());
         buffer.putFloat(position.getY());
+        onSerializeMessage(buffer);
     }
+
+    protected abstract void onSerializeMessage(DataBuffer buffer);
 }

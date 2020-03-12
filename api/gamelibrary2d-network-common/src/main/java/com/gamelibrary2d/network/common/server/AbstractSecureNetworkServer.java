@@ -164,11 +164,9 @@ public abstract class AbstractSecureNetworkServer extends InternalAbstractNetwor
     }
 
     private void onConnected(Communicator communicator, boolean reconnect) throws InitializationException {
-
         CommunicatorWrapper communicatorWrapper;
 
         if (reconnect) {
-
             ReconnectingCommunicator reconnecting = reconnectingCommunicators.stream()
                     .filter(x -> x.getCommunicator().getId() == communicator.getId()).findFirst().orElse(null);
 
@@ -231,6 +229,7 @@ public abstract class AbstractSecureNetworkServer extends InternalAbstractNetwor
     private void configureAuthentication(CommunicatorWrapper communicator, ProducerPhase onAuthenticated) {
         var initializer = new InternalCommunicatorInitializer();
         initializer.add(new IdentityProducer(communicatorIdFactory));
+        initializer.add(c -> onConnected(c));
         onConfigureAuthentication(initializer);
         initializer.add(onAuthenticated);
         communicator.addInitializationPhases(initializer.getInitializationPhases());
@@ -260,7 +259,6 @@ public abstract class AbstractSecureNetworkServer extends InternalAbstractNetwor
 
     private void setAuthenticated(Communicator communicator) {
         communicator.setAuthenticated();
-        onAuthenticated(communicator);
     }
 
     @Override
@@ -280,11 +278,11 @@ public abstract class AbstractSecureNetworkServer extends InternalAbstractNetwor
         }
     }
 
+    protected abstract void onConnected(Communicator communicator);
+
     protected abstract void onConnectionLost(Communicator communicator, boolean pending);
 
     protected abstract void onConfigureAuthentication(CommunicationInitializer initializer);
-
-    protected abstract void onAuthenticated(Communicator communicator);
 
     private static class ReconnectingCommunicator {
 

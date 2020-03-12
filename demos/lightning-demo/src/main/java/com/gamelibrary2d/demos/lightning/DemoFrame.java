@@ -58,7 +58,7 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void initializeFrame(FrameInitializer initializer) {
         try {
             var window = game().window();
             var particleSystem = createParticleSystem();

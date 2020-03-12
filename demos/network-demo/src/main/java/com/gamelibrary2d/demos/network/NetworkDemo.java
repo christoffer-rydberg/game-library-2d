@@ -1,11 +1,11 @@
-package com.gamelibrary2d.demos.clientserver;
+package com.gamelibrary2d.demos.network;
 
 import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
 
 import java.io.IOException;
 
-public class ClientServerDemo {
+public class NetworkDemo {
 
     private static void exitWithError(String message, Throwable e) {
         System.out.println(message);

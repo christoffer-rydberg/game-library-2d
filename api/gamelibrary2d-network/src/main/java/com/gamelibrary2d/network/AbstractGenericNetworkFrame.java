@@ -2,20 +2,17 @@ package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
-import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.exceptions.LoadInterruptedException;
+import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.frames.AbstractFrame;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientObject, TClientPlayer extends ClientPlayer>
-        extends AbstractFrame implements GenericNetworkFrame<TClientObject, TClientPlayer> {
+        extends AbstractFrame implements NetworkFrame {
 
     private final InternalNetworkClient networkClient;
     private final List<TClientPlayer> players = new ArrayList<>();
@@ -26,10 +23,10 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
 
     protected AbstractGenericNetworkFrame(Game game) {
         super(game);
-        networkClient = new InternalNetworkClient(this);
+        networkClient = new InternalNetworkClient();
         networkClient.setSendingDataOnUpdate(false); // Send data after frame update instead
     }
-    
+
     public List<TClientPlayer> getLocalPlayers() {
         return localPlayersReadOnly;
     }
@@ -51,6 +48,11 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         networkClient.setCommunicator(communicator);
     }
 
+    @Override
+    public float getServerUpdateRate() {
+        return networkClient.getServerUpdateRate();
+    }
+
     public boolean isLocalServer() {
         return networkClient.isLocalServer();
     }
@@ -61,20 +63,9 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
             communicator.disconnect();
     }
 
-    protected int getInitializationRetries() {
-        return networkClient.getInitializationRetries();
-    }
-
-    protected void setInitializationRetries(int initializationRetries) {
-        networkClient.setInitializationRetries(initializationRetries);
-    }
-
-    protected int getInitializationRetryDelay() {
-        return networkClient.getInitializationRetryDelay();
-    }
-
-    protected void setInitializationRetryDelay(int initializationRetryDelay) {
-        networkClient.setInitializationRetryDelay(initializationRetryDelay);
+    @Override
+    protected final void initializeFrame(FrameInitializer initializer) {
+        networkClient.setContext(initializeNetworkFrame(initializer));
     }
 
     @Override
@@ -159,10 +150,6 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         return clientObjects.get(id);
     }
 
-    public void onDisconnect(ParameterizedAction<Throwable> onDisconnect) {
-        networkClient.onDisconnect(onDisconnect);
-    }
-
     @Override
     protected void onUpdate(float deltaTime) {
         networkClient.update(deltaTime);
@@ -175,14 +162,5 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         }
     }
 
-    protected void configureAuthentication(CommunicationInitializer initializer) {
-
-    }
-
-    protected abstract void configureInitialization(CommunicationInitializer initializer);
-
-    /**
-     * Called for each new message from the server once the frame has loaded.
-     */
-    protected abstract void onMessage(DataBuffer buffer);
+    protected abstract FrameClient initializeNetworkFrame(FrameInitializer initializer);
 }

@@ -25,8 +25,6 @@ public abstract class AbstractClient implements UpdateTarget {
 
     private final DataBuffer inbox;
     CommunicatorWrapper communicator = new CommunicatorWrapper();
-    private int initializationRetries = 10;
-    private int initializationRetryDelay = 1000;
     private boolean sendingDataOnUpdate = true;
     private volatile CommunicatorDisconnected disconnectedEvent;
     private CommunicatorDisconnectedListener disconnectedListener = x -> disconnectedEvent = x;
@@ -52,22 +50,6 @@ public abstract class AbstractClient implements UpdateTarget {
     public void clearInbox() {
         inbox.clear();
         inbox.flip();
-    }
-
-    public int getInitializationRetries() {
-        return initializationRetries;
-    }
-
-    public void setInitializationRetries(int initializationRetries) {
-        this.initializationRetries = initializationRetries;
-    }
-
-    public int getInitializationRetryDelay() {
-        return initializationRetryDelay;
-    }
-
-    public void setInitializationRetryDelay(int initializationRetryDelay) {
-        this.initializationRetryDelay = initializationRetryDelay;
     }
 
     public boolean isConnected() {
@@ -188,7 +170,7 @@ public abstract class AbstractClient implements UpdateTarget {
             result = communicator.runInitializationPhase(this::runInitializationPhase);
             if (result == InitializationResult.AWAITING_DATA) {
 
-                if (retries == initializationRetries) {
+                if (retries == getInitializationRetries()) {
                     throw new InitializationException("Reading server response timed out");
                 }
 
@@ -207,7 +189,7 @@ public abstract class AbstractClient implements UpdateTarget {
 
                 if (!triggerLocalServerUpdate()) {
                     try {
-                        Thread.sleep(initializationRetryDelay);
+                        Thread.sleep(getInitializationRetryDelay());
                     } catch (InterruptedException e) {
                         throw new InitializationException("Loading thread interrupted");
                     }
@@ -257,6 +239,20 @@ public abstract class AbstractClient implements UpdateTarget {
         }
 
         return false;
+    }
+
+    /**
+     * The max number of retries for each initialization step.
+     */
+    protected int getInitializationRetries() {
+        return 10;
+    }
+
+    /**
+     * The delay between retries of initialization steps in milliseconds.
+     */
+    protected int getInitializationRetryDelay() {
+        return 1000;
     }
 
     protected abstract void configureInitialization(CommunicationInitializer initializer);

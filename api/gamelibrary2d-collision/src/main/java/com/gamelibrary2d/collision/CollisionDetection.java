@@ -116,7 +116,9 @@ public class CollisionDetection<T extends Collidable> {
         }
 
         for (int i = 0; i < size; ++i) {
-            rootNode.update(updateList.get(i), deltaTime);
+            var obj = updateList.get(i);
+            rootNode.update(obj, deltaTime);
+            obj.updated();
         }
 
         return updateListReadOnly;

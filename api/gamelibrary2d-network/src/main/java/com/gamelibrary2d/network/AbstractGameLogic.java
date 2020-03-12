@@ -1,32 +1,19 @@
 package com.gamelibrary2d.network;
 
-import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.server.Server;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractGameLogic implements GameLogic {
-
-    private final Server server;
-
     private final List<ServerPlayer> players;
-
     private final List<ServerPlayer> playersReadOnly;
-
     private final InternalServerObjectRegister objectRegister;
 
-    public AbstractGameLogic(Server server) {
-        this.server = server;
+    protected AbstractGameLogic() {
         players = new ArrayList<>();
         playersReadOnly = Collections.unmodifiableList(players);
         objectRegister = new InternalServerObjectRegister();
-    }
-
-    public Server getServer() {
-        return server;
     }
 
     protected void register(ServerObject obj) {
@@ -100,31 +87,7 @@ public abstract class AbstractGameLogic implements GameLogic {
 
     @Override
     public void clearRegisteredObjects() {
+        players.clear();
         objectRegister.clear();
     }
-
-    @Override
-    public void initialized(Communicator communicator) {
-        onInitialized(communicator);
-    }
-
-    @Override
-    public void disconnected(Communicator communicator, boolean pending) {
-        onDisconnected(communicator, pending);
-        disconnectPlayers(communicator);
-    }
-
-    private void disconnectPlayers(Communicator communicator) {
-        List<ServerPlayer> playersToRemove = new ArrayList<>();
-        getRegisteredPlayers(communicator.getId(), playersToRemove);
-        for (int i = 0; i < playersToRemove.size(); ++i) {
-            onRemovePlayer(playersToRemove.get(i));
-        }
-    }
-
-    protected abstract void onInitialized(Communicator communicator);
-
-    protected abstract void onDisconnected(Communicator communicator, boolean pending);
-
-    protected abstract void onRemovePlayer(ServerPlayer serverPlayer);
 }
