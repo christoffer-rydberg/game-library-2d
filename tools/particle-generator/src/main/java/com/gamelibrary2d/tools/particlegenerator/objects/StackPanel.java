@@ -53,27 +53,27 @@ public class StackPanel extends AbstractPanel<GameObject> {
         for (int i = startIndex; i < getChildren().size(); ++i) {
             GameObject obj = get(i);
             if (orientation == Orientation.HORIZONTAL) {
-                obj.position().set(obj.position().getX() + offset, obj.position().getY());
+                obj.getPosition().set(obj.getPosition().getX() + offset, obj.getPosition().getY());
             } else {
-                obj.position().set(obj.position().getX(), obj.position().getY() + offset);
+                obj.getPosition().set(obj.getPosition().getX(), obj.getPosition().getY() + offset);
             }
         }
     }
 
     private void positionObject(int index, GameObject obj, float margin) {
         if (orientation == Orientation.HORIZONTAL) {
-            obj.position().set(positionX(index) + margin, obj.position().getY());
+            obj.getPosition().set(positionX(index) + margin, obj.getPosition().getY());
         } else {
-            obj.position().set(obj.position().getX(), positionY(index) + margin);
+            obj.getPosition().set(obj.getPosition().getX(), positionY(index) + margin);
         }
     }
 
     private float positionX(int index) {
-        return index == 0 ? -defaultMargin : get(index - 1).position().getX();
+        return index == 0 ? -defaultMargin : get(index - 1).getPosition().getX();
     }
 
     private float positionY(int index) {
-        return index == 0 ? -defaultMargin : get(index - 1).position().getY();
+        return index == 0 ? -defaultMargin : get(index - 1).getPosition().getY();
     }
 
     public enum Orientation {

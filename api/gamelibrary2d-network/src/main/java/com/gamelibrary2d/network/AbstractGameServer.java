@@ -2,9 +2,9 @@ package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.server.AbstractSecureNetworkServer;
+import com.gamelibrary2d.network.common.server.AbstractNetworkServer;
 
-public abstract class AbstractGameServer<T extends GameLogic> extends AbstractSecureNetworkServer {
+public abstract class AbstractGameServer<T extends GameLogic> extends AbstractNetworkServer {
     private T gameLogic;
     private int streamRate;
     private int updateCounter;
@@ -77,7 +77,7 @@ public abstract class AbstractGameServer<T extends GameLogic> extends AbstractSe
         acceptConnection = initializer.acceptConnection;
 
         this.streamRate = streamRate;
-        new UpdateLoop(this, ups).run();
+        new UpdateLoop(this::update, ups).run();
     }
 
     @Override

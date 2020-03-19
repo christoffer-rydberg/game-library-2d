@@ -2,7 +2,7 @@ package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.exceptions.LoadInterruptedException;
+import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
@@ -11,19 +11,23 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientObject, TClientPlayer extends ClientPlayer>
-        extends AbstractFrame implements NetworkFrame {
+public abstract class AbstractGenericNetworkFrame<
+        TFrameClient extends FrameClient,
+        TClientObject extends ClientObject,
+        TClientPlayer extends ClientPlayer>
+        extends AbstractFrame implements NetworkFrame<TFrameClient> {
 
-    private final InternalNetworkClient networkClient;
+    private final InternalNetworkClient<TFrameClient> networkClient;
     private final List<TClientPlayer> players = new ArrayList<>();
     private final List<TClientPlayer> playersReadOnly = Collections.unmodifiableList(players);
     private final List<TClientPlayer> localPlayers = new ArrayList<>();
     private final List<TClientPlayer> localPlayersReadOnly = Collections.unmodifiableList(localPlayers);
     private final Map<Integer, TClientObject> clientObjects = new HashMap<>();
 
-    protected AbstractGenericNetworkFrame(Game game) {
+    protected AbstractGenericNetworkFrame(Game game, TFrameClient frameClient) {
         super(game);
-        networkClient = new InternalNetworkClient();
+        networkClient = new InternalNetworkClient<>();
+        networkClient.setContext(frameClient);
         networkClient.setSendingDataOnUpdate(false); // Send data after frame update instead
     }
 
@@ -39,37 +43,19 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         return clientObjects.values();
     }
 
-    @Override
-    public Communicator getCommunicator() {
-        return networkClient.getCommunicator();
-    }
-
-    public void setCommunicator(Communicator communicator) {
-        networkClient.setCommunicator(communicator);
-    }
-
-    @Override
-    public float getServerUpdateRate() {
-        return networkClient.getServerUpdateRate();
-    }
-
-    public boolean isLocalServer() {
-        return networkClient.isLocalServer();
-    }
-
     public void disconnectFromServer() {
-        Communicator communicator = getCommunicator();
+        Communicator communicator = networkClient.getCommunicator();
         if (communicator != null)
             communicator.disconnect();
     }
 
     @Override
-    protected final void initializeFrame(FrameInitializer initializer) {
-        networkClient.setContext(initializeNetworkFrame(initializer));
+    public TFrameClient getClient() {
+        return networkClient.getContext();
     }
 
     @Override
-    public void load() throws LoadInterruptedException {
+    public void load() throws LoadFailedException {
         if (isLoaded())
             return;
 
@@ -82,8 +68,7 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
             try {
                 networkClient.connect().get();
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                throw new LoadInterruptedException("Failed to connect to server");
+                throw new LoadFailedException("Failed to connect to server", e);
             }
         }
 
@@ -93,9 +78,8 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
             super.load();
             networkClient.initialize();
         } catch (InitializationException e) {
-            e.printStackTrace();
             reset();
-            throw new LoadInterruptedException("Client/server communication failed");
+            throw new LoadFailedException("Client/server communication failed", e);
         }
     }
 
@@ -127,7 +111,7 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
             @SuppressWarnings("unchecked")
             TClientPlayer player = (TClientPlayer) obj;
             players.add(player);
-            if (player.isLocal(getCommunicator()))
+            if (player.isLocal(networkClient.getCommunicator()))
                 localPlayers.add(player);
         }
     }
@@ -137,7 +121,7 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
         if (obj instanceof ClientPlayer) {
             ClientPlayer player = (ClientPlayer) obj;
             players.remove(player);
-            if (player.isLocal(getCommunicator()))
+            if (player.isLocal(networkClient.getCommunicator()))
                 localPlayers.remove(player);
         }
     }
@@ -152,15 +136,13 @@ public abstract class AbstractGenericNetworkFrame<TClientObject extends ClientOb
 
     @Override
     protected void onUpdate(float deltaTime) {
-        networkClient.update(deltaTime);
+        networkClient.update();
         super.onUpdate(deltaTime);
-        var communicator = getCommunicator();
+        var communicator = networkClient.getCommunicator();
         try {
             communicator.sendOutgoing();
         } catch (IOException e) {
             communicator.disconnect(e);
         }
     }
-
-    protected abstract FrameClient initializeNetworkFrame(FrameInitializer initializer);
 }

@@ -37,5 +37,5 @@ public interface ServerObject extends Message {
     /**
      * Gets the position of the object.
      */
-    Point position();
+    Point getPosition();
 }

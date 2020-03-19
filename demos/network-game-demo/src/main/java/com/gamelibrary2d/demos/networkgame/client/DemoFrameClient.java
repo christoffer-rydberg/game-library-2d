@@ -2,30 +2,20 @@ package com.gamelibrary2d.demos.networkgame.client;
 
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.common.io.Write;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.AbstractFrameClient;
-import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 
-import java.nio.charset.StandardCharsets;
-
-public class DemoFrameClient extends AbstractFrameClient {
-
-    private final DemoFrame frame;
+public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     private final BitParser bitParser = new BitParser();
 
+    private DemoFrame frame;
     private int serverUpdateRate;
 
-    DemoFrameClient(DemoFrame frame) {
+    void initialize(DemoFrame frame) {
         this.frame = frame;
-    }
-
-    @Override
-    public void configureAuthentication(CommunicationInitializer initializer) {
-        initializer.add(this::authenticate);
     }
 
     @Override
@@ -51,6 +41,7 @@ public class DemoFrameClient extends AbstractFrameClient {
                 break;
         }
     }
+
 
     private void onUpdateRateMessage(DataBuffer buffer) {
         serverUpdateRate = buffer.getInt();
@@ -90,19 +81,18 @@ public class DemoFrameClient extends AbstractFrameClient {
     }
 
     @Override
-    public void onDisconnected(Throwable cause) {
-        System.err.println("Disconnected from server");
-        cause.printStackTrace();
-        frame.game().exit();
-    }
-
-    @Override
     public float getServerUpdateRate() {
         return serverUpdateRate;
     }
 
-    private void authenticate(Communicator communicator) {
-        var outgoing = communicator.getOutgoing();
-        Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, outgoing);
+    @Override
+    protected void onDisconnected(DemoCommunicator communicator, Throwable cause) {
+        frame.invokeLater(() -> onDisconnected(cause));
+    }
+    
+    private void onDisconnected(Throwable cause) {
+        System.err.println("Disconnected from server");
+        cause.printStackTrace();
+        frame.getGame().exit();
     }
 }

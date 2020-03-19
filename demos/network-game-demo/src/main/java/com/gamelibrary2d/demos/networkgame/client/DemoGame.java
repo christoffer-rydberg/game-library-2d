@@ -3,7 +3,6 @@ package com.gamelibrary2d.demos.networkgame.client;
 import com.gamelibrary2d.AbstractGame;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
-import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
 
 public class DemoGame extends AbstractGame {
@@ -20,8 +19,8 @@ public class DemoGame extends AbstractGame {
     @Override
     protected void onStart() {
         var networkFrame = new DemoFrame(this);
-        var communicator = new ClientSideCommunicator(new TcpConnectionSettings("localhost", 4444, true));
-        networkFrame.setCommunicator(communicator);
+        networkFrame.getClient().setCommunicator(new DemoCommunicator(
+                new TcpConnectionSettings("localhost", 4444, true)));
         setFrame(networkFrame);
     }
 

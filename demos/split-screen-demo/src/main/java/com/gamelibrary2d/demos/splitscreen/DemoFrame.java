@@ -52,7 +52,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
                 random.nextFloat() * 0.5f + 0.5f);
 
         var spaceCraft = new SpaceCraft(GAME_BOUNDS, renderer);
-        spaceCraft.position().set(
+        spaceCraft.getPosition().set(
                 GAME_BOUNDS.xMin() + random.nextFloat() * GAME_BOUNDS.width(),
                 GAME_BOUNDS.yMin() + random.nextFloat() * GAME_BOUNDS.height());
 
@@ -81,11 +81,11 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private void prepareView(SpaceCraft spaceCraft, Rectangle viewArea) {
         var x = Math.min(
                 GAME_BOUNDS.width() - viewArea.width() / 2,
-                Math.max(spaceCraft.position().getX(), viewArea.width() / 2));
+                Math.max(spaceCraft.getPosition().getX(), viewArea.width() / 2));
         var y = Math.min(
                 GAME_BOUNDS.height() - viewArea.height() / 2,
-                Math.max(spaceCraft.position().getY(), viewArea.height() / 2));
-        spacecraftLayer.position().set(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
+                Math.max(spaceCraft.getPosition().getY(), viewArea.height() / 2));
+        spacecraftLayer.getPosition().set(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
     }
 
     private SplitLayout createSplitLayoutHelper(List<SpaceCraft> spaceCrafts, SplitOrientation orientation) {
@@ -93,7 +93,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
         if (size == 1) {
             var spaceCraft = spaceCrafts.get(0);
-            spacecraftLayer.position().set(spaceCraft.position());
+            spacecraftLayer.getPosition().set(spaceCraft.getPosition());
             return new SplitLayoutLeaf<>(spacecraftLayer, this::prepareView, spaceCraft);
         }
 
@@ -136,7 +136,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     private void refreshSplitLayout(List<SpaceCraft> spaceCrafts) {
-        var window = game().window();
+        var window = getGame().getWindow();
         if (view != null) {
             remove(view);
         }
@@ -167,7 +167,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         try {
             spacecraftLayer.getBackground().add(createBackground());
 
@@ -184,7 +184,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
             refreshSplitLayout(spaceCrafts);
 
-            initializer.onBegin(() -> game().setBackgroundColor(SPLIT_COLOR));
+            initializer.onBegin(() -> getGame().setBackgroundColor(SPLIT_COLOR));
         } catch (IOException e) {
             e.printStackTrace();
         }

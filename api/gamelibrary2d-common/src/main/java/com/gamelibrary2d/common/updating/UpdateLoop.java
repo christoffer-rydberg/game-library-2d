@@ -1,15 +1,14 @@
 package com.gamelibrary2d.common.updating;
 
 public class UpdateLoop {
-
-    private UpdateTarget updateTarget;
+    private UpdateAction updateAction;
     private double ups;
     private Timer timer;
 
-    private boolean running;
+    private volatile boolean running;
 
-    public UpdateLoop(UpdateTarget updateTarget, int ups) {
-        this.updateTarget = updateTarget;
+    public UpdateLoop(UpdateAction updateAction, int ups) {
+        this.updateAction = updateAction;
         this.ups = ups;
         timer = new Timer();
     }
@@ -20,7 +19,7 @@ public class UpdateLoop {
         timer.init();
 
         while (!Thread.currentThread().isInterrupted() && running) {
-            updateTarget.update((float) timer.update());
+            updateAction.invoke((float) timer.update());
             synch();
         }
 
@@ -45,5 +44,9 @@ public class UpdateLoop {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public interface UpdateAction {
+        void invoke(float deltaTime);
     }
 }

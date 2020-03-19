@@ -4,39 +4,25 @@ import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
-import com.gamelibrary2d.common.updating.UpdateTarget;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
+import com.gamelibrary2d.network.common.TcpConnector;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.network.common.initialization.ConsumerPhase;
-import com.gamelibrary2d.network.common.initialization.InitializationPhase;
-import com.gamelibrary2d.network.common.initialization.ProducerPhase;
+import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
-import com.gamelibrary2d.network.common.internal.CommunicatorWrapper.InitializationResult;
 import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public abstract class AbstractClient implements UpdateTarget {
-
+public abstract class AbstractClient {
     private final DataBuffer inbox;
-    CommunicatorWrapper communicator = new CommunicatorWrapper();
     private boolean sendingDataOnUpdate = true;
-    private volatile CommunicatorDisconnected disconnectedEvent;
-    private CommunicatorDisconnectedListener disconnectedListener = x -> disconnectedEvent = x;
 
     protected AbstractClient() {
         this.inbox = new DynamicByteBuffer();
         inbox.flip();
-    }
-
-    protected AbstractClient(Communicator communicator) {
-        this();
-        setCommunicator(communicator);
     }
 
     public boolean isSendingDataOnUpdate() {
@@ -77,36 +63,18 @@ public abstract class AbstractClient implements UpdateTarget {
             communicator.disconnect();
     }
 
-    public Communicator getCommunicator() {
-        return this.communicator.getWrappedCommunicator();
-    }
-
-    public void setCommunicator(Communicator communicator) {
-        var current = getCommunicator();
-
-        if (current != communicator) {
-            if (current != null)
-                current.removeDisconnectedListener(disconnectedListener);
-
-            disconnectedEvent = null;
-
-            this.communicator.setWrappedCommunicator(communicator);
-
-            if (communicator != null)
-                communicator.addDisconnectedListener(disconnectedListener);
-        }
-    }
-
     public void initialize() throws InitializationException {
         var initializer = new InternalCommunicatorInitializer();
+        var communicatorWrapper = new CommunicatorWrapper(getCommunicator());
         configureInitialization(initializer);
-        communicator.clearInitializationPhases();
-        communicator.addInitializationPhases(initializer.getInitializationPhases());
-        runInitializationPhases();
+        communicatorWrapper.clearInitializationPhases();
+        communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
+        runInitializationPhases(communicatorWrapper);
     }
 
-    @Override
-    public void update(float deltaTime) {
+    public void update() {
+        var communicator = getCommunicator();
+
         if (communicator == null) {
             return;
         }
@@ -120,23 +88,16 @@ public abstract class AbstractClient implements UpdateTarget {
                     communicator.disconnect(e);
                 }
             }
-        } else if (disconnectedEvent != null) {
-            try {
-                // Read any final messages from the server
-                readMessages();
-                onDisconnected(disconnectedEvent.getCause());
-            } finally {
-                disconnectedEvent = null;
-            }
         }
     }
 
-    protected void readMessages() {
+    private void readMessages() {
         handleMessages();
 
+        var communicator = getCommunicator();
         boolean hasIncoming;
         try {
-            hasIncoming = refreshInboxIfEmpty();
+            hasIncoming = refreshInboxIfEmpty(communicator);
         } catch (IOException e) {
             communicator.disconnect(e);
             return;
@@ -153,22 +114,18 @@ public abstract class AbstractClient implements UpdateTarget {
         }
     }
 
-    private boolean refreshInboxIfEmpty() throws IOException {
-        return inbox.remaining() > 0 || getCommunicator().readIncoming(inbox);
+    private boolean refreshInboxIfEmpty(Communicator communicator) throws IOException {
+        return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
-    public boolean isLocalServer() {
-        return communicator.unwrap() instanceof LocalCommunicator;
-    }
-
-    protected void runInitializationPhases() throws InitializationException {
-        InitializationResult result;
+    private void runInitializationPhases(CommunicatorWrapper communicator) throws InitializationException {
+        CommunicatorWrapper.InitializationResult result;
 
         int retries = 0;
         do {
 
             result = communicator.runInitializationPhase(this::runInitializationPhase);
-            if (result == InitializationResult.AWAITING_DATA) {
+            if (result == CommunicatorWrapper.InitializationResult.AWAITING_DATA) {
 
                 if (retries == getInitializationRetries()) {
                     throw new InitializationException("Reading server response timed out");
@@ -187,7 +144,7 @@ public abstract class AbstractClient implements UpdateTarget {
                     throw new InitializationException("Connection has been lost", e);
                 }
 
-                if (!triggerLocalServerUpdate()) {
+                if (!triggerLocalServerUpdate(communicator)) {
                     try {
                         Thread.sleep(getInitializationRetryDelay());
                     } catch (InterruptedException e) {
@@ -198,7 +155,7 @@ public abstract class AbstractClient implements UpdateTarget {
                 retries = 0;
             }
 
-        } while (result != InitializationResult.FINISHED);
+        } while (result != CommunicatorWrapper.InitializationResult.FINISHED);
 
         try {
             communicator.sendOutgoing();
@@ -207,14 +164,14 @@ public abstract class AbstractClient implements UpdateTarget {
             throw new InitializationException("Connection has been lost", e);
         }
 
-        triggerLocalServerUpdate();
+        triggerLocalServerUpdate(communicator);
     }
 
     private boolean runInitializationPhase(Communicator communicator, InitializationPhase phase)
             throws InitializationException {
         if (phase instanceof ConsumerPhase) {
             try {
-                return refreshInboxIfEmpty() && ((ConsumerPhase) phase).run(communicator, inbox);
+                return refreshInboxIfEmpty(communicator) && ((ConsumerPhase) phase).run(communicator, inbox);
             } catch (IOException e) {
                 communicator.disconnect(e);
                 throw new InitializationException("Connection has been lost", e);
@@ -232,8 +189,8 @@ public abstract class AbstractClient implements UpdateTarget {
      *
      * @return True the server is local, false otherwise.
      */
-    private boolean triggerLocalServerUpdate() {
-        if (isLocalServer()) {
+    private boolean triggerLocalServerUpdate(CommunicatorWrapper communicator) {
+        if (communicator.unwrap() instanceof LocalCommunicator) {
             ((LocalCommunicator) communicator.unwrap()).getLocalServer().update(0);
             return true;
         }
@@ -255,9 +212,68 @@ public abstract class AbstractClient implements UpdateTarget {
         return 1000;
     }
 
-    protected abstract void configureInitialization(CommunicationInitializer initializer);
+    public void authenticate() throws InitializationException {
+        var communicator = getCommunicator();
+        if (!communicator.isAuthenticated()) {
+            var initializer = new InternalCommunicatorInitializer();
+            var communicatorWrapper = new CommunicatorWrapper(communicator);
+            configureAuthentication(initializer, communicatorWrapper);
+            communicatorWrapper.clearInitializationPhases();
+            communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
+            runInitializationPhases(communicatorWrapper);
+        }
+    }
+
+    private void configureInitialization(CommunicationInitializer initializer) {
+        onConfigureInitialization(initializer);
+    }
+
+    private void configureAuthentication(CommunicationInitializer initializer, CommunicatorWrapper communicator) {
+        initializer.add(x -> initializeConnection(x, false));
+        initializer.add(new IdentityConsumer());
+        communicator.configureAuthentication(initializer);
+        initializer.add(this::onAuthenticated);
+    }
+
+    private void initializeConnection(Communicator communicator, boolean isReconnect) {
+        communicator.getOutgoing().putBool(isReconnect);
+    }
+
+    private boolean onAuthenticated(Communicator communicator, DataBuffer inbox) throws InitializationException {
+        var reconnect = inbox.getBool();
+
+        if (reconnect) {
+            int port = inbox.getInt();
+            var wrappedCommunicator = communicator.unwrap();
+            if (wrappedCommunicator instanceof TcpConnector) {
+                var tcpConnector = (TcpConnector) wrappedCommunicator;
+                tcpConnector.setTcpConnectionSettings(
+                        new TcpConnectionSettings(wrappedCommunicator.getEndpoint(), port, false));
+            }
+        }
+
+        communicator.setAuthenticated();
+
+        if (reconnect) {
+            var wrappedCommunicator = communicator.unwrap();
+            if (wrappedCommunicator instanceof Reconnectable) {
+                try {
+                    ((Reconnectable) wrappedCommunicator).reconnect().get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new InitializationException(e);
+                }
+            }
+            initializeConnection(communicator, true);
+            var identityProducer = new IdentityProducer(communicator::getId);
+            identityProducer.run(communicator);
+        }
+
+        return true;
+    }
+
+    public abstract Communicator getCommunicator();
+
+    protected abstract void onConfigureInitialization(CommunicationInitializer initializer);
 
     protected abstract void onMessage(DataBuffer buffer);
-
-    protected abstract void onDisconnected(Throwable cause);
 }

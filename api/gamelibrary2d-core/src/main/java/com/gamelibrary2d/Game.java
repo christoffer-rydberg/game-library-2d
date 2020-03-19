@@ -15,7 +15,7 @@ public interface Game extends Disposer, Updatable {
      */
     void start(Window window);
 
-    Window window();
+    Window getWindow();
 
     void setViewPort(int x, int y, int width, int height);
 

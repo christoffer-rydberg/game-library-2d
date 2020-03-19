@@ -53,18 +53,18 @@ public class Slider extends AbstractMouseRoutingObject<Layer<Renderable>> {
 
     private int getValue() {
         return (int) ((direction == SliderDirection.HORIZONTAL
-                ? handle.position().getX()
-                : handle.position().getY()) / step);
+                ? handle.getPosition().getX()
+                : handle.getPosition().getY()) / step);
     }
 
     public int setValue(int value, boolean publishEvent) {
         var actual = (int) Math.max(min, Math.min(max, value));
         switch (direction) {
             case HORIZONTAL:
-                handle.position().set(actual * step, 0);
+                handle.getPosition().set(actual * step, 0);
                 break;
             case VERTICAL:
-                handle.position().set(0, actual * step);
+                handle.getPosition().set(0, actual * step);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
@@ -86,9 +86,9 @@ public class Slider extends AbstractMouseRoutingObject<Layer<Renderable>> {
     private int getValueFromPosition(float x, float y) {
         switch (direction) {
             case HORIZONTAL:
-                return (int) ((handle.position().getX() + x - dragOriginX) / step);
+                return (int) ((handle.getPosition().getX() + x - dragOriginX) / step);
             case VERTICAL:
-                return (int) ((handle.position().getY() + y - dragOriginY) / step);
+                return (int) ((handle.getPosition().getY() + y - dragOriginY) / step);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }

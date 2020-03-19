@@ -42,7 +42,7 @@ class DemoFrame extends AbstractFrame {
     private Renderable createTorch(DefaultParticleSystem particleSystem, DefaultDynamicLightMap lightMap) throws IOException {
         var bounds = Rectangle.fromTopLeft(32, 64).move(-5, 10);
         var renderer = createRenderer(bounds, "torch.png");
-        return new Cursor(game(), renderer, lightMap, particleSystem);
+        return new Cursor(getGame(), renderer, lightMap, particleSystem);
     }
 
     private LightRenderer createLightRenderer(Window window, LightMap lightMap) {
@@ -58,9 +58,9 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         try {
-            var window = game().window();
+            var window = getGame().getWindow();
             var particleSystem = createParticleSystem();
             var lightMap = new DefaultDynamicLightMap(new DefaultLightSpreadMatrix(20));
             var frameLayer = new DynamicLayer<>();

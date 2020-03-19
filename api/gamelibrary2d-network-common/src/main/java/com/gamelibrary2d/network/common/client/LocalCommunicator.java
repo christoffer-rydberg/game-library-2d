@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.AbstractCommunicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 import com.gamelibrary2d.network.common.server.LocalServer;
 import com.gamelibrary2d.network.common.server.Server;
 
@@ -17,6 +18,8 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
     private final LocalServer localServer;
 
     private final LocalCommunicator serverSideCommunicator;
+
+    private ParameterizedAction<CommunicationInitializer> configureAuthentication;
 
     public LocalCommunicator(LocalServer localServer) {
         super(1, false);
@@ -57,6 +60,17 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
     @Override
     public String getEndpoint() {
         return "localhost";
+    }
+
+    public void onConfigureAuthentication(ParameterizedAction<CommunicationInitializer> action) {
+        this.configureAuthentication = action;
+    }
+
+    @Override
+    public void configureAuthentication(CommunicationInitializer initializer) {
+        if (configureAuthentication != null) {
+            configureAuthentication.invoke(initializer);
+        }
     }
 
     @Override

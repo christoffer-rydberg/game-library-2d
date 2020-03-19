@@ -94,14 +94,14 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
     }
 
     private void updateTargetFromSettings() {
-        target.position().set(internalTargetSettings.position());
+        target.getPosition().set(internalTargetSettings.position());
         target.getScaleAndRotationCenter().set(internalTargetSettings.getScaleAndRotationCenter());
         target.getScale().set(internalTargetSettings.getScale());
         target.setRotation(internalTargetSettings.getRotation());
     }
 
     private void updateSettingsFromTarget() {
-        internalTargetSettings.position().set(target.position());
+        internalTargetSettings.position().set(target.getPosition());
         internalTargetSettings.getScaleAndRotationCenter().set(target.getScaleAndRotationCenter());
         internalTargetSettings.getScale().set(target.getScale());
         internalTargetSettings.setRotation(target.getRotation());

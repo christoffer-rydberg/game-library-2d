@@ -1,9 +1,9 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.server.AbstractSecureLocalServer;
+import com.gamelibrary2d.network.common.server.AbstractLocalServer;
 
-public abstract class AbstractLocalGameServer extends AbstractSecureLocalServer {
+public abstract class AbstractLocalGameServer extends AbstractLocalServer {
 
     private GameLogic gameLogic;
 

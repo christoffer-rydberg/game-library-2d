@@ -1,19 +1,20 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 
-public interface FrameClient {
-
-    void configureAuthentication(CommunicationInitializer initializer);
+public interface FrameClient<T extends Communicator> {
 
     void configureInitialization(CommunicationInitializer initializer);
 
     void onMessage(DataBuffer buffer);
 
-    float getServerUpdateRate();
+    T getCommunicator();
 
-    void onDisconnected(Throwable cause);
+    void setCommunicator(T communicator);
+
+    float getServerUpdateRate();
 
     /**
      * The max number of retries for each initialization step.

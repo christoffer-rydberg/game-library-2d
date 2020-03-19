@@ -22,7 +22,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     protected AbstractClientObject(NetworkFrame frame, DataBuffer buffer) {
         this.frame = frame;
         id = buffer.getInt();
-        position().set(buffer.getFloat(), buffer.getFloat());
+        getPosition().set(buffer.getFloat(), buffer.getFloat());
     }
 
     @Override
@@ -32,8 +32,8 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     @Override
     public void setGoalPosition(float x, float y) {
-        x0 = position().getX();
-        y0 = position().getY();
+        x0 = getPosition().getX();
+        y0 = getPosition().getY();
         x1 = x;
         y1 = y;
         interpolationAlpha = 0;
@@ -54,7 +54,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     public void instantPositionUpdate() {
         if (interpolationAlpha != -1) {
-            position().set(x1, y1);
+            getPosition().set(x1, y1);
             interpolationAlpha = -1;
         }
     }
@@ -62,7 +62,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     @Override
     public void update(float deltaTime) {
         onUpdate(deltaTime);
-        float ups = frame.getServerUpdateRate();
+        float ups = frame.getClient().getServerUpdateRate();
         if (ups <= 0) {
             instantMovement();
         } else {
@@ -72,7 +72,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     private void instantMovement() {
         if (interpolationAlpha != -1) {
-            position().set(x1, y1);
+            getPosition().set(x1, y1);
             interpolationAlpha = -1;
         }
 
@@ -87,11 +87,11 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
         if (interpolationAlpha != -1) {
             interpolationAlpha += deltaTime * ups;
             if (interpolationAlpha >= 1f) {
-                position().set(x1, y1);
+                getPosition().set(x1, y1);
                 interpolationAlpha = -1;
             } else {
-                position().set(x0, y0);
-                position().lerp(x1, y1, interpolationAlpha);
+                getPosition().set(x0, y0);
+                getPosition().lerp(x1, y1, interpolationAlpha);
             }
         }
 

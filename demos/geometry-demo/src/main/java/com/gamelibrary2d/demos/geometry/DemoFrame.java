@@ -13,7 +13,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         var lineLayer = new BasicLayer<Geometry>();
 
         var lineRenderer = new LineRenderer(4f);

@@ -24,17 +24,17 @@ public class PositionUpdate extends AbstractAttributeUpdate {
 
     @Override
     public void makeAbsolute() {
-        deltaX = originalDeltaX - getTarget().position().getX();
-        deltaY = originalDeltaY - getTarget().position().getY();
+        deltaX = originalDeltaX - getTarget().getPosition().getX();
+        deltaY = originalDeltaY - getTarget().getPosition().getY();
     }
 
     public void makeRelative(GameObject target) {
-        deltaX = originalDeltaX - getTarget().position().getX() + target.position().getX();
-        deltaY = originalDeltaY - getTarget().position().getY() + target.position().getY();
+        deltaX = originalDeltaX - getTarget().getPosition().getX() + target.getPosition().getX();
+        deltaY = originalDeltaY - getTarget().getPosition().getY() + target.getPosition().getY();
     }
 
     @Override
     protected void onApply(float deltaTime) {
-        getTarget().position().add(deltaX * deltaTime, deltaY * deltaTime);
+        getTarget().getPosition().add(deltaX * deltaTime, deltaY * deltaTime);
     }
 }

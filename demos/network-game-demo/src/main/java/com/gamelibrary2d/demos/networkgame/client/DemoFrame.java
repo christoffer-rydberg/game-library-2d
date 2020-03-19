@@ -8,7 +8,6 @@ import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.layers.LayerObject;
 import com.gamelibrary2d.network.AbstractNetworkFrame;
-import com.gamelibrary2d.network.FrameClient;
 import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
@@ -18,24 +17,23 @@ import com.gamelibrary2d.util.RenderSettings;
 
 import java.io.IOException;
 
-public class DemoFrame extends AbstractNetworkFrame {
-
+public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private Renderer boulderRenderer;
     private Texture boulderTexture;
     private LayerObject<Renderable> worldLayer = new DynamicLayer<>();
 
     DemoFrame(Game game) {
-        super(game);
+        super(game, new DemoFrameClient());
     }
 
     @Override
-    protected FrameClient initializeNetworkFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
+        getClient().initialize(this);
+
         try {
             boulderTexture = Texture.create(
                     getClass().getClassLoader().getResource("boulder.png"),
                     this);
-
-            return new DemoFrameClient(this);
         } catch (IOException e) {
             throw new GameLibrary2DRuntimeException("Failed to initialize frame", e);
         }
@@ -46,13 +44,13 @@ public class DemoFrame extends AbstractNetworkFrame {
         var renderer = new SurfaceRenderer(quad);
         renderer.updateSettings(RenderSettings.COLOR_R, 1f, 1f, 1f);
         var obj = new BasicObject<>(renderer);
-        obj.position().set(posX, posY);
+        obj.getPosition().set(posX, posY);
         return obj;
     }
 
     void applySettings(GameSettings gameSettings) {
-        var windowWidth = game().window().width();
-        var windowHeight = game().window().height();
+        var windowWidth = getGame().getWindow().width();
+        var windowHeight = getGame().getWindow().height();
         var gameBounds = gameSettings.getGameBounds();
         var scale = Math.min(windowWidth / gameBounds.width(), windowHeight / gameBounds.height());
         var worldArea = Rectangle.centered(gameBounds.width() * scale, gameBounds.height() * scale);
@@ -65,7 +63,7 @@ public class DemoFrame extends AbstractNetworkFrame {
         add(worldLayer);
 
         worldLayer.getScale().set(scale, scale);
-        worldLayer.position().set(windowWidth / 2f + worldArea.xMin(), windowHeight / 2f + worldArea.yMin());
+        worldLayer.getPosition().set(windowWidth / 2f + worldArea.xMin(), windowHeight / 2f + worldArea.yMin());
 
         var boulderBounds = gameSettings.getBoulderBounds();
         var boulderQuad = Quad.create(boulderBounds.resize(1.25f), this);

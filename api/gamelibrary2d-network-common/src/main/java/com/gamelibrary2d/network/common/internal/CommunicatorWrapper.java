@@ -8,6 +8,7 @@ import com.gamelibrary2d.network.common.DataReader;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 import com.gamelibrary2d.network.common.initialization.InitializationPhase;
 
 import java.io.IOException;
@@ -108,6 +109,11 @@ public class CommunicatorWrapper implements Communicator {
     @Override
     public Communicator unwrap() {
         return wrappedCommunicator.unwrap();
+    }
+
+    @Override
+    public void configureAuthentication(CommunicationInitializer initializer) {
+        wrappedCommunicator.configureAuthentication(initializer);
     }
 
     public Communicator getWrappedCommunicator() {

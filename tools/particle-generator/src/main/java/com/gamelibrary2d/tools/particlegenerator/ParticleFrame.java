@@ -48,7 +48,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         particleSystem = ParticleSystemModel.create(this);
 
         screenLayer = new BasicLayer<>();
@@ -58,36 +58,36 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         backgroundLayer = new BasicLayer<>();
 
         particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
-        particleSettingsPanel.position().set(WINDOW_MARGIN, game().window().height() - WINDOW_MARGIN);
+        particleSettingsPanel.getPosition().set(WINDOW_MARGIN, getGame().getWindow().height() - WINDOW_MARGIN);
 
         basicSpawnSettingsPanel = new BasicSpawnSettingsPanel(this, particleSystem);
-        basicSpawnSettingsPanel.position().set(WINDOW_MARGIN,
-                game().window().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
+        basicSpawnSettingsPanel.getPosition().set(WINDOW_MARGIN,
+                getGame().getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         ellipsoidSpawnSettingsPanel = new EllipsoidSpawnSettingsPanel(this, particleSystem);
-        ellipsoidSpawnSettingsPanel.position().set(WINDOW_MARGIN,
-                game().window().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
+        ellipsoidSpawnSettingsPanel.getPosition().set(WINDOW_MARGIN,
+                getGame().getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         spawnSettingsPanel = basicSpawnSettingsPanel;
 
         renderSettingsPanel = new RenderSettingsPanel(particleSystem, this);
-        renderSettingsPanel.position().set(
-                game().window().width() - renderSettingsPanel.getBounds().width() - WINDOW_MARGIN,
-                game().window().height() - WINDOW_MARGIN);
+        renderSettingsPanel.getPosition().set(
+                getGame().getWindow().width() - renderSettingsPanel.getBounds().width() - WINDOW_MARGIN,
+                getGame().getWindow().height() - WINDOW_MARGIN);
 
         emitterPanel = new EmitterPanel(particleSystem);
-        emitterPanel.position().set(game().window().width() - WINDOW_MARGIN,
+        emitterPanel.getPosition().set(getGame().getWindow().width() - WINDOW_MARGIN,
                 emitterPanel.getBounds().height() + WINDOW_MARGIN);
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
-        saveLoadResetPanel.position().set(WINDOW_MARGIN, WINDOW_MARGIN);
+        saveLoadResetPanel.getPosition().set(WINDOW_MARGIN, WINDOW_MARGIN);
 
         initializer.onLoad(this::onLoad);
     }
 
     private void onLoad() {
-        PosX = game().window().width() / 2f;
-        PosY = game().window().height() / 2f;
+        PosX = getGame().getWindow().width() / 2f;
+        PosY = getGame().getWindow().height() / 2f;
         add(backgroundLayer);
         add(particleLayer);
         add(screenLayer);

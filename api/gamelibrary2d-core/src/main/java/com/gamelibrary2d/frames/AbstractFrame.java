@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Action;
-import com.gamelibrary2d.exceptions.LoadInterruptedException;
+import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
 import com.gamelibrary2d.updaters.Updater;
@@ -14,16 +14,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public abstract class AbstractFrame extends AbstractLayer<Renderable> implements Frame {
-    private Game game;
+    private final Deque<Runnable> invokeLater = new ArrayDeque<>();
 
+    private Game game;
     private DisposerStack disposer;
     private Deque<Updater> updaters;
-
     private boolean paused;
     private boolean disposed;
     private boolean initialized;
-    private boolean loaded;
-
+    private volatile boolean loaded;
+    private boolean firstTimeUsage = true;
     private LoadAction loadAction;
     private Action loadedAction;
     private Action beginAction;
@@ -33,6 +33,10 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         this.game = game;
     }
 
+    public void invokeLater(Runnable runnable) {
+        invokeLater.addLast(runnable);
+    }
+
     @Override
     public void registerDisposal(Disposable disposable) {
         disposer.push(disposable);
@@ -40,8 +44,8 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     @Override
     public void initialize() {
-        if (isDisposed()) {
-            throw new GameLibrary2DRuntimeException("This object has been disposed.");
+        if (disposed) {
+            throw new GameLibrary2DRuntimeException("This object has been disposed");
         }
 
         if (isInitialized())
@@ -52,7 +56,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         updaters = new ArrayDeque<>();
 
         var frameInitializer = new FrameInitializer();
-        initializeFrame(frameInitializer);
+        onInitialize(frameInitializer);
         loadAction = frameInitializer.load;
         loadedAction = frameInitializer.loaded;
         beginAction = frameInitializer.begin;
@@ -68,22 +72,21 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void load() throws LoadInterruptedException {
+    public void load() throws LoadFailedException {
         if (isLoaded())
             return;
 
         if (!isInitialized()) {
-            throw new LoadInterruptedException("Frame has not been initialized");
+            throw new LoadFailedException("Frame has not been initialized");
         }
 
         if (loadAction != null) {
             try {
                 loadAction.invoke();
             } catch (Exception e) {
-                e.printStackTrace();
                 reset();
-                throw e instanceof LoadInterruptedException ? (LoadInterruptedException) e
-                        : new LoadInterruptedException(e.getMessage());
+                throw e instanceof LoadFailedException ? (LoadFailedException) e
+                        : new LoadFailedException("Unhandled exception", e);
             }
         }
 
@@ -96,17 +99,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void loadCompleted() {
-        if (!isLoaded()) {
-            throw new GameLibrary2DRuntimeException("Frame has not been loaded");
-        }
-
-        if (loadedAction != null) {
-            loadedAction.invoke();
-        }
-    }
-
-    @Override
     public void reset() {
         // Dispose all resources created after the initialization phase.
         disposer.disposeUntilBreak();
@@ -115,26 +107,22 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     @Override
     public void dispose() {
-        if (isDisposed())
-            return;
-
-        disposer.dispose();
-        commonCleanUp();
-        initialized = false;
-        disposed = true;
-        game = null;
-        disposer = null;
-        updaters = null;
-    }
-
-    public boolean isDisposed() {
-        return disposed;
+        if (!disposed) {
+            disposer.dispose();
+            commonCleanUp();
+            initialized = false;
+            game = null;
+            disposer = null;
+            updaters = null;
+            disposed = true;
+        }
     }
 
     private void commonCleanUp() {
         clear();
         updaters.clear();
         loaded = false;
+        firstTimeUsage = true;
     }
 
     protected void runUpdater(Updater updater) {
@@ -154,6 +142,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     protected void onUpdate(float deltaTime) {
         if (!isPaused()) {
             super.onUpdate(deltaTime);
+
             for (int i = 0; i < updaters.size(); ++i) {
                 Updater updater = updaters.pollFirst();
                 updater.update(deltaTime);
@@ -162,10 +151,14 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
                 }
             }
         }
+
+        while (!invokeLater.isEmpty()) {
+            invokeLater.pollFirst().run();
+        }
     }
 
     @Override
-    public Game game() {
+    public Game getGame() {
         return game;
     }
 
@@ -184,22 +177,38 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         return paused;
     }
 
-    protected abstract void initializeFrame(FrameInitializer initializer);
-
+    @Override
     public void begin() {
+        if (!isLoaded()) {
+            throw new GameLibrary2DRuntimeException("Frame has not been loaded");
+        }
+
+        if (firstTimeUsage) {
+            if (loadedAction != null) {
+                loadedAction.invoke();
+            }
+
+            firstTimeUsage = false;
+        }
+
         if (beginAction != null) {
             beginAction.invoke();
         }
     }
 
+    @Override
     public void end() {
         if (endAction != null) {
             endAction.invoke();
         }
+
+        invokeLater.clear();
     }
 
+    protected abstract void onInitialize(FrameInitializer initializer);
+
     public interface LoadAction {
-        void invoke() throws LoadInterruptedException;
+        void invoke() throws LoadFailedException;
     }
 
     protected static class FrameInitializer {
@@ -252,19 +261,15 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
         private final Deque<Disposable> stack = new ArrayDeque<>();
 
-        public void push(Disposable disposable) {
+        void push(Disposable disposable) {
             stack.addLast(disposable);
         }
 
-        public void pushBreak() {
+        void pushBreak() {
             stack.addLast(breakMark);
         }
 
-        public void remove(Disposable disposable) {
-            stack.removeLastOccurrence(disposable);
-        }
-
-        public void disposeUntilBreak() {
+        void disposeUntilBreak() {
             while (!stack.isEmpty()) {
                 Disposable e = stack.pollLast();
                 if (e == breakMark) {
@@ -275,7 +280,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             }
         }
 
-        public void dispose() {
+        void dispose() {
             while (!stack.isEmpty()) {
                 stack.pollLast().dispose();
             }

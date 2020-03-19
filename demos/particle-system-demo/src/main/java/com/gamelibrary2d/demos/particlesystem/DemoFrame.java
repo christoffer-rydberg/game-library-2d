@@ -54,7 +54,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         try {
             // Example of particle system created from code:
             fireSystem = DefaultParticleSystem.create(
@@ -74,7 +74,7 @@ public class DemoFrame extends AbstractFrame {
             add(explosionSystem);
         } catch (IOException e) {
             e.printStackTrace();
-            game().exit();
+            getGame().exit();
         }
     }
 

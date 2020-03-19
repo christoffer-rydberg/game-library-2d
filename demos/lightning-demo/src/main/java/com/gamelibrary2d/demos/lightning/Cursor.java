@@ -27,8 +27,8 @@ public class Cursor extends AbstractCursor implements Updatable {
 
     @Override
     public void update(float deltaTime) {
-        lightMap.addInterpolated(position().getX() / 32f, position().getY() / 32f, 20);
-        particleEmitter.position().set(position());
+        lightMap.addInterpolated(getPosition().getX() / 32f, getPosition().getY() / 32f, 20);
+        particleEmitter.position().set(getPosition());
         particleEmitter.update(deltaTime);
     }
 

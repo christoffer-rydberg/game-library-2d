@@ -12,7 +12,7 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onStart() {
-        window().setMouseCursorMode(MouseCursorMode.HIDDEN);
+        getWindow().setMouseCursorMode(MouseCursorMode.HIDDEN);
         setFrame(new DemoFrame(this));
     }
 

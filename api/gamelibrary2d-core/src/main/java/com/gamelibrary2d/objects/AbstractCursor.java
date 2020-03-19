@@ -27,7 +27,7 @@ public abstract class AbstractCursor<T extends Renderable> extends AbstractGameO
 
     @Override
     public boolean onMouseMove(float x, float y) {
-        position().set(x, y);
+        getPosition().set(x, y);
         onInteracted();
         return false;
     }

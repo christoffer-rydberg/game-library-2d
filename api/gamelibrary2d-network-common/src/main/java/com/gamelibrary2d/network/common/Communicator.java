@@ -2,6 +2,8 @@ package com.gamelibrary2d.network.common;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
+import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
 
 import java.io.IOException;
 
@@ -100,4 +102,6 @@ public interface Communicator {
      * @return The unwrapped communicator instance.
      */
     Communicator unwrap();
+
+    void configureAuthentication(CommunicationInitializer initializer);
 }

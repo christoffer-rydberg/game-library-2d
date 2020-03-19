@@ -16,8 +16,8 @@ public class Projection {
     public static Point projectTo(Transformable ref, float x, float y) {
         point.set(x, y);
 
-        float rotationAndScaleCenterX = ref.position().getX() + ref.getScaleAndRotationCenter().getX();
-        float rotationAndScaleCenterY = ref.position().getY() + ref.getScaleAndRotationCenter().getY();
+        float rotationAndScaleCenterX = ref.getPosition().getX() + ref.getScaleAndRotationCenter().getX();
+        float rotationAndScaleCenterY = ref.getPosition().getY() + ref.getScaleAndRotationCenter().getY();
 
         if (ref.getRotation() != 0) {
             point.rotate(-ref.getRotation(), rotationAndScaleCenterX, rotationAndScaleCenterY);
@@ -28,8 +28,8 @@ public class Projection {
             point.setY(rotationAndScaleCenterY + ((point.getY() - rotationAndScaleCenterY) / ref.getScale().getY()));
         }
 
-        point.setX(point.getX() - ref.position().getX());
-        point.setY(point.getY() - ref.position().getY());
+        point.setX(point.getX() - ref.getPosition().getX());
+        point.setY(point.getY() - ref.getPosition().getY());
 
         return point;
     }

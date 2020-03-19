@@ -73,8 +73,8 @@ public class DemoGameServer extends AbstractGameServer<DemoGameLogic> {
         var balls = gameLogic.getRegisteredObjects();
         for (var object : balls) {
             bitParser.putInt(object.getId(), NetworkConstants.BIT_COUNT_OBJECT_ID);
-            bitParser.putInt(Math.round(object.position().getX()), NetworkConstants.BIT_COUNT_POS_X);
-            bitParser.putInt(Math.round(object.position().getY()), NetworkConstants.BIT_COUNT_POS_Y);
+            bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.BIT_COUNT_POS_X);
+            bitParser.putInt(Math.round(object.getPosition().getY()), NetworkConstants.BIT_COUNT_POS_Y);
         }
 
         int bitPosition = (int) bitParser.position();

@@ -42,7 +42,7 @@ public class DemoGameLogic extends AbstractGameLogic {
 
     void spawnBoulder(float x, float y) {
         var boulder = new ServerBoulder(settings.getGameBounds(), settings.getBoulderBounds());
-        boulder.position().set(x, y);
+        boulder.getPosition().set(x, y);
         register(boulder);
         collisionDetection.add(boulder);
         server.sendToAll(ServerMessages.SPAWN_BOULDER, false);

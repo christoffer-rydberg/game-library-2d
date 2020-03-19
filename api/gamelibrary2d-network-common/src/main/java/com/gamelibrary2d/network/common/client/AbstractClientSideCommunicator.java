@@ -13,7 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public class ClientSideCommunicator extends AbstractNetworkCommunicator
+public abstract class AbstractClientSideCommunicator extends AbstractNetworkCommunicator
         implements TcpConnector, UdpReceiver, Connectable, Reconnectable {
 
     private final boolean ownsCommunicationServer;
@@ -24,13 +24,13 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator
 
     private volatile boolean connectingTcp;
 
-    public ClientSideCommunicator(TcpConnectionSettings tcpSettings) {
+    protected AbstractClientSideCommunicator(TcpConnectionSettings tcpSettings) {
         super(new CommunicationServer(), 2, false);
         this.tcpSettings = tcpSettings;
         ownsCommunicationServer = true;
     }
 
-    public ClientSideCommunicator(TcpConnectionSettings tcpSettings, CommunicationServer communicationServer) {
+    protected AbstractClientSideCommunicator(TcpConnectionSettings tcpSettings, CommunicationServer communicationServer) {
         super(communicationServer, 2, false);
         this.tcpSettings = tcpSettings;
         ownsCommunicationServer = false;

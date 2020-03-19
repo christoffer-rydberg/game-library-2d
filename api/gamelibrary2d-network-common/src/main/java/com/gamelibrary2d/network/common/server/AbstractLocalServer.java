@@ -10,7 +10,7 @@ import com.gamelibrary2d.network.common.initialization.IdentityProducer;
 import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
 import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
 
-public abstract class AbstractSecureLocalServer extends InternalAbstractServer implements LocalServer {
+public abstract class AbstractLocalServer extends InternalAbstractServer implements LocalServer {
 
     private final Factory<Integer> communicatorIdFactory = () -> RandomInstance.get().nextInt();
 

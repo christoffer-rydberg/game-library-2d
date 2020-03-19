@@ -15,12 +15,17 @@ public class DemoServer extends AbstractNetworkServer {
     private int messagesReceived;
 
     DemoServer(int port) {
-        super(port, true);
-        updateLoop = new UpdateLoop(this, 10);
+        super(port);
+        updateLoop = new UpdateLoop(this::update, 10);
     }
 
     void run() {
         updateLoop.run();
+    }
+
+    @Override
+    protected void onConfigureAuthentication(CommunicationInitializer initializer) {
+
     }
 
     @Override
@@ -44,7 +49,12 @@ public class DemoServer extends AbstractNetworkServer {
     }
 
     @Override
-    protected void onDisconnected(Communicator communicator, boolean pending) {
+    protected void onConnected(Communicator communicator) {
+        System.out.println(String.format("%s has connected.", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onConnectionLost(Communicator communicator, boolean pending) {
         System.out.println(String.format("%s has disconnected.", communicator.getEndpoint()));
     }
 

@@ -2,7 +2,7 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.exceptions.LoadInterruptedException;
+import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.updaters.Updater;
@@ -25,18 +25,12 @@ public interface Frame extends Layer<Renderable>, Disposer {
      * No OpenGL context is available and the implementation of this method must be thread safe.
      * This method is invoked after {@link #initialize}.
      */
-    void load() throws LoadInterruptedException;
+    void load() throws LoadFailedException;
 
     /**
      * @return True if the frame has been {@link #load loaded}, false otherwise.
      */
     boolean isLoaded();
-
-    /**
-     * Invoked from the main thread after {@link #load} has completed.
-     * Performs any required OpenGL-related initialization after the frame has loaded.
-     */
-    void loadCompleted();
 
     /**
      * Invoked when the frame begins.
@@ -51,7 +45,7 @@ public interface Frame extends Layer<Renderable>, Disposer {
     /**
      * @return The game instance.
      */
-    Game game();
+    Game getGame();
 
     /**
      * Pauses the game.
@@ -85,4 +79,6 @@ public interface Frame extends Layer<Renderable>, Disposer {
      *                runs from the beginning, if this property is set to true.
      */
     void runUpdater(Updater updater, boolean reset);
+
+    void invokeLater(Runnable runnable);
 }

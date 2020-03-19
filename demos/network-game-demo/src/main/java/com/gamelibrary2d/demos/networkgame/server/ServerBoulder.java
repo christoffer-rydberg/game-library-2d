@@ -24,12 +24,12 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
 
     @Override
     public float getPosX() {
-        return position().getX();
+        return getPosition().getX();
     }
 
     @Override
     public float getPosY() {
-        return position().getY();
+        return getPosition().getY();
     }
 
     @Override
@@ -44,8 +44,8 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
 
     @Override
     public UpdateResult update(float deltaTime) {
-        beforeUpdate.set(position());
-        position().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
+        beforeUpdate.set(getPosition());
+        getPosition().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
         bounceIfOutside(gameBounds);
         return UpdateResult.MOVED;
     }
@@ -58,13 +58,13 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
     @Override
     public boolean onCollisionWith(ServerBoulder other) {
         // TODO: Implement more realistic physics (colliding balls)
-        position().set(beforeUpdate);
+        getPosition().set(beforeUpdate);
         velocity.multiply(-1f);
         return true;
     }
 
     private void bounceIfOutside(Rectangle area) {
-        var position = position();
+        var position = getPosition();
         var bounds = getBounds();
         if (position.getX() + bounds.xMax() > area.xMax()) {
             position.setX(area.xMax() - bounds.xMax());

@@ -53,13 +53,8 @@ public class NetworkGameDemo {
         var thread = new Thread(() -> {
             var server = new DemoGameServer(4444, 4445);
             try {
-                // Listen for incoming connections
-                server.startConnectionServer();
-
-                // Run update loop that will send outgoing messages and listen for incoming messages (blocking).
+                server.startConnectionListener();
                 server.start(new DemoGameLogic(server), 30, 3);
-
-                // Stop internal server threads
                 server.stop();
             } catch (IOException e) {
                 System.out.println("Failed to start connection server");

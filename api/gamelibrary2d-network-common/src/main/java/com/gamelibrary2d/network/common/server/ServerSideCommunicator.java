@@ -1,10 +1,12 @@
 package com.gamelibrary2d.network.common.server;
 
+import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.AbstractNetworkCommunicator;
 import com.gamelibrary2d.network.common.CommunicationServer;
 import com.gamelibrary2d.network.common.ConnectionOperations;
 import com.gamelibrary2d.network.common.UdpTransmitter;
+import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
@@ -12,11 +14,13 @@ import java.nio.channels.SocketChannel;
 public class ServerSideCommunicator extends AbstractNetworkCommunicator implements UdpTransmitter {
 
     private final String endpoint;
+    private final ParameterizedAction<CommunicationInitializer> configureAuthentication;
 
-    public ServerSideCommunicator(CommunicationServer communicationServer, SocketChannel socketChannel) {
+    public ServerSideCommunicator(CommunicationServer communicationServer, SocketChannel socketChannel, ParameterizedAction<CommunicationInitializer> configureAuthentication) {
         super(communicationServer, 1, true);
         setSocketChannel(socketChannel);
         endpoint = socketChannel.socket().getInetAddress().getHostAddress();
+        this.configureAuthentication = configureAuthentication;
         getCommunicationServer().connect(getSocketChannel(), this, this::onSocketChannelDisconnected);
     }
 
@@ -42,5 +46,10 @@ public class ServerSideCommunicator extends AbstractNetworkCommunicator implemen
         } else {
             getCommunicationServer().send(getDatagramChannel(), buffer);
         }
+    }
+
+    @Override
+    public void configureAuthentication(CommunicationInitializer initializer) {
+        configureAuthentication.invoke(initializer);
     }
 }

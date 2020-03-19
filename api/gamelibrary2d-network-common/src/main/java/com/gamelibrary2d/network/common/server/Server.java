@@ -1,10 +1,11 @@
 package com.gamelibrary2d.network.common.server;
 
-import com.gamelibrary2d.common.updating.UpdateTarget;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
 
-public interface Server extends UpdateTarget {
+public interface Server {
+
+    void update(float deltaTime);
 
     void send(Communicator communicator, int message);
 

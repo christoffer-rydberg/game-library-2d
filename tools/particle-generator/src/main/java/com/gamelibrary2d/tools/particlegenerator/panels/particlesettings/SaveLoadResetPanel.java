@@ -53,7 +53,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         buttonContext.setVerticalAlignment(VerticalAlignment.BOTTOM);
         buttonContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
 
-        button.position().set(posX, posY);
+        button.getPosition().set(posX, posY);
         button.setBounds(Fonts.getDefaultFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
                 buttonContext.getVerticalAlignment()));
         button.addMouseButtonReleaseListener(mouseEventHandler);
@@ -225,9 +225,9 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         if (ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()) != null) {
 
             ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()).setPositionVar(
-                    round(random.nextFloat() * frame.game().window().width() / 2, 0),
-                    round(random.nextFloat() * frame.game().window().height() / 2, 0),
-                    round(random.nextFloat() * frame.game().window().height() / 2, 0));
+                    round(random.nextFloat() * frame.getGame().getWindow().width() / 2, 0),
+                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0),
+                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0));
 
             ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));
@@ -242,9 +242,9 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         } else if (ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()) != null) {
 
             ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(
-                    round(random.nextFloat() * frame.game().window().width() / 2, 0),
-                    round(random.nextFloat() * frame.game().window().height() / 2, 0),
-                    round(random.nextFloat() * frame.game().window().height() / 2, 0));
+                    round(random.nextFloat() * frame.getGame().getWindow().width() / 2, 0),
+                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0),
+                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0));
 
             ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));

@@ -1,19 +1,19 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.network.common.client.AbstractSecureClient;
+import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
 
-class InternalNetworkClient extends AbstractSecureClient {
-    private FrameClient context;
+class InternalNetworkClient<TFrameClient extends FrameClient> extends AbstractClient {
+    private TFrameClient context;
 
-    void setContext(FrameClient context) {
+    void setContext(TFrameClient context) {
         this.context = context;
     }
 
-    @Override
-    protected void onConfigureAuthentication(CommunicationInitializer initializer) {
-        context.configureAuthentication(initializer);
+    TFrameClient getContext() {
+        return context;
     }
 
     @Override
@@ -27,12 +27,8 @@ class InternalNetworkClient extends AbstractSecureClient {
     }
 
     @Override
-    protected void onDisconnected(Throwable cause) {
-        context.onDisconnected(cause);
-    }
-
-    float getServerUpdateRate() {
-        return context.getServerUpdateRate();
+    public Communicator getCommunicator() {
+        return context.getCommunicator();
     }
 
     @Override

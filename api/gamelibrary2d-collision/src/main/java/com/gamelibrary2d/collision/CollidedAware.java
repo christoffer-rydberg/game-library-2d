@@ -6,7 +6,7 @@ package com.gamelibrary2d.collision;
  *
  * @param <T> The generic {@link CollisionAware} type that will be monitored for collisions.
  */
-public interface CollidedAware<T extends CollisionAware<?>> extends Collidable {
+public interface CollidedAware<T extends CollisionAware> extends Collidable {
 
     /**
      * The class of the generic {@link CollisionAware} that this instance is aware of.

@@ -16,9 +16,9 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
+    protected void onInitialize(FrameInitializer initializer) {
         try {
-            Window window = game().window();
+            Window window = getGame().getWindow();
             float windowWidth = window.width();
             float windowHeight = window.height();
             BufferedImage init = Texture.load(DemoFrame.class.getResource("/Images/before.jpg"));

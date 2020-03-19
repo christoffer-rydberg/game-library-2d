@@ -31,13 +31,13 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void initializeFrame(FrameInitializer initializer) {
-        var game = game();
-        var window = game.window();
+    protected void onInitialize(FrameInitializer initializer) {
+        var game = getGame();
+        var window = game.getWindow();
         try {
             var animation = createAnimation();
             animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
-            animationObj.position().set(window.width() / 2f, window.height() / 2f);
+            animationObj.getPosition().set(window.width() / 2f, window.height() / 2f);
             add(animationObj);
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class DemoFrame extends AbstractFrame {
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
         if (animationObj.getContent().isAnimationFinished()) {
-            game().exit();
+            getGame().exit();
         }
     }
 
