@@ -52,7 +52,7 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     @Override
-    public void setAuthenticated() {
+    public void onAuthenticated() {
         authenticated = true;
     }
 

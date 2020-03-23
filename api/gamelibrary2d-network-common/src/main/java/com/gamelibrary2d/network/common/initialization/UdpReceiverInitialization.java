@@ -6,7 +6,7 @@ import com.gamelibrary2d.network.common.exceptions.InitializationException;
 
 import java.io.IOException;
 
-public class UdpReceiverInitialization implements ProducerPhase {
+public class UdpReceiverInitialization implements ProducerStep {
 
     private int localPort;
 

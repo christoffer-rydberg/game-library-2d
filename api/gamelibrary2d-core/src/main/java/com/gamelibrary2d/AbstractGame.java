@@ -337,16 +337,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         if (frame == null)
             return;
         frame.end();
-        switch (frameDisposal) {
-            case NONE:
-                break;
-            case RESET:
-                frame.reset();
-                break;
-            case DISPOSE:
-                frame.dispose();
-                break;
-        }
+        frame.dispose(frameDisposal);
     }
 
     @Override

@@ -2,9 +2,7 @@ package com.gamelibrary2d.network.common.client;
 
 import com.gamelibrary2d.common.concurrent.NotHandledException;
 import com.gamelibrary2d.common.concurrent.ResultHandlingFuture;
-import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.functional.Functions;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.network.common.*;
 
 import java.io.IOException;
@@ -39,13 +37,6 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
     @Override
     public Future<Void> connect() {
         return canConnect() ? connectTcp() : CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void connect(Action onSuccess, ParameterizedAction<Throwable> onFail) {
-        if (canConnect()) {
-            connectTcp(onSuccess, onFail);
-        }
     }
 
     private boolean canConnect() {
@@ -110,45 +101,6 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
             disconnect(e);
             throw new NotHandledException();
         });
-    }
-
-    private void connectTcp(Action onSuccess, ParameterizedAction<Throwable> onFail) {
-        connectingTcp = true;
-        var communicationServer = getCommunicationServer();
-        var communicationServerWasRunning = communicationServer.isRunning();
-
-        SocketChannelConnectedHandler connected = x -> {
-            try {
-                onConnected(x);
-                new Thread(onSuccess::invoke).start();
-            } catch (SocketException e) {
-                new Thread(() -> onFail.invoke(e)).start();
-            }
-        };
-
-        SocketChannelFailedConnectionHandler failed = (x, e) -> {
-            try {
-                onDisconnected(e);
-            } finally {
-                new Thread(() -> onFail.invoke(e)).start();
-            }
-        };
-
-        try {
-            communicationServer.start();
-            communicationServer.connect(tcpSettings.getHost(), tcpSettings.getPort(), connected, failed);
-            connectedTcpSettings = tcpSettings;
-        } catch (IOException e) {
-            connectingTcp = false;
-            if (!communicationServerWasRunning) {
-                try {
-                    communicationServer.stop();
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            onFail.invoke(e);
-        }
     }
 
     /**

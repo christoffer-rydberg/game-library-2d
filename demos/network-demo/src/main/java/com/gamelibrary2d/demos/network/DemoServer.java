@@ -3,59 +3,69 @@ package com.gamelibrary2d.demos.network;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.AbstractNetworkServer;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class DemoServer extends AbstractNetworkServer {
-
-    private final UpdateLoop updateLoop;
-
+    private final static int UPDATES_PER_SECOND = 10;
     private int messagesReceived;
 
     DemoServer(int port) {
         super(port);
-        updateLoop = new UpdateLoop(this::update, 10);
     }
 
-    void run() {
-        updateLoop.run();
-    }
-
-    @Override
-    protected void onConfigureAuthentication(CommunicationInitializer initializer) {
-
+    public void start() throws IOException {
+        new UpdateLoop(this::update, UPDATES_PER_SECOND).run();
+        stop();
     }
 
     @Override
-    protected void onConfigureInitialization(CommunicationInitializer initializer) {
+    protected void configureClientAuthentication(CommunicationSteps steps) {
 
+    }
+
+    @Override
+    protected void configureClientInitialization(CommunicationSteps steps) {
+
+    }
+
+    @Override
+    protected void onClientAuthenticated(Communicator communicator) {
+        log(String.format("Client has been authenticated: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onClientInitialized(Communicator communicator) {
+        log(String.format("Client has been initialized: %s", communicator.getEndpoint()));
     }
 
     @Override
     protected boolean acceptConnection(String endpoint) {
+        log(String.format("Accepting incoming connection: %s", endpoint));
         return true;
     }
 
     @Override
-    protected void onInitialized(Communicator communicator) {
-        System.out.println(String.format("%s has connected.", communicator.getEndpoint()));
-    }
-
-    @Override
     protected void onConnectionFailed(String endpoint, Exception e) {
-        System.out.println(String.format("%s failed to connect", endpoint));
+        log(String.format("Incoming connection failed: %s", endpoint), e);
     }
 
     @Override
     protected void onConnected(Communicator communicator) {
-        System.out.println(String.format("%s has connected.", communicator.getEndpoint()));
+        log(String.format("Connection established: %s", communicator.getEndpoint()));
     }
 
     @Override
     protected void onConnectionLost(Communicator communicator, boolean pending) {
-        System.out.println(String.format("%s has disconnected.", communicator.getEndpoint()));
+        log(String.format("Connection lost: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onUpdate(float deltaTime) {
+
     }
 
     private void sendMessage(Communicator communicator, String message) {
@@ -79,11 +89,20 @@ public class DemoServer extends AbstractNetworkServer {
             sendMessage(communicator, "... Bye.");
             try {
                 communicator.sendOutgoing();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 communicator.disconnect();
             }
         }
+    }
+
+    private void log(String message) {
+        System.out.println(message);
+    }
+
+    private void log(String message, Throwable e) {
+        System.out.println(message);
+        e.printStackTrace();
     }
 }

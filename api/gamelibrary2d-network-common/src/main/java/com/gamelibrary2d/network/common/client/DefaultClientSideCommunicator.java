@@ -2,11 +2,11 @@ package com.gamelibrary2d.network.common.client;
 
 import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.network.common.CommunicationServer;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 public final class DefaultClientSideCommunicator extends AbstractClientSideCommunicator {
 
-    private ParameterizedAction<CommunicationInitializer> configureAuthentication;
+    private ParameterizedAction<CommunicationSteps> configureAuthentication;
 
     public DefaultClientSideCommunicator(TcpConnectionSettings tcpSettings) {
         super(tcpSettings);
@@ -16,14 +16,14 @@ public final class DefaultClientSideCommunicator extends AbstractClientSideCommu
         super(tcpSettings, communicationServer);
     }
 
-    public void onConfigureAuthentication(ParameterizedAction<CommunicationInitializer> action) {
+    public void onConfigureAuthentication(ParameterizedAction<CommunicationSteps> action) {
         this.configureAuthentication = action;
     }
 
     @Override
-    public void configureAuthentication(CommunicationInitializer initializer) {
+    public void configureAuthentication(CommunicationSteps steps) {
         if (configureAuthentication != null) {
-            configureAuthentication.invoke(initializer);
+            configureAuthentication.invoke(steps);
         }
     }
 }

@@ -17,14 +17,8 @@ public class NetworkDemo {
         var thread = new Thread(() -> {
             var server = new DemoServer(4444);
             try {
-                // Listen for incoming connections
-                server.startConnectionListener();
-
-                // Run update loop that will send outgoing messages and listen for incoming messages (blocking).
-                server.run();
-
-                // Stop internal server threads
-                server.stop();
+                server.listenForConnections(true);
+                server.start(); // Blocking
             } catch (IOException e) {
                 exitWithError("Failed to start connection server", e);
             }
@@ -38,8 +32,11 @@ public class NetworkDemo {
             var communicator = new DefaultClientSideCommunicator(new TcpConnectionSettings("localhost", 4444, true));
             var client = new DemoClient(communicator);
 
-            // Begin connecting to server
-            client.connect(client::tellJoke, e -> exitWithError("Failed to connect to server", e));
+            try {
+                client.connect().get();
+            } catch (Exception e) {
+                exitWithError("Failed to connect", e);
+            }
 
             // Run update loop that will send outgoing messages and listen for incoming messages once connected (blocking).
             client.run();

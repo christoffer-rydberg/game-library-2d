@@ -1,11 +1,10 @@
 package com.gamelibrary2d.network.common.client;
 
-import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.AbstractCommunicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.LocalServer;
 import com.gamelibrary2d.network.common.server.Server;
 
@@ -19,7 +18,7 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
 
     private final LocalCommunicator serverSideCommunicator;
 
-    private ParameterizedAction<CommunicationInitializer> configureAuthentication;
+    private ParameterizedAction<CommunicationSteps> configureAuthentication;
 
     public LocalCommunicator(LocalServer localServer) {
         super(1, false);
@@ -46,30 +45,18 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
     }
 
     @Override
-    public void connect(Action onSuccess, ParameterizedAction<Throwable> onFail) {
-        if (setConnected()) {
-            try {
-                localServer.addCommunicator(serverSideCommunicator);
-                onSuccess.invoke();
-            } catch (InitializationException e) {
-                onFail.invoke(e);
-            }
-        }
-    }
-
-    @Override
     public String getEndpoint() {
         return "localhost";
     }
 
-    public void onConfigureAuthentication(ParameterizedAction<CommunicationInitializer> action) {
+    public void onConfigureAuthentication(ParameterizedAction<CommunicationSteps> action) {
         this.configureAuthentication = action;
     }
 
     @Override
-    public void configureAuthentication(CommunicationInitializer initializer) {
+    public void configureAuthentication(CommunicationSteps steps) {
         if (configureAuthentication != null) {
-            configureAuthentication.invoke(initializer);
+            configureAuthentication.invoke(steps);
         }
     }
 

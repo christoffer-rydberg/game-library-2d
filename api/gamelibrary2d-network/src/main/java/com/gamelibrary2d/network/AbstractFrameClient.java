@@ -56,4 +56,9 @@ public abstract class AbstractFrameClient<T extends Communicator> implements Fra
 
     protected abstract void onDisconnected(T communicator, Throwable cause);
 
+    public void disconnect() {
+        if (communicator != null) {
+            communicator.disconnect();
+        }
+    }
 }

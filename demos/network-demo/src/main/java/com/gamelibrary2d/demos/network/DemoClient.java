@@ -5,12 +5,11 @@ import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.nio.charset.StandardCharsets;
 
 public class DemoClient extends AbstractClient {
-
     private final Communicator communicator;
     private final UpdateLoop updateLoop;
 
@@ -31,12 +30,8 @@ public class DemoClient extends AbstractClient {
         communicator.getOutgoing().put(bytes);
     }
 
-    void tellJoke() {
-        sendMessage("What do you call a guy with a rubber toe?");
-    }
-
     @Override
-    protected void onConfigureInitialization(CommunicationInitializer initializer) {
+    protected void onConfigureInitialization(CommunicationSteps steps) {
 
     }
 
@@ -48,6 +43,11 @@ public class DemoClient extends AbstractClient {
         var message = new String(bytes, StandardCharsets.UTF_8);
         System.out.println(String.format("Server: %s", message));
         sendMessage("Roberto.");
+    }
+
+    @Override
+    protected void onInitialized() {
+        sendMessage("What do you call a guy with a rubber toe?");
     }
 
     @Override

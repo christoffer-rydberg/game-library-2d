@@ -34,10 +34,8 @@ public class DemoGameLogic extends AbstractGameLogic {
         return settings;
     }
 
-    @Override
-    public boolean update(float deltaTime) {
+    public void update(float deltaTime) {
         collisionDetection.update(deltaTime);
-        return true;
     }
 
     void spawnBoulder(float x, float y) {

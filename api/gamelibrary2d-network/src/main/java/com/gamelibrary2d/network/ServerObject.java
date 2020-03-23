@@ -9,33 +9,25 @@ import com.gamelibrary2d.network.common.Message;
 public interface ServerObject extends Message {
 
     /**
-     * Gets the object identifier. The object identifier is set when the object is
-     * registered, i.e. when {@link #onRegistered} is invoked by the
-     * {@link GameLogic}. This method should return {@link Integer#MAX_VALUE} if the
-     * object has not been registered.
+     * @return The unique object identifier.
      */
     int getId();
 
     /**
-     * The {@link GameLogic} is responsible for registration of server objects. When
-     * an object is registered, it will be assigned a unique identifier. If the
-     * object has been registered before, it will be re-registered with its previous
-     * identifier.
+     * Invoked when the object has been registered.
      *
-     * @param id The object identifier.
+     * @param id The unique object identifier.
      */
     void onRegistered(int id);
 
     /**
-     * Invoked when the object is unregistered from the {@link GameLogic}. The
-     * object can at any time be registered again. Note that this method should not
-     * reset the object's {@link #getId identifier}. If the object is re-registered,
-     * the old identifier will be reused.
+     * Invoked when the object has been de-registered.
+     * The object {@link #getId id} should not be reset when this method is called.
      */
-    void onUnregistered();
+    void onDeregister();
 
     /**
-     * Gets the position of the object.
+     * @return The object's position.
      */
     Point getPosition();
 }

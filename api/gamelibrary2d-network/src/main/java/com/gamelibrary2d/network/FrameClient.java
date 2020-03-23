@@ -2,11 +2,13 @@ package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 public interface FrameClient<T extends Communicator> {
 
-    void configureInitialization(CommunicationInitializer initializer);
+    void configureInitialization(CommunicationSteps steps);
+
+    void onInitialized();
 
     void onMessage(DataBuffer buffer);
 
@@ -14,15 +16,16 @@ public interface FrameClient<T extends Communicator> {
 
     void setCommunicator(T communicator);
 
-    float getServerUpdateRate();
+    float getServerUpdatesPerSecond();
 
     /**
-     * The max number of retries for each initialization step.
+     * The max number of retries for each communication step.
      */
     int getInitializationRetries();
 
     /**
-     * The delay between retries of initialization steps in milliseconds.
+     * The delay between retries of communication steps in milliseconds.
      */
     int getInitializationRetryDelay();
+
 }

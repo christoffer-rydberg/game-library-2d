@@ -72,7 +72,6 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
     void addBoulder(ClientBoulder boulder) {
         boulder.setRenderer(boulderRenderer);
-        this.registerObject(boulder);
         worldLayer.add(boulder);
     }
 }

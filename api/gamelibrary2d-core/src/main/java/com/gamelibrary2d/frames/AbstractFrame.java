@@ -84,7 +84,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             try {
                 loadAction.invoke();
             } catch (Exception e) {
-                reset();
+                unload();
                 throw e instanceof LoadFailedException ? (LoadFailedException) e
                         : new LoadFailedException("Unhandled exception", e);
             }
@@ -99,7 +99,20 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void reset() {
+    public void dispose(FrameDisposal disposal) {
+        switch (disposal) {
+            case NONE:
+                break;
+            case UNLOAD:
+                unload();
+                break;
+            case DISPOSE:
+                dispose();
+                break;
+        }
+    }
+
+    protected void unload() {
         // Dispose all resources created after the initialization phase.
         disposer.disposeUntilBreak();
         commonCleanUp();
@@ -218,8 +231,8 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         private Action end;
 
         /**
-         * The specified action is invoked when the frame is loaded. A frame should typically be reloadable after a
-         * {@link Frame#reset reset}. It is good practice to place initialization logic, such as initial objects
+         * The specified action is invoked when the frame is loaded. A frame should typically be reloadable if it
+         * is unloaded. It is good practice to place initialization logic, such as initial objects
          * and positions, inside this action.
          * <br>
          * <br>

@@ -1,7 +1,5 @@
 package com.gamelibrary2d.network.common.client;
 
-import com.gamelibrary2d.common.functional.Action;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.network.common.Communicator;
@@ -9,7 +7,7 @@ import com.gamelibrary2d.network.common.TcpConnector;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
-import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
+import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +17,7 @@ import java.util.concurrent.Future;
 public abstract class AbstractClient {
     private final DataBuffer inbox;
     private boolean sendingDataOnUpdate = true;
+    private boolean initialized;
 
     protected AbstractClient() {
         this.inbox = new DynamicByteBuffer();
@@ -50,43 +49,60 @@ public abstract class AbstractClient {
         return CompletableFuture.completedFuture(null);
     }
 
-    public void connect(Action onSuccess, ParameterizedAction<Throwable> onFail) {
-        var communicator = getCommunicator();
-        if (communicator instanceof Connectable) {
-            ((Connectable) getCommunicator()).connect(onSuccess, onFail);
-        }
-    }
-
     public void disconnect() {
         var communicator = getCommunicator();
         if (communicator != null)
             communicator.disconnect();
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void deinitialize() {
+        this.initialized = false;
+    }
+
     public void initialize() throws InitializationException {
-        var initializer = new InternalCommunicatorInitializer();
+        if (initialized) {
+            throw new InitializationException("Client has already been initialized");
+        }
+        var initializer = new InternalCommunicationSteps();
         var communicatorWrapper = new CommunicatorWrapper(getCommunicator());
         configureInitialization(initializer);
-        communicatorWrapper.clearInitializationPhases();
-        communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
-        runInitializationPhases(communicatorWrapper);
+        communicatorWrapper.clearCommunicationSteps();
+        communicatorWrapper.addCommunicationSteps(initializer.getAll());
+        runCommunicationSteps(communicatorWrapper);
+        initialized = true;
+        onInitialized();
     }
 
     public void update() {
         var communicator = getCommunicator();
-
         if (communicator == null) {
             return;
         }
 
         if (communicator.isConnected()) {
-            readMessages();
-            if (sendingDataOnUpdate) {
-                try {
-                    communicator.sendOutgoing();
-                } catch (IOException e) {
-                    communicator.disconnect(e);
+            try {
+                if (!communicator.isAuthenticated()) {
+                    authenticate();
                 }
+
+                if (!initialized) {
+                    initialize();
+                }
+
+                readMessages();
+                if (sendingDataOnUpdate) {
+                    try {
+                        communicator.sendOutgoing();
+                    } catch (IOException e) {
+                        communicator.disconnect(e);
+                    }
+                }
+            } catch (Exception e) {
+                communicator.disconnect(e);
             }
         }
     }
@@ -118,13 +134,13 @@ public abstract class AbstractClient {
         return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
-    private void runInitializationPhases(CommunicatorWrapper communicator) throws InitializationException {
+    private void runCommunicationSteps(CommunicatorWrapper communicator) throws InitializationException {
         CommunicatorWrapper.InitializationResult result;
 
         int retries = 0;
         do {
 
-            result = communicator.runInitializationPhase(this::runInitializationPhase);
+            result = communicator.runCommunicationStep(this::runCommunicationStep);
             if (result == CommunicatorWrapper.InitializationResult.AWAITING_DATA) {
 
                 if (retries == getInitializationRetries()) {
@@ -167,20 +183,20 @@ public abstract class AbstractClient {
         triggerLocalServerUpdate(communicator);
     }
 
-    private boolean runInitializationPhase(Communicator communicator, InitializationPhase phase)
+    private boolean runCommunicationStep(Communicator communicator, CommunicationStep step)
             throws InitializationException {
-        if (phase instanceof ConsumerPhase) {
+        if (step instanceof ConsumerStep) {
             try {
-                return refreshInboxIfEmpty(communicator) && ((ConsumerPhase) phase).run(communicator, inbox);
+                return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(communicator, inbox);
             } catch (IOException e) {
                 communicator.disconnect(e);
                 throw new InitializationException("Connection has been lost", e);
             }
-        } else if (phase instanceof ProducerPhase) {
-            ((ProducerPhase) phase).run(communicator);
+        } else if (step instanceof ProducerStep) {
+            ((ProducerStep) step).run(communicator);
             return true;
         } else {
-            throw new InitializationException("Unknown initialization phase");
+            throw new InitializationException("Unknown communication step");
         }
     }
 
@@ -199,14 +215,14 @@ public abstract class AbstractClient {
     }
 
     /**
-     * The max number of retries for each initialization step.
+     * The max number of retries for each communication step.
      */
     protected int getInitializationRetries() {
         return 10;
     }
 
     /**
-     * The delay between retries of initialization steps in milliseconds.
+     * The delay between retries of communication steps in milliseconds.
      */
     protected int getInitializationRetryDelay() {
         return 1000;
@@ -215,24 +231,24 @@ public abstract class AbstractClient {
     public void authenticate() throws InitializationException {
         var communicator = getCommunicator();
         if (!communicator.isAuthenticated()) {
-            var initializer = new InternalCommunicatorInitializer();
+            var steps = new InternalCommunicationSteps();
             var communicatorWrapper = new CommunicatorWrapper(communicator);
-            configureAuthentication(initializer, communicatorWrapper);
-            communicatorWrapper.clearInitializationPhases();
-            communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
-            runInitializationPhases(communicatorWrapper);
+            configureAuthentication(communicatorWrapper, steps);
+            communicatorWrapper.clearCommunicationSteps();
+            communicatorWrapper.addCommunicationSteps(steps.getAll());
+            runCommunicationSteps(communicatorWrapper);
         }
     }
 
-    private void configureInitialization(CommunicationInitializer initializer) {
-        onConfigureInitialization(initializer);
+    private void configureInitialization(CommunicationSteps steps) {
+        onConfigureInitialization(steps);
     }
 
-    private void configureAuthentication(CommunicationInitializer initializer, CommunicatorWrapper communicator) {
-        initializer.add(x -> initializeConnection(x, false));
-        initializer.add(new IdentityConsumer());
-        communicator.configureAuthentication(initializer);
-        initializer.add(this::onAuthenticated);
+    private void configureAuthentication(CommunicatorWrapper communicator, CommunicationSteps steps) {
+        steps.add(x -> initializeConnection(x, false));
+        steps.add(new IdentityConsumer());
+        communicator.configureAuthentication(steps);
+        steps.add(this::onAuthenticated);
     }
 
     private void initializeConnection(Communicator communicator, boolean isReconnect) {
@@ -252,7 +268,7 @@ public abstract class AbstractClient {
             }
         }
 
-        communicator.setAuthenticated();
+        communicator.onAuthenticated();
 
         if (reconnect) {
             var wrappedCommunicator = communicator.unwrap();
@@ -271,9 +287,11 @@ public abstract class AbstractClient {
         return true;
     }
 
+    protected abstract void onInitialized();
+
     public abstract Communicator getCommunicator();
 
-    protected abstract void onConfigureInitialization(CommunicationInitializer initializer);
+    protected abstract void onConfigureInitialization(CommunicationSteps steps);
 
     protected abstract void onMessage(DataBuffer buffer);
 }

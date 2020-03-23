@@ -7,7 +7,7 @@ import com.gamelibrary2d.network.common.exceptions.InitializationException;
 
 import java.io.IOException;
 
-public class UdpTransmitterInitialization implements ConsumerPhase {
+public class UdpTransmitterInitialization implements ConsumerStep {
 
     @Override
     public boolean run(Communicator communicator, DataBuffer inbox) throws InitializationException {

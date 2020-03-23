@@ -2,8 +2,7 @@ package com.gamelibrary2d.network.common;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
 
@@ -85,11 +84,6 @@ public interface Communicator {
     void removeDisconnectedListener(CommunicatorDisconnectedListener listener);
 
     /**
-     * Invoked when the client/server connection has been authenticated.
-     */
-    void setAuthenticated();
-
-    /**
      * @return True if the communicator has been authenticated, false otherwise.
      */
     boolean isAuthenticated();
@@ -103,5 +97,10 @@ public interface Communicator {
      */
     Communicator unwrap();
 
-    void configureAuthentication(CommunicationInitializer initializer);
+    void configureAuthentication(CommunicationSteps steps);
+
+    /**
+     * Invoked when the client/server connection has been authenticated.
+     */
+    void onAuthenticated();
 }

@@ -7,6 +7,8 @@ import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
 
 public class DemoGame extends AbstractGame {
 
+    private DemoFrame networkFrame;
+
     public DemoGame() {
         super(new Lwjgl_Framework());
     }
@@ -18,7 +20,7 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onStart() {
-        var networkFrame = new DemoFrame(this);
+        networkFrame = new DemoFrame(this);
         networkFrame.getClient().setCommunicator(new DemoCommunicator(
                 new TcpConnectionSettings("localhost", 4444, true)));
         setFrame(networkFrame);
@@ -26,6 +28,6 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onExit() {
-        // TODO Auto-generated method stub
+        networkFrame.getClient().disconnect();
     }
 }

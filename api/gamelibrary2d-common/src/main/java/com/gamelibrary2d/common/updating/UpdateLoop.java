@@ -7,7 +7,7 @@ public class UpdateLoop {
 
     private volatile boolean running;
 
-    public UpdateLoop(UpdateAction updateAction, int ups) {
+    public UpdateLoop(UpdateAction updateAction, double ups) {
         this.updateAction = updateAction;
         this.ups = ups;
         timer = new Timer();

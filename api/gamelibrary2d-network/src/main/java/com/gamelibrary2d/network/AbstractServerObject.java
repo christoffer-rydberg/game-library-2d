@@ -18,7 +18,7 @@ public abstract class AbstractServerObject implements ServerObject {
     }
 
     @Override
-    public void onUnregistered() {
+    public void onDeregister() {
 
     }
 

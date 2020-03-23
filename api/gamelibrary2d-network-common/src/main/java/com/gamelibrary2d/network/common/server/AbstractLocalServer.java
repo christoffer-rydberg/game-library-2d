@@ -5,10 +5,10 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.initialization.IdentityProducer;
 import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
-import com.gamelibrary2d.network.common.internal.InternalCommunicatorInitializer;
+import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
 
 public abstract class AbstractLocalServer extends InternalAbstractServer implements LocalServer {
 
@@ -28,33 +28,35 @@ public abstract class AbstractLocalServer extends InternalAbstractServer impleme
         onInitialize();
 
         var communicatorWrapper = (CommunicatorWrapper) communicator;
-        var initializer = new InternalCommunicatorInitializer();
-        configureAuthentication(initializer);
-        onConfigureInitialization(initializer);
-        communicatorWrapper.addInitializationPhases(initializer.getInitializationPhases());
+        var initializer = new InternalCommunicationSteps();
+        configureClientAuthentication(initializer);
+        onConfigureClientInitialization(initializer);
+        communicatorWrapper.addCommunicationSteps(initializer.getAll());
 
         return true;
     }
 
     @Override
-    protected final void configureInitialization(CommunicationInitializer initializer) {
-        initializer.add(this::initialize);
+    protected final void configureClientInitialization(CommunicationSteps steps) {
+        steps.add(this::initialize);
     }
 
-    private void configureAuthentication(CommunicationInitializer initializer) throws InitializationException {
-        initializer.add(new IdentityProducer(communicatorIdFactory));
-        onConfigureAuthentication(initializer);
-        initializer.add(this::onAuthenticated);
+    private void configureClientAuthentication(CommunicationSteps steps) throws InitializationException {
+        steps.add(new IdentityProducer(communicatorIdFactory));
+        onConfigureClientAuthentication(steps);
+        steps.add(this::onAuthenticated);
     }
 
     private void onAuthenticated(Communicator communicator) {
-        communicator.setAuthenticated();
+        communicator.onAuthenticated();
         communicator.getOutgoing().putBool(false); // Instruct client to not reconnect after authentication.
     }
 
     protected abstract void onInitialize() throws InitializationException;
 
-    protected abstract void onConfigureAuthentication(CommunicationInitializer initializer)
+    protected abstract void onConfigureClientAuthentication(CommunicationSteps steps)
             throws InitializationException;
 
+    protected abstract void onConfigureClientInitialization(CommunicationSteps steps)
+            throws InitializationException;
 }

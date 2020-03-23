@@ -8,24 +8,19 @@ import com.gamelibrary2d.network.common.DataReader;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
-import com.gamelibrary2d.network.common.initialization.InitializationPhase;
+import com.gamelibrary2d.network.common.initialization.CommunicationStep;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class CommunicatorWrapper implements Communicator {
-
-    private final Deque<InitializationPhase> initializationPhases = new ArrayDeque<>();
+    private final Deque<CommunicationStep> communicationSteps = new ArrayDeque<>();
     private final EventPublisher<CommunicatorDisconnected> disconnectedPublisher = new DefaultEventPublisher<>();
     private final CommunicatorDisconnectedListener internalDisconnectedListener = this::onDisconnectedEvent;
     private Communicator wrappedCommunicator;
-    private boolean initializationRunning;
-
-    public CommunicatorWrapper() {
-
-    }
+    private boolean communicationStepIsRunning;
 
     public CommunicatorWrapper(Communicator wrappedCommunicator) {
         setWrappedCommunicator(wrappedCommunicator);
@@ -97,8 +92,8 @@ public class CommunicatorWrapper implements Communicator {
     }
 
     @Override
-    public void setAuthenticated() {
-        wrappedCommunicator.setAuthenticated();
+    public void onAuthenticated() {
+        wrappedCommunicator.onAuthenticated();
     }
 
     @Override
@@ -112,8 +107,8 @@ public class CommunicatorWrapper implements Communicator {
     }
 
     @Override
-    public void configureAuthentication(CommunicationInitializer initializer) {
-        wrappedCommunicator.configureAuthentication(initializer);
+    public void configureAuthentication(CommunicationSteps steps) {
+        wrappedCommunicator.configureAuthentication(steps);
     }
 
     public Communicator getWrappedCommunicator() {
@@ -135,57 +130,57 @@ public class CommunicatorWrapper implements Communicator {
         disconnectedPublisher.publish(new CommunicatorDisconnected(this, event.getCause()));
     }
 
-    public void clearInitializationPhases() throws InitializationException {
+    public void clearCommunicationSteps() throws InitializationException {
+        if (communicationStepIsRunning)
+            throw new InitializationException("Cannot clear communication steps while a step is running");
 
-        if (initializationRunning)
-            throw new InitializationException("Cannot clear initialization phases during initialization");
-
-        initializationPhases.clear();
+        communicationSteps.clear();
     }
 
-    public void addInitializationPhases(Iterable<InitializationPhase> phases) {
-        for (var phase : phases)
-            initializationPhases.addLast(phase);
+    public void addCommunicationSteps(Iterable<CommunicationStep> steps) {
+        for (var step : steps) {
+            communicationSteps.addLast(step);
+        }
     }
 
-    public InitializationResult runInitializationPhase(InitializationPhaseRunner runner)
+    public InitializationResult runCommunicationStep(CommunicationStepRunner runner)
             throws InitializationException {
 
-        if (initializationRunning)
-            throw new InitializationException("An initialization phase is already running");
+        if (communicationStepIsRunning)
+            throw new InitializationException("An communication step is already running");
 
-        if (initializationPhases.isEmpty()) {
+        if (communicationSteps.isEmpty()) {
             return InitializationResult.FINISHED;
         }
 
-        initializationRunning = true;
+        communicationStepIsRunning = true;
 
         try {
-            var next = initializationPhases.peekFirst();
+            var next = communicationSteps.peekFirst();
             if (runner.run(this, next)) {
-                initializationPhases.pollFirst();
-                return initializationPhases.isEmpty() ? InitializationResult.FINISHED : InitializationResult.PENDING;
+                communicationSteps.pollFirst();
+                return communicationSteps.isEmpty() ? InitializationResult.FINISHED : InitializationResult.PENDING;
             }
             return InitializationResult.AWAITING_DATA;
         } finally {
-            initializationRunning = false;
+            communicationStepIsRunning = false;
         }
     }
 
     public enum InitializationResult {
 
         /**
-         * All initialization phases has finished.
+         * All communication steps has finished.
          */
         FINISHED,
 
         /**
-         * The current initialization phase requires more data.
+         * The current communication step requires more data.
          */
         AWAITING_DATA,
 
         /**
-         * The next communication phase is ready to run.
+         * The next communication step is ready to run.
          */
         PENDING
     }

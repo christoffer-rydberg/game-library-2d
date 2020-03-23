@@ -63,10 +63,9 @@ public interface Frame extends Layer<Renderable>, Disposer {
     boolean isPaused();
 
     /**
-     * Invoked when the frame is changed with the option FrameDisposal.Reset.
-     * {@link #isLoaded Loaded} is set to false but any initialization done in {@link #initialize} is left intact.
+     * Disposes the frame according to the specified {@link FrameDisposal}.
      */
-    void reset();
+    void dispose(FrameDisposal disposal);
 
     /**
      * Runs the specified updater until it is {@link Updater#isFinished finished}.

@@ -3,7 +3,7 @@ package com.gamelibrary2d.network.common.initialization;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.network.common.Communicator;
 
-public class IdentityProducer implements ProducerPhase {
+public class IdentityProducer implements ProducerStep {
 
     private final Factory<Integer> idFactory;
 

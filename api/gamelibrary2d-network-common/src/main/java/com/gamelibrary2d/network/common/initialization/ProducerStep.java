@@ -4,13 +4,14 @@ import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 
 /**
- * Defines a phase that produces messages or changes in the initialization
- * pipeline.
+ * Defines a communication step that doesn't read messages.
+ * Typically used to send messages. If you want to read messages,
+ * use a {@link ConsumerStep}.
  */
-public interface ProducerPhase extends InitializationPhase {
+public interface ProducerStep extends CommunicationStep {
 
     /**
-     * Runs the initialization phase.
+     * Runs the communication step.
      *
      * @param communicator The communicator.
      */

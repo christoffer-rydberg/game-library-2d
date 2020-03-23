@@ -3,14 +3,14 @@ package com.gamelibrary2d.demos.networkgame.client;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.common.MessageParser;
 import com.gamelibrary2d.network.AbstractClientObject;
-import com.gamelibrary2d.network.NetworkFrame;
+import com.gamelibrary2d.network.FrameClient;
 import com.gamelibrary2d.renderers.Renderer;
 
 public class ClientBoulder extends AbstractClientObject {
 
-    protected ClientBoulder(NetworkFrame frame, DataBuffer buffer) {
-        super(frame, buffer);
-        super.setBounds(MessageParser.readRectangle(buffer));
+    protected ClientBoulder(FrameClient frameClient, DataBuffer buffer) {
+        super(frameClient, buffer);
+        setBounds(MessageParser.readRectangle(buffer));
     }
 
     public void setRenderer(Renderer renderer) {

@@ -1,7 +1,6 @@
 package com.gamelibrary2d.demos.networkgame;
 
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
-import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameServer;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
@@ -53,9 +52,8 @@ public class NetworkGameDemo {
         var thread = new Thread(() -> {
             var server = new DemoGameServer(4444, 4445);
             try {
-                server.startConnectionListener();
-                server.start(new DemoGameLogic(server), 30, 3);
-                server.stop();
+                server.listenForConnections(true);
+                server.start(); // Blocking
             } catch (IOException e) {
                 System.out.println("Failed to start connection server");
                 e.printStackTrace();

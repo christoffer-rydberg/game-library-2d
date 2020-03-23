@@ -3,40 +3,87 @@ package com.gamelibrary2d.demos.networkgame.server;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Read;
+import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
-import com.gamelibrary2d.network.AbstractGameServer;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.server.AbstractNetworkServer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public class DemoGameServer extends AbstractGameServer<DemoGameLogic> {
-
+public class DemoGameServer extends AbstractNetworkServer {
+    private final static float UPDATES_PER_SECOND = 30;
+    private final static int STREAM_UPDATE_RATE = 3;
+    private final static float STREAMS_PER_SECOND = UPDATES_PER_SECOND / STREAM_UPDATE_RATE;
     private final BitParser bitParser = new BitParser(ByteBuffer.wrap(new byte[10000]));
 
     private DemoGameLogic gameLogic;
+    private int streamCounter;
 
     public DemoGameServer(int connectionPort, int reconnectionPort) {
         super(connectionPort, reconnectionPort);
+        this.gameLogic = new DemoGameLogic(this);
+    }
+
+    public void start() throws IOException {
+        new UpdateLoop(this::update, UPDATES_PER_SECOND).run();
+        stop();
     }
 
     @Override
-    protected void initialize(DemoGameLogic gameLogic, ServerContextInitializer initializer) {
-        this.gameLogic = gameLogic;
+    protected void configureClientAuthentication(CommunicationSteps steps) {
+        steps.add(this::authenticate);
     }
 
     @Override
-    protected void onConfigureAuthentication(CommunicationInitializer initializer) {
-        initializer.add(this::authenticate);
+    protected void configureClientInitialization(CommunicationSteps steps) {
+        steps.add(this::sendUpdateRate);
+        steps.add(this::sendGameSettings);
     }
 
     @Override
-    protected void onConfigureInitialization(CommunicationInitializer initializer) {
-        initializer.add(this::sendUpdateRate);
-        initializer.add(this::sendGameSettings);
+    protected void onClientAuthenticated(Communicator communicator) {
+        log(String.format("Client has been authenticated: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onClientInitialized(Communicator communicator) {
+        log(String.format("Client has been initialized: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected boolean acceptConnection(String endpoint) {
+        log(String.format("Accepting incoming connection: %s", endpoint));
+        return true;
+    }
+
+    @Override
+    protected void onConnectionFailed(String endpoint, Exception e) {
+        log(String.format("Incoming connection failed: %s", endpoint), e);
+    }
+
+    @Override
+    protected void onConnected(Communicator communicator) {
+        log(String.format("Connection established: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onConnectionLost(Communicator communicator, boolean pending) {
+        log(String.format("Connection lost: %s", communicator.getEndpoint()));
+    }
+
+    @Override
+    protected void onUpdate(float deltaTime) {
+        ++streamCounter;
+        gameLogic.update(deltaTime);
+        if (streamCounter == STREAM_UPDATE_RATE) {
+            updateClients();
+            streamCounter = 0;
+        }
     }
 
     private boolean authenticate(Communicator communicator, DataBuffer buffer) throws InitializationException {
@@ -50,7 +97,7 @@ public class DemoGameServer extends AbstractGameServer<DemoGameLogic> {
     private void sendUpdateRate(Communicator communicator) {
         var buffer = communicator.getOutgoing();
         buffer.put(ServerMessages.UPDATE_RATE);
-        buffer.putInt(10);
+        buffer.putFloat(STREAMS_PER_SECOND);
     }
 
     private void sendGameSettings(Communicator communicator) {
@@ -64,8 +111,7 @@ public class DemoGameServer extends AbstractGameServer<DemoGameLogic> {
 
     }
 
-    @Override
-    public void updateClients() {
+    private void updateClients() {
         sendToAll(ServerMessages.POSITION_UPDATE, true);
 
         bitParser.position(NetworkConstants.BIT_SIZE_HEADER);
@@ -87,5 +133,14 @@ public class DemoGameServer extends AbstractGameServer<DemoGameLogic> {
         bitParser.putInt(bitSize, NetworkConstants.BIT_SIZE_HEADER);
 
         sendToAll(bitParser.getByteBuffer().array(), 0, bytesToSend, true);
+    }
+
+    private void log(String message) {
+        System.out.println(message);
+    }
+
+    private void log(String message, Throwable e) {
+        System.out.println(message);
+        e.printStackTrace();
     }
 }

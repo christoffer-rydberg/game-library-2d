@@ -5,7 +5,7 @@ import com.gamelibrary2d.objects.AbstractMouseAwareObject;
 
 public abstract class AbstractClientObject extends AbstractMouseAwareObject implements ClientObject {
 
-    private final NetworkFrame frame;
+    private final FrameClient frameClient;
 
     private final int id;
 
@@ -19,8 +19,8 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     private float rotationDelta;
     private float rotationInterpolationAlpha = -1;
 
-    protected AbstractClientObject(NetworkFrame frame, DataBuffer buffer) {
-        this.frame = frame;
+    protected AbstractClientObject(FrameClient frameClient, DataBuffer buffer) {
+        this.frameClient = frameClient;
         id = buffer.getInt();
         getPosition().set(buffer.getFloat(), buffer.getFloat());
     }
@@ -62,7 +62,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
     @Override
     public void update(float deltaTime) {
         onUpdate(deltaTime);
-        float ups = frame.getClient().getServerUpdateRate();
+        float ups = frameClient.getServerUpdatesPerSecond();
         if (ups <= 0) {
             instantMovement();
         } else {

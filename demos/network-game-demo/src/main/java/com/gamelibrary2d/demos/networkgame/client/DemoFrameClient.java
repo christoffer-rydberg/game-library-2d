@@ -6,20 +6,30 @@ import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.AbstractFrameClient;
-import com.gamelibrary2d.network.common.initialization.CommunicationInitializer;
+import com.gamelibrary2d.network.ClientObject;
+import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     private final BitParser bitParser = new BitParser();
+    private final Map<Integer, ClientObject> objects = new HashMap<>();
 
     private DemoFrame frame;
-    private int serverUpdateRate;
+    private float serverUpdateRate;
 
     void initialize(DemoFrame frame) {
         this.frame = frame;
     }
 
     @Override
-    public void configureInitialization(CommunicationInitializer initializer) {
+    public void configureInitialization(CommunicationSteps steps) {
+
+    }
+
+    @Override
+    public void onInitialized() {
 
     }
 
@@ -37,14 +47,15 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
                 onUpdateMessage(buffer);
                 break;
             case ServerMessages.SPAWN_BOULDER:
-                frame.addBoulder(new ClientBoulder(frame, buffer));
+                var boulder = new ClientBoulder(this, buffer);
+                frame.addBoulder(boulder);
+                objects.put(boulder.getId(), boulder);
                 break;
         }
     }
 
-
     private void onUpdateRateMessage(DataBuffer buffer) {
-        serverUpdateRate = buffer.getInt();
+        serverUpdateRate = buffer.getFloat();
     }
 
     private void onGameSettingsMessage(DataBuffer buffer) {
@@ -67,7 +78,7 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
             int id = bitParser.getInt(NetworkConstants.BIT_COUNT_OBJECT_ID);
             int x = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_X);
             int y = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_Y);
-            var obj = frame.getClientObjectById(id);
+            var obj = objects.get(id);
             if (obj != null) {
                 obj.setGoalPosition(x, y);
             }
@@ -81,7 +92,7 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     }
 
     @Override
-    public float getServerUpdateRate() {
+    public float getServerUpdatesPerSecond() {
         return serverUpdateRate;
     }
 
@@ -89,7 +100,7 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     protected void onDisconnected(DemoCommunicator communicator, Throwable cause) {
         frame.invokeLater(() -> onDisconnected(cause));
     }
-    
+
     private void onDisconnected(Throwable cause) {
         System.err.println("Disconnected from server");
         cause.printStackTrace();

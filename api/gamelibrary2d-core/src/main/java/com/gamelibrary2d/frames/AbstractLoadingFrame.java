@@ -30,17 +30,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     }
 
     private void changeFrame(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) {
-        switch (previousFrameDisposal) {
-            case NONE:
-                break;
-            case RESET:
-                previousFrame.reset();
-                break;
-            case DISPOSE:
-                previousFrame.dispose();
-                break;
-        }
-
+        previousFrame.dispose(previousFrameDisposal);
         game.setFrame(frame, FrameDisposal.NONE);
     }
 
