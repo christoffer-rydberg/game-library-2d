@@ -6,13 +6,14 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.AbstractGameLogic;
+import com.gamelibrary2d.network.common.server.Server;
 
 public class DemoGameLogic extends AbstractGameLogic {
-    private final DemoGameServer server;
+    private final Server server;
     private final GameSettings settings;
     private final CollisionDetection<Collidable> collisionDetection;
 
-    public DemoGameLogic(DemoGameServer server) {
+    public DemoGameLogic(Server server) {
         this.server = server;
 
         settings = new GameSettings(
@@ -30,7 +31,7 @@ public class DemoGameLogic extends AbstractGameLogic {
         collisionDetection.add(portal);
     }
 
-    GameSettings getGameSettings() {
+    public GameSettings getGameSettings() {
         return settings;
     }
 
@@ -38,7 +39,7 @@ public class DemoGameLogic extends AbstractGameLogic {
         collisionDetection.update(deltaTime);
     }
 
-    void spawnBoulder(float x, float y) {
+    public void spawnBoulder(float x, float y) {
         var boulder = new ServerBoulder(settings.getGameBounds(), settings.getBoulderBounds());
         boulder.getPosition().set(x, y);
         register(boulder);

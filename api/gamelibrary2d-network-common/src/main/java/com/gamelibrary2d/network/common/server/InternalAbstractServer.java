@@ -1,18 +1,18 @@
 package com.gamelibrary2d.network.common.server;
 
+import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
+import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
+import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationStep;
-import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
-import com.gamelibrary2d.network.common.initialization.ConsumerStep;
-import com.gamelibrary2d.network.common.initialization.ProducerStep;
-import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
-import com.gamelibrary2d.network.common.internal.CommunicatorWrapper.InitializationResult;
+import com.gamelibrary2d.network.common.initialization.*;
+import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
+import com.gamelibrary2d.network.common.internal.CommunicatorInitializer.InitializationResult;
 import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
 
 import java.io.IOException;
@@ -22,39 +22,47 @@ import java.util.Deque;
 import java.util.List;
 
 abstract class InternalAbstractServer implements Server {
-    final List<CommunicatorWrapper> pendingCommunicators;
+    private final Factory<Integer> communicatorIdFactory = RandomInstance.get()::nextInt;
+    private final List<PendingCommunicator> pendingCommunicators;
     private final DataBuffer outgoingBuffer;
     private final DataBuffer incomingBuffer;
     private final List<Communicator> communicators;
-    private final List<Communicator> iteratorList;
     private final DelayedMonitor delayedMonitor = new DelayedMonitor();
-    final CommunicatorDisconnectedListener disconnectedEventListener = this::onDisonnectedEvent;
+    private final CommunicatorDisconnectedListener disconnectedEventListener = this::onDisonnectedEvent;
 
     InternalAbstractServer() {
         incomingBuffer = new DynamicByteBuffer();
         incomingBuffer.flip();
         outgoingBuffer = new DynamicByteBuffer();
-
         communicators = new ArrayList<>();
         pendingCommunicators = new ArrayList<>();
-
-        iteratorList = new ArrayList<>();
     }
 
-    void addCommunicator(CommunicatorWrapper communicator) throws InitializationException {
+    void addCommunicator(Communicator communicator) throws InitializationException {
         if (!communicator.isConnected()) {
             throw new InitializationException("Communicator is not connected");
         }
-        pendingCommunicators.add(communicator);
+
         communicator.addDisconnectedListener(disconnectedEventListener);
-        configureClientInitialization(communicator);
+
+        var steps = new InternalCommunicationSteps();
+        try {
+            steps.add(new IdentityProducer(communicatorIdFactory));
+            steps.add(this::onConnected);
+            communicator.configureAuthentication(steps);
+            steps.add(this::onAuthenticated);
+            configureClientInitialization(steps);
+        } finally {
+            pendingCommunicators.add(new PendingCommunicator(communicator, new CommunicatorInitializer(steps.getAll())));
+        }
     }
 
-    protected void configureClientInitialization(CommunicatorWrapper communicator) {
-        var initializer = new InternalCommunicationSteps();
-        configureClientInitialization(initializer);
-        communicator.addCommunicationSteps(initializer.getAll());
+    private void onAuthenticated(Communicator communicator) {
+        communicator.onAuthenticated();
+        onClientAuthenticated(communicator);
     }
+
+    protected abstract void onClientAuthenticated(Communicator communicator);
 
     /**
      * Marks the specified communicator as pending and invokes {@link #configureClientInitialization}
@@ -66,13 +74,16 @@ abstract class InternalAbstractServer implements Server {
             throw new InitializationException("Communicator has not been initialized");
         }
 
-        var communicatorWrapper = (CommunicatorWrapper) communicator;
-        pendingCommunicators.add(communicatorWrapper);
-        configureClientInitialization(communicatorWrapper);
+        var steps = new InternalCommunicationSteps();
+        try {
+            configureClientInitialization(steps);
+        } finally {
+            pendingCommunicators.add(new PendingCommunicator(communicator, new CommunicatorInitializer(steps.getAll())));
+        }
     }
 
     private void initialized(Communicator communicator) {
-        pendingCommunicators.remove(communicator);
+        removePending(communicator);
         communicators.add(communicator);
         communicator.onAuthenticated();
         onClientInitialized(communicator);
@@ -81,24 +92,38 @@ abstract class InternalAbstractServer implements Server {
     private void onDisonnectedEvent(CommunicatorDisconnected event) {
         var communicator = event.getCommunicator();
         communicator.removeDisconnectedListener(disconnectedEventListener);
-        delayedMonitor.delay(() -> onDisconnected(communicator));
+        invokeLater(() -> onDisconnected(communicator));
+    }
+
+    private PendingCommunicator removePending(Communicator communicator) {
+        for (int i = 0; i < pendingCommunicators.size(); ++i) {
+            var pending = pendingCommunicators.get(i);
+            if (pending.communicator == communicator) {
+                return pendingCommunicators.remove(i);
+            }
+        }
+
+        return null;
     }
 
     private void onDisconnected(Communicator communicator) {
         if (communicators.remove(communicator)) {
+            // Read final messages
             readAndHandleMessages(communicator);
             onDisconnected(communicator, false);
-        } else if (pendingCommunicators.remove(communicator)) {
-            try {
-                runCommunicationSteps((CommunicatorWrapper) communicator);
-            } catch (InitializationException e) {
-                e.printStackTrace();
+        } else {
+            var pending = removePending(communicator);
+            if (pending != null) {
+                onDisconnected(communicator, true);
+            } else {
+                throw new GameLibrary2DRuntimeException(String.format(
+                        "Faulty state! Disconnected communicator '%s' is neither active nor pending. Endpoint: %s.",
+                        communicator.getId(),
+                        communicator.getEndpoint()));
             }
-            onDisconnected(communicator, true);
         }
     }
 
-    @Override
     public void update(float deltaTime) {
         readIncoming();
         initializePending();
@@ -122,26 +147,26 @@ abstract class InternalAbstractServer implements Server {
         // Iterating backwards allows deletion of the current
         // element when connection has been established.
         for (int i = pendingCommunicators.size() - 1; i >= 0; --i) {
-            var communicator = pendingCommunicators.get(i);
+            var pending = pendingCommunicators.get(i);
             try {
-                runCommunicationSteps(communicator);
+                runCommunicationSteps(pending.communicator, pending.initializer);
             } catch (InitializationException e) {
-                communicator.disconnect(e);
+                pending.communicator.disconnect(e);
             }
         }
     }
 
-    void runCommunicationSteps(CommunicatorWrapper communicator) throws InitializationException {
+    private void runCommunicationSteps(Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
         try {
             InitializationResult result;
             do {
-                result = communicator.runCommunicationStep(this::runCommunicationStep);
+                result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
                 if (result == InitializationResult.AWAITING_DATA && communicator.readIncoming(incomingBuffer)) {
-                    result = communicator.runCommunicationStep(this::runCommunicationStep);
+                    result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
                 }
             } while (result == InitializationResult.PENDING);
 
-            if (result == InitializationResult.FINISHED && pendingCommunicators.contains(communicator)) {
+            if (result == InitializationResult.FINISHED) {
                 initialized(communicator);
                 handleMesages(communicator);
             }
@@ -158,15 +183,18 @@ abstract class InternalAbstractServer implements Server {
         if (step instanceof ConsumerStep) {
             while (true) {
                 int remaining = incomingBuffer.remaining();
-                if (remaining <= 0)
+                if (remaining <= 0) {
                     return false;
+                }
 
                 var hasCompleted = ((ConsumerStep) step).run(communicator, incomingBuffer);
-                if (hasCompleted)
+                if (hasCompleted) {
                     return true;
+                }
 
-                if (remaining == incomingBuffer.remaining())
+                if (remaining == incomingBuffer.remaining()) {
                     throw new InitializationException("Unexpected message");
+                }
             }
 
         } else if (step instanceof ProducerStep) {
@@ -178,12 +206,10 @@ abstract class InternalAbstractServer implements Server {
     }
 
     private void readIncoming() {
-        iteratorList.addAll(communicators);
-        for (int i = 0; i < iteratorList.size(); ++i) {
-            var communicator = iteratorList.get(i);
+        for (int i = 0; i < communicators.size(); ++i) {
+            var communicator = communicators.get(i);
             readAndHandleMessages(communicator);
         }
-        iteratorList.clear();
     }
 
     private void readAndHandleMessages(Communicator communicator) {
@@ -218,7 +244,7 @@ abstract class InternalAbstractServer implements Server {
 
     private void sendIndividualMessages() {
         for (int i = 0; i < pendingCommunicators.size(); ++i)
-            sendMessages(pendingCommunicators.get(i));
+            sendMessages(pendingCommunicators.get(i).communicator);
 
         for (int i = 0; i < communicators.size(); ++i)
             sendMessages(communicators.get(i));
@@ -347,6 +373,8 @@ abstract class InternalAbstractServer implements Server {
         message.serializeMessage(communicator.getOutgoing());
     }
 
+    protected abstract void onConnected(Communicator communicator);
+
     protected abstract void configureClientInitialization(CommunicationSteps steps);
 
     protected abstract void onClientInitialized(Communicator communicator);
@@ -366,6 +394,16 @@ abstract class InternalAbstractServer implements Server {
 
         synchronized void delay(Runnable runnable) {
             delayed.addLast(runnable);
+        }
+    }
+
+    private static class PendingCommunicator {
+        final Communicator communicator;
+        final CommunicatorInitializer initializer;
+
+        PendingCommunicator(Communicator communicator, CommunicatorInitializer initializer) {
+            this.communicator = communicator;
+            this.initializer = initializer;
         }
     }
 }

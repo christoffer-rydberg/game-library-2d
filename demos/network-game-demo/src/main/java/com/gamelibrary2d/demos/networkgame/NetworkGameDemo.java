@@ -50,7 +50,7 @@ public class NetworkGameDemo {
 
     private static Thread startServerThread() {
         var thread = new Thread(() -> {
-            var server = new DemoGameServer(4444, 4445);
+            var server = new DemoGameServer(4444);
             try {
                 server.listenForConnections(true);
                 server.start(); // Blocking

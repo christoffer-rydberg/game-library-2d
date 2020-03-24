@@ -88,15 +88,6 @@ public interface Communicator {
      */
     boolean isAuthenticated();
 
-    /**
-     * Internal classes are used to wrap communicators. This is an implementation
-     * detail that will become evident if you try to do type checking and casting.
-     * Use this method to unwrap the internal communicator and allow type checking.
-     *
-     * @return The unwrapped communicator instance.
-     */
-    Communicator unwrap();
-
     void configureAuthentication(CommunicationSteps steps);
 
     /**

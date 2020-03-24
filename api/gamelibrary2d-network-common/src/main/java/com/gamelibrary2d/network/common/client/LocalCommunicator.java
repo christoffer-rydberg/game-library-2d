@@ -6,7 +6,6 @@ import com.gamelibrary2d.network.common.AbstractCommunicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.LocalServer;
-import com.gamelibrary2d.network.common.server.Server;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -23,20 +22,22 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
     public LocalCommunicator(LocalServer localServer) {
         super(1, false);
         this.localServer = localServer;
-        serverSideCommunicator = new LocalCommunicator(this);
+        serverSideCommunicator = new LocalCommunicator(this, localServer);
     }
 
-    private LocalCommunicator(LocalCommunicator host) {
+    private LocalCommunicator(LocalCommunicator host, LocalServer server) {
         super(1, true);
         localServer = null;
         this.serverSideCommunicator = host;
+        this.configureAuthentication = server::configureClientAuthentication;
     }
 
     @Override
     public Future<Void> connect() {
         if (setConnected()) {
             try {
-                localServer.addCommunicator(serverSideCommunicator);
+                localServer.initialize();
+                localServer.connectCommunicator(serverSideCommunicator);
             } catch (InitializationException e) {
                 return CompletableFuture.failedFuture(e);
             }
@@ -78,7 +79,7 @@ public class LocalCommunicator extends AbstractCommunicator implements Connectab
         }
     }
 
-    public Server getLocalServer() {
+    public LocalServer getLocalServer() {
         return localServer;
     }
 }

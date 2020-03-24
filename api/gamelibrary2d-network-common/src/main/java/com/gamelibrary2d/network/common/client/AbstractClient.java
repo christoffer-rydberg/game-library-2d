@@ -3,15 +3,13 @@ package com.gamelibrary2d.network.common.client;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.TcpConnector;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
-import com.gamelibrary2d.network.common.internal.CommunicatorWrapper;
+import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public abstract class AbstractClient {
@@ -67,12 +65,10 @@ public abstract class AbstractClient {
         if (initialized) {
             throw new InitializationException("Client has already been initialized");
         }
-        var initializer = new InternalCommunicationSteps();
-        var communicatorWrapper = new CommunicatorWrapper(getCommunicator());
-        configureInitialization(initializer);
-        communicatorWrapper.clearCommunicationSteps();
-        communicatorWrapper.addCommunicationSteps(initializer.getAll());
-        runCommunicationSteps(communicatorWrapper);
+        var communicator = getCommunicator();
+        var steps = new InternalCommunicationSteps();
+        configureInitialization(steps);
+        runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
         initialized = true;
         onInitialized();
     }
@@ -134,14 +130,14 @@ public abstract class AbstractClient {
         return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
-    private void runCommunicationSteps(CommunicatorWrapper communicator) throws InitializationException {
-        CommunicatorWrapper.InitializationResult result;
+    private void runCommunicationSteps(Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
+        CommunicatorInitializer.InitializationResult result;
 
         int retries = 0;
         do {
 
-            result = communicator.runCommunicationStep(this::runCommunicationStep);
-            if (result == CommunicatorWrapper.InitializationResult.AWAITING_DATA) {
+            result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
+            if (result == CommunicatorInitializer.InitializationResult.AWAITING_DATA) {
 
                 if (retries == getInitializationRetries()) {
                     throw new InitializationException("Reading server response timed out");
@@ -171,7 +167,7 @@ public abstract class AbstractClient {
                 retries = 0;
             }
 
-        } while (result != CommunicatorWrapper.InitializationResult.FINISHED);
+        } while (result != CommunicatorInitializer.InitializationResult.FINISHED);
 
         try {
             communicator.sendOutgoing();
@@ -205,9 +201,9 @@ public abstract class AbstractClient {
      *
      * @return True the server is local, false otherwise.
      */
-    private boolean triggerLocalServerUpdate(CommunicatorWrapper communicator) {
-        if (communicator.unwrap() instanceof LocalCommunicator) {
-            ((LocalCommunicator) communicator.unwrap()).getLocalServer().update(0);
+    private boolean triggerLocalServerUpdate(Communicator communicator) {
+        if (communicator instanceof LocalCommunicator) {
+            ((LocalCommunicator) communicator).getLocalServer().update(0);
             return true;
         }
 
@@ -232,11 +228,8 @@ public abstract class AbstractClient {
         var communicator = getCommunicator();
         if (!communicator.isAuthenticated()) {
             var steps = new InternalCommunicationSteps();
-            var communicatorWrapper = new CommunicatorWrapper(communicator);
-            configureAuthentication(communicatorWrapper, steps);
-            communicatorWrapper.clearCommunicationSteps();
-            communicatorWrapper.addCommunicationSteps(steps.getAll());
-            runCommunicationSteps(communicatorWrapper);
+            configureAuthentication(communicator, steps);
+            runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
         }
     }
 
@@ -244,47 +237,14 @@ public abstract class AbstractClient {
         onConfigureInitialization(steps);
     }
 
-    private void configureAuthentication(CommunicatorWrapper communicator, CommunicationSteps steps) {
-        steps.add(x -> initializeConnection(x, false));
+    private void configureAuthentication(Communicator communicator, CommunicationSteps steps) {
         steps.add(new IdentityConsumer());
         communicator.configureAuthentication(steps);
         steps.add(this::onAuthenticated);
     }
 
-    private void initializeConnection(Communicator communicator, boolean isReconnect) {
-        communicator.getOutgoing().putBool(isReconnect);
-    }
-
-    private boolean onAuthenticated(Communicator communicator, DataBuffer inbox) throws InitializationException {
-        var reconnect = inbox.getBool();
-
-        if (reconnect) {
-            int port = inbox.getInt();
-            var wrappedCommunicator = communicator.unwrap();
-            if (wrappedCommunicator instanceof TcpConnector) {
-                var tcpConnector = (TcpConnector) wrappedCommunicator;
-                tcpConnector.setTcpConnectionSettings(
-                        new TcpConnectionSettings(wrappedCommunicator.getEndpoint(), port, false));
-            }
-        }
-
+    private void onAuthenticated(Communicator communicator) {
         communicator.onAuthenticated();
-
-        if (reconnect) {
-            var wrappedCommunicator = communicator.unwrap();
-            if (wrappedCommunicator instanceof Reconnectable) {
-                try {
-                    ((Reconnectable) wrappedCommunicator).reconnect().get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new InitializationException(e);
-                }
-            }
-            initializeConnection(communicator, true);
-            var identityProducer = new IdentityProducer(communicator::getId);
-            identityProducer.run(communicator);
-        }
-
-        return true;
     }
 
     protected abstract void onInitialized();

@@ -24,8 +24,8 @@ public class DemoGameServer extends AbstractNetworkServer {
     private DemoGameLogic gameLogic;
     private int streamCounter;
 
-    public DemoGameServer(int connectionPort, int reconnectionPort) {
-        super(connectionPort, reconnectionPort);
+    public DemoGameServer(int port) {
+        super(port);
         this.gameLogic = new DemoGameLogic(this);
     }
 
@@ -72,7 +72,7 @@ public class DemoGameServer extends AbstractNetworkServer {
     }
 
     @Override
-    protected void onConnectionLost(Communicator communicator, boolean pending) {
+    protected void onDisconnected(Communicator communicator, boolean pending) {
         log(String.format("Connection lost: %s", communicator.getEndpoint()));
     }
 
@@ -119,8 +119,8 @@ public class DemoGameServer extends AbstractNetworkServer {
         var balls = gameLogic.getRegisteredObjects();
         for (var object : balls) {
             bitParser.putInt(object.getId(), NetworkConstants.BIT_COUNT_OBJECT_ID);
-            bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.BIT_COUNT_POS_X);
-            bitParser.putInt(Math.round(object.getPosition().getY()), NetworkConstants.BIT_COUNT_POS_Y);
+            bitParser.putInt((int) (object.getPosition().getX() * 10), NetworkConstants.BIT_COUNT_POS_X);
+            bitParser.putInt((int) (object.getPosition().getY() * 10), NetworkConstants.BIT_COUNT_POS_Y);
         }
 
         int bitPosition = (int) bitParser.position();

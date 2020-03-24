@@ -28,11 +28,14 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     protected boolean setConnected() {
-        if (connected)
+        if (connected) {
             return false;
+        }
+
         connected = true;
-        for (int i = 0; i < incomingBufferMonitor.length; ++i)
+        for (int i = 0; i < incomingBufferMonitor.length; ++i) {
             incomingBufferMonitor[i].incomingBuffer.clear();
+        }
         return true;
     }
 
@@ -69,11 +72,6 @@ public abstract class AbstractCommunicator implements Communicator {
     @Override
     public void removeDisconnectedListener(CommunicatorDisconnectedListener listener) {
         disconnectedPublisher.removeListener(listener);
-    }
-
-    @Override
-    public Communicator unwrap() {
-        return this;
     }
 
     @Override
@@ -157,7 +155,6 @@ public abstract class AbstractCommunicator implements Communicator {
         }
 
         private void writeIncomingToBuffer(DataBuffer buffer) {
-
             incomingBuffer.flip();
 
             int remainingBytes = incomingBuffer.remaining();

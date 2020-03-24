@@ -76,8 +76,8 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
 
         while (bitParser.position() < endOfUpdate) {
             int id = bitParser.getInt(NetworkConstants.BIT_COUNT_OBJECT_ID);
-            int x = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_X);
-            int y = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_Y);
+            float x = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_X) / 10f;
+            float y = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_Y) / 10f;
             var obj = objects.get(id);
             if (obj != null) {
                 obj.setGoalPosition(x, y);

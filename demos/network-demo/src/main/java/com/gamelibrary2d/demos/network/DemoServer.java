@@ -59,7 +59,7 @@ public class DemoServer extends AbstractNetworkServer {
     }
 
     @Override
-    protected void onConnectionLost(Communicator communicator, boolean pending) {
+    protected void onDisconnected(Communicator communicator, boolean pending) {
         log(String.format("Connection lost: %s", communicator.getEndpoint()));
     }
 

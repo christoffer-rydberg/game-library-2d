@@ -127,11 +127,6 @@ class MatrixBuffer {
     }
 
     void translate(float x, float y, float z) {
-        // Coordinates are rounded to even integers to avoid rendering artifacts due to fractioned pixels.
-        // TODO: Is there a better way to fix this?
-        x = Math.round(x);
-        y = Math.round(y);
-        z = Math.round(z);
         current[12] = current[0] * x + current[4] * y + current[8] * z + current[12];
         current[13] = current[1] * x + current[5] * y + current[9] * z + current[13];
         current[14] = current[2] * x + current[6] * y + current[10] * z + current[14];

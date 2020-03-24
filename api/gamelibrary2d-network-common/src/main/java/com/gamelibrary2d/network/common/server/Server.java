@@ -5,8 +5,6 @@ import com.gamelibrary2d.network.common.Message;
 
 public interface Server {
 
-    void update(float deltaTime);
-
     void send(Communicator communicator, int message);
 
     void send(Communicator communicator, float message);

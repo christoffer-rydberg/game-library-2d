@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public abstract class AbstractClientSideCommunicator extends AbstractNetworkCommunicator
-        implements TcpConnector, UdpReceiver, Connectable, Reconnectable {
+        implements TcpConnector, UdpReceiver, Connectable {
 
     private final boolean ownsCommunicationServer;
 
@@ -150,15 +150,6 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
     protected void disconnectTcp() {
         super.disconnectTcp();
         connectedTcpSettings = null;
-    }
-
-    @Override
-    public Future<Void> reconnect() {
-        if (!connectedTcpSettings.equals(tcpSettings)) {
-            disconnectTcp();
-            return connectTcp();
-        }
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override

@@ -19,10 +19,10 @@ public class UdpTransmitterInitialization implements ConsumerStep {
         int udpPort = inbox.getInt();
         if (udpPort <= 0)
             throw new InitializationException(String.format("Invalid udp port: %s", udpPort));
-        var wrapped = communicator.unwrap();
-        if (wrapped instanceof UdpTransmitter) {
+
+        if (communicator instanceof UdpTransmitter) {
             try {
-                ((UdpTransmitter) wrapped).connectUdpTransmitter(udpPort);
+                ((UdpTransmitter) communicator).connectUdpTransmitter(udpPort);
             } catch (IOException e) {
                 throw new InitializationException(String.format("Failed to connect UDP transmitter to host %s:%s",
                         communicator.getEndpoint(), udpPort), e);
