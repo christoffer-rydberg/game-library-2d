@@ -2,13 +2,13 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.renderers.BitmapRenderer;
 
 public class Bitmap<T extends Renderable> implements Renderable, Bounded {
-    private final ResourceDisposer disposer;
+    private final DefaultDisposer disposer;
     private final T content;
     private boolean caching;
     private boolean cached;
@@ -18,7 +18,7 @@ public class Bitmap<T extends Renderable> implements Renderable, Bounded {
     public Bitmap(T content, Rectangle bounds, Disposer disposer) {
         this.content = content;
         this.bounds = bounds;
-        this.disposer = new ResourceDisposer(disposer);
+        this.disposer = new DefaultDisposer(disposer);
     }
 
     @Override

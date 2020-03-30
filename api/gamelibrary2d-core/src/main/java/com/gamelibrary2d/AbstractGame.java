@@ -366,12 +366,10 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     }
 
     private void update(Frame frame, float deltaTime) {
-        if (frame == null || !frame.isLoaded()) {
-            return;
+        if (frame != null) {
+            frame.update(frameNotUpdated ? 0 : deltaTime);
+            frameNotUpdated = false;
         }
-
-        frame.update(frameNotUpdated ? 0 : deltaTime);
-        frameNotUpdated = false;
     }
 
     @Override

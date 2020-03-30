@@ -3,7 +3,13 @@ package com.gamelibrary2d.network.common.server;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
 
+import java.io.IOException;
+
 public interface Server {
+
+    void update(float deltaTime);
+
+    void stop() throws IOException;
 
     void send(Communicator communicator, int message);
 

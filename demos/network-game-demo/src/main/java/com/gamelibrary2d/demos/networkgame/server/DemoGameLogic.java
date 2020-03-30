@@ -5,19 +5,17 @@ import com.gamelibrary2d.collision.CollisionDetection;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
-import com.gamelibrary2d.network.AbstractGameLogic;
-import com.gamelibrary2d.network.common.server.Server;
 
-public class DemoGameLogic extends AbstractGameLogic {
-    private final Server server;
+public class DemoGameLogic {
+    private final DemoGameServer server;
     private final GameSettings settings;
     private final CollisionDetection<Collidable> collisionDetection;
 
-    public DemoGameLogic(Server server) {
+    public DemoGameLogic(DemoGameServer server) {
         this.server = server;
 
         settings = new GameSettings(
-                new Rectangle(0, 0, 1600, 1200),
+                new Rectangle(0, 0, 1024, 1024),
                 Rectangle.centered(32f, 32f));
 
         var center = settings.getGameBounds().center();
@@ -42,9 +40,7 @@ public class DemoGameLogic extends AbstractGameLogic {
     public void spawnBoulder(float x, float y) {
         var boulder = new ServerBoulder(settings.getGameBounds(), settings.getBoulderBounds());
         boulder.getPosition().set(x, y);
-        register(boulder);
         collisionDetection.add(boulder);
-        server.sendToAll(ServerMessages.SPAWN_BOULDER, false);
-        server.sendToAll(boulder, false);
+        server.createObject(ServerMessages.SPAWN_BOULDER, boulder);
     }
 }

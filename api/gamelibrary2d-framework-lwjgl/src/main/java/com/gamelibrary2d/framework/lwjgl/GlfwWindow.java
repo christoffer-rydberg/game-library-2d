@@ -1,5 +1,6 @@
 package com.gamelibrary2d.framework.lwjgl;
 
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.CallbackHandler;
 import com.gamelibrary2d.framework.MouseCursorMode;
@@ -27,6 +28,8 @@ public class GlfwWindow implements Window {
 
     private final int height;
 
+    private final Rectangle bounds;
+
     private final boolean fullScreen;
 
     private final List<WindowHint> additionalWindowHints = new ArrayList<>();
@@ -51,6 +54,7 @@ public class GlfwWindow implements Window {
         this.title = title;
         this.width = width;
         this.height = height;
+        this.bounds = new Rectangle(0, 0, width, height);
         this.fullScreen = fullScreen;
     }
 

@@ -16,7 +16,6 @@ public class GameSettings implements Message {
     public GameSettings(DataBuffer buffer) {
         gameBounds = MessageParser.readRectangle(buffer);
         boulderBounds = MessageParser.readRectangle(buffer);
-        ;
     }
 
     public Rectangle getGameBounds() {

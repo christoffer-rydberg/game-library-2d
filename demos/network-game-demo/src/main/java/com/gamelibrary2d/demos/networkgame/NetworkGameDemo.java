@@ -1,11 +1,8 @@
 package com.gamelibrary2d.demos.networkgame;
 
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
-import com.gamelibrary2d.demos.networkgame.server.DemoGameServer;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
-
-import java.io.IOException;
 
 public class NetworkGameDemo {
     private static final String title = "Network Game";
@@ -48,30 +45,7 @@ public class NetworkGameDemo {
         }
     }
 
-    private static Thread startServerThread() {
-        var thread = new Thread(() -> {
-            var server = new DemoGameServer(4444);
-            try {
-                server.listenForConnections(true);
-                server.start(); // Blocking
-            } catch (IOException e) {
-                System.out.println("Failed to start connection server");
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        });
-        thread.start();
-        return thread;
-    }
-
     public static void main(String[] args) {
-        var serverThread = startServerThread();
         new DemoGame().start(createWindow(args));
-        try {
-            serverThread.interrupt();
-            serverThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

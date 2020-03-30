@@ -29,7 +29,7 @@ public class NetworkDemo {
 
     private static Thread startClientThread() {
         var thread = new Thread(() -> {
-            var communicator = new DefaultClientSideCommunicator(new TcpConnectionSettings("localhost", 4444, true));
+            var communicator = new DefaultClientSideCommunicator(new TcpConnectionSettings("localhost", 4444));
             var client = new DemoClient(communicator);
 
             try {

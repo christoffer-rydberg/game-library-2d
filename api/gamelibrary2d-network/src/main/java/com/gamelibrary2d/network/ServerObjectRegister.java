@@ -4,18 +4,18 @@ import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 
 import java.util.*;
 
-public abstract class AbstractGameLogic {
+public class ServerObjectRegister {
     private final List<ServerPlayer> players;
     private final List<ServerPlayer> playersReadOnly;
     private final ObjectRegister objectRegister;
 
-    protected AbstractGameLogic() {
+    public ServerObjectRegister() {
         players = new ArrayList<>();
         playersReadOnly = Collections.unmodifiableList(players);
         objectRegister = new ObjectRegister();
     }
 
-    protected void register(ServerObject obj) {
+    public void register(ServerObject obj) {
         if (obj instanceof ServerPlayer) {
             registerPlayer((ServerPlayer) obj);
         } else {
@@ -37,7 +37,7 @@ public abstract class AbstractGameLogic {
         obj.onRegistered(id);
     }
 
-    protected void unregister(ServerObject obj) {
+    public void unregister(ServerObject obj) {
         if (obj instanceof ServerPlayer) {
             unregisterPlayer((ServerPlayer) obj);
         } else {
@@ -55,7 +55,7 @@ public abstract class AbstractGameLogic {
         obj.onDeregister();
     }
 
-    protected boolean isRegistered(ServerObject obj) {
+    public boolean isRegistered(ServerObject obj) {
         return objectRegister.get(obj.getId()) == obj;
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractGameLogic {
         return playersReadOnly;
     }
 
-    protected void getRegisteredPlayers(int communicatorId, List<ServerPlayer> output) {
+    public void getRegisteredPlayers(int communicatorId, List<ServerPlayer> output) {
         int count = players.size();
         for (int i = 0; i < count; ++i) {
             ServerPlayer player = players.get(i);
@@ -77,11 +77,11 @@ public abstract class AbstractGameLogic {
         return objectRegister.getValues();
     }
 
-    protected ServerObject getRegisteredObject(int id) {
+    public ServerObject getRegisteredObject(int id) {
         return objectRegister.get(id);
     }
 
-    protected void clearRegisteredObjects() {
+    public void clearRegisteredObjects() {
         players.clear();
         objectRegister.clear();
     }

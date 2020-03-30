@@ -65,7 +65,7 @@ public abstract class AbstractNetworkFrame<TFrameClient extends FrameClient>
 
     @Override
     protected void onUpdate(float deltaTime) {
-        networkClient.update();
+        networkClient.update(deltaTime);
         super.onUpdate(deltaTime);
         var communicator = networkClient.getCommunicator();
         try {
@@ -114,6 +114,11 @@ public abstract class AbstractNetworkFrame<TFrameClient extends FrameClient>
         @Override
         protected void onInitialized() {
             frameClient.onInitialized();
+        }
+
+        @Override
+        protected boolean isUpdatingLocalServer() {
+            return frameClient.isUpdatingLocalServer();
         }
     }
 }

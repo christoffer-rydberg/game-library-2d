@@ -1,9 +1,14 @@
 package com.gamelibrary2d.resources;
 
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.AbstractDisposable;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
+import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.glUtil.FrameBuffer;
+import com.gamelibrary2d.glUtil.ModelMatrix;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,6 +17,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+
+import static com.gamelibrary2d.framework.OpenGL.*;
 
 public class Texture extends AbstractDisposable {
 
@@ -39,6 +46,30 @@ public class Texture extends AbstractDisposable {
         Texture texture = new Texture();
         texture.loadTexture(createFlipped(image));
         disposer.registerDisposal(texture);
+        return texture;
+    }
+
+    public static Texture create(Renderable r, float alpha, Rectangle area, Disposer disposer) {
+        var tempResourceDisposer = new DefaultDisposer();
+
+        var texture = Texture.create((int) area.width(), (int) area.height(), disposer);
+        var frameBuffer = FrameBuffer.create(texture, tempResourceDisposer);
+
+        frameBuffer.bind();
+
+        // Fix for incorrect alpha blending. See:
+        // https://community.khronos.org/t/alpha-blending-issues-when-drawing-frame-buffer-into-default-buffer/73958/3
+        OpenGL.instance().glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+        ModelMatrix.instance().pushMatrix();
+        ModelMatrix.instance().clearMatrix();
+        ModelMatrix.instance().translatef(-area.xMin(), -area.yMin(), 0);
+        r.render(alpha);
+        ModelMatrix.instance().popMatrix();
+        frameBuffer.unbind(true);
+
+        tempResourceDisposer.dispose();
+
         return texture;
     }
 

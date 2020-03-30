@@ -67,6 +67,7 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
         }
     }
 
+    @Override
     public void stop() throws IOException {
         listenForConnections(false);
         if (ownsCommunicationServer) {

@@ -26,6 +26,10 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
         }
     }
 
+    public void goBack() {
+        goBack(1);
+    }
+
     public void goBack(int steps) {
         GameObject previous = null;
 

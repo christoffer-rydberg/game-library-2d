@@ -4,7 +4,7 @@ import com.gamelibrary2d.animation.Animation;
 import com.gamelibrary2d.animation.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
@@ -143,14 +143,14 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     }
 
     private static class BackgroundBuffer {
-        private final ResourceDisposer resourceDisposer;
+        private final DefaultDisposer resourceDisposer;
         private FrameBuffer frameBuffer;
         private Renderer frameBufferRenderer;
         private Quad[] backgroundQuads;
         private int previousFrame;
 
         BackgroundBuffer(Disposer disposer) {
-            resourceDisposer = new ResourceDisposer(disposer);
+            resourceDisposer = new DefaultDisposer(disposer);
         }
 
         private static Quad[] createBackgroundQuads(Animation animation, Disposer disposer) {

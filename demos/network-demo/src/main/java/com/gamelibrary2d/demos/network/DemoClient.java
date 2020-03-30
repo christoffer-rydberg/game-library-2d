@@ -15,7 +15,7 @@ public class DemoClient extends AbstractClient {
 
     DemoClient(Communicator communicator) {
         this.communicator = communicator;
-        updateLoop = new UpdateLoop(dt -> update(), 10);
+        updateLoop = new UpdateLoop(this::update, 10);
         communicator.addDisconnectedListener(this::onDisconnected);
     }
 

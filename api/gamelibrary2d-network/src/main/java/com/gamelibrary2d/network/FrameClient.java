@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
-public interface FrameClient<T extends Communicator> {
+public interface FrameClient {
 
     void configureInitialization(CommunicationSteps steps);
 
@@ -12,9 +12,9 @@ public interface FrameClient<T extends Communicator> {
 
     void onMessage(DataBuffer buffer);
 
-    T getCommunicator();
+    Communicator getCommunicator();
 
-    void setCommunicator(T communicator);
+    void setCommunicator(Communicator communicator);
 
     float getServerUpdatesPerSecond();
 
@@ -28,4 +28,7 @@ public interface FrameClient<T extends Communicator> {
      */
     int getInitializationRetryDelay();
 
+    boolean isUpdatingLocalServer();
+
+    void setUpdateLocalServer(boolean updateLocalServer);
 }

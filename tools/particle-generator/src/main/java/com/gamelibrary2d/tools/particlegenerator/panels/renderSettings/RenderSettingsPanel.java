@@ -3,7 +3,7 @@ package com.gamelibrary2d.tools.particlegenerator.panels.renderSettings;
 import com.gamelibrary2d.animation.AnimationFactory;
 import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.glUtil.ShaderProgram;
@@ -56,8 +56,8 @@ public class RenderSettingsPanel extends StackPanel {
     private final Panel<GameObject> useTexturePanel;
     private final Panel<GameObject> useOriginalImageSize;
     private final Panel<GameObject> loopAnimationPanel;
-    private final ResourceDisposer quadDisposer;
-    private final ResourceDisposer rendererDisposer;
+    private final DefaultDisposer quadDisposer;
+    private final DefaultDisposer rendererDisposer;
     private URL textureURL;
     private Renderer texturedRenderer;
     private Surface quad;
@@ -77,9 +77,9 @@ public class RenderSettingsPanel extends StackPanel {
 
         this.particleSystem = particleSystem;
 
-        rendererDisposer = new ResourceDisposer(frame);
+        rendererDisposer = new DefaultDisposer(frame);
 
-        quadDisposer = new ResourceDisposer(frame);
+        quadDisposer = new DefaultDisposer(frame);
 
         fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/texture_path.txt");
 
@@ -208,7 +208,7 @@ public class RenderSettingsPanel extends StackPanel {
 
     private void updateQuad() {
 
-        int prevouslyRegistered = quadDisposer.getResourceCount();
+        int prevouslyRegistered = quadDisposer.size();
 
         quad = Quad.create(Rectangle.centered(width, height), quadDisposer);
 
@@ -426,7 +426,7 @@ public class RenderSettingsPanel extends StackPanel {
 
             textureURL = url;
 
-            int prevouslyRegistered = rendererDisposer.getResourceCount();
+            int prevouslyRegistered = rendererDisposer.size();
 
             // TODO: When should renderer be set? Should this always be true??
             boolean setRenderer = true;// particleSystem.getEmitter().getIndividualRenderer() == texturedRenderer;

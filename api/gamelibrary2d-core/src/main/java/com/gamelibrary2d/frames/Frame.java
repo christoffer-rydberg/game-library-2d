@@ -10,8 +10,7 @@ import com.gamelibrary2d.updaters.Updater;
 public interface Frame extends Layer<Renderable>, Disposer {
 
     /**
-     * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.
-     * Thread-safe and OpenGL-unrelated initialization is performed by the {@link #load} method.
+     * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.method.
      */
     void initialize();
 

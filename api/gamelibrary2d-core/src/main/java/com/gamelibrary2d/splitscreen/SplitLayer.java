@@ -2,7 +2,7 @@ package com.gamelibrary2d.splitscreen;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.objects.AbstractObjectWrapper;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.objects.GameObject;
@@ -15,7 +15,7 @@ public class SplitLayer<T extends GameObject> extends AbstractObjectWrapper<T> i
     public SplitLayer(SplitLayout layout, Rectangle renderArea, Disposer disposer) {
         this.layout = layout;
         this.renderArea = renderArea;
-        this.layoutDisposer = new ResourceDisposer(disposer);
+        this.layoutDisposer = new DefaultDisposer(disposer);
     }
 
     public T getTarget() {

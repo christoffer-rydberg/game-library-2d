@@ -1,85 +1,9 @@
 package com.gamelibrary2d.network.common.client;
 
-import com.gamelibrary2d.common.functional.ParameterizedAction;
-import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.network.common.AbstractCommunicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.server.LocalServer;
 
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+public interface LocalCommunicator extends Communicator {
 
-public class LocalCommunicator extends AbstractCommunicator implements Connectable {
-
-    private final LocalServer localServer;
-
-    private final LocalCommunicator serverSideCommunicator;
-
-    private ParameterizedAction<CommunicationSteps> configureAuthentication;
-
-    public LocalCommunicator(LocalServer localServer) {
-        super(1, false);
-        this.localServer = localServer;
-        serverSideCommunicator = new LocalCommunicator(this, localServer);
-    }
-
-    private LocalCommunicator(LocalCommunicator host, LocalServer server) {
-        super(1, true);
-        localServer = null;
-        this.serverSideCommunicator = host;
-        this.configureAuthentication = server::configureClientAuthentication;
-    }
-
-    @Override
-    public Future<Void> connect() {
-        if (setConnected()) {
-            try {
-                localServer.initialize();
-                localServer.connectCommunicator(serverSideCommunicator);
-            } catch (InitializationException e) {
-                return CompletableFuture.failedFuture(e);
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public String getEndpoint() {
-        return "localhost";
-    }
-
-    public void onConfigureAuthentication(ParameterizedAction<CommunicationSteps> action) {
-        this.configureAuthentication = action;
-    }
-
-    @Override
-    public void configureAuthentication(CommunicationSteps steps) {
-        if (configureAuthentication != null) {
-            configureAuthentication.invoke(steps);
-        }
-    }
-
-    @Override
-    protected void send(DataBuffer buffer) throws IOException {
-        serverSideCommunicator.addIncoming(buffer1 -> {
-            int size = buffer.remaining();
-            buffer1.putBool(false);
-            buffer1.putInt(size);
-            buffer1.put(buffer);
-        }, 0);
-    }
-
-    @Override
-    protected void onDisconnected(Throwable cause) {
-        if (localServer != null) {
-            serverSideCommunicator.disconnect();
-            localServer.update(0);
-        }
-    }
-
-    public LocalServer getLocalServer() {
-        return localServer;
-    }
+    LocalServer getLocalServer();
 }

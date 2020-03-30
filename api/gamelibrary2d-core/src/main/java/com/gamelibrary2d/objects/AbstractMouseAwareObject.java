@@ -2,7 +2,7 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.renderers.BitmapRenderer;
@@ -12,7 +12,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     private final MouseButtonStates mouseButtonStates = new MouseButtonStates(5);
     private Rectangle bounds;
     private BitmapRenderer bitmapRenderer;
-    private ResourceDisposer disposer;
+    private DefaultDisposer disposer;
 
     protected AbstractMouseAwareObject() {
 
@@ -49,7 +49,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     public void enablePixelDetection(Disposer disposer) {
         if (this.disposer == null || this.disposer.getParentDisposer() != disposer) {
             disablePixelDetection();
-            this.disposer = new ResourceDisposer(disposer);
+            this.disposer = new DefaultDisposer(disposer);
         }
     }
 

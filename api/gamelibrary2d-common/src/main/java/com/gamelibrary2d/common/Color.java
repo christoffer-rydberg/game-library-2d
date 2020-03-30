@@ -35,6 +35,30 @@ public class Color {
         this.a = a;
     }
 
+    public Color add(Color c) {
+        return new Color(r + c.r, g + c.g, b + c.b, a + c.a);
+    }
+
+    public Color subtract(Color c) {
+        return new Color(r - c.r, g - c.g, b - c.b, a - c.a);
+    }
+
+    public Color multiply(Color c) {
+        return new Color(r * c.r, g * c.g, b * c.b, a * c.a);
+    }
+
+    public Color multiply(float factor) {
+        return new Color(r * factor, g * factor, b * factor, a * factor);
+    }
+
+    public Color divide(Color c) {
+        return new Color(r / c.r, g / c.g, b / c.b, a / c.a);
+    }
+
+    public Color divide(float divisor) {
+        return new Color(r / divisor, g / divisor, b / divisor, a / divisor);
+    }
+
     public float getR() {
         return r;
     }

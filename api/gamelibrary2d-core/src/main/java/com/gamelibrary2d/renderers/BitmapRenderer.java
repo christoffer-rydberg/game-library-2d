@@ -27,9 +27,10 @@ public class BitmapRenderer {
     private final FrameBuffer frameBuffer;
     private final SurfaceRenderer frameBufferRenderer;
     private final ByteBuffer pixelReadBuffer = ByteBuffer.allocateDirect(4);
+    private final Texture texture;
 
     private BitmapRenderer(Rectangle area, Disposer disposer) {
-        var texture = Texture.create((int) area.width(), (int) area.height(), disposer);
+        this.texture = Texture.create((int) area.width(), (int) area.height(), disposer);
         this.area = area;
         this.frameBuffer = FrameBuffer.create(texture, disposer);
         this.frameBufferRenderer = new SurfaceRenderer(Quad.create(area, disposer), frameBuffer.getTexture());
@@ -43,6 +44,10 @@ public class BitmapRenderer {
      */
     public static BitmapRenderer create(Rectangle area, Disposer disposer) {
         return new BitmapRenderer(area, disposer);
+    }
+
+    public Texture getTexture() {
+        return texture;
     }
 
     /**

@@ -1,18 +1,20 @@
-package com.gamelibrary2d.demos.networkgame.client;
+package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.demos.networkgame.client.objects.ClientBoulder;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.AbstractFrameClient;
 import com.gamelibrary2d.network.ClientObject;
+import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
+public class DemoFrameClient extends AbstractFrameClient {
     private final BitParser bitParser = new BitParser();
     private final Map<Integer, ClientObject> objects = new HashMap<>();
 
@@ -65,7 +67,7 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     private void onUpdateMessage(DataBuffer buffer) {
         bitParser.setByteBuffer(buffer.internalByteBuffer());
 
-        final int headerSize = NetworkConstants.BIT_SIZE_HEADER;
+        final int headerSize = NetworkConstants.HEADER_BIT_SIZE;
         final int bitSize = bitParser.getInt(headerSize);
         final int totalBitSize = headerSize + bitSize;
         final long endOfUpdate = bitParser.position() + bitSize;
@@ -75,9 +77,9 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
         byteSize = positionInByte == 0 ? byteSize : byteSize + 1;
 
         while (bitParser.position() < endOfUpdate) {
-            int id = bitParser.getInt(NetworkConstants.BIT_COUNT_OBJECT_ID);
-            float x = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_X) / 10f;
-            float y = bitParser.getInt(NetworkConstants.BIT_COUNT_POS_Y) / 10f;
+            int id = bitParser.getInt(NetworkConstants.OBJECT_ID_BIT_SIZE);
+            float x = bitParser.getInt(NetworkConstants.POS_X_BIT_SIZE);
+            float y = bitParser.getInt(NetworkConstants.POS_Y_BIT_SIZE);
             var obj = objects.get(id);
             if (obj != null) {
                 obj.setGoalPosition(x, y);
@@ -97,7 +99,7 @@ public class DemoFrameClient extends AbstractFrameClient<DemoCommunicator> {
     }
 
     @Override
-    protected void onDisconnected(DemoCommunicator communicator, Throwable cause) {
+    protected void onDisconnected(Communicator communicator, Throwable cause) {
         frame.invokeLater(() -> onDisconnected(cause));
     }
 

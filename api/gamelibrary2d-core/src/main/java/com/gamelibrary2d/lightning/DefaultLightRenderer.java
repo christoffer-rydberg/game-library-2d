@@ -3,7 +3,7 @@ package com.gamelibrary2d.lightning;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceDisposer;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
@@ -51,12 +51,12 @@ public class DefaultLightRenderer implements LightRenderer {
     /**
      * Disposes obsolete objects when the resolution changes.
      */
-    private ResourceDisposer resolutionChangedDisposer;
+    private DefaultDisposer resolutionChangedDisposer;
 
     private DefaultLightRenderer(int windowWidth, int windowHeight, Disposer disposer) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
-        resolutionChangedDisposer = new ResourceDisposer(disposer);
+        resolutionChangedDisposer = new DefaultDisposer(disposer);
 
         ShaderProgram shaderProgram = ShaderProgram.create(disposer);
         shaderProgram.attachShader(Shader.fromFile("Shaders/LightMap.vertex", ShaderType.VERTEX, disposer));

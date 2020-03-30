@@ -33,7 +33,20 @@ public class Label implements Bounded, Renderable {
     private int textOffset;
     private int rowCount = -1;
     private int charactersRendered;
-    private Renderer backgroundRenderer;
+    private Renderable background;
+
+    public Label() {
+
+    }
+
+    public Label(TextRenderer textRenderer) {
+        setTextRenderer(textRenderer);
+    }
+
+    public Label(String text, TextRenderer textRenderer) {
+        setText(text);
+        setTextRenderer(textRenderer);
+    }
 
     public void addTextChangedListener(TextChangedListener listener) {
         textChangedListeners.add(listener);
@@ -71,12 +84,12 @@ public class Label implements Bounded, Renderable {
         this.horizontalAlignment = horizontalAlignment;
     }
 
-    public Renderer getBackgroundRenderer() {
-        return backgroundRenderer;
+    public Renderable getBackground() {
+        return background;
     }
 
-    public void setBackgroundRenderer(Renderer backgroundRenderer) {
-        this.backgroundRenderer = backgroundRenderer;
+    public void setBackground(Renderable background) {
+        this.background = background;
     }
 
     public VerticalAlignment getVerticalAlignment() {
@@ -167,8 +180,8 @@ public class Label implements Bounded, Renderable {
     }
 
     public void render(float alpha) {
-        if (backgroundRenderer != null) {
-            backgroundRenderer.render(alpha);
+        if (background != null) {
+            background.render(alpha);
         }
         if (textRenderer != null) {
             onRender(textRenderer, fontColor, alpha);
@@ -292,6 +305,8 @@ public class Label implements Bounded, Renderable {
 
     @Override
     public Rectangle getBounds() {
-        return backgroundRenderer != null ? backgroundRenderer.getBounds() : Rectangle.EMPTY;
+        return background instanceof Bounded
+                ? ((Bounded) background).getBounds()
+                : Rectangle.EMPTY;
     }
 }

@@ -50,6 +50,10 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         game.setFrame(previousFrame, FrameDisposal.NONE);
     }
 
+    protected void loadFrame(Frame frame) throws LoadFailedException {
+        frame.load();
+    }
+
     @Override
     public void load(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) {
         verifyNotLoading();
@@ -58,7 +62,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         } else {
             workerThread = new Thread(() -> {
                 try {
-                    frame.load();
+                    loadFrame(frame);
                     loadResult = new LoadResult(frame, previousFrame, previousFrameDisposal, null);
                 } catch (LoadFailedException e) {
                     loadResult = new LoadResult(frame, previousFrame, previousFrameDisposal, e);

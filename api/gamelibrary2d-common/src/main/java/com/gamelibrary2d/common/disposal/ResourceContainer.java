@@ -10,7 +10,7 @@ import com.gamelibrary2d.common.functional.Func;
 public class ResourceContainer<T> {
     private T resource;
     private Func<Disposer, T> resourceFactory;
-    private ResourceDisposer resourceDisposer;
+    private DefaultDisposer resourceDisposer;
 
     /**
      * Creates an empty instance of {@link ResourceContainer}.
@@ -41,7 +41,7 @@ public class ResourceContainer<T> {
     public void createResource(Func<Disposer, T> resourceFactory, boolean lazy, Disposer disposer) {
         dispose();
         if (resourceDisposer == null || disposer != resourceDisposer.getParentDisposer()) {
-            resourceDisposer = new ResourceDisposer(disposer);
+            resourceDisposer = new DefaultDisposer(disposer);
         }
         if (lazy) {
             this.resourceFactory = resourceFactory;

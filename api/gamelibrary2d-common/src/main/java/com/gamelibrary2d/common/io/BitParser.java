@@ -3,7 +3,6 @@ package com.gamelibrary2d.common.io;
 import java.nio.ByteBuffer;
 
 public class BitParser {
-
     private ByteBuffer byteBuffer;
 
     private int bytePosition;
@@ -31,7 +30,6 @@ public class BitParser {
     }
 
     public void putInt(int i, int bits) {
-
         if (bits == 0) {
             return;
         }
@@ -73,7 +71,6 @@ public class BitParser {
     }
 
     public void put(byte b, int bits) {
-
         if (bits <= 0 || bits > 8)
             throw new IllegalStateException("Invalid bit count: " + bits);
 
@@ -114,7 +111,6 @@ public class BitParser {
     }
 
     public int getInt(int bits) {
-
         if (bits <= 0 || bits > 32)
             throw new IllegalStateException("Invalid bit count: " + bits);
 
@@ -145,7 +141,6 @@ public class BitParser {
     }
 
     public byte get(int bits) {
-
         if (bits <= 0 || bits > 8)
             throw new IllegalStateException("Invalid bit count: " + bits);
 

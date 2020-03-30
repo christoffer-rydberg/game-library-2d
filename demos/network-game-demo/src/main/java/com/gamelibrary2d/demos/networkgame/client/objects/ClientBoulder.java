@@ -1,4 +1,4 @@
-package com.gamelibrary2d.demos.networkgame.client;
+package com.gamelibrary2d.demos.networkgame.client.objects;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.common.MessageParser;
@@ -8,7 +8,7 @@ import com.gamelibrary2d.renderers.Renderer;
 
 public class ClientBoulder extends AbstractClientObject {
 
-    protected ClientBoulder(FrameClient frameClient, DataBuffer buffer) {
+    public ClientBoulder(FrameClient frameClient, DataBuffer buffer) {
         super(frameClient, buffer);
         setBounds(MessageParser.readRectangle(buffer));
     }

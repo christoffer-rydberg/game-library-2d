@@ -22,6 +22,10 @@ public abstract class AbstractClient {
         inbox.flip();
     }
 
+    protected boolean isUpdatingLocalServer() {
+        return false;
+    }
+
     public boolean isSendingDataOnUpdate() {
         return sendingDataOnUpdate;
     }
@@ -36,7 +40,8 @@ public abstract class AbstractClient {
     }
 
     public boolean isConnected() {
-        return getCommunicator().isConnected();
+        var communicator = getCommunicator();
+        return communicator != null && communicator.isConnected();
     }
 
     public Future<Void> connect() {
@@ -73,7 +78,7 @@ public abstract class AbstractClient {
         onInitialized();
     }
 
-    public void update() {
+    public void update(float deltaTime) {
         var communicator = getCommunicator();
         if (communicator == null) {
             return;
@@ -88,6 +93,8 @@ public abstract class AbstractClient {
                 if (!initialized) {
                     initialize();
                 }
+
+                triggerLocalServerUpdate(communicator, deltaTime);
 
                 readMessages();
                 if (sendingDataOnUpdate) {
@@ -156,7 +163,7 @@ public abstract class AbstractClient {
                     throw new InitializationException("Connection has been lost", e);
                 }
 
-                if (!triggerLocalServerUpdate(communicator)) {
+                if (!triggerLocalServerUpdate(communicator, 0f)) {
                     try {
                         Thread.sleep(getInitializationRetryDelay());
                     } catch (InterruptedException e) {
@@ -175,8 +182,6 @@ public abstract class AbstractClient {
             communicator.disconnect(e);
             throw new InitializationException("Connection has been lost", e);
         }
-
-        triggerLocalServerUpdate(communicator);
     }
 
     private boolean runCommunicationStep(Communicator communicator, CommunicationStep step)
@@ -196,14 +201,9 @@ public abstract class AbstractClient {
         }
     }
 
-    /**
-     * Updates local server to trigger delivery of messages.
-     *
-     * @return True the server is local, false otherwise.
-     */
-    private boolean triggerLocalServerUpdate(Communicator communicator) {
-        if (communicator instanceof LocalCommunicator) {
-            ((LocalCommunicator) communicator).getLocalServer().update(0);
+    private boolean triggerLocalServerUpdate(Communicator communicator, float deltaTime) {
+        if (isUpdatingLocalServer() && communicator instanceof LocalCommunicator) {
+            ((LocalCommunicator) communicator).getLocalServer().update(deltaTime);
             return true;
         }
 
@@ -214,14 +214,14 @@ public abstract class AbstractClient {
      * The max number of retries for each communication step.
      */
     protected int getInitializationRetries() {
-        return 10;
+        return 100;
     }
 
     /**
      * The delay between retries of communication steps in milliseconds.
      */
     protected int getInitializationRetryDelay() {
-        return 1000;
+        return 100;
     }
 
     public void authenticate() throws InitializationException {
