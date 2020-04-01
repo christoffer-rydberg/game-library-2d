@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
+import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.nio.charset.StandardCharsets;
@@ -16,10 +16,11 @@ public class DemoClient extends AbstractClient {
     DemoClient(Communicator communicator) {
         this.communicator = communicator;
         updateLoop = new UpdateLoop(this::update, 10);
-        communicator.addDisconnectedListener(this::onDisconnected);
     }
 
-    void run() {
+    void run() throws InitializationException {
+        initialize();
+        authenticate();
         updateLoop.run();
     }
 
@@ -55,7 +56,8 @@ public class DemoClient extends AbstractClient {
         return communicator;
     }
 
-    private void onDisconnected(CommunicatorDisconnected communicatorDisconnected) {
+    @Override
+    protected void onDisconnected(Communicator communicator, Throwable cause) {
         updateLoop.stop();
     }
 }

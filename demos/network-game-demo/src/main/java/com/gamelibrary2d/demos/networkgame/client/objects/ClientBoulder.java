@@ -1,16 +1,15 @@
 package com.gamelibrary2d.demos.networkgame.client.objects;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.common.MessageParser;
 import com.gamelibrary2d.network.AbstractClientObject;
-import com.gamelibrary2d.network.FrameClient;
 import com.gamelibrary2d.renderers.Renderer;
 
 public class ClientBoulder extends AbstractClientObject {
+    private final float serverUpdatesPerSecond;
 
-    public ClientBoulder(FrameClient frameClient, DataBuffer buffer) {
-        super(frameClient, buffer);
-        setBounds(MessageParser.readRectangle(buffer));
+    public ClientBoulder(DataBuffer buffer, float serverUpdatesPerSecond) {
+        super(buffer);
+        this.serverUpdatesPerSecond = serverUpdatesPerSecond;
     }
 
     public void setRenderer(Renderer renderer) {
@@ -20,6 +19,11 @@ public class ClientBoulder extends AbstractClientObject {
     @Override
     protected void onUpdate(float deltaTime) {
 
+    }
+
+    @Override
+    protected float getUpdatesPerSecond() {
+        return serverUpdatesPerSecond;
     }
 
     @Override

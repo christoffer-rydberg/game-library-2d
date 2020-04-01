@@ -17,7 +17,7 @@ public class NetworkGameDemo {
 
     private static Window createWindow(String[] args) {
         if (args.length == 0) {
-            return GlfwWindow.createWindowed(title);
+            return GlfwWindow.createWindowed(title, 800, 600);
         } else if (args.length == 1) {
             if (isWindowed(args[0])) {
                 return GlfwWindow.createWindowed(title);

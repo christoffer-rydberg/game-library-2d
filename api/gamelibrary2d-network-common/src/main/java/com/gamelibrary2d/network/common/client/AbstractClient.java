@@ -2,7 +2,10 @@ package com.gamelibrary2d.network.common.client;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
+import com.gamelibrary2d.common.updating.UpdateAction;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
@@ -12,38 +15,41 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public abstract class AbstractClient {
+public abstract class AbstractClient implements Client {
     private final DataBuffer inbox;
-    private boolean sendingDataOnUpdate = true;
-    private boolean initialized;
+    private final CommunicatorDisconnectedListener disconnectedListener = this::onDisconnected;
+
+    private Communicator communicator;
+    private int initializationRetries = 100;
+    private int initializationRetryDelay = 100;
+    private boolean updateLocalServer;
 
     protected AbstractClient() {
         this.inbox = new DynamicByteBuffer();
         inbox.flip();
     }
 
-    protected boolean isUpdatingLocalServer() {
-        return false;
+    public boolean isUpdatingLocalServer() {
+        return updateLocalServer;
     }
 
-    public boolean isSendingDataOnUpdate() {
-        return sendingDataOnUpdate;
+    public void setUpdateLocalServer(boolean updateLocalServer) {
+        this.updateLocalServer = updateLocalServer;
     }
 
-    public void setSendingDataOnUpdate(boolean sendingDataOnUpdate) {
-        this.sendingDataOnUpdate = sendingDataOnUpdate;
-    }
-
+    @Override
     public void clearInbox() {
         inbox.clear();
         inbox.flip();
     }
 
+    @Override
     public boolean isConnected() {
         var communicator = getCommunicator();
         return communicator != null && communicator.isConnected();
     }
 
+    @Override
     public Future<Void> connect() {
         var communicator = getCommunicator();
         if (communicator instanceof Connectable) {
@@ -52,33 +58,39 @@ public abstract class AbstractClient {
         return CompletableFuture.completedFuture(null);
     }
 
+    @Override
     public void disconnect() {
         var communicator = getCommunicator();
         if (communicator != null)
             communicator.disconnect();
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public void deinitialize() {
-        this.initialized = false;
-    }
-
-    public void initialize() throws InitializationException {
-        if (initialized) {
-            throw new InitializationException("Client has already been initialized");
+    @Override
+    public void authenticate() throws InitializationException {
+        var communicator = getCommunicator();
+        if (!communicator.isAuthenticated()) {
+            var steps = new InternalCommunicationSteps();
+            configureAuthentication(communicator, steps);
+            runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
         }
+    }
+
+    @Override
+    public void initialize() throws InitializationException {
         var communicator = getCommunicator();
         var steps = new InternalCommunicationSteps();
         configureInitialization(steps);
         runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
-        initialized = true;
         onInitialized();
     }
 
+    @Override
     public void update(float deltaTime) {
+        update(deltaTime, null);
+    }
+
+    @Override
+    public void update(float deltaTime, UpdateAction updateAction) {
         var communicator = getCommunicator();
         if (communicator == null) {
             return;
@@ -86,27 +98,66 @@ public abstract class AbstractClient {
 
         if (communicator.isConnected()) {
             try {
-                if (!communicator.isAuthenticated()) {
-                    authenticate();
-                }
-
-                if (!initialized) {
-                    initialize();
-                }
-
                 triggerLocalServerUpdate(communicator, deltaTime);
 
                 readMessages();
-                if (sendingDataOnUpdate) {
-                    try {
-                        communicator.sendOutgoing();
-                    } catch (IOException e) {
-                        communicator.disconnect(e);
-                    }
+
+                if (updateAction != null) {
+                    updateAction.invoke(deltaTime);
                 }
+
+                communicator.sendOutgoing();
             } catch (Exception e) {
                 communicator.disconnect(e);
             }
+        } else if (updateAction != null) {
+            updateAction.invoke(deltaTime);
+        }
+    }
+
+    /**
+     * The max number of retries for each communication step.
+     */
+    protected int getInitializationRetries() {
+        return initializationRetries;
+    }
+
+    /**
+     * Sets the number of {@link #getInitializationRetries() initialization retries}.
+     */
+    protected void setInitializationRetries(int initializationRetries) {
+        this.initializationRetries = initializationRetries;
+    }
+
+    /**
+     * The delay between retries of communication steps in milliseconds.
+     */
+    protected int getInitializationRetryDelay() {
+        return initializationRetryDelay;
+    }
+
+    /**
+     * Sets the {@link #getInitializationRetries() initialization retry delay}.
+     */
+    protected void setInitializationRetryDelay(int initializationRetryDelay) {
+        this.initializationRetryDelay = initializationRetryDelay;
+    }
+
+    @Override
+    public Communicator getCommunicator() {
+        return communicator;
+    }
+
+    @Override
+    public void setCommunicator(Communicator communicator) {
+        if (this.communicator != null) {
+            this.communicator.removeDisconnectedListener(disconnectedListener);
+        }
+
+        this.communicator = communicator;
+
+        if (this.communicator != null) {
+            this.communicator.addDisconnectedListener(disconnectedListener);
         }
     }
 
@@ -202,35 +253,12 @@ public abstract class AbstractClient {
     }
 
     private boolean triggerLocalServerUpdate(Communicator communicator, float deltaTime) {
-        if (isUpdatingLocalServer() && communicator instanceof LocalCommunicator) {
+        if (updateLocalServer && communicator instanceof LocalCommunicator) {
             ((LocalCommunicator) communicator).getLocalServer().update(deltaTime);
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * The max number of retries for each communication step.
-     */
-    protected int getInitializationRetries() {
-        return 100;
-    }
-
-    /**
-     * The delay between retries of communication steps in milliseconds.
-     */
-    protected int getInitializationRetryDelay() {
-        return 100;
-    }
-
-    public void authenticate() throws InitializationException {
-        var communicator = getCommunicator();
-        if (!communicator.isAuthenticated()) {
-            var steps = new InternalCommunicationSteps();
-            configureAuthentication(communicator, steps);
-            runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
-        }
     }
 
     private void configureInitialization(CommunicationSteps steps) {
@@ -243,15 +271,19 @@ public abstract class AbstractClient {
         steps.add(this::onAuthenticated);
     }
 
+    private void onDisconnected(CommunicatorDisconnected communicatorDisconnected) {
+        onDisconnected(communicatorDisconnected.getCommunicator(), communicatorDisconnected.getCause());
+    }
+
     private void onAuthenticated(Communicator communicator) {
         communicator.onAuthenticated();
     }
 
     protected abstract void onInitialized();
 
-    public abstract Communicator getCommunicator();
-
     protected abstract void onConfigureInitialization(CommunicationSteps steps);
 
     protected abstract void onMessage(DataBuffer buffer);
+
+    protected abstract void onDisconnected(Communicator communicator, Throwable cause);
 }

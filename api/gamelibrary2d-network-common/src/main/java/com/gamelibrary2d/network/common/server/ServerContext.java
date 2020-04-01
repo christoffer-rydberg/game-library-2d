@@ -6,25 +6,27 @@ import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 public interface ServerContext {
 
-    void configureClientAuthentication(CommunicationSteps steps);
+    void start();
+
+    void stop();
 
     boolean acceptConnection(String endpoint);
 
     void onConnectionFailed(String endpoint, Exception e);
 
-    void onClientAuthenticated(Communicator communicator);
-
-    void update(float deltaTime);
-
     void onConnected(Communicator communicator);
+
+    void configureClientAuthentication(CommunicationSteps steps);
 
     void configureClientInitialization(CommunicationSteps steps);
 
+    void onClientAuthenticated(Communicator communicator);
+
     void onClientInitialized(Communicator communicator);
 
-    void onDisconnected(Communicator communicator, boolean pending);
+    void update(float deltaTime);
 
     void onMessage(Communicator communicator, DataBuffer buffer);
 
-    void stop();
+    void onDisconnected(Communicator communicator, boolean pending);
 }

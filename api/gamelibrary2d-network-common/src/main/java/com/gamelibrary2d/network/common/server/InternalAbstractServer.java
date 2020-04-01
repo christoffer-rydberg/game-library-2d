@@ -20,6 +20,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 abstract class InternalAbstractServer implements Server {
     private final Factory<Integer> communicatorIdFactory = RandomInstance.get()::nextInt;
@@ -29,6 +30,7 @@ abstract class InternalAbstractServer implements Server {
     private final List<Communicator> communicators;
     private final DelayedMonitor delayedMonitor = new DelayedMonitor();
     private final CommunicatorDisconnectedListener disconnectedEventListener = this::onDisonnectedEvent;
+    private final AtomicBoolean running = new AtomicBoolean();
 
     InternalAbstractServer() {
         incomingBuffer = new DynamicByteBuffer();
@@ -373,6 +375,29 @@ abstract class InternalAbstractServer implements Server {
     public void send(Communicator communicator, Message message) {
         message.serializeMessage(communicator.getOutgoing());
     }
+
+    @Override
+    public final void start() throws IOException {
+        if (running.compareAndSet(false, true)) {
+            onStart();
+        }
+    }
+
+    @Override
+    public final void stop() throws IOException {
+        if (running.compareAndSet(true, false)) {
+            onStop();
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running.get();
+    }
+
+    protected abstract void onStart() throws IOException;
+
+    protected abstract void onStop() throws IOException;
 
     protected abstract void onConnected(Communicator communicator);
 

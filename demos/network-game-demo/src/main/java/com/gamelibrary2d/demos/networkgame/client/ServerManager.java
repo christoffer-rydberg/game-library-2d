@@ -85,11 +85,8 @@ public class ServerManager {
 
     private ServerResult createLocalServer() {
         var localServer = new DefaultLocalServer(DemoGameServer::new);
-        localServer.initialize();
-
         var communicator = new DefaultLocalCommunicator(localServer);
         communicator.onConfigureAuthentication(this::authenticate);
-
         return new ServerResult(localServer, communicator);
     }
 
@@ -103,10 +100,9 @@ public class ServerManager {
     private ServerResult createNetworkServer(int port) {
         try {
             var server = new DefaultNetworkServer(port, DemoGameServer::new);
+            server.start();
             server.listenForConnections(true);
-
             var communicator = createNetworkCommunicator("localhost", port);
-
             return new ServerResult(server, communicator);
         } catch (IOException e) {
             throw new GameLibrary2DRuntimeException("Failed to create network server", e);

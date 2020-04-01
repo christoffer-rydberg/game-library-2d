@@ -17,10 +17,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class DemoGameServer implements ServerContext {
-
     public final static float UPDATES_PER_SECOND = 30;
-    public final static int STREAM_UPDATE_RATE = 3;
-    public final static float STREAMS_PER_SECOND = UPDATES_PER_SECOND / STREAM_UPDATE_RATE;
+    private final static int STREAM_UPDATE_RATE = 3;
+    private final static float STREAMS_PER_SECOND = UPDATES_PER_SECOND / STREAM_UPDATE_RATE;
     private final BitParser bitParser = new BitParser(ByteBuffer.wrap(new byte[NetworkConstants.UPDATE_BUFFER_BYTE_SIZE]));
     private final ServerObjectRegister objectRegister = new ServerObjectRegister();
 
@@ -64,6 +63,25 @@ public class DemoGameServer implements ServerContext {
     public void configureClientInitialization(CommunicationSteps steps) {
         steps.add(this::sendUpdateRate);
         steps.add(this::sendGameSettings);
+        steps.add(this::sendState);
+    }
+
+    private void sendState(Communicator communicator) {
+        var buffer = communicator.getOutgoing();
+        var objects = objectRegister.getRegisteredObjects();
+        buffer.putInt(objects.size());
+        for (var obj : objects) {
+            // TODO: Include object header so they can be properly deserialized
+            obj.serializeMessage(buffer);
+        }
+    }
+
+    private void sendUpdateRate(Communicator communicator) {
+        communicator.getOutgoing().putFloat(STREAMS_PER_SECOND);
+    }
+
+    private void sendGameSettings(Communicator communicator) {
+        gameLogic.getGameSettings().serializeMessage(communicator.getOutgoing());
     }
 
     @Override
@@ -82,6 +100,11 @@ public class DemoGameServer implements ServerContext {
     }
 
     @Override
+    public void start() {
+        log("Server has started");
+    }
+
+    @Override
     public void stop() {
         log("Server has stopped");
     }
@@ -94,17 +117,6 @@ public class DemoGameServer implements ServerContext {
         return true;
     }
 
-    private void sendUpdateRate(Communicator communicator) {
-        var buffer = communicator.getOutgoing();
-        buffer.put(ServerMessages.UPDATE_RATE);
-        buffer.putFloat(STREAMS_PER_SECOND);
-    }
-
-    private void sendGameSettings(Communicator communicator) {
-        var buffer = communicator.getOutgoing();
-        buffer.put(ServerMessages.GAME_SETTINGS);
-        gameLogic.getGameSettings().serializeMessage(buffer);
-    }
 
     @Override
     public void update(float deltaTime) {

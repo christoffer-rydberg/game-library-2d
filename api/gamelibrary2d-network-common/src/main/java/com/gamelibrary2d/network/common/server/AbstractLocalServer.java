@@ -14,7 +14,7 @@ public abstract class AbstractLocalServer extends InternalAbstractServer impleme
     }
 
     @Override
-    public void stop() {
+    protected void onStop() {
         if (communicator != null) {
             communicator.disconnect();
         }

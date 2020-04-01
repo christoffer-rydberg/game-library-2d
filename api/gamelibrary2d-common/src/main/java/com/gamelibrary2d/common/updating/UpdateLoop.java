@@ -46,7 +46,4 @@ public class UpdateLoop {
         return running;
     }
 
-    public interface UpdateAction {
-        void invoke(float deltaTime);
-    }
 }

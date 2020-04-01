@@ -6,10 +6,13 @@ import com.gamelibrary2d.network.common.Message;
 import java.io.IOException;
 
 public interface Server {
-
-    void update(float deltaTime);
+    void start() throws IOException;
 
     void stop() throws IOException;
+
+    boolean isRunning();
+
+    void update(float deltaTime);
 
     void send(Communicator communicator, int message);
 

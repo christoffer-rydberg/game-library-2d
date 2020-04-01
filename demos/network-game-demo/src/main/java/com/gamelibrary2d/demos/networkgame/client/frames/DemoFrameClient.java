@@ -6,28 +6,50 @@ import com.gamelibrary2d.demos.networkgame.client.objects.ClientBoulder;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
-import com.gamelibrary2d.network.AbstractFrameClient;
 import com.gamelibrary2d.network.ClientObject;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DemoFrameClient extends AbstractFrameClient {
+public class DemoFrameClient extends AbstractClient {
     private final BitParser bitParser = new BitParser();
     private final Map<Integer, ClientObject> objects = new HashMap<>();
 
     private DemoFrame frame;
-    private float serverUpdateRate;
+    private float serverUpdatesPerSecond;
 
     void initialize(DemoFrame frame) {
         this.frame = frame;
     }
 
     @Override
-    public void configureInitialization(CommunicationSteps steps) {
+    public void onConfigureInitialization(CommunicationSteps steps) {
+        steps.add(this::readUpdateRate);
+        steps.add(this::readGameSettings);
+        steps.add(this::readState);
+    }
 
+    private boolean readUpdateRate(Communicator communicator, DataBuffer buffer) {
+        serverUpdatesPerSecond = buffer.getFloat();
+        return true;
+    }
+
+    private boolean readGameSettings(Communicator communicator, DataBuffer buffer) {
+        var gameSettings = new GameSettings(buffer);
+        frame.invokeLater(() -> frame.applySettings(gameSettings));
+        return true;
+    }
+
+    private boolean readState(Communicator communicator, DataBuffer buffer) {
+        int boulders = buffer.getInt();
+        for (int i = 0; i < boulders; ++i) {
+            // TODO: Read object header
+            spawnBoulder(buffer);
+        }
+        return true;
     }
 
     @Override
@@ -39,32 +61,22 @@ public class DemoFrameClient extends AbstractFrameClient {
     public void onMessage(DataBuffer buffer) {
         byte id = buffer.get();
         switch (id) {
-            case ServerMessages.UPDATE_RATE:
-                onUpdateRateMessage(buffer);
-                break;
-            case ServerMessages.GAME_SETTINGS:
-                onGameSettingsMessage(buffer);
-                break;
             case ServerMessages.POSITION_UPDATE:
-                onUpdateMessage(buffer);
+                updatePositions(buffer);
                 break;
             case ServerMessages.SPAWN_BOULDER:
-                var boulder = new ClientBoulder(this, buffer);
-                frame.addBoulder(boulder);
-                objects.put(boulder.getId(), boulder);
+                spawnBoulder(buffer);
                 break;
         }
     }
 
-    private void onUpdateRateMessage(DataBuffer buffer) {
-        serverUpdateRate = buffer.getFloat();
+    private void spawnBoulder(DataBuffer buffer) {
+        var boulder = new ClientBoulder(buffer, serverUpdatesPerSecond);
+        frame.addBoulder(boulder);
+        objects.put(boulder.getId(), boulder);
     }
 
-    private void onGameSettingsMessage(DataBuffer buffer) {
-        frame.applySettings(new GameSettings(buffer));
-    }
-
-    private void onUpdateMessage(DataBuffer buffer) {
+    private void updatePositions(DataBuffer buffer) {
         bitParser.setByteBuffer(buffer.internalByteBuffer());
 
         final int headerSize = NetworkConstants.HEADER_BIT_SIZE;
@@ -91,11 +103,6 @@ public class DemoFrameClient extends AbstractFrameClient {
         }
 
         buffer.position(buffer.position() + byteSize);
-    }
-
-    @Override
-    public float getServerUpdatesPerSecond() {
-        return serverUpdateRate;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.gamelibrary2d.network.common.server;
 
+import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.network.common.CommunicationServer;
 import com.gamelibrary2d.network.common.ServerSocketChannelRegistration;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
@@ -54,22 +55,40 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
     }
 
     public void listenForConnections(boolean listen) throws IOException {
+        if (!isRunning()) {
+            throw new GameLibrary2DRuntimeException("Server is not running");
+        }
+
         if (listen) {
-            communicationServer.start();
-            registration = communicationServer.registerConnectionListener(
-                    "localhost",
-                    port,
-                    this::onConnected,
-                    (endpoint, exc) -> invokeLater(() -> onConnectionFailed(endpoint, exc)));
-        } else if (registration != null) {
+            enableConnections();
+        } else {
+            disableConnections();
+        }
+    }
+
+    private void enableConnections() throws IOException {
+        registration = communicationServer.registerConnectionListener(
+                "localhost",
+                port,
+                this::onConnected,
+                (endpoint, exc) -> invokeLater(() -> onConnectionFailed(endpoint, exc)));
+    }
+
+    private void disableConnections() throws IOException {
+        if (registration != null) {
             communicationServer.deregisterConnectionListener(registration);
             registration = null;
         }
     }
 
     @Override
-    public void stop() throws IOException {
-        listenForConnections(false);
+    protected void onStart() throws IOException {
+        communicationServer.start();
+    }
+
+    @Override
+    protected void onStop() throws IOException {
+        disableConnections();
         if (ownsCommunicationServer) {
             try {
                 communicationServer.stop();

@@ -67,9 +67,15 @@ public final class DefaultNetworkServer extends AbstractNetworkServer {
     }
 
     @Override
-    public void stop() throws IOException {
+    protected void onStart() throws IOException {
+        super.onStart();
+        serverContext.start();
+    }
+
+    @Override
+    protected void onStop() throws IOException {
         serverContext.stop();
-        super.stop();
+        super.onStop();
     }
 
     @Override

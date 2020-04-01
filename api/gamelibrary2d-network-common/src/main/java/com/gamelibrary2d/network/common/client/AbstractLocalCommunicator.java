@@ -4,7 +4,6 @@ import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.AbstractCommunicator;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.LocalServer;
 
@@ -34,9 +33,11 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
     public Future<Void> connect() {
         if (setConnected()) {
             try {
-                localServer.initialize();
+                if (!localServer.isRunning()) {
+                    localServer.start();
+                }
                 localServer.connectCommunicator(serverSideCommunicator);
-            } catch (InitializationException e) {
+            } catch (Exception e) {
                 return CompletableFuture.failedFuture(e);
             }
         }

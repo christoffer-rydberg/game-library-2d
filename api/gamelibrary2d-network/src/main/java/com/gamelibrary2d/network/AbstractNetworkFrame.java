@@ -1,31 +1,25 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.client.AbstractClient;
+import com.gamelibrary2d.network.common.client.Client;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
-import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public abstract class AbstractNetworkFrame<TFrameClient extends FrameClient>
+public abstract class AbstractNetworkFrame<T extends Client>
         extends AbstractFrame {
 
-    private final InternalNetworkClient<TFrameClient> networkClient;
+    private final T frameClient;
 
-    protected AbstractNetworkFrame(Game game, TFrameClient frameClient) {
+    protected AbstractNetworkFrame(Game game, T frameClient) {
         super(game);
-        networkClient = new InternalNetworkClient<>();
-        networkClient.setFrameClient(frameClient);
-        networkClient.setSendingDataOnUpdate(false); // Send data after frame update instead
+        this.frameClient = frameClient;
     }
 
-    public TFrameClient getClient() {
-        return networkClient.getFrameClient();
+    public T getClient() {
+        return frameClient;
     }
 
     @Override
@@ -38,19 +32,19 @@ public abstract class AbstractNetworkFrame<TFrameClient extends FrameClient>
             return;
         }
 
-        if (!networkClient.isConnected()) {
+        if (!frameClient.isConnected()) {
             try {
-                networkClient.connect().get();
+                frameClient.connect().get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new LoadFailedException("Failed to connect to server", e);
             }
         }
 
         try {
-            networkClient.clearInbox();
-            networkClient.authenticate();
+            frameClient.clearInbox();
+            frameClient.authenticate();
             super.load();
-            networkClient.initialize();
+            frameClient.initialize();
         } catch (InitializationException e) {
             unload();
             throw new LoadFailedException("Client/server communication failed", e);
@@ -58,67 +52,11 @@ public abstract class AbstractNetworkFrame<TFrameClient extends FrameClient>
     }
 
     @Override
-    protected void unload() {
-        networkClient.deinitialize();
-        super.unload();
+    protected final void onUpdate(float deltaTime) {
+        frameClient.update(deltaTime, this::handleUpdate);
     }
 
-    @Override
-    protected void onUpdate(float deltaTime) {
-        networkClient.update(deltaTime);
+    protected void handleUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-        var communicator = networkClient.getCommunicator();
-        try {
-            communicator.sendOutgoing();
-        } catch (IOException e) {
-            communicator.disconnect(e);
-        }
-    }
-
-    static class InternalNetworkClient<TFrameClient extends FrameClient> extends AbstractClient {
-        private TFrameClient frameClient;
-
-        TFrameClient getFrameClient() {
-            return frameClient;
-        }
-
-        void setFrameClient(TFrameClient frameClient) {
-            this.frameClient = frameClient;
-        }
-
-        @Override
-        protected void onConfigureInitialization(CommunicationSteps steps) {
-            frameClient.configureInitialization(steps);
-        }
-
-        @Override
-        protected void onMessage(DataBuffer buffer) {
-            frameClient.onMessage(buffer);
-        }
-
-        @Override
-        public Communicator getCommunicator() {
-            return frameClient.getCommunicator();
-        }
-
-        @Override
-        protected int getInitializationRetries() {
-            return frameClient.getInitializationRetries();
-        }
-
-        @Override
-        protected int getInitializationRetryDelay() {
-            return frameClient.getInitializationRetryDelay();
-        }
-
-        @Override
-        protected void onInitialized() {
-            frameClient.onInitialized();
-        }
-
-        @Override
-        protected boolean isUpdatingLocalServer() {
-            return frameClient.isUpdatingLocalServer();
-        }
     }
 }

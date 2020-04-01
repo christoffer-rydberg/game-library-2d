@@ -1,7 +1,6 @@
 package com.gamelibrary2d.demos.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.AbstractNetworkServer;
@@ -10,16 +9,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class DemoServer extends AbstractNetworkServer {
-    private final static int UPDATES_PER_SECOND = 10;
     private int messagesReceived;
 
     DemoServer(int port) {
         super(port);
-    }
-
-    public void start() throws IOException {
-        new UpdateLoop(this::update, UPDATES_PER_SECOND).run();
-        stop();
     }
 
     @Override

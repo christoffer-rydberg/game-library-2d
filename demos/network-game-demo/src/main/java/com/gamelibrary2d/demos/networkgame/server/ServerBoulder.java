@@ -7,7 +7,6 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.demos.networkgame.common.MessageParser;
 import com.gamelibrary2d.network.AbstractServerObject;
 
 class ServerBoulder extends AbstractServerObject implements Collidable, CollisionAware<ServerBoulder> {
@@ -15,9 +14,9 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
     private final Rectangle gameBounds;
     private final Point beforeUpdate = new Point();
 
-    ServerBoulder(Rectangle gameBounds, Rectangle game2Bounds) {
+    ServerBoulder(Rectangle gameBounds, Rectangle bounds) {
         this.gameBounds = gameBounds;
-        this.setBounds(game2Bounds);
+        this.setBounds(bounds);
         velocity = new Point(0f, 100f);
         velocity.rotate(RandomInstance.get().nextFloat() * 360f);
     }
@@ -34,7 +33,7 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
 
     @Override
     protected void onSerializeMessage(DataBuffer buffer) {
-        MessageParser.writeRectangle(gameBounds, buffer);
+
     }
 
     @Override

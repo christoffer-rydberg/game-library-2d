@@ -14,8 +14,15 @@ public class DefaultLocalServer extends AbstractLocalServer {
     }
 
     @Override
-    public void initialize() {
+    protected void onStart() {
         serverContext = serverContextFactory.invoke(this);
+        serverContext.start();
+    }
+
+    @Override
+    protected void onStop() {
+        serverContext.stop();
+        super.onStop();
     }
 
     @Override
@@ -56,11 +63,5 @@ public class DefaultLocalServer extends AbstractLocalServer {
     @Override
     protected void onMessage(Communicator communicator, DataBuffer buffer) {
         serverContext.onMessage(communicator, buffer);
-    }
-
-    @Override
-    public void stop() {
-        serverContext.stop();
-        super.stop();
     }
 }
