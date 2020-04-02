@@ -214,10 +214,10 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
         float posX = obj.getPosition().getX();
         float posY = obj.getPosition().getY();
 
-        obj.getPosition().set(0, 0);
+        obj.setPosition(0, 0);
         Rectangle objectBounds = getExtentInPanel(obj);
         if (objectBounds.equals(Rectangle.INFINITE)) {
-            obj.getPosition().set(posX, posY);
+            obj.setPosition(posX, posY);
             throw new IllegalStateException("Stacked object must have valid bounds.");
         }
 
@@ -236,7 +236,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
                 break;
         }
 
-        obj.getPosition().set(posX, posY);
+        obj.setPosition(posX, posY);
     }
 
     private float stackLeft(Rectangle objectBounds, float margin) {

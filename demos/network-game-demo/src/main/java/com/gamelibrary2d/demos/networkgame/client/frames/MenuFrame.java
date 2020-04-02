@@ -27,7 +27,7 @@ public class MenuFrame extends AbstractFrame {
     }
 
     private static void center(GameObject obj, Window window) {
-        obj.getPosition().set(window.width() / 2f, window.height() / 2f);
+        obj.setPosition(window.width() / 2f, window.height() / 2f);
         obj.getPosition().subtract(obj.getBounds().center());
     }
 

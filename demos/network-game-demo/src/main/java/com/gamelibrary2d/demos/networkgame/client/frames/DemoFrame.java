@@ -35,9 +35,9 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         var quad = Quad.create(bounds, this);
         var renderer = new SurfaceRenderer(quad);
         renderer.updateSettings(RenderSettings.COLOR_R, 1f, 1f, 1f);
-        var obj = new BasicObject<>(renderer);
-        obj.getPosition().set(posX, posY);
-        return obj;
+        var gameArea = new BasicObject<>(renderer);
+        gameArea.setPosition(posX, posY);
+        return gameArea;
     }
 
     private Renderer createBoulderRenderer(Rectangle bounds) {
@@ -57,8 +57,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
                 windowWidth / 2f,
                 windowHeight / 2f);
 
-        objectLayer.getScale().set(scale, scale);
-        objectLayer.getPosition().set(
+        objectLayer.setScale(scale, scale);
+        objectLayer.setPosition(
                 windowWidth / 2f + scaledGameBounds.xMin(),
                 windowHeight / 2f + scaledGameBounds.yMin());
 

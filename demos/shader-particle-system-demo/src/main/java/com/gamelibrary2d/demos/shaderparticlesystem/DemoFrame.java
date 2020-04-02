@@ -33,8 +33,8 @@ public class DemoFrame extends AbstractFrame {
             float scale = Math.min(scaleX, scaleY);
 
             var layer = new DynamicLayer<>();
-            layer.getScale().set(scale, scale);
-            layer.getScaleAndRotationCenter().set(windowWidth / 2, windowHeight / 2);
+            layer.setScale(scale, scale);
+            layer.setScaleAndRotationCenter(windowWidth / 2, windowHeight / 2);
             layer.add(particleSystem);
             add(layer);
         } catch (IOException e) {

@@ -57,7 +57,7 @@ class ServerBoulder extends AbstractServerObject implements Collidable, Collisio
     @Override
     public boolean onCollisionWith(ServerBoulder other) {
         // TODO: Implement more realistic physics (colliding balls)
-        getPosition().set(beforeUpdate);
+        setPosition(beforeUpdate);
         velocity.multiply(-1f);
         return true;
     }

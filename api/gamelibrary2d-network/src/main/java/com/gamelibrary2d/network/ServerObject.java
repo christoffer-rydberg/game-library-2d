@@ -30,4 +30,12 @@ public interface ServerObject extends Message {
      * @return The object's position.
      */
     Point getPosition();
+
+    default void setPosition(Point position) {
+        getPosition().set(position);
+    }
+
+    default void setPosition(float x, float y) {
+        getPosition().set(x, y);
+    }
 }

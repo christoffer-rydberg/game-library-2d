@@ -38,7 +38,7 @@ public class DemoGameLogic {
 
     public void spawnBoulder(float x, float y) {
         var boulder = new ServerBoulder(settings.getGameBounds(), settings.getBoulderBounds());
-        boulder.getPosition().set(x, y);
+        boulder.setPosition(x, y);
         collisionDetection.add(boulder);
         server.createObject(boulder);
     }

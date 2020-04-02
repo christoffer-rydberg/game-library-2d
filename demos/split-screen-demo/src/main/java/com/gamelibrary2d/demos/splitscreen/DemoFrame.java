@@ -52,7 +52,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
                 random.nextFloat() * 0.5f + 0.5f);
 
         var spaceCraft = new SpaceCraft(GAME_BOUNDS, renderer);
-        spaceCraft.getPosition().set(
+        spaceCraft.setPosition(
                 GAME_BOUNDS.xMin() + random.nextFloat() * GAME_BOUNDS.width(),
                 GAME_BOUNDS.yMin() + random.nextFloat() * GAME_BOUNDS.height());
 
@@ -85,7 +85,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         var y = Math.min(
                 GAME_BOUNDS.height() - viewArea.height() / 2,
                 Math.max(spaceCraft.getPosition().getY(), viewArea.height() / 2));
-        spacecraftLayer.getPosition().set(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
+        spacecraftLayer.setPosition(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
     }
 
     private SplitLayout createSplitLayoutHelper(List<SpaceCraft> spaceCrafts, SplitOrientation orientation) {
@@ -93,7 +93,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
         if (size == 1) {
             var spaceCraft = spaceCrafts.get(0);
-            spacecraftLayer.getPosition().set(spaceCraft.getPosition());
+            spacecraftLayer.setPosition(spaceCraft.getPosition());
             return new SplitLayoutLeaf<>(spacecraftLayer, this::prepareView, spaceCraft);
         }
 

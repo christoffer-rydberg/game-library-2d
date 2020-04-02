@@ -48,10 +48,10 @@ public class DemoFrame extends AbstractFrame {
         final float windowHeight = getGame().getWindow().height();
 
         var loadButton = createLoadButton();
-        loadButton.getPosition().set(windowWidth / 2, windowHeight - windowHeight / 6);
+        loadButton.setPosition(windowWidth / 2, windowHeight - windowHeight / 6);
 
         animatedObject = new AnimatedObject();
-        animatedObject.getPosition().set(windowWidth / 2, windowHeight / 2);
+        animatedObject.setPosition(windowWidth / 2, windowHeight / 2);
 
         add(animatedObject);
         add(loadButton);

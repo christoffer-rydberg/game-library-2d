@@ -61,10 +61,10 @@ public class Slider extends AbstractMouseRoutingObject<Layer<Renderable>> {
         var actual = (int) Math.max(min, Math.min(max, value));
         switch (direction) {
             case HORIZONTAL:
-                handle.getPosition().set(actual * step, 0);
+                handle.setPosition(actual * step, 0);
                 break;
             case VERTICAL:
-                handle.getPosition().set(0, actual * step);
+                handle.setPosition(0, actual * step);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);

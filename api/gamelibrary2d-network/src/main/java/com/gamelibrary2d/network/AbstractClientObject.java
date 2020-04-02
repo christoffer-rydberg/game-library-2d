@@ -19,7 +19,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     protected AbstractClientObject(DataBuffer buffer) {
         id = buffer.getInt();
-        getPosition().set(buffer.getFloat(), buffer.getFloat());
+        setPosition(buffer.getFloat(), buffer.getFloat());
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     public void instantPositionUpdate() {
         if (interpolationAlpha != -1) {
-            getPosition().set(x1, y1);
+            setPosition(x1, y1);
             interpolationAlpha = -1;
         }
     }
@@ -69,7 +69,7 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
 
     private void instantMovement() {
         if (interpolationAlpha != -1) {
-            getPosition().set(x1, y1);
+            setPosition(x1, y1);
             interpolationAlpha = -1;
         }
 
@@ -84,10 +84,10 @@ public abstract class AbstractClientObject extends AbstractMouseAwareObject impl
         if (interpolationAlpha != -1) {
             interpolationAlpha += deltaTime * ups;
             if (interpolationAlpha >= 1f) {
-                getPosition().set(x1, y1);
+                setPosition(x1, y1);
                 interpolationAlpha = -1;
             } else {
-                getPosition().set(x0, y0);
+                setPosition(x0, y0);
                 getPosition().lerp(x1, y1, interpolationAlpha);
             }
         }

@@ -53,7 +53,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         buttonContext.setVerticalAlignment(VerticalAlignment.BOTTOM);
         buttonContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
 
-        button.getPosition().set(posX, posY);
+        button.setPosition(posX, posY);
         button.setBounds(Fonts.getDefaultFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
                 buttonContext.getVerticalAlignment()));
         button.addMouseButtonReleaseListener(mouseEventHandler);

@@ -19,12 +19,6 @@ public interface GameObject extends Transformable, Bounded, Renderable {
     void setOpacity(float opacity);
 
     /**
-     * Sets the rotation of the object in degrees, clockwise, starting from the
-     * positive y-axis.
-     */
-    void setRotation(float rotation);
-
-    /**
      * Checks if the object is enabled. Disabled objects are not rendered or updated.
      */
     boolean isEnabled();

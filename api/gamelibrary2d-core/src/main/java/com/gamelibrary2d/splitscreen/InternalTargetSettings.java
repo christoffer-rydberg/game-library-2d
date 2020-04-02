@@ -8,7 +8,7 @@ class InternalTargetSettings {
     private final Point scaleAndRotationCenter = new Point();
     private float rotation;
 
-    public Point position() {
+    public Point getPosition() {
         return position;
     }
 

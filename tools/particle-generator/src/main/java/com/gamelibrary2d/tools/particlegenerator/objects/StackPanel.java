@@ -53,18 +53,18 @@ public class StackPanel extends AbstractPanel<GameObject> {
         for (int i = startIndex; i < getChildren().size(); ++i) {
             GameObject obj = get(i);
             if (orientation == Orientation.HORIZONTAL) {
-                obj.getPosition().set(obj.getPosition().getX() + offset, obj.getPosition().getY());
+                obj.setPosition(obj.getPosition().getX() + offset, obj.getPosition().getY());
             } else {
-                obj.getPosition().set(obj.getPosition().getX(), obj.getPosition().getY() + offset);
+                obj.setPosition(obj.getPosition().getX(), obj.getPosition().getY() + offset);
             }
         }
     }
 
     private void positionObject(int index, GameObject obj, float margin) {
         if (orientation == Orientation.HORIZONTAL) {
-            obj.getPosition().set(positionX(index) + margin, obj.getPosition().getY());
+            obj.setPosition(positionX(index) + margin, obj.getPosition().getY());
         } else {
-            obj.getPosition().set(obj.getPosition().getX(), positionY(index) + margin);
+            obj.setPosition(obj.getPosition().getX(), positionY(index) + margin);
         }
     }
 

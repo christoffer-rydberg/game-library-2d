@@ -15,7 +15,7 @@ public class BasicSpawnSettingsPanel extends AbstractSpawnSettingsPanel {
         add(new FloatPropertyPanel("Position Pitch", getPositionPitchParameters()));
 
         var slider = ResizeSlider.create(particleSystem, frame);
-        slider.getPosition().set(getBounds().width() / 2 + 10, 0);
+        slider.setPosition(getBounds().width() / 2 + 10, 0);
         add(slider, -slider.getBounds().height() - ROW_HEIGHT);
     }
 

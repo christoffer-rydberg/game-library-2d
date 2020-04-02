@@ -59,29 +59,29 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         backgroundLayer = new BasicLayer<>();
 
         particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
-        particleSettingsPanel.getPosition().set(WINDOW_MARGIN, getGame().getWindow().height() - WINDOW_MARGIN);
+        particleSettingsPanel.setPosition(WINDOW_MARGIN, getGame().getWindow().height() - WINDOW_MARGIN);
 
         basicSpawnSettingsPanel = new BasicSpawnSettingsPanel(this, particleSystem);
-        basicSpawnSettingsPanel.getPosition().set(WINDOW_MARGIN,
+        basicSpawnSettingsPanel.setPosition(WINDOW_MARGIN,
                 getGame().getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         ellipsoidSpawnSettingsPanel = new EllipsoidSpawnSettingsPanel(this, particleSystem);
-        ellipsoidSpawnSettingsPanel.getPosition().set(WINDOW_MARGIN,
+        ellipsoidSpawnSettingsPanel.setPosition(WINDOW_MARGIN,
                 getGame().getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
 
         spawnSettingsPanel = basicSpawnSettingsPanel;
 
         renderSettingsPanel = new RenderSettingsPanel(particleSystem, this);
-        renderSettingsPanel.getPosition().set(
+        renderSettingsPanel.setPosition(
                 getGame().getWindow().width() - renderSettingsPanel.getBounds().width() - WINDOW_MARGIN,
                 getGame().getWindow().height() - WINDOW_MARGIN);
 
         emitterPanel = new EmitterPanel(particleSystem);
-        emitterPanel.getPosition().set(getGame().getWindow().width() - WINDOW_MARGIN,
+        emitterPanel.setPosition(getGame().getWindow().width() - WINDOW_MARGIN,
                 emitterPanel.getBounds().height() + WINDOW_MARGIN);
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
-        saveLoadResetPanel.getPosition().set(WINDOW_MARGIN, WINDOW_MARGIN);
+        saveLoadResetPanel.setPosition(WINDOW_MARGIN, WINDOW_MARGIN);
 
         initializer.onLoad(this::onLoad);
     }
