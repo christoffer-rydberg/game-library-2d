@@ -4,6 +4,7 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.animation.*;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 
@@ -31,7 +32,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         var game = getGame();
         var window = game.getWindow();
         try {
@@ -42,6 +43,26 @@ public class DemoFrame extends AbstractFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     @Override

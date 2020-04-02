@@ -21,7 +21,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             var loadResult = this.loadResult;
             workerThread = null;
             this.loadResult = null;
-            if (loadResult.isSuccessful()) {
+            if (loadResult.error == null) {
                 onLoadingSuccessful(loadResult);
             } else {
                 onLoadingFailed(loadResult);
@@ -75,11 +75,11 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     }
 
     protected static class LoadResult {
-        private final Frame frame;
-        private final Frame previousFrame;
-        private final LoadingContext context;
-        private final FrameDisposal previousFrameDisposal;
-        private final LoadFailedException error;
+        protected final Frame frame;
+        protected final Frame previousFrame;
+        protected final LoadingContext context;
+        protected final FrameDisposal previousFrameDisposal;
+        protected final LoadFailedException error;
 
         private LoadResult(Frame frame, LoadingContext context, Frame previousFrame,
                            FrameDisposal previousFrameDisposal, LoadFailedException error) {
@@ -88,10 +88,6 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             this.context = context;
             this.previousFrameDisposal = previousFrameDisposal;
             this.error = error;
-        }
-
-        boolean isSuccessful() {
-            return error == null;
         }
     }
 }

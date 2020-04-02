@@ -15,9 +15,9 @@ import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSet
 
 public class ParticleFrame extends AbstractFrame implements KeyAware {
 
+    private static final float WINDOW_MARGIN = 40;
     public static float PosX;
     public static float PosY;
-    private final float WINDOW_MARGIN = 40;
     private int dragging = -1;
 
     private ParticleSystemModel particleSystem;
@@ -49,7 +49,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         particleSystem = ParticleSystemModel.create(this);
 
         screenLayer = new BasicLayer<>();
@@ -82,11 +82,10 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, this);
         saveLoadResetPanel.setPosition(WINDOW_MARGIN, WINDOW_MARGIN);
-
-        initializer.onLoad(this::onLoad);
     }
 
-    private void onLoad(LoadingContext context) {
+    @Override
+    protected void onLoad(LoadingContext context) {
         PosX = getGame().getWindow().width() / 2f;
         PosY = getGame().getWindow().height() / 2f;
         add(backgroundLayer);
@@ -97,6 +96,21 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         screenLayer.add(renderSettingsPanel);
         screenLayer.add(emitterPanel);
         screenLayer.add(saveLoadResetPanel);
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     @Override
@@ -159,7 +173,6 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         }
 
         if (!repeat && key == Keyboard.instance().keyEscape()) {
-
             if (!interfaceHidden) {
                 remove(screenLayer);
                 interfaceHidden = true;
@@ -167,8 +180,6 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
                 add(screenLayer);
                 interfaceHidden = false;
             }
-
-            return;
         }
     }
 

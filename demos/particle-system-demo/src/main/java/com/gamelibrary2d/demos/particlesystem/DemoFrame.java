@@ -1,7 +1,9 @@
 package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.settings.BasicSpawnSettings;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
@@ -54,7 +56,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         try {
             // Example of particle system created from code:
             fireSystem = DefaultParticleSystem.create(
@@ -76,6 +78,26 @@ public class DemoFrame extends AbstractFrame {
             e.printStackTrace();
             getGame().exit();
         }
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) throws LoadFailedException {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     private void createFire(float posX, float posY, float delay) {

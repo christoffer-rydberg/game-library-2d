@@ -16,9 +16,28 @@ public class LoadingFrame extends AbstractLoadingFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
-        initializer.onBegin(() -> getGame().setBackgroundColor(Color.LIGHT_CORAL));
-        initializer.onEnd(() -> getGame().setBackgroundColor(Color.BLACK));
+    protected void onInitialize() {
+
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+        getGame().setBackgroundColor(Color.LIGHT_CORAL);
+    }
+
+    @Override
+    protected void onEnd() {
+        getGame().setBackgroundColor(Color.BLACK);
     }
 
     public void setLoadingAction(LoadingAction action) {

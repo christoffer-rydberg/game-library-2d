@@ -32,17 +32,32 @@ public class MenuFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         navigationPanel = new NavigationPanel();
         mainPanel = createMainPanel();
         hostPanel = createHostPanel();
         joinPanel = createJoinPanel();
-        initializer.onLoaded(this::onLoaded);
     }
 
-    private void onLoaded(LoadingContext context) {
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
         add(navigationPanel);
         navigationPanel.navigateTo(mainPanel, false);
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     private <T extends GameObject> void stack(Panel<T> panel, T obj) {

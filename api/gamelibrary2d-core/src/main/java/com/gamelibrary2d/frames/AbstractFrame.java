@@ -2,10 +2,7 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposable;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.common.functional.Action;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
@@ -24,10 +21,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     private boolean disposed;
     private boolean initialized;
     private volatile boolean loaded;
-    private LoadAction loadAction;
-    private ParameterizedAction<LoadingContext> loadedAction;
-    private Action beginAction;
-    private Action endAction;
 
     protected AbstractFrame(Game game) {
         this.game = game;
@@ -55,12 +48,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         disposer = new DisposerStack();
         updaters = new ArrayDeque<>();
 
-        var frameInitializer = new FrameInitializer();
-        onInitialize(frameInitializer);
-        loadAction = frameInitializer.load;
-        loadedAction = frameInitializer.loaded;
-        beginAction = frameInitializer.begin;
-        endAction = frameInitializer.end;
+        onInitialize();
 
         disposer.pushBreak();
         initialized = true;
@@ -80,14 +68,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new LoadFailedException("Frame has not been initialized");
         }
 
-        if (loadAction != null) {
-            try {
-                loadAction.invoke(context);
-            } catch (Exception e) {
-                unload();
-                throw e instanceof LoadFailedException ? (LoadFailedException) e
-                        : new LoadFailedException("Unhandled exception", e);
-            }
+        try {
+            onLoad(context);
+        } catch (Exception e) {
+            unload();
+            throw e instanceof LoadFailedException ? (LoadFailedException) e
+                    : new LoadFailedException("Unhandled exception", e);
         }
 
         loaded = true;
@@ -95,10 +81,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     @Override
     public void loaded(LoadingContext context) {
-        if (loadedAction != null) {
-            loadedAction.invoke(context);
-        }
+        onLoaded(context);
     }
+
 
     @Override
     public boolean isLoaded() {
@@ -202,69 +187,24 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new GameLibrary2DRuntimeException("Frame has not been loaded");
         }
 
-        if (beginAction != null) {
-            beginAction.invoke();
-        }
+        onBegin();
     }
 
     @Override
     public void end() {
-        if (endAction != null) {
-            endAction.invoke();
-        }
-
+        onEnd();
         invokeLater.clear();
     }
 
-    protected abstract void onInitialize(FrameInitializer initializer);
+    protected abstract void onInitialize();
 
-    public interface LoadAction {
-        void invoke(LoadingContext context) throws LoadFailedException;
-    }
+    protected abstract void onLoad(LoadingContext context) throws LoadFailedException;
 
-    protected static class FrameInitializer {
-        private LoadAction load;
-        private ParameterizedAction<LoadingContext> loaded;
-        private Action begin;
-        private Action end;
+    protected abstract void onLoaded(LoadingContext context);
 
-        /**
-         * The specified action is invoked when the frame is loaded. A frame should typically be reloadable if it
-         * is unloaded. It is good practice to place initialization logic, such as initial objects
-         * and positions, inside this action.
-         * <br>
-         * <br>
-         * <strong>Important:</strong> The load-action is invoked by a {@link LoadingFrame} on a separate thread.
-         * Although no other code in the frame should run in parallel, thread-safety must be considered -
-         * especially in regards to thread caching. Another important note is that no OpenGL context is available.
-         * By convention, static "create"-methods accepting a {@link Disposer} requires an OpenGL context. Consider
-         * placing non-thread safe code or OpenGL-related calls in the {@link #onLoaded} action.
-         */
-        public final void onLoad(LoadAction action) {
-            this.load = action;
-        }
+    protected abstract void onBegin();
 
-        /**
-         * The specified action is invoked from the main thread when the frame has loaded.
-         */
-        public final void onLoaded(ParameterizedAction<LoadingContext> action) {
-            this.loaded = action;
-        }
-
-        /**
-         * The specified action is invoked when the frame begins.
-         */
-        public final void onBegin(Action action) {
-            this.begin = action;
-        }
-
-        /**
-         * The specified action is invoked when the frame ends.
-         */
-        public final void onEnd(Action action) {
-            this.end = action;
-        }
-    }
+    protected abstract void onEnd();
 
     private static class DisposerStack {
         private final static Disposable breakMark = () -> {

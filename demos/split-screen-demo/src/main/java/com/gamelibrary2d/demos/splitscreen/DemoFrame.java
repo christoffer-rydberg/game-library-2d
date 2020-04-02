@@ -5,8 +5,10 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.markers.KeyAware;
@@ -14,7 +16,6 @@ import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.QuadsRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.splitscreen.*;
@@ -167,7 +168,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         try {
             spacecraftLayer.getBackground().add(createBackground());
 
@@ -183,11 +184,29 @@ class DemoFrame extends AbstractFrame implements KeyAware {
             }
 
             refreshSplitLayout(spaceCrafts);
-
-            initializer.onBegin(() -> getGame().setBackgroundColor(SPLIT_COLOR));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+        getGame().setBackgroundColor(SPLIT_COLOR);
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     @Override

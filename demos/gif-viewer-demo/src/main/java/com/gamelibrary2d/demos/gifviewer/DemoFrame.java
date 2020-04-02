@@ -8,6 +8,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.objects.ObservableObject;
 import com.gamelibrary2d.renderable.Label;
@@ -19,7 +20,7 @@ import com.gamelibrary2d.util.io.FileChooser;
 import java.io.IOException;
 
 public class DemoFrame extends AbstractFrame {
-    private AnimatedObject animatedObject;
+    private AnimatedObject<AnimationRenderer> animatedObject;
 
     DemoFrame(Game game) {
         super(game);
@@ -43,18 +44,38 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         final float windowWidth = getGame().getWindow().width();
         final float windowHeight = getGame().getWindow().height();
 
         var loadButton = createLoadButton();
         loadButton.setPosition(windowWidth / 2, windowHeight - windowHeight / 6);
 
-        animatedObject = new AnimatedObject();
+        animatedObject = new AnimatedObject<>();
         animatedObject.setPosition(windowWidth / 2, windowHeight / 2);
 
         add(animatedObject);
         add(loadButton);
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     private void selectGif() throws IOException {

@@ -26,9 +26,29 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         getClient().initialize(this);
-        initializer.onLoaded(this::onLoaded);
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext loadingContext) {
+        add(gameArea);
+        add(objectLayer);
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 
     private Renderable createGameArea(Rectangle bounds, float posX, float posY) {
@@ -63,11 +83,6 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
                 windowHeight / 2f + scaledGameBounds.yMin());
 
         boulderRenderer = createBoulderRenderer(gameSettings.getBoulderBounds());
-    }
-
-    private void onLoaded(LoadingContext loadingContext) {
-        add(gameArea);
-        add(objectLayer);
     }
 
     void addBoulder(ClientBoulder boulder) {

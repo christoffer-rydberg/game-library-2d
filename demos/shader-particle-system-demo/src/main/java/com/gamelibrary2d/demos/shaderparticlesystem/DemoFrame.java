@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.shaderparticlesystem;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.resources.Texture;
@@ -16,7 +17,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize(FrameInitializer initializer) {
+    protected void onInitialize() {
         try {
             Window window = getGame().getWindow();
             float windowWidth = window.width();
@@ -38,8 +39,27 @@ public class DemoFrame extends AbstractFrame {
             layer.add(particleSystem);
             add(layer);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onLoad(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(LoadingContext context) {
+
+    }
+
+    @Override
+    protected void onBegin() {
+
+    }
+
+    @Override
+    protected void onEnd() {
+
     }
 }
