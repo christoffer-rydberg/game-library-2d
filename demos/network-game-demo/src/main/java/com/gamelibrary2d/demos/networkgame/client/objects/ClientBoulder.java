@@ -1,6 +1,7 @@
 package com.gamelibrary2d.demos.networkgame.client.objects;
 
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.network.AbstractClientObject;
 import com.gamelibrary2d.renderers.Renderer;
 
@@ -12,8 +13,8 @@ public class ClientBoulder extends AbstractClientObject {
         this.serverUpdatesPerSecond = serverUpdatesPerSecond;
     }
 
-    public void setRenderer(Renderer renderer) {
-        setContent(renderer);
+    public void setContent(Renderable content) {
+        super.setContent(content);
     }
 
     @Override

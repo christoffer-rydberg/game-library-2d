@@ -3,6 +3,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.ObjectFactory;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultPanel;
 import com.gamelibrary2d.layers.NavigationPanel;
@@ -36,10 +37,10 @@ public class MenuFrame extends AbstractFrame {
         mainPanel = createMainPanel();
         hostPanel = createHostPanel();
         joinPanel = createJoinPanel();
-        initializer.onLoad(this::onLoad);
+        initializer.onLoaded(this::onLoaded);
     }
 
-    private void onLoad() {
+    private void onLoaded(LoadingContext context) {
         add(navigationPanel);
         navigationPanel.navigateTo(mainPanel, false);
     }

@@ -2,6 +2,7 @@ package com.gamelibrary2d.network.common.internal;
 
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationStep;
 
 public interface CommunicationStepRunner {
@@ -15,6 +16,6 @@ public interface CommunicationStepRunner {
      * await more data.
      * @throws InitializationException Occurs when initialization fails.
      */
-    boolean run(Communicator communicator, CommunicationStep step) throws InitializationException;
+    boolean run(CommunicationContext context, Communicator communicator, CommunicationStep step) throws InitializationException;
 
 }

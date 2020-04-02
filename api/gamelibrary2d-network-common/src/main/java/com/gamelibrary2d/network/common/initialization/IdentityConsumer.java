@@ -6,7 +6,7 @@ import com.gamelibrary2d.network.common.Communicator;
 public class IdentityConsumer implements ConsumerStep {
 
     @Override
-    public boolean run(Communicator communicator, DataBuffer inbox) {
+    public boolean run(CommunicationContext context, Communicator communicator, DataBuffer inbox) {
         int communicatorId = inbox.getInt();
         communicator.setId(communicatorId);
         return true;

@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.frames.AbstractLoadingFrame;
 import com.gamelibrary2d.frames.Frame;
+import com.gamelibrary2d.frames.LoadingContext;
 
 public class LoadingFrame extends AbstractLoadingFrame {
 
@@ -25,12 +26,12 @@ public class LoadingFrame extends AbstractLoadingFrame {
     }
 
     @Override
-    protected void loadFrame(Frame frame) throws LoadFailedException {
+    protected void loadFrame(Frame frame, LoadingContext context) throws LoadFailedException {
         if (loadingAction != null) {
             loadingAction.invoke();
         }
-        
-        super.loadFrame(frame);
+
+        super.loadFrame(frame, context);
     }
 
     public interface LoadingAction {

@@ -50,13 +50,21 @@ abstract class InternalAbstractServer implements Server {
         var steps = new InternalCommunicationSteps();
         try {
             steps.add(new IdentityProducer(communicatorIdFactory));
-            steps.add(this::onConnected);
+            steps.add(this::connectedStep);
             communicator.configureAuthentication(steps);
-            steps.add(this::onAuthenticated);
+            steps.add(this::authenticatedStep);
             configureClientInitialization(steps);
         } finally {
             pendingCommunicators.add(new PendingCommunicator(communicator, new CommunicatorInitializer(steps.getAll())));
         }
+    }
+
+    private void connectedStep(CommunicationContext context, Communicator communicator) {
+        onConnected(communicator);
+    }
+
+    private void authenticatedStep(CommunicationContext context, Communicator communicator) {
+        onAuthenticated(communicator);
     }
 
     private void onAuthenticated(Communicator communicator) {
@@ -161,11 +169,13 @@ abstract class InternalAbstractServer implements Server {
 
     private void runCommunicationSteps(Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
         try {
+            var context = new DefaultCommunicationContext();
+
             InitializationResult result;
             do {
-                result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
+                result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
                 if (result == InitializationResult.AWAITING_DATA && communicator.readIncoming(incomingBuffer)) {
-                    result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
+                    result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
                 }
             } while (result == InitializationResult.PENDING);
 
@@ -181,7 +191,7 @@ abstract class InternalAbstractServer implements Server {
         }
     }
 
-    private boolean runCommunicationStep(Communicator communicator, CommunicationStep step)
+    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
             throws InitializationException {
         if (step instanceof ConsumerStep) {
             while (true) {
@@ -190,7 +200,7 @@ abstract class InternalAbstractServer implements Server {
                     return false;
                 }
 
-                var hasCompleted = ((ConsumerStep) step).run(communicator, incomingBuffer);
+                var hasCompleted = ((ConsumerStep) step).run(context, communicator, incomingBuffer);
                 if (hasCompleted) {
                     return true;
                 }
@@ -201,7 +211,7 @@ abstract class InternalAbstractServer implements Server {
             }
 
         } else if (step instanceof ProducerStep) {
-            ((ProducerStep) step).run(communicator);
+            ((ProducerStep) step).run(context, communicator);
             return true;
         } else {
             throw new InitializationException("Unknown communication step");

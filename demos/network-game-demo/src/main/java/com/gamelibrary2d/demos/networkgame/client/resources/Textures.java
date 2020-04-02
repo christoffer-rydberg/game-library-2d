@@ -10,11 +10,14 @@ import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.RenderSettings;
 
+import java.io.IOException;
+
 public class Textures {
     private static Texture button;
     private static Texture inputField;
+    private static Texture boulder;
 
-    public static void create(Disposer disposer) {
+    public static void create(Disposer disposer) throws IOException {
         button = createQuadStackTexture(
                 Settings.BUTTON_SIZE,
                 Color.WHITE.divide(10),
@@ -23,6 +26,10 @@ public class Textures {
                 disposer);
 
         inputField = button;
+
+        boulder = Texture.create(
+                Textures.class.getClassLoader().getResource("boulder.png"),
+                disposer);
     }
 
     public static Texture button() {
@@ -31,6 +38,10 @@ public class Textures {
 
     public static Texture inputField() {
         return inputField;
+    }
+
+    public static Texture boulder() {
+        return boulder;
     }
 
     public static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {

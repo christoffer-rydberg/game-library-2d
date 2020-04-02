@@ -13,8 +13,9 @@ public interface ProducerStep extends CommunicationStep {
     /**
      * Runs the communication step.
      *
+     * @param context      Accumulated through each step.
      * @param communicator The communicator.
      */
-    void run(Communicator communicator) throws InitializationException;
+    void run(CommunicationContext context, Communicator communicator) throws InitializationException;
 
 }

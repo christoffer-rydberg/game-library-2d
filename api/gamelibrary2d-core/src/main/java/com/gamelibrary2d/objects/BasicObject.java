@@ -13,11 +13,6 @@ public final class BasicObject<T extends Renderable> extends AbstractGameObject<
         super(content);
     }
 
-    public BasicObject(T content, Rectangle bounds) {
-        super(content);
-        setBounds(bounds);
-    }
-
     @Override
     public void setBounds(Rectangle bounds) {
         super.setBounds(bounds);

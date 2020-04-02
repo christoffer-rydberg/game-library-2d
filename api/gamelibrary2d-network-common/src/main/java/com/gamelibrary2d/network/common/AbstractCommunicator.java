@@ -12,12 +12,13 @@ import java.io.IOException;
 public abstract class AbstractCommunicator implements Communicator {
 
     private final DataBuffer outgoingBuffer;
-
     private final EventPublisher<CommunicatorDisconnected> disconnectedPublisher = new DefaultEventPublisher<>();
     private final IncomingBufferMonitor[] incomingBufferMonitor;
+
+    private volatile int id;
     private volatile boolean connected;
+
     private boolean authenticated;
-    private int id;
 
     protected AbstractCommunicator(int incomingChannels, boolean connected) {
         incomingBufferMonitor = new IncomingBufferMonitor[incomingChannels];

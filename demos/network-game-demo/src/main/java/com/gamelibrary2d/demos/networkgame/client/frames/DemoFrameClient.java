@@ -9,9 +9,12 @@ import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.ClientObject;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DemoFrameClient extends AbstractClient {
@@ -27,34 +30,28 @@ public class DemoFrameClient extends AbstractClient {
 
     @Override
     public void onConfigureInitialization(CommunicationSteps steps) {
-        steps.add(this::readUpdateRate);
-        steps.add(this::readGameSettings);
+        steps.read("updateRate", DataBuffer::getFloat);
+        steps.read(GameSettings::new);
         steps.add(this::readState);
     }
 
-    private boolean readUpdateRate(Communicator communicator, DataBuffer buffer) {
-        serverUpdatesPerSecond = buffer.getFloat();
-        return true;
-    }
-
-    private boolean readGameSettings(Communicator communicator, DataBuffer buffer) {
-        var gameSettings = new GameSettings(buffer);
-        frame.invokeLater(() -> frame.applySettings(gameSettings));
-        return true;
-    }
-
-    private boolean readState(Communicator communicator, DataBuffer buffer) {
-        int boulders = buffer.getInt();
-        for (int i = 0; i < boulders; ++i) {
-            // TODO: Read object header
-            spawnBoulder(buffer);
-        }
+    private boolean readState(CommunicationContext context, Communicator communicator, DataBuffer buffer) {
+        var serverUpdatesPerSecond = context.get(Float.class, "updateRate");
+        var gameState = new InitialState(serverUpdatesPerSecond, buffer);
+        context.register(gameState);
         return true;
     }
 
     @Override
-    public void onInitialized() {
+    public void initialized(CommunicationContext context) {
+        serverUpdatesPerSecond = context.get(Float.class, "updateRate");
+        frame.applySettings(context.get(GameSettings.class));
 
+        var gameState = context.get(InitialState.class);
+        for (var boulder : gameState.getBoulders()) {
+            frame.addBoulder(boulder);
+            objects.put(boulder.getId(), boulder);
+        }
     }
 
     @Override
@@ -114,5 +111,21 @@ public class DemoFrameClient extends AbstractClient {
         System.err.println("Disconnected from server");
         cause.printStackTrace();
         frame.getGame().exit();
+    }
+
+    private static class InitialState {
+        private final List<ClientBoulder> boulders;
+
+        InitialState(float serverUpdatesPerSecond, DataBuffer buffer) {
+            var size = buffer.getInt();
+            boulders = new ArrayList<>(size);
+            for (int i = 0; i < size; ++i) {
+                boulders.add(new ClientBoulder(buffer, serverUpdatesPerSecond));
+            }
+        }
+
+        List<ClientBoulder> getBoulders() {
+            return boulders;
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Action;
+import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
@@ -23,9 +24,8 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     private boolean disposed;
     private boolean initialized;
     private volatile boolean loaded;
-    private boolean firstTimeUsage = true;
     private LoadAction loadAction;
-    private Action loadedAction;
+    private ParameterizedAction<LoadingContext> loadedAction;
     private Action beginAction;
     private Action endAction;
 
@@ -72,7 +72,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void load() throws LoadFailedException {
+    public void load(LoadingContext context) throws LoadFailedException {
         if (isLoaded())
             return;
 
@@ -82,7 +82,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
         if (loadAction != null) {
             try {
-                loadAction.invoke();
+                loadAction.invoke(context);
             } catch (Exception e) {
                 unload();
                 throw e instanceof LoadFailedException ? (LoadFailedException) e
@@ -91,6 +91,13 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         }
 
         loaded = true;
+    }
+
+    @Override
+    public void loaded(LoadingContext context) {
+        if (loadedAction != null) {
+            loadedAction.invoke(context);
+        }
     }
 
     @Override
@@ -135,7 +142,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         clear();
         updaters.clear();
         loaded = false;
-        firstTimeUsage = true;
     }
 
     protected void runUpdater(Updater updater) {
@@ -196,14 +202,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new GameLibrary2DRuntimeException("Frame has not been loaded");
         }
 
-        if (firstTimeUsage) {
-            if (loadedAction != null) {
-                loadedAction.invoke();
-            }
-
-            firstTimeUsage = false;
-        }
-
         if (beginAction != null) {
             beginAction.invoke();
         }
@@ -221,12 +219,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     protected abstract void onInitialize(FrameInitializer initializer);
 
     public interface LoadAction {
-        void invoke() throws LoadFailedException;
+        void invoke(LoadingContext context) throws LoadFailedException;
     }
 
     protected static class FrameInitializer {
         private LoadAction load;
-        private Action loaded;
+        private ParameterizedAction<LoadingContext> loaded;
         private Action begin;
         private Action end;
 
@@ -249,7 +247,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         /**
          * The specified action is invoked from the main thread when the frame has loaded.
          */
-        public final void onLoaded(Action action) {
+        public final void onLoaded(ParameterizedAction<LoadingContext> action) {
             this.loaded = action;
         }
 

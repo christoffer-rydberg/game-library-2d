@@ -22,9 +22,23 @@ public interface Frame extends Layer<Renderable>, Disposer {
     /**
      * Typically invoked from a separate thread by a {@link LoadingFrame}.
      * No OpenGL context is available and the implementation of this method must be thread safe.
+     * Loaded resources should be registered in the specified {@link LoadingContext} and can be
+     * added to the frame in a thread-safe manner when {@link #loaded} is invoked.
+     * <br>
+     * <br>
      * This method is invoked after {@link #initialize}.
+     *
+     * @param context Used to registered loaded items.
+     * @throws LoadFailedException
      */
-    void load() throws LoadFailedException;
+    void load(LoadingContext context) throws LoadFailedException;
+
+    /**
+     * Invoked after {@link #load} from the main thread with the loaded resources.
+     *
+     * @param context The loaded context.
+     */
+    void loaded(LoadingContext context);
 
     /**
      * @return True if the frame has been {@link #load loaded}, false otherwise.

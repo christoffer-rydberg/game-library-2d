@@ -2,9 +2,10 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.demos.networkgame.client.objects.ClientBoulder;
+import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.layers.LayerObject;
@@ -13,14 +14,11 @@ import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.RenderSettings;
 
-import java.io.IOException;
-
 public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
-    private Renderer boulderRenderer;
-    private Texture boulderTexture;
+    private Renderable gameArea;
+    private Renderable boulderRenderer;
     private LayerObject<Renderable> objectLayer = new DynamicLayer<>();
 
     public DemoFrame(Game game) {
@@ -30,14 +28,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     @Override
     protected void onInitialize(FrameInitializer initializer) {
         getClient().initialize(this);
-
-        try {
-            boulderTexture = Texture.create(
-                    getClass().getClassLoader().getResource("boulder.png"),
-                    this);
-        } catch (IOException e) {
-            throw new GameLibrary2DRuntimeException("Failed to initialize frame", e);
-        }
+        initializer.onLoaded(this::onLoaded);
     }
 
     private Renderable createGameArea(Rectangle bounds, float posX, float posY) {
@@ -49,30 +40,38 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         return obj;
     }
 
+    private Renderer createBoulderRenderer(Rectangle bounds) {
+        var quad = Quad.create(bounds.resize(1.25f), this);
+        return new SurfaceRenderer(quad, Textures.boulder());
+    }
+
     void applySettings(GameSettings gameSettings) {
         var windowWidth = getGame().getWindow().width();
         var windowHeight = getGame().getWindow().height();
         var gameBounds = gameSettings.getGameBounds();
         var scale = Math.min(windowWidth / gameBounds.width(), windowHeight / gameBounds.height());
-        var gameArea = Rectangle.centered(gameBounds.width() * scale, gameBounds.height() * scale);
+        var scaledGameBounds = Rectangle.centered(gameBounds.width(), gameBounds.height()).resize(scale);
 
-        add(createGameArea(
-                gameArea,
+        gameArea = createGameArea(
+                scaledGameBounds,
                 windowWidth / 2f,
-                windowHeight / 2f));
-
-        add(objectLayer);
+                windowHeight / 2f);
 
         objectLayer.getScale().set(scale, scale);
-        objectLayer.getPosition().set(windowWidth / 2f + gameArea.xMin(), windowHeight / 2f + gameArea.yMin());
+        objectLayer.getPosition().set(
+                windowWidth / 2f + scaledGameBounds.xMin(),
+                windowHeight / 2f + scaledGameBounds.yMin());
 
-        var boulderBounds = gameSettings.getBoulderBounds();
-        var boulderQuad = Quad.create(boulderBounds.resize(1.25f), this);
-        boulderRenderer = new SurfaceRenderer(boulderQuad, boulderTexture);
+        boulderRenderer = createBoulderRenderer(gameSettings.getBoulderBounds());
+    }
+
+    private void onLoaded(LoadingContext loadingContext) {
+        add(gameArea);
+        add(objectLayer);
     }
 
     void addBoulder(ClientBoulder boulder) {
-        boulder.setRenderer(boulderRenderer);
+        boulder.setContent(boulderRenderer);
         objectLayer.add(boulder);
     }
 }

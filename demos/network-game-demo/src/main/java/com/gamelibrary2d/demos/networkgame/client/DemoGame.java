@@ -15,6 +15,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 import com.gamelibrary2d.network.common.Communicator;
 
+import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -35,11 +36,16 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onStart() {
-        showSplashScreen();
-        createGlobalResources();
-        initializeFrames();
-        setLoadingFrame(loadingFrame);
-        setFrame(menuFrame, FrameDisposal.DISPOSE);
+        try {
+            showSplashScreen();
+            createGlobalResources();
+            initializeFrames();
+            setLoadingFrame(loadingFrame);
+            setFrame(menuFrame, FrameDisposal.DISPOSE);
+        } catch (Exception e) {
+            System.err.println("Failed to start game");
+            e.printStackTrace();
+        }
     }
 
     private void loadDemoFrame(Future<Communicator> futureCommunicator) {
@@ -74,7 +80,7 @@ public class DemoGame extends AbstractGame {
         renderFrame();
     }
 
-    private void createGlobalResources() {
+    private void createGlobalResources() throws IOException {
         Fonts.create(this);
         Surfaces.create(this);
         Textures.create(this);

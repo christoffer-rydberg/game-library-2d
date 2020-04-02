@@ -4,7 +4,6 @@ import com.gamelibrary2d.collision.Collidable;
 import com.gamelibrary2d.collision.CollisionDetection;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
-import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 
 public class DemoGameLogic {
     private final DemoGameServer server;
@@ -41,6 +40,6 @@ public class DemoGameLogic {
         var boulder = new ServerBoulder(settings.getGameBounds(), settings.getBoulderBounds());
         boulder.getPosition().set(x, y);
         collisionDetection.add(boulder);
-        server.createObject(ServerMessages.SPAWN_BOULDER, boulder);
+        server.createObject(boulder);
     }
 }

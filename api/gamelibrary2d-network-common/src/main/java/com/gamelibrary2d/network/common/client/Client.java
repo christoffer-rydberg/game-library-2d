@@ -3,6 +3,7 @@ package com.gamelibrary2d.network.common.client;
 import com.gamelibrary2d.common.updating.UpdateAction;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 
 import java.util.concurrent.Future;
 
@@ -14,9 +15,11 @@ public interface Client {
 
     boolean isConnected();
 
-    void authenticate() throws InitializationException;
+    void authenticate(CommunicationContext context) throws InitializationException;
 
-    void initialize() throws InitializationException;
+    void initialize(CommunicationContext context) throws InitializationException;
+
+    void initialized(CommunicationContext context);
 
     void update(float deltaTime);
 

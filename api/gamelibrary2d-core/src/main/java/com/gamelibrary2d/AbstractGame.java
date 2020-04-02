@@ -8,6 +8,7 @@ import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.frames.DefaultLoadingContext;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.frames.LoadingFrame;
@@ -302,7 +303,9 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
             if (!frame.isLoaded()) {
                 try {
-                    frame.load();
+                    var loadContext = new DefaultLoadingContext();
+                    frame.load(loadContext);
+                    frame.loaded(loadContext);
                 } catch (LoadFailedException e) {
                     e.printStackTrace();
                     return;

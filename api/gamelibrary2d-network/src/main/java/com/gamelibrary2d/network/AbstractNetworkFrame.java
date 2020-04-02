@@ -3,27 +3,31 @@ package com.gamelibrary2d.network;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.exceptions.LoadFailedException;
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.network.common.client.Client;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
+import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
 
 import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractNetworkFrame<T extends Client>
         extends AbstractFrame {
 
-    private final T frameClient;
+    private final T client;
+    private final Object clientContextKey = new Object();
 
-    protected AbstractNetworkFrame(Game game, T frameClient) {
+    protected AbstractNetworkFrame(Game game, T client) {
         super(game);
-        this.frameClient = frameClient;
+        this.client = client;
     }
 
     public T getClient() {
-        return frameClient;
+        return client;
     }
 
     @Override
-    public void load() throws LoadFailedException {
+    public void load(LoadingContext context) throws LoadFailedException {
         if (isLoaded())
             return;
 
@@ -32,19 +36,22 @@ public abstract class AbstractNetworkFrame<T extends Client>
             return;
         }
 
-        if (!frameClient.isConnected()) {
+        if (!client.isConnected()) {
             try {
-                frameClient.connect().get();
+                client.connect().get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new LoadFailedException("Failed to connect to server", e);
             }
         }
 
+
         try {
-            frameClient.clearInbox();
-            frameClient.authenticate();
-            super.load();
-            frameClient.initialize();
+            client.clearInbox();
+            var clientContext = new DefaultCommunicationContext();
+            client.authenticate(clientContext);
+            super.load(context);
+            client.initialize(clientContext);
+            context.register(clientContextKey, clientContext);
         } catch (InitializationException e) {
             unload();
             throw new LoadFailedException("Client/server communication failed", e);
@@ -52,8 +59,15 @@ public abstract class AbstractNetworkFrame<T extends Client>
     }
 
     @Override
+    public void loaded(LoadingContext context) {
+        client.initialized(context.get(CommunicationContext.class, clientContextKey));
+        super.loaded(context);
+
+    }
+
+    @Override
     protected final void onUpdate(float deltaTime) {
-        frameClient.update(deltaTime, this::handleUpdate);
+        client.update(deltaTime, this::handleUpdate);
     }
 
     protected void handleUpdate(float deltaTime) {

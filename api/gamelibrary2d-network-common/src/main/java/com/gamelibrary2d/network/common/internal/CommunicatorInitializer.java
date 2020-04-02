@@ -2,6 +2,7 @@ package com.gamelibrary2d.network.common.internal;
 
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationStep;
 
 import java.util.ArrayDeque;
@@ -15,7 +16,7 @@ public class CommunicatorInitializer {
         this.initializationSteps = new ArrayDeque<>(initializationSteps);
     }
 
-    public InitializationResult runCommunicationStep(Communicator communicator, CommunicationStepRunner runner)
+    public InitializationResult runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStepRunner runner)
             throws InitializationException {
 
         if (initializationSteps.isEmpty()) {
@@ -23,7 +24,7 @@ public class CommunicatorInitializer {
         }
 
         var next = initializationSteps.peekFirst();
-        if (runner.run(communicator, next)) {
+        if (runner.run(context, communicator, next)) {
             initializationSteps.pollFirst();
             return initializationSteps.isEmpty() ? InitializationResult.FINISHED : InitializationResult.PENDING;
         }

@@ -1,6 +1,7 @@
 package com.gamelibrary2d.tools.particlegenerator;
 
 import com.gamelibrary2d.frames.AbstractFrame;
+import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.BasicLayer;
@@ -85,7 +86,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         initializer.onLoad(this::onLoad);
     }
 
-    private void onLoad() {
+    private void onLoad(LoadingContext context) {
         PosX = getGame().getWindow().width() / 2f;
         PosY = getGame().getWindow().height() / 2f;
         add(backgroundLayer);

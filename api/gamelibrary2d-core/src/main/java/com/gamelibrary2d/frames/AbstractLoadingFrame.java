@@ -22,9 +22,9 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             workerThread = null;
             this.loadResult = null;
             if (loadResult.isSuccessful()) {
-                onLoadingSuccessful(loadResult.frame, loadResult.previousFrame, loadResult.previousFrameDisposal);
+                onLoadingSuccessful(loadResult);
             } else {
-                onLoadingFailed(loadResult.frame, loadResult.previousFrame, loadResult.previousFrameDisposal, loadResult.error);
+                onLoadingFailed(loadResult);
             }
         }
     }
@@ -40,18 +40,19 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         }
     }
 
-    protected void onLoadingSuccessful(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) {
+    protected void onLoadingSuccessful(LoadResult result) {
         verifyNotLoading();
-        changeFrame(frame, previousFrame, previousFrameDisposal);
+        result.frame.loaded(result.context);
+        changeFrame(result.frame, result.previousFrame, result.previousFrameDisposal);
     }
 
-    protected void onLoadingFailed(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal, LoadFailedException error) {
+    protected void onLoadingFailed(LoadResult result) {
         verifyNotLoading();
-        game.setFrame(previousFrame, FrameDisposal.NONE);
+        game.setFrame(result.previousFrame, FrameDisposal.NONE);
     }
 
-    protected void loadFrame(Frame frame) throws LoadFailedException {
-        frame.load();
+    protected void loadFrame(Frame frame, LoadingContext context) throws LoadFailedException {
+        frame.load(context);
     }
 
     @Override
@@ -61,26 +62,30 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             changeFrame(frame, previousFrame, previousFrameDisposal);
         } else {
             workerThread = new Thread(() -> {
+                var context = new DefaultLoadingContext();
                 try {
-                    loadFrame(frame);
-                    loadResult = new LoadResult(frame, previousFrame, previousFrameDisposal, null);
+                    loadFrame(frame, context);
+                    loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, null);
                 } catch (LoadFailedException e) {
-                    loadResult = new LoadResult(frame, previousFrame, previousFrameDisposal, e);
+                    loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, e);
                 }
             });
             workerThread.start();
         }
     }
 
-    private static class LoadResult {
+    protected static class LoadResult {
         private final Frame frame;
         private final Frame previousFrame;
+        private final LoadingContext context;
         private final FrameDisposal previousFrameDisposal;
         private final LoadFailedException error;
 
-        private LoadResult(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal, LoadFailedException error) {
+        private LoadResult(Frame frame, LoadingContext context, Frame previousFrame,
+                           FrameDisposal previousFrameDisposal, LoadFailedException error) {
             this.frame = frame;
             this.previousFrame = previousFrame;
+            this.context = context;
             this.previousFrameDisposal = previousFrameDisposal;
             this.error = error;
         }

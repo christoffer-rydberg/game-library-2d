@@ -32,11 +32,11 @@ public class ServerManager {
     }
 
     public Future<Communicator> joinNetworkServer(String ip, int port) {
-        var futureCommunicator = new CompletableFuture<Communicator>();
-        var communicator = createNetworkCommunicator(ip, port);
-        connectCommunicator(communicator);
-        futureCommunicator.complete(communicator);
-        return futureCommunicator;
+        return CompletableFuture.supplyAsync(() -> {
+            var communicator = createNetworkCommunicator(ip, port);
+            connectCommunicator(communicator);
+            return communicator;
+        });
     }
 
     public void stopHostedServer() {
@@ -77,7 +77,7 @@ public class ServerManager {
     }
 
     private void authenticate(CommunicationSteps steps) {
-        steps.add(communicator -> {
+        steps.add((context, communicator) -> {
             var outgoing = communicator.getOutgoing();
             Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, outgoing);
         });

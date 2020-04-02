@@ -66,22 +66,28 @@ public abstract class AbstractClient implements Client {
     }
 
     @Override
-    public void authenticate() throws InitializationException {
+    public void authenticate(CommunicationContext context) throws InitializationException {
         var communicator = getCommunicator();
         if (!communicator.isAuthenticated()) {
             var steps = new InternalCommunicationSteps();
             configureAuthentication(communicator, steps);
-            runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
+            runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
         }
     }
 
-    @Override
     public void initialize() throws InitializationException {
+        var context = new DefaultCommunicationContext();
+        authenticate(context);
+        initialize(context);
+        initialized(context);
+    }
+
+    @Override
+    public void initialize(CommunicationContext context) throws InitializationException {
         var communicator = getCommunicator();
         var steps = new InternalCommunicationSteps();
         configureInitialization(steps);
-        runCommunicationSteps(communicator, new CommunicatorInitializer(steps.getAll()));
-        onInitialized();
+        runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
     }
 
     @Override
@@ -188,13 +194,13 @@ public abstract class AbstractClient implements Client {
         return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
-    private void runCommunicationSteps(Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
+    private void runCommunicationSteps(CommunicationContext context, Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
         CommunicatorInitializer.InitializationResult result;
 
         int retries = 0;
         do {
 
-            result = initializer.runCommunicationStep(communicator, this::runCommunicationStep);
+            result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
             if (result == CommunicatorInitializer.InitializationResult.AWAITING_DATA) {
 
                 if (retries == getInitializationRetries()) {
@@ -235,17 +241,17 @@ public abstract class AbstractClient implements Client {
         }
     }
 
-    private boolean runCommunicationStep(Communicator communicator, CommunicationStep step)
+    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
             throws InitializationException {
         if (step instanceof ConsumerStep) {
             try {
-                return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(communicator, inbox);
+                return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(context, communicator, inbox);
             } catch (IOException e) {
                 communicator.disconnect(e);
                 throw new InitializationException("Connection has been lost", e);
             }
         } else if (step instanceof ProducerStep) {
-            ((ProducerStep) step).run(communicator);
+            ((ProducerStep) step).run(context, communicator);
             return true;
         } else {
             throw new InitializationException("Unknown communication step");
@@ -275,11 +281,9 @@ public abstract class AbstractClient implements Client {
         onDisconnected(communicatorDisconnected.getCommunicator(), communicatorDisconnected.getCause());
     }
 
-    private void onAuthenticated(Communicator communicator) {
+    private void onAuthenticated(CommunicationContext context, Communicator communicator) {
         communicator.onAuthenticated();
     }
-
-    protected abstract void onInitialized();
 
     protected abstract void onConfigureInitialization(CommunicationSteps steps);
 

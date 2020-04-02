@@ -107,7 +107,6 @@ public class DynamicByteBuffer implements DataBuffer {
     }
 
     public void ensureRemaining(int bytes) {
-
         final int position = internalByteBuffer.position();
         final int minCapacity = bytes + position;
         final int capacity = capacity();

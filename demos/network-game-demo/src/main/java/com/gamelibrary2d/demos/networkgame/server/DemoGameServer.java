@@ -5,10 +5,9 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
-import com.gamelibrary2d.network.ServerObject;
-import com.gamelibrary2d.network.ServerObjectRegister;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.Server;
 import com.gamelibrary2d.network.common.server.ServerContext;
@@ -21,7 +20,8 @@ public class DemoGameServer implements ServerContext {
     private final static int STREAM_UPDATE_RATE = 3;
     private final static float STREAMS_PER_SECOND = UPDATES_PER_SECOND / STREAM_UPDATE_RATE;
     private final BitParser bitParser = new BitParser(ByteBuffer.wrap(new byte[NetworkConstants.UPDATE_BUFFER_BYTE_SIZE]));
-    private final ServerObjectRegister objectRegister = new ServerObjectRegister();
+
+    private final ServerState state = new ServerState();
 
     private final Server server;
     private final DemoGameLogic gameLogic;
@@ -62,26 +62,12 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void configureClientInitialization(CommunicationSteps steps) {
         steps.add(this::sendUpdateRate);
-        steps.add(this::sendGameSettings);
-        steps.add(this::sendState);
+        steps.write(gameLogic::getGameSettings);
+        steps.write(() -> state);
     }
 
-    private void sendState(Communicator communicator) {
-        var buffer = communicator.getOutgoing();
-        var objects = objectRegister.getRegisteredObjects();
-        buffer.putInt(objects.size());
-        for (var obj : objects) {
-            // TODO: Include object header so they can be properly deserialized
-            obj.serializeMessage(buffer);
-        }
-    }
-
-    private void sendUpdateRate(Communicator communicator) {
+    private void sendUpdateRate(CommunicationContext context, Communicator communicator) {
         communicator.getOutgoing().putFloat(STREAMS_PER_SECOND);
-    }
-
-    private void sendGameSettings(Communicator communicator) {
-        gameLogic.getGameSettings().serializeMessage(communicator.getOutgoing());
     }
 
     @Override
@@ -109,14 +95,13 @@ public class DemoGameServer implements ServerContext {
         log("Server has stopped");
     }
 
-    private boolean authenticate(Communicator communicator, DataBuffer buffer) throws InitializationException {
+    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws InitializationException {
         var serverPassword = Read.textWithSizeHeader(buffer, StandardCharsets.UTF_8);
         if (!serverPassword.equals("serverPassword123")) {
             throw new InitializationException("Wrong password");
         }
         return true;
     }
-
 
     @Override
     public void update(float deltaTime) {
@@ -131,12 +116,18 @@ public class DemoGameServer implements ServerContext {
         }
     }
 
+    void createObject(ServerBoulder obj) {
+        state.register(obj);
+        server.sendToAll(ServerMessages.SPAWN_BOULDER, false);
+        server.sendToAll(obj, false);
+    }
+
     private void updateClients() {
         server.sendToAll(ServerMessages.POSITION_UPDATE, true);
 
         bitParser.position(NetworkConstants.HEADER_BIT_SIZE);
 
-        var balls = objectRegister.getRegisteredObjects();
+        var balls = state.getRegistered();
         for (var object : balls) {
             bitParser.putInt(object.getId(), NetworkConstants.OBJECT_ID_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.POS_X_BIT_SIZE);
@@ -162,11 +153,5 @@ public class DemoGameServer implements ServerContext {
     private void log(String message, Throwable e) {
         System.out.println(message);
         e.printStackTrace();
-    }
-
-    void createObject(byte id, ServerObject obj) {
-        objectRegister.register(obj);
-        server.sendToAll(id, false);
-        server.sendToAll(obj, false);
     }
 }

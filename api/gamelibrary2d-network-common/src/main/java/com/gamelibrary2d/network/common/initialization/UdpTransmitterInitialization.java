@@ -10,8 +10,7 @@ import java.io.IOException;
 public class UdpTransmitterInitialization implements ConsumerStep {
 
     @Override
-    public boolean run(Communicator communicator, DataBuffer inbox) throws InitializationException {
-
+    public boolean run(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws InitializationException {
         var sendUdp = inbox.getBool();
         if (!sendUdp)
             return true;

@@ -15,7 +15,7 @@ public class UdpReceiverInitialization implements ProducerStep {
     }
 
     @Override
-    public void run(Communicator communicator) throws InitializationException {
+    public void run(CommunicationContext context, Communicator communicator) throws InitializationException {
         var buffer = communicator.getOutgoing();
         if (communicator instanceof UdpReceiver) {
             var udpConnector = (UdpReceiver) communicator;

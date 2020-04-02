@@ -12,7 +12,7 @@ public class IdentityProducer implements ProducerStep {
     }
 
     @Override
-    public void run(Communicator communicator) {
+    public void run(CommunicationContext context, Communicator communicator) {
         int id = idFactory.create();
         communicator.setId(id);
         communicator.getOutgoing().putInt(id);

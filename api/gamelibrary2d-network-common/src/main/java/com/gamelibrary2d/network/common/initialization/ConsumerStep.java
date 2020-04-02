@@ -16,11 +16,12 @@ public interface ConsumerStep extends CommunicationStep {
      * available in the inbox buffer. It will be invoked repeatedly until the step
      * is completed, which is indicated by the return value.
      *
+     * @param context      Accumulated through each step.
      * @param communicator The communicator.
      * @param inbox        The inbox buffer.
      * @return True if the step has completed, false otherwise.
      * @throws InitializationException Occurs if the communication step fails.
      */
-    boolean run(Communicator communicator, DataBuffer inbox) throws InitializationException;
+    boolean run(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws InitializationException;
 
 }

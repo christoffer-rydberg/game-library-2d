@@ -5,22 +5,21 @@ import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.nio.charset.StandardCharsets;
 
 public class DemoClient extends AbstractClient {
-    private final Communicator communicator;
     private final UpdateLoop updateLoop;
 
     DemoClient(Communicator communicator) {
-        this.communicator = communicator;
+        setCommunicator(communicator);
         updateLoop = new UpdateLoop(this::update, 10);
     }
 
     void run() throws InitializationException {
         initialize();
-        authenticate();
         updateLoop.run();
     }
 
@@ -47,13 +46,8 @@ public class DemoClient extends AbstractClient {
     }
 
     @Override
-    protected void onInitialized() {
+    public void initialized(CommunicationContext context) {
         sendMessage("What do you call a guy with a rubber toe?");
-    }
-
-    @Override
-    public Communicator getCommunicator() {
-        return communicator;
     }
 
     @Override
