@@ -22,13 +22,6 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
         serverSideCommunicator = new LocalServerSideCommunicator(this, localServer);
     }
 
-    private static void addIncoming(DataBuffer buffer, DataBuffer b) {
-        int size = buffer.remaining();
-        b.putBool(false);
-        b.putInt(size);
-        b.put(buffer);
-    }
-
     @Override
     public Future<Void> connect() {
         if (setConnected()) {
@@ -51,7 +44,7 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
 
     @Override
     protected void send(DataBuffer buffer) throws IOException {
-        serverSideCommunicator.addIncoming(b -> addIncoming(buffer, b), 0);
+        serverSideCommunicator.addIncoming(b -> Util.addIncoming(buffer, b), 0);
     }
 
     @Override
@@ -68,12 +61,12 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
     }
 
     private static class LocalServerSideCommunicator extends AbstractCommunicator {
-        private final Communicator serverSideCommunicator;
+        private final Communicator clientSideCommunicator;
         private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
-        LocalServerSideCommunicator(Communicator host, LocalServer server) {
+        LocalServerSideCommunicator(Communicator clientSideCommunicator, LocalServer server) {
             super(1, true);
-            this.serverSideCommunicator = host;
+            this.clientSideCommunicator = clientSideCommunicator;
             this.configureAuthentication = server::configureClientAuthentication;
         }
 
@@ -89,12 +82,21 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
 
         @Override
         protected void send(DataBuffer buffer) throws IOException {
-            serverSideCommunicator.addIncoming(b -> AbstractLocalCommunicator.addIncoming(buffer, b), 0);
+            clientSideCommunicator.addIncoming(b -> Util.addIncoming(buffer, b), 0);
         }
 
         @Override
         protected void onDisconnected(Throwable cause) {
-            serverSideCommunicator.disconnect();
+            clientSideCommunicator.disconnect();
+        }
+    }
+
+    private static class Util {
+        private static void addIncoming(DataBuffer buffer, DataBuffer b) {
+            int size = buffer.remaining();
+            b.putBool(false);
+            b.putInt(size);
+            b.put(buffer);
         }
     }
 }
