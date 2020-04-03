@@ -18,6 +18,8 @@ import com.gamelibrary2d.network.common.server.Server;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class ServerManager {
@@ -33,9 +35,13 @@ public class ServerManager {
 
     public Future<Communicator> joinNetworkServer(String ip, int port) {
         return CompletableFuture.supplyAsync(() -> {
-            var communicator = createNetworkCommunicator(ip, port);
-            connectCommunicator(communicator);
-            return communicator;
+            try {
+                var communicator = createNetworkCommunicator(ip, port);
+                connectCommunicator(communicator);
+                return communicator;
+            } catch (Exception e) {
+                throw new CompletionException(e);
+            }
         });
     }
 
@@ -50,9 +56,9 @@ public class ServerManager {
         }
     }
 
-    private void connectCommunicator(Communicator communicator) {
+    private void connectCommunicator(Communicator communicator) throws ExecutionException, InterruptedException {
         if (communicator instanceof Connectable) {
-            ((Connectable) communicator).connect();
+            ((Connectable) communicator).connect().get();
         }
     }
 
@@ -60,20 +66,32 @@ public class ServerManager {
         var futureCommunicator = new CompletableFuture<Communicator>();
         serverThread = new Thread(() -> {
             var serverResult = serverFactory.create();
-            connectCommunicator(serverResult.communicator);
-            futureCommunicator.complete(serverResult.communicator);
-            new UpdateLoop(serverResult.server::update, DemoGameServer.UPDATES_PER_SECOND).run();
 
             try {
-                serverResult.server.stop();
-            } catch (IOException e) {
-                e.printStackTrace();
+                connectCommunicator(serverResult.communicator);
+                futureCommunicator.complete(serverResult.communicator);
+            } catch (Exception e) {
+                futureCommunicator.completeExceptionally(e);
+                stopServer(serverResult.server);
+                return;
             }
+
+            new UpdateLoop(serverResult.server::update, DemoGameServer.UPDATES_PER_SECOND).run();
+
+            stopServer(serverResult.server);
         });
 
         serverThread.start();
 
         return futureCommunicator;
+    }
+
+    private void stopServer(Server server) {
+        try {
+            server.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void authenticate(CommunicationSteps steps) {

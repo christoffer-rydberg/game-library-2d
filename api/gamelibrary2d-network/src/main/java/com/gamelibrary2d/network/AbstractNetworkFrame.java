@@ -44,7 +44,6 @@ public abstract class AbstractNetworkFrame<T extends Client>
             }
         }
 
-
         try {
             client.clearInbox();
             var clientContext = new DefaultCommunicationContext();

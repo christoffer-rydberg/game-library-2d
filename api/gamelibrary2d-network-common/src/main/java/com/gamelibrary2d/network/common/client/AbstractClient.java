@@ -75,7 +75,7 @@ public abstract class AbstractClient implements Client {
         }
     }
 
-    public void initialize() throws InitializationException {
+    public void authenticateAndInitialize() throws InitializationException {
         var context = new DefaultCommunicationContext();
         authenticate(context);
         initialize(context);

@@ -19,7 +19,7 @@ public class DemoClient extends AbstractClient {
     }
 
     void run() throws InitializationException {
-        initialize();
+        authenticateAndInitialize();
         updateLoop.run();
     }
 

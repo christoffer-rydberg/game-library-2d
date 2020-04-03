@@ -75,11 +75,11 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     }
 
     protected static class LoadResult {
-        protected final Frame frame;
-        protected final Frame previousFrame;
-        protected final LoadingContext context;
-        protected final FrameDisposal previousFrameDisposal;
-        protected final LoadFailedException error;
+        public final Frame frame;
+        public final Frame previousFrame;
+        public final LoadingContext context;
+        public final FrameDisposal previousFrameDisposal;
+        public final LoadFailedException error;
 
         private LoadResult(Frame frame, LoadingContext context, Frame previousFrame,
                            FrameDisposal previousFrameDisposal, LoadFailedException error) {
