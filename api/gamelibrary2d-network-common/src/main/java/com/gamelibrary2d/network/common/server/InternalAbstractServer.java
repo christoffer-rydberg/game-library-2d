@@ -55,7 +55,10 @@ abstract class InternalAbstractServer implements Server {
             steps.add(this::authenticatedStep);
             configureClientInitialization(steps);
         } finally {
-            pendingCommunicators.add(new PendingCommunicator(communicator, new CommunicatorInitializer(steps.getAll())));
+            pendingCommunicators.add(new PendingCommunicator(
+                    communicator,
+                    new DefaultCommunicationContext(),
+                    new CommunicatorInitializer(steps.getAll())));
         }
     }
 
@@ -88,7 +91,10 @@ abstract class InternalAbstractServer implements Server {
         try {
             configureClientInitialization(steps);
         } finally {
-            pendingCommunicators.add(new PendingCommunicator(communicator, new CommunicatorInitializer(steps.getAll())));
+            pendingCommunicators.add(new PendingCommunicator(
+                    communicator,
+                    new DefaultCommunicationContext(),
+                    new CommunicatorInitializer(steps.getAll())));
         }
     }
 
@@ -160,17 +166,15 @@ abstract class InternalAbstractServer implements Server {
         for (int i = pendingCommunicators.size() - 1; i >= 0; --i) {
             var pending = pendingCommunicators.get(i);
             try {
-                runCommunicationSteps(pending.communicator, pending.initializer);
+                runCommunicationSteps(pending.communicator, pending.context, pending.initializer);
             } catch (InitializationException e) {
                 pending.communicator.disconnect(e);
             }
         }
     }
 
-    private void runCommunicationSteps(Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
+    private void runCommunicationSteps(Communicator communicator, CommunicationContext context, CommunicatorInitializer initializer) throws InitializationException {
         try {
-            var context = new DefaultCommunicationContext();
-
             InitializationResult result;
             do {
                 result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
@@ -435,10 +439,12 @@ abstract class InternalAbstractServer implements Server {
 
     private static class PendingCommunicator {
         final Communicator communicator;
+        final CommunicationContext context;
         final CommunicatorInitializer initializer;
 
-        PendingCommunicator(Communicator communicator, CommunicatorInitializer initializer) {
+        PendingCommunicator(Communicator communicator, CommunicationContext context, CommunicatorInitializer initializer) {
             this.communicator = communicator;
+            this.context = context;
             this.initializer = initializer;
         }
     }
