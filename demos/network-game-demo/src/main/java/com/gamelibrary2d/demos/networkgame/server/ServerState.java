@@ -1,34 +1,35 @@
 package com.gamelibrary2d.demos.networkgame.server;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.network.ServerObject;
+import com.gamelibrary2d.demos.networkgame.server.objects.DemoServerObject;
 import com.gamelibrary2d.network.ServerObjectRegister;
 import com.gamelibrary2d.network.common.Message;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class ServerState implements Message {
+    private final ServerObjectRegister<DemoServerObject> objectRegister = new ServerObjectRegister<>();
 
-    private final ServerObjectRegister objectRegister = new ServerObjectRegister();
-
-    private final List<ServerBoulder> boulders = new ArrayList<>();
-
-    public void register(ServerBoulder obj) {
+    public void register(DemoServerObject obj) {
         objectRegister.register(obj);
-        boulders.add(obj);
     }
 
-    public Collection<ServerObject> getRegistered() {
-        return objectRegister.getRegisteredObjects();
+    public void deregister(DemoServerObject obj) {
+    }
+
+    public Collection<DemoServerObject> getAll() {
+        return objectRegister.getAll();
     }
 
     @Override
     public void serializeMessage(DataBuffer buffer) {
-        buffer.putInt(boulders.size());
-        for (var obj : boulders) {
+        var objects = objectRegister.getAll();
+        buffer.putInt(objects.size());
+        for (var obj : objects) {
+            buffer.put(obj.getObjectIdentifier());
             obj.serializeMessage(buffer);
         }
     }
+
+
 }

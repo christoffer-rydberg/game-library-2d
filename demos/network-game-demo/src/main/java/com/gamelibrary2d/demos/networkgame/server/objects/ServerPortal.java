@@ -1,24 +1,23 @@
-package com.gamelibrary2d.demos.networkgame.server;
+package com.gamelibrary2d.demos.networkgame.server.objects;
 
-import com.gamelibrary2d.collision.Collidable;
 import com.gamelibrary2d.collision.CollisionAware;
 import com.gamelibrary2d.collision.UpdateResult;
-import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
+import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 
-public class Portal implements Collidable, CollisionAware<ServerBoulder> {
+public class ServerPortal extends AbstractDemoServerObject implements CollisionAware<ServerBoulder> {
     private static final float SPAWN_RATE = 1f;
 
     private final DemoGameLogic gameLogic;
-    private final Rectangle bounds;
-    private final Point position;
     private float spawnTimer;
     private boolean collided;
 
-    public Portal(DemoGameLogic gameLogic, float posX, float posY) {
+    public ServerPortal(DemoGameLogic gameLogic, Rectangle bounds) {
+        super(ObjectIdentifiers.PORTAL);
         this.gameLogic = gameLogic;
-        this.bounds = gameLogic.getGameSettings().getBoulderBounds();
-        position = new Point(posX, posY);
+        setBounds(bounds);
     }
 
     @Override
@@ -41,7 +40,11 @@ public class Portal implements Collidable, CollisionAware<ServerBoulder> {
     @Override
     public void updated() {
         if (!collided && spawnTimer > SPAWN_RATE) {
-            gameLogic.spawnBoulder(position.getX(), position.getY());
+            var boulder = new ServerBoulder(
+                    gameLogic.getGameSettings().getGameBounds(),
+                    gameLogic.getGameSettings().getBoulderBounds());
+            boulder.setPosition(getPosition());
+            gameLogic.spawn(boulder);
             spawnTimer -= SPAWN_RATE;
         }
 
@@ -49,17 +52,7 @@ public class Portal implements Collidable, CollisionAware<ServerBoulder> {
     }
 
     @Override
-    public Rectangle getBounds() {
-        return bounds;
-    }
+    protected void onSerializeMessage(DataBuffer buffer) {
 
-    @Override
-    public float getPosX() {
-        return position.getX();
-    }
-
-    @Override
-    public float getPosY() {
-        return position.getY();
     }
 }

@@ -1,10 +1,11 @@
 package com.gamelibrary2d.demos.networkgame.client.frames;
 
-import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.demos.networkgame.client.objects.ClientBoulder;
+import com.gamelibrary2d.demos.networkgame.client.DemoGame;
+import com.gamelibrary2d.demos.networkgame.client.objects.DemoClientObject;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
+import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.DynamicLayer;
@@ -14,15 +15,21 @@ import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.RenderSettings;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
+    private final DemoGame game;
     private Renderable gameArea;
-    private Renderable boulderRenderer;
+    private Map<Byte, Renderable> renderers = new HashMap<>();
     private LayerObject<Renderable> objectLayer = new DynamicLayer<>();
 
-    public DemoFrame(Game game) {
+    public DemoFrame(DemoGame game) {
         super(game, new DemoFrameClient());
+        this.game = game;
     }
 
     @Override
@@ -60,9 +67,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         return gameArea;
     }
 
-    private Renderer createBoulderRenderer(Rectangle bounds) {
-        var quad = Quad.create(bounds.resize(1.25f), this);
-        return new SurfaceRenderer(quad, Textures.boulder());
+    private Renderer createRenderer(Rectangle bounds, Texture texture) {
+        return new SurfaceRenderer(Quad.create(bounds, this), texture);
     }
 
     void applySettings(GameSettings gameSettings) {
@@ -82,11 +88,30 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
                 windowWidth / 2f + scaledGameBounds.xMin(),
                 windowHeight / 2f + scaledGameBounds.yMin());
 
-        boulderRenderer = createBoulderRenderer(gameSettings.getBoulderBounds());
+        renderers.put(ObjectIdentifiers.PLAYER, createRenderer(
+                gameSettings.getSpaceCraftBounds().resize(2f),
+                Textures.spacecraft()));
+
+        renderers.put(ObjectIdentifiers.PORTAL, createRenderer(
+                gameSettings.getPortalBounds().resize(2f),
+                Textures.boulder()));
+
+        renderers.put(ObjectIdentifiers.BOULDER, createRenderer(
+                gameSettings.getBoulderBounds().resize(1.25f),
+                Textures.boulder()));
     }
 
-    void addBoulder(ClientBoulder boulder) {
-        boulder.setContent(boulderRenderer);
-        objectLayer.add(boulder);
+    void destroy(DemoClientObject obj) {
+        objectLayer.remove(obj);
     }
+
+    void spawn(DemoClientObject obj) {
+        obj.setContent(renderers.get(obj.getObjectIdentifier()));
+        objectLayer.add(obj);
+    }
+
+    void goToMenu() {
+        game.goToMenu();
+    }
+
 }

@@ -1,34 +1,24 @@
-package com.gamelibrary2d.demos.networkgame.server;
+package com.gamelibrary2d.demos.networkgame.server.objects;
 
-import com.gamelibrary2d.collision.Collidable;
 import com.gamelibrary2d.collision.CollisionAware;
 import com.gamelibrary2d.collision.UpdateResult;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.network.AbstractServerObject;
+import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 
-class ServerBoulder extends AbstractServerObject implements Collidable, CollisionAware<ServerBoulder> {
+public class ServerBoulder extends AbstractDemoServerObject implements CollisionAware<ServerBoulder> {
     private final Point velocity;
     private final Rectangle gameBounds;
     private final Point beforeUpdate = new Point();
 
-    ServerBoulder(Rectangle gameBounds, Rectangle bounds) {
+    public ServerBoulder(Rectangle gameBounds, Rectangle bounds) {
+        super(ObjectIdentifiers.BOULDER);
         this.gameBounds = gameBounds;
         this.setBounds(bounds);
         velocity = new Point(0f, 100f);
         velocity.rotate(RandomInstance.get().nextFloat() * 360f);
-    }
-
-    @Override
-    public float getPosX() {
-        return getPosition().getX();
-    }
-
-    @Override
-    public float getPosY() {
-        return getPosition().getY();
     }
 
     @Override

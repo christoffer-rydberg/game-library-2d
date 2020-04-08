@@ -48,6 +48,10 @@ public class DemoGame extends AbstractGame {
         }
     }
 
+    public void goToMenu() {
+        setFrame(menuFrame, FrameDisposal.UNLOAD);
+    }
+
     private void loadDemoFrame(Future<Communicator> futureCommunicator) {
         loadingFrame.setLoadingAction(() -> {
             try {
@@ -102,4 +106,6 @@ public class DemoGame extends AbstractGame {
         demoFrame.getClient().disconnect();
         serverManager.stopHostedServer();
     }
+
+
 }

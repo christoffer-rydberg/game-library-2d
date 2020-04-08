@@ -4,6 +4,7 @@ import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.CommunicationServer;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
@@ -37,8 +38,8 @@ public final class DefaultNetworkServer extends AbstractNetworkServer {
     }
 
     @Override
-    protected void onClientAuthenticated(Communicator communicator) {
-        serverContext.onClientAuthenticated(communicator);
+    protected void onClientAuthenticated(CommunicationContext context, Communicator communicator) {
+        serverContext.onClientAuthenticated(context, communicator);
     }
 
     @Override
@@ -57,8 +58,8 @@ public final class DefaultNetworkServer extends AbstractNetworkServer {
     }
 
     @Override
-    protected void onClientInitialized(Communicator communicator) {
-        serverContext.onClientInitialized(communicator);
+    protected void onClientInitialized(CommunicationContext context, Communicator communicator) {
+        serverContext.onClientInitialized(context, communicator);
     }
 
     @Override

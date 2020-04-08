@@ -1,30 +1,34 @@
 package com.gamelibrary2d.demos.networkgame.client.objects;
 
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.network.AbstractClientObject;
-import com.gamelibrary2d.renderers.Renderer;
 
-public class ClientBoulder extends AbstractClientObject {
-    private final float serverUpdatesPerSecond;
+public abstract class AbstractDemoClientObject extends AbstractClientObject implements DemoClientObject {
+    private final DemoFrameClient client;
 
-    public ClientBoulder(DataBuffer buffer, float serverUpdatesPerSecond) {
+    private final byte objectIdentifier;
+
+    protected AbstractDemoClientObject(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
         super(buffer);
-        this.serverUpdatesPerSecond = serverUpdatesPerSecond;
+        this.objectIdentifier = objectIdentifier;
+        this.client = client;
     }
 
+    @Override
+    public byte getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
+    @Override
     public void setContent(Renderable content) {
         super.setContent(content);
     }
 
     @Override
-    protected void onUpdate(float deltaTime) {
-
-    }
-
-    @Override
     protected float getUpdatesPerSecond() {
-        return serverUpdatesPerSecond;
+        return client.getServerUpdatesPerSecond();
     }
 
     @Override

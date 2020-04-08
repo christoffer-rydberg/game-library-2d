@@ -16,6 +16,7 @@ public class Textures {
     private static Texture button;
     private static Texture inputField;
     private static Texture boulder;
+    private static Texture spacecraft;
 
     public static void create(Disposer disposer) throws IOException {
         button = createQuadStackTexture(
@@ -30,6 +31,10 @@ public class Textures {
         boulder = Texture.create(
                 Textures.class.getClassLoader().getResource("boulder.png"),
                 disposer);
+
+        spacecraft = Texture.create(
+                Textures.class.getClassLoader().getResource("spacecraft.png"),
+                disposer);
     }
 
     public static Texture button() {
@@ -42,6 +47,10 @@ public class Textures {
 
     public static Texture boulder() {
         return boulder;
+    }
+
+    public static Texture spacecraft() {
+        return spacecraft;
     }
 
     public static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {

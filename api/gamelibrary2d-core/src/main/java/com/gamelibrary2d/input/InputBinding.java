@@ -1,5 +1,6 @@
 package com.gamelibrary2d.input;
 
+import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Serializable;
 import com.gamelibrary2d.framework.Joystick;
@@ -7,37 +8,62 @@ import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Mouse;
 
 /**
- * This class is used by the {@link com.gamelibrary2d.input.InputBindings
- * InputBindings} class to represents input from a mouse, keyboard or
- * joystick. The input can be a button or an axis (if the source is a joystick).
+ * Binds to an input from a mouse, keyboard or joystick.
+ * The input can be a button or an axis (if the source is a joystick).
  * This class contains methods to determine if the button/axis is pressed/tilted
- * and to update and retrieve the state to see when it is changed.
- *
- * @see com.gamelibrary2d.input.InputBindings InputBindings
+ * and to update and retrieve the {@link InputState state}.
  */
-public class Input implements Serializable {
+public class InputBinding implements Serializable {
 
     public static final int KEYBOARD_SOURCE_ID = Integer.MAX_VALUE;
-
     public static final int MOUSE_SOURCE_ID = Integer.MAX_VALUE - 1;
 
-    private int inputId;
+    private final int inputId;
+    private final int sourceId;
+    private final InputType inputType;
 
-    private int sourceId;
+    private Action onActive;
+    private Action onActiveUnchanged;
+    private Action onRelease;
+    private Action onReleaseUnchanged;
+    private InputState state = InputState.RELEASED;
 
-    private InputType inputType;
-
-    private boolean isActiveState;
-
-    Input(DataBuffer buffer) {
-        var inputId = buffer.getInt();
-        var sourceId = buffer.getInt();
-        var inputType = InputType.values()[buffer.getInt()];
-        set(inputId, sourceId, inputType, false);
+    private InputBinding(int sourceId, int inputId, InputType inputType) {
+        this.sourceId = sourceId;
+        this.inputId = inputId;
+        this.inputType = inputType;
     }
 
-    Input(int inputId, int sourceId, InputType inputType, boolean isActive) {
-        set(inputId, sourceId, inputType, isActive);
+    public InputBinding(DataBuffer buffer) {
+        this(buffer.getInt(), buffer.getInt(), InputType.values()[buffer.getInt()]);
+    }
+
+    public static InputBinding keyboard(int inputId) {
+        return new InputBinding(KEYBOARD_SOURCE_ID, inputId, InputType.BUTTON);
+    }
+
+    public static InputBinding mouse(int inputId) {
+        return new InputBinding(MOUSE_SOURCE_ID, inputId, InputType.BUTTON);
+    }
+
+    public static InputBinding joystick(int sourceId, int inputId, InputType inputType) {
+        return new InputBinding(sourceId, inputId, inputType);
+    }
+
+    public void onActive(Action onActive) {
+        this.onActive = onActive;
+    }
+
+    public void onActiveUnchanged(Action onActiveUnchanged) {
+        this.onActiveUnchanged = onActiveUnchanged;
+    }
+
+    public void onRelease(Action onRelease) {
+        this.onRelease = onRelease;
+    }
+
+    public void onReleaseUnchanged(Action onReleaseUnchanged) {
+        this.onReleaseUnchanged = onReleaseUnchanged;
     }
 
     @Override
@@ -45,18 +71,6 @@ public class Input implements Serializable {
         buffer.putInt(inputId);
         buffer.putInt(sourceId);
         buffer.putInt(inputType.ordinal());
-    }
-
-    void set(int inputId, int sourceId, InputType inputType, boolean isActive) {
-
-        if (inputType != InputType.BUTTON && (sourceId == KEYBOARD_SOURCE_ID || sourceId == MOUSE_SOURCE_ID)) {
-            throw new IllegalStateException("Axis can only be used for joysticks.");
-        }
-
-        this.inputId = inputId;
-        this.sourceId = sourceId;
-        this.inputType = inputType;
-        this.isActiveState = isActive;
     }
 
     /**
@@ -111,7 +125,6 @@ public class Input implements Serializable {
      * an axis, or if the tilt is less than the threshold.
      */
     public boolean isAxisTilted(float threshold) {
-
         if (threshold <= 0) {
             throw new IllegalStateException("Threshold must be a positive value greater than 0.");
         }
@@ -126,12 +139,10 @@ public class Input implements Serializable {
      * a button, or if the button is not pushed.
      */
     public boolean isPushed() {
-
         if (inputId < 0 || isAxis())
             return false;
 
         switch (sourceId) {
-
             case KEYBOARD_SOURCE_ID:
                 return Keyboard.instance().isKeyDown(inputId);
 
@@ -144,30 +155,62 @@ public class Input implements Serializable {
     }
 
     /**
-     * Determines if the input is active or not and returns the updated
-     * {@link InputState}.
+     * Updates the current {@link InputState state} and triggers the corresponding action:
+     * {@link #onActive(Action) onActive}, {@link #onActiveUnchanged(Action) onActiveUnchanged},
+     * {@link #onRelease(Action) onRelease} or {@link #onReleaseUnchanged(Action) onReleaseUnchanged}.
      *
      * @param tiltThreshold    Threshold for a tilt if the input is an axis. Value range: (0, 1].
      * @param releaseThreshold Threshold for releasing a tilt if the input is an axis. Value
      *                         range: (0, 1].
-     * @return The updated input state.
+     * @return The updated state.
      */
-    public InputState getAndUpdateState(float tiltThreshold, float releaseThreshold) {
-
-        boolean wasActive = this.isActiveState;
-
-        if (isAxis()) {
-            isActiveState = wasActive ? isAxisTilted(releaseThreshold) : isAxisTilted(tiltThreshold);
+    public void updateState(float tiltThreshold, float releaseThreshold) {
+        if (isActiveState()) {
+            if (isActive(tiltThreshold, releaseThreshold)) {
+                state = InputState.ACTIVE_UNCHANGED;
+                tryInvoke(onActiveUnchanged);
+            } else {
+                state = InputState.RELEASED;
+                tryInvoke(onRelease);
+            }
         } else {
-            isActiveState = isPushed();
+            if (isActive(tiltThreshold, releaseThreshold)) {
+                state = InputState.ACTIVE;
+                tryInvoke(onActive);
+            } else {
+                state = InputState.RELEASED_UNCHANGED;
+                tryInvoke(onReleaseUnchanged);
+            }
         }
+    }
 
-        if (isActiveState == wasActive)
-            return isActiveState ? InputState.ACTIVE_UNCHANGED : InputState.RELEASED_UNCHANGED;
-        else if (isActiveState)
-            return InputState.ACTIVE;
-        else
-            return InputState.RELEASED;
+    public InputState getState() {
+        return state;
+    }
+
+    /**
+     * Sets the current {@link #getState state}. This will affect the result of {@link #updateState} next time it is invoked.
+     */
+    public void setState(InputState state) {
+        this.state = state;
+    }
+
+    private boolean isActive(float tiltThreshold, float releaseThreshold) {
+        if (isAxis()) {
+            return isActiveState() ? isAxisTilted(releaseThreshold) : isAxisTilted(tiltThreshold);
+        } else {
+            return isPushed();
+        }
+    }
+
+    private boolean isActiveState() {
+        return state == InputState.ACTIVE || state == InputState.ACTIVE_UNCHANGED;
+    }
+
+    private void tryInvoke(Action action) {
+        if (action != null) {
+            action.invoke();
+        }
     }
 
     /**
@@ -221,14 +264,5 @@ public class Input implements Serializable {
      */
     public int getInputId() {
         return inputId;
-    }
-
-    /**
-     * Resets the current state flag to the specified value. This will affect the
-     * returned {@link InputState} of {@link #getAndUpdateState} next time it is
-     * called since the result depend on the current state.
-     */
-    public void resetState(boolean state) {
-        isActiveState = state;
     }
 }

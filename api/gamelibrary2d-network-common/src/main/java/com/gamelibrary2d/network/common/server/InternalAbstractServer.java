@@ -67,15 +67,9 @@ abstract class InternalAbstractServer implements Server {
     }
 
     private void authenticatedStep(CommunicationContext context, Communicator communicator) {
-        onAuthenticated(communicator);
-    }
-
-    private void onAuthenticated(Communicator communicator) {
         communicator.onAuthenticated();
-        onClientAuthenticated(communicator);
+        onClientAuthenticated(context, communicator);
     }
-
-    protected abstract void onClientAuthenticated(Communicator communicator);
 
     /**
      * Marks the specified communicator as pending and invokes {@link #configureClientInitialization}
@@ -98,11 +92,11 @@ abstract class InternalAbstractServer implements Server {
         }
     }
 
-    private void initialized(Communicator communicator) {
+    private void initialized(CommunicationContext context, Communicator communicator) {
         removePending(communicator);
         communicators.add(communicator);
         communicator.onAuthenticated();
-        onClientInitialized(communicator);
+        onClientInitialized(context, communicator);
     }
 
     private void onDisonnectedEvent(CommunicatorDisconnected event) {
@@ -184,7 +178,7 @@ abstract class InternalAbstractServer implements Server {
             } while (result == InitializationResult.PENDING);
 
             if (result == InitializationResult.FINISHED) {
-                initialized(communicator);
+                initialized(context, communicator);
                 handleMesages(communicator);
             }
         } catch (InitializationException e) {
@@ -417,7 +411,9 @@ abstract class InternalAbstractServer implements Server {
 
     protected abstract void configureClientInitialization(CommunicationSteps steps);
 
-    protected abstract void onClientInitialized(Communicator communicator);
+    protected abstract void onClientAuthenticated(CommunicationContext context, Communicator communicator);
+
+    protected abstract void onClientInitialized(CommunicationContext context, Communicator communicator);
 
     protected abstract void onDisconnected(Communicator communicator, boolean pending);
 
