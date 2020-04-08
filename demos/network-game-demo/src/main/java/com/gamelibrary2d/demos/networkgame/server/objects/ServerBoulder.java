@@ -4,7 +4,6 @@ import com.gamelibrary2d.collision.CollisionAware;
 import com.gamelibrary2d.collision.UpdateResult;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 
@@ -19,11 +18,6 @@ public class ServerBoulder extends AbstractDemoServerObject implements Collision
         this.setBounds(bounds);
         velocity = new Point(0f, 100f);
         velocity.rotate(RandomInstance.get().nextFloat() * 360f);
-    }
-
-    @Override
-    protected void onSerializeMessage(DataBuffer buffer) {
-
     }
 
     @Override

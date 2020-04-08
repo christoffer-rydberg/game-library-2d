@@ -1,7 +1,6 @@
 package com.gamelibrary2d.demos.networkgame.server.objects;
 
 import com.gamelibrary2d.collision.UpdateResult;
-import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.AbstractServerObject;
 
 public abstract class AbstractDemoServerObject extends AbstractServerObject implements DemoServerObject {
@@ -48,8 +47,4 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
         return getPosition().getY();
     }
 
-    @Override
-    protected void onSerializeMessage(DataBuffer buffer) {
-
-    }
 }

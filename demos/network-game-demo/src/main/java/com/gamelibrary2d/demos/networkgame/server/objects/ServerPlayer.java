@@ -38,11 +38,6 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
     }
 
     @Override
-    protected void onSerializeMessage(DataBuffer buffer) {
-
-    }
-
-    @Override
     public Class<ServerBoulder> getCollidableClass() {
         return ServerBoulder.class;
     }

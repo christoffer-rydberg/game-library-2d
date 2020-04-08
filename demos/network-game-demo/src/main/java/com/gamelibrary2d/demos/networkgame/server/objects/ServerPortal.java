@@ -3,7 +3,6 @@ package com.gamelibrary2d.demos.networkgame.server.objects;
 import com.gamelibrary2d.collision.CollisionAware;
 import com.gamelibrary2d.collision.UpdateResult;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 
@@ -49,10 +48,5 @@ public class ServerPortal extends AbstractDemoServerObject implements CollisionA
         }
 
         collided = false;
-    }
-
-    @Override
-    protected void onSerializeMessage(DataBuffer buffer) {
-
     }
 }
