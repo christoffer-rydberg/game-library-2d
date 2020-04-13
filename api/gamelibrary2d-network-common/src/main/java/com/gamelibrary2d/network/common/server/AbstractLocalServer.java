@@ -1,15 +1,16 @@
 package com.gamelibrary2d.network.common.server;
 
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+
+import java.io.IOException;
 
 public abstract class AbstractLocalServer extends InternalAbstractServer implements LocalServer {
 
     private Communicator communicator;
 
     @Override
-    public void connectCommunicator(Communicator communicator) throws InitializationException {
-        super.addCommunicator(communicator);
+    public void connectCommunicator(Communicator communicator) throws IOException {
+        super.addConnectedCommunicator(communicator);
         this.communicator = communicator;
     }
 

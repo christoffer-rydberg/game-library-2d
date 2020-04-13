@@ -1,12 +1,14 @@
 package com.gamelibrary2d.network.common.client;
 
+import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.updating.UpdateAction;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
@@ -27,6 +29,15 @@ public abstract class AbstractClient implements Client {
     protected AbstractClient() {
         this.inbox = new DynamicByteBuffer();
         inbox.flip();
+    }
+
+    private static void sendOutgoing(Communicator com) throws IOException {
+        try {
+            com.sendOutgoing();
+        } catch (IOException e) {
+            com.disconnect(e);
+            throw e;
+        }
     }
 
     public boolean isUpdatingLocalServer() {
@@ -66,28 +77,40 @@ public abstract class AbstractClient implements Client {
     }
 
     @Override
-    public void authenticate(CommunicationContext context) throws InitializationException {
+    public void authenticate(CommunicationContext context) throws NetworkAuthenticationException {
         var communicator = getCommunicator();
         if (!communicator.isAuthenticated()) {
             var steps = new InternalCommunicationSteps();
             configureAuthentication(communicator, steps);
-            runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
+            try {
+                runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
+            } catch (IOException e) {
+                throw new NetworkAuthenticationException("Authentication failed", e);
+            } catch (InterruptedException e) {
+                throw new NetworkAuthenticationException("Authentication failed", e);
+            }
         }
     }
 
-    public void authenticateAndInitialize() throws InitializationException {
+    @Override
+    public void initialize(CommunicationContext context) throws NetworkInitializationException {
+        var communicator = getCommunicator();
+        var steps = new InternalCommunicationSteps();
+        configureInitialization(steps);
+        try {
+            runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
+        } catch (IOException e) {
+            throw new NetworkInitializationException("Initialization failed", e);
+        } catch (InterruptedException e) {
+            throw new NetworkInitializationException("Initialization failed", e);
+        }
+    }
+
+    public void authenticateAndInitialize() throws NetworkInitializationException, NetworkAuthenticationException {
         var context = new DefaultCommunicationContext();
         authenticate(context);
         initialize(context);
         initialized(context);
-    }
-
-    @Override
-    public void initialize(CommunicationContext context) throws InitializationException {
-        var communicator = getCommunicator();
-        var steps = new InternalCommunicationSteps();
-        configureInitialization(steps);
-        runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
     }
 
     @Override
@@ -194,38 +217,28 @@ public abstract class AbstractClient implements Client {
         return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
-    private void runCommunicationSteps(CommunicationContext context, Communicator communicator, CommunicatorInitializer initializer) throws InitializationException {
+    private void runCommunicationSteps(CommunicationContext context, Communicator communicator, CommunicatorInitializer initializer)
+            throws IOException, InterruptedException {
         CommunicatorInitializer.InitializationResult result;
 
         int retries = 0;
         do {
-
             result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
             if (result == CommunicatorInitializer.InitializationResult.AWAITING_DATA) {
-
                 if (retries == getInitializationRetries()) {
-                    throw new InitializationException("Reading server response timed out");
+                    throw new IOException("Reading server response timed out");
                 }
 
                 if (!communicator.isConnected()) {
-                    throw new InitializationException("Connection has been lost");
+                    throw new IOException("Connection has been lost");
                 }
 
                 ++retries;
 
-                try {
-                    communicator.sendOutgoing();
-                } catch (IOException e) {
-                    communicator.disconnect(e);
-                    throw new InitializationException("Connection has been lost", e);
-                }
+                sendOutgoing(communicator);
 
                 if (!triggerLocalServerUpdate(communicator, 0f)) {
-                    try {
-                        Thread.sleep(getInitializationRetryDelay());
-                    } catch (InterruptedException e) {
-                        throw new InitializationException("Loading thread interrupted");
-                    }
+                    Thread.sleep(getInitializationRetryDelay());
                 }
             } else {
                 retries = 0;
@@ -233,28 +246,23 @@ public abstract class AbstractClient implements Client {
 
         } while (result != CommunicatorInitializer.InitializationResult.FINISHED);
 
-        try {
-            communicator.sendOutgoing();
-        } catch (IOException e) {
-            communicator.disconnect(e);
-            throw new InitializationException("Connection has been lost", e);
-        }
+        sendOutgoing(communicator);
     }
 
     private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
-            throws InitializationException {
+            throws IOException {
         if (step instanceof ConsumerStep) {
             try {
                 return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(context, communicator, inbox);
             } catch (IOException e) {
                 communicator.disconnect(e);
-                throw new InitializationException("Connection has been lost", e);
+                throw (e);
             }
         } else if (step instanceof ProducerStep) {
             ((ProducerStep) step).run(context, communicator);
             return true;
         } else {
-            throw new InitializationException("Unknown communication step");
+            throw new GameLibrary2DRuntimeException("Unknown communication step");
         }
     }
 

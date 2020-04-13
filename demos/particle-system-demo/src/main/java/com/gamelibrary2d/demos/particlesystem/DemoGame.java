@@ -1,8 +1,8 @@
 package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.AbstractGame;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 
 public class DemoGame extends AbstractGame {
@@ -12,12 +12,12 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    public void start(Window window) {
+    public void start(Window window) throws InitializationException {
         super.start(window);
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() throws InitializationException {
         setFrame(new DemoFrame(this));
     }
 

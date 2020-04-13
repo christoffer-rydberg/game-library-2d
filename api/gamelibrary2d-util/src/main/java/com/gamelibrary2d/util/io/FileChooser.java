@@ -16,15 +16,21 @@ public class FileChooser {
     }
 
     public FileChooser(String tmpPath) {
+        try {
+            loadCurrentDirectoryFromTempPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+            tmpPath = null;
+        }
+
         this.tmpPath = tmpPath;
-        loadCurrentDirectoryFromTempPath();
     }
 
     public String getCurrentDirectory() {
         return currentDirectory;
     }
 
-    public void setCurrentDirectory(String currentDirectory) {
+    public void setCurrentDirectory(String currentDirectory) throws IOException {
         this.currentDirectory = currentDirectory;
         if (tmpPath != null) {
             saveCurrentDirectoryToTempPath();
@@ -39,7 +45,7 @@ public class FileChooser {
         this.selectedFile = selectedFile;
     }
 
-    public File browse() {
+    public File browse() throws IOException {
         JFrame frame = new JFrame();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
@@ -62,7 +68,7 @@ public class FileChooser {
         return null;
     }
 
-    private void loadCurrentDirectoryFromTempPath() {
+    private void loadCurrentDirectoryFromTempPath() throws IOException {
         BufferedReader reader = null;
         try {
             File f = new File(tmpPath);
@@ -70,30 +76,20 @@ public class FileChooser {
                 reader = new BufferedReader(new FileReader(f));
                 currentDirectory = reader.readLine();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-            try {
-                reader.close();
-            } catch (Exception e) {
-            }
+            reader.close();
         }
     }
 
-    private void saveCurrentDirectoryToTempPath() {
+    private void saveCurrentDirectoryToTempPath() throws IOException {
         BufferedWriter writer = null;
         try {
             File file = new File(tmpPath);
             file.getParentFile().mkdirs();
             writer = new BufferedWriter(new FileWriter(file));
             writer.write(currentDirectory);
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-            try {
-                writer.close();
-            } catch (Exception e) {
-            }
+            writer.close();
         }
     }
 }

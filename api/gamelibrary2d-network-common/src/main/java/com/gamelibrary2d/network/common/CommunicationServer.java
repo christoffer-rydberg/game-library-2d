@@ -3,6 +3,7 @@ package com.gamelibrary2d.network.common;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -69,81 +70,23 @@ public class CommunicationServer {
         return channel;
     }
 
-    private void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                selector.select();
-                Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
-                while (keys.hasNext()) {
-                    SelectionKey key = keys.next();
-                    keys.remove();
-
-                    if (!key.isValid())
-                        continue;
-
-                    if (key.isAcceptable()) {
-                        accept(key);
-                    } else if (key.isWritable()) {
-                        write(key);
-                    } else if (key.isReadable()) {
-                        read(key);
-                    } else if (key.isConnectable()) {
-                        handleConnect(key);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-    }
-
     public ServerSocketChannelRegistration registerConnectionListener(
             String hostName, int port, SocketChannelConnectedHandler onConnected,
             SocketChannelFailedConnectionHandler onConnectionFailed)
             throws IOException {
 
-        ServerSocketChannel serverChannel = null;
+        ServerSocketChannel socketChannel = null;
         try {
-            serverChannel = ServerSocketChannel.open();
-            serverChannel.configureBlocking(false);
-            serverChannel.socket().bind(new InetSocketAddress(hostName, port));
-            connectionListeners.put(serverChannel, new ConnectionListener(onConnected, onConnectionFailed));
-            serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-            selector.wakeup();
-            return new ServerSocketChannelRegistration(serverChannel, serverChannel.socket().getLocalPort());
-        } catch (IOException e) {
-            e.printStackTrace();
-            if (serverChannel != null) {
-                try {
-                    serverChannel.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            throw e;
-        }
-    }
-
-    private void accept(SelectionKey key) {
-        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
-        SocketChannel socketChannel = null;
-        var connectionHandler = connectionListeners.get(serverSocketChannel);
-        try {
-            socketChannel = serverSocketChannel.accept();
+            socketChannel = ServerSocketChannel.open();
             socketChannel.configureBlocking(false);
-            connectionHandler.onConnected(socketChannel);
+            socketChannel.socket().bind(new InetSocketAddress(hostName, port));
+            connectionListeners.put(socketChannel, new ConnectionListener(onConnected, onConnectionFailed));
+            socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+            selector.wakeup();
+            return new ServerSocketChannelRegistration(socketChannel, socketChannel.socket().getLocalPort());
         } catch (IOException e) {
-            var hostName = socketChannel.socket().getInetAddress().getCanonicalHostName();
-            connectionHandler.onConnectionFailed(hostName, e);
-            if (socketChannel != null) {
-                try {
-                    socketChannel.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
+            close(socketChannel);
+            throw e;
         }
     }
 
@@ -196,6 +139,104 @@ public class CommunicationServer {
         }
 
         selector.wakeup();
+    }
+
+    public void connect(String hostname, int port, SocketChannelConnectedHandler onConnected,
+                        SocketChannelFailedConnectionHandler onConnectionFailed) throws IOException {
+        var channel = SocketChannel.open();
+        channel.configureBlocking(false);
+        channel.connect(new InetSocketAddress(hostname, port));
+        connectionListeners.put(channel, new ConnectionListener(onConnected, onConnectionFailed));
+        channel.register(selector, SelectionKey.OP_CONNECT);
+        selector.wakeup();
+    }
+
+    public void connect(SocketChannel socketChannel, Communicator communicator,
+                        ChannelDisconnectedHandler disconnectedHandler) {
+        try {
+            var tcpConnection = new TcpConnection(communicator, disconnectedHandler);
+            tcpConnections.put(socketChannel, tcpConnection);
+            socketChannel.register(selector, SelectionKey.OP_READ, tcpConnection);
+            selector.wakeup();
+        } catch (IOException e) {
+            disconnect(socketChannel, e);
+        }
+    }
+
+    public void disconnect(SocketChannel socketChannel) {
+        disconnect(socketChannel, null);
+    }
+
+    public void closeAfterLastScheduledSend(SocketChannel channel) {
+        var tcpConnection = tcpConnections.get(channel);
+        if (tcpConnection != null) {
+            var byteBuffer = tcpConnection.getWriteBuffer();
+            synchronized (byteBuffer) {
+                tcpConnection.scheduleCloseConnection();
+                if (tcpConnection.shouldClose()) {
+                    disconnect(channel);
+                }
+            }
+        }
+    }
+
+    public void disconnect(DatagramChannel datagramChannel) {
+        disconnect(datagramChannel, null);
+    }
+
+    private void run() {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                selector.select();
+                Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+                while (keys.hasNext()) {
+                    SelectionKey key = keys.next();
+                    keys.remove();
+
+                    if (!key.isValid())
+                        continue;
+
+                    if (key.isAcceptable()) {
+                        accept(key);
+                    } else if (key.isWritable()) {
+                        write(key);
+                    } else if (key.isReadable()) {
+                        read(key);
+                    } else if (key.isConnectable()) {
+                        handleConnect(key);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+    }
+
+    private void accept(SelectionKey key) {
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+        SocketChannel socketChannel = null;
+        var connectionHandler = connectionListeners.get(serverSocketChannel);
+        try {
+            socketChannel = serverSocketChannel.accept();
+            socketChannel.configureBlocking(false);
+            connectionHandler.onConnected(socketChannel);
+        } catch (IOException e) {
+            var hostName = socketChannel.socket().getInetAddress().getCanonicalHostName();
+            connectionHandler.onConnectionFailed(hostName, e);
+            close(socketChannel);
+        }
+    }
+
+    private void close(Closeable channel) {
+        if (channel != null) {
+            try {
+                channel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void write(SelectionKey key) {
@@ -272,7 +313,7 @@ public class CommunicationServer {
     private void readTcp(SelectionKey key, TcpConnection tcpConnection) {
         var channel = (SocketChannel) key.channel();
         try {
-            tcpConnection.getCommunicator().addIncoming(buffer -> {
+            tcpConnection.getCommunicator().addIncoming(tcpConnection.getChannel(), buffer -> {
                 while (true) {
                     int bytesRead = channel.read(readBuffer);
                     if (bytesRead > 0) {
@@ -286,7 +327,7 @@ public class CommunicationServer {
                         return;
                     }
                 }
-            }, tcpConnection.getChannel());
+            });
         } catch (IOException e) {
             disconnect(channel, e);
         }
@@ -295,7 +336,7 @@ public class CommunicationServer {
     private void readUdp(SelectionKey key, UdpConnection udpConnection) {
         var channel = (DatagramChannel) key.channel();
         try {
-            udpConnection.getCommunicator().addIncoming(buffer -> {
+            udpConnection.getCommunicator().addIncoming(udpConnection.getChannel(), buffer -> {
                 while (true) {
                     int bytesRead = channel.read(readBuffer);
                     if (bytesRead > 0) {
@@ -309,31 +350,9 @@ public class CommunicationServer {
                         return;
                     }
                 }
-            }, udpConnection.getChannel());
+            });
         } catch (IOException e) {
             disconnect(channel, e);
-        }
-    }
-
-    public void connect(String hostname, int port, SocketChannelConnectedHandler onConnected,
-                        SocketChannelFailedConnectionHandler onConnectionFailed) throws IOException {
-        var channel = SocketChannel.open();
-        channel.configureBlocking(false);
-        channel.connect(new InetSocketAddress(hostname, port));
-        connectionListeners.put(channel, new ConnectionListener(onConnected, onConnectionFailed));
-        channel.register(selector, SelectionKey.OP_CONNECT);
-        selector.wakeup();
-    }
-
-    public void connect(SocketChannel socketChannel, Communicator communicator,
-                        ChannelDisconnectedHandler disconnectedHandler) {
-        try {
-            var tcpConnection = new TcpConnection(communicator, disconnectedHandler);
-            tcpConnections.put(socketChannel, tcpConnection);
-            socketChannel.register(selector, SelectionKey.OP_READ, tcpConnection);
-            selector.wakeup();
-        } catch (IOException e) {
-            disconnect(socketChannel, e);
         }
     }
 
@@ -357,10 +376,6 @@ public class CommunicationServer {
         }
     }
 
-    public void disconnect(SocketChannel socketChannel) {
-        disconnect(socketChannel, null);
-    }
-
     private void disconnect(SocketChannel socketChannel, IOException e) {
         var tcpConnection = tcpConnections.remove(socketChannel);
         try {
@@ -372,23 +387,6 @@ public class CommunicationServer {
                 tcpConnection.onDisconnected(e);
             }
         }
-    }
-
-    public void closeAfterLastScheduledSend(SocketChannel channel) {
-        var tcpConnection = tcpConnections.get(channel);
-        if (tcpConnection != null) {
-            var byteBuffer = tcpConnection.getWriteBuffer();
-            synchronized (byteBuffer) {
-                tcpConnection.scheduleCloseConnection();
-                if (tcpConnection.shouldClose()) {
-                    disconnect(channel);
-                }
-            }
-        }
-    }
-
-    public void disconnect(DatagramChannel datagramChannel) {
-        disconnect(datagramChannel, null);
     }
 
     private void disconnect(DatagramChannel datagramChannel, IOException e) {
@@ -406,35 +404,22 @@ public class CommunicationServer {
 
     private void closeConnection() {
         if (selector != null) {
-            try {
-                selector.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            close(selector);
             readBuffer.clear();
 
-            for (var channel : connectionListeners.keySet())
-                try {
-                    channel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            for (var channel : connectionListeners.keySet()) {
+                close(channel);
+            }
             connectionListeners.clear();
 
-            for (var socketChannel : tcpConnections.keySet())
-                try {
-                    socketChannel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            for (var socketChannel : tcpConnections.keySet()) {
+                close(socketChannel);
+            }
             tcpConnections.clear();
 
-            for (var datagramChannel : udpConnections.keySet())
-                try {
-                    datagramChannel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            for (var datagramChannel : udpConnections.keySet()) {
+                close(datagramChannel);
+            }
             udpConnections.clear();
         }
     }

@@ -2,7 +2,7 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 
 public abstract class AbstractLoadingFrame extends AbstractFrame implements LoadingFrame {
     private final Game game;
@@ -22,16 +22,26 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             workerThread = null;
             this.loadResult = null;
             if (loadResult.error == null) {
-                onLoadingSuccessful(loadResult);
+                try {
+                    onLoadingSuccessful(loadResult);
+                } catch (InitializationException e) {
+                    onLoadingFailed(new LoadResult(
+                            loadResult.frame,
+                            loadResult.context,
+                            loadResult.previousFrame,
+                            loadResult.previousFrameDisposal,
+                            e
+                    ));
+                }
             } else {
                 onLoadingFailed(loadResult);
             }
         }
     }
 
-    private void changeFrame(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) {
-        previousFrame.dispose(previousFrameDisposal);
+    private void changeFrame(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) throws InitializationException {
         game.setFrame(frame, FrameDisposal.NONE);
+        previousFrame.dispose(previousFrameDisposal);
     }
 
     private void verifyNotLoading() {
@@ -40,7 +50,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         }
     }
 
-    protected void onLoadingSuccessful(LoadResult result) {
+    protected void onLoadingSuccessful(LoadResult result) throws InitializationException {
         verifyNotLoading();
         result.frame.loaded(result.context);
         changeFrame(result.frame, result.previousFrame, result.previousFrameDisposal);
@@ -48,15 +58,25 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
 
     protected void onLoadingFailed(LoadResult result) {
         verifyNotLoading();
-        game.setFrame(result.previousFrame, FrameDisposal.NONE);
+        try {
+            game.setFrame(result.previousFrame, FrameDisposal.NONE);
+        } catch (InitializationException e) {
+            var exception = new GameLibrary2DRuntimeException(
+                    "Failed to restore previous frame after failed load",
+                    e);
+
+            exception.addSuppressed(result.error);
+
+            throw exception;
+        }
     }
 
-    protected void loadFrame(Frame frame, LoadingContext context) throws LoadFailedException {
+    protected void loadFrame(Frame frame, LoadingContext context) throws InitializationException {
         frame.load(context);
     }
 
     @Override
-    public void load(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) {
+    public void load(Frame frame, Frame previousFrame, FrameDisposal previousFrameDisposal) throws InitializationException {
         verifyNotLoading();
         if (frame.isLoaded()) {
             changeFrame(frame, previousFrame, previousFrameDisposal);
@@ -66,7 +86,8 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
                 try {
                     loadFrame(frame, context);
                     loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, null);
-                } catch (LoadFailedException e) {
+                } catch (InitializationException e) {
+                    frame.dispose(FrameDisposal.UNLOAD);
                     loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, e);
                 }
             });
@@ -79,10 +100,10 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         public final Frame previousFrame;
         public final LoadingContext context;
         public final FrameDisposal previousFrameDisposal;
-        public final LoadFailedException error;
+        public final InitializationException error;
 
         private LoadResult(Frame frame, LoadingContext context, Frame previousFrame,
-                           FrameDisposal previousFrameDisposal, LoadFailedException error) {
+                           FrameDisposal previousFrameDisposal, InitializationException error) {
             this.frame = frame;
             this.previousFrame = previousFrame;
             this.context = context;

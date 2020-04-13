@@ -1,7 +1,8 @@
 package com.gamelibrary2d.network.common.initialization;
 
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+
+import java.io.IOException;
 
 /**
  * Defines a communication step that doesn't read messages.
@@ -16,6 +17,6 @@ public interface ProducerStep extends CommunicationStep {
      * @param context      Accumulated through each step.
      * @param communicator The communicator.
      */
-    void run(CommunicationContext context, Communicator communicator) throws InitializationException;
+    void run(CommunicationContext context, Communicator communicator) throws IOException;
 
 }

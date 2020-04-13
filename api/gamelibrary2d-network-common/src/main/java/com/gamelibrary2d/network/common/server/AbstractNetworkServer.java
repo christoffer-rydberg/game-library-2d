@@ -3,11 +3,9 @@ package com.gamelibrary2d.network.common.server;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.network.common.CommunicationServer;
 import com.gamelibrary2d.network.common.ServerSocketChannelRegistration;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.nio.channels.SocketChannel;
 
 public abstract class AbstractNetworkServer extends InternalAbstractServer {
@@ -41,8 +39,8 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
                 try {
                     // Disable Nagle's algorithm
                     channel.socket().setTcpNoDelay(true);
-                    addCommunicator(new ServerSideCommunicator(communicationServer, channel, this::configureClientAuthentication));
-                } catch (SocketException | InitializationException e) {
+                    addConnectedCommunicator(new ServerSideCommunicator(communicationServer, channel, this::configureClientAuthentication));
+                } catch (IOException e) {
                     communicationServer.disconnect(channel);
                     onConnectionFailed(endpoint, e);
                 }
@@ -87,14 +85,10 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
     }
 
     @Override
-    protected void onStop() throws IOException {
+    protected void onStop() throws IOException, InterruptedException {
         disableConnections();
         if (ownsCommunicationServer) {
-            try {
-                communicationServer.stop();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            communicationServer.stop();
         }
     }
 

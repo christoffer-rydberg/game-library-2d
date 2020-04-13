@@ -3,7 +3,7 @@ package com.gamelibrary2d.frames;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
 import com.gamelibrary2d.updaters.Updater;
@@ -36,9 +36,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void initialize() {
+    public void initialize() throws InitializationException {
         if (disposed) {
-            throw new GameLibrary2DRuntimeException("This object has been disposed");
+            throw new InitializationException("This object has been disposed");
         }
 
         if (isInitialized())
@@ -60,21 +60,15 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void load(LoadingContext context) throws LoadFailedException {
+    public void load(LoadingContext context) throws InitializationException {
         if (isLoaded())
             return;
 
         if (!isInitialized()) {
-            throw new LoadFailedException("Frame has not been initialized");
+            throw new InitializationException("Frame has not been initialized");
         }
 
-        try {
-            onLoad(context);
-        } catch (Exception e) {
-            unload();
-            throw e instanceof LoadFailedException ? (LoadFailedException) e
-                    : new LoadFailedException("Unhandled exception", e);
-        }
+        onLoad(context);
 
         loaded = true;
     }
@@ -83,7 +77,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     public void loaded(LoadingContext context) {
         onLoaded(context);
     }
-
 
     @Override
     public boolean isLoaded() {
@@ -196,9 +189,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         invokeLater.clear();
     }
 
-    protected abstract void onInitialize();
+    protected abstract void onInitialize() throws InitializationException;
 
-    protected abstract void onLoad(LoadingContext context) throws LoadFailedException;
+    protected abstract void onLoad(LoadingContext context) throws InitializationException;
 
     protected abstract void onLoaded(LoadingContext context);
 

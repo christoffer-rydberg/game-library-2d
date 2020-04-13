@@ -1,5 +1,6 @@
 package com.gamelibrary2d.demos.lightning;
 
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
@@ -44,7 +45,7 @@ public class LightningDemo {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InitializationException {
         new DemoGame().start(createWindow(args));
     }
 }

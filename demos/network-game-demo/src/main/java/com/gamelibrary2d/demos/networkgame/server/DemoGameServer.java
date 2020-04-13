@@ -11,12 +11,12 @@ import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.demos.networkgame.server.objects.DemoServerObject;
 import com.gamelibrary2d.demos.networkgame.server.objects.ServerPlayer;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.Server;
 import com.gamelibrary2d.network.common.server.ServerContext;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -127,10 +127,10 @@ public class DemoGameServer implements ServerContext {
         log("Server has stopped");
     }
 
-    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws InitializationException {
+    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
         var serverPassword = Read.textWithSizeHeader(buffer, StandardCharsets.UTF_8);
         if (!serverPassword.equals("serverPassword123")) {
-            throw new InitializationException("Wrong password");
+            throw new IOException("Wrong password");
         }
         return true;
     }

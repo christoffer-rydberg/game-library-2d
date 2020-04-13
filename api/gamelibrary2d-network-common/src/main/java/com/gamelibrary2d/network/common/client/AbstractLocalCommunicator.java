@@ -44,7 +44,7 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
 
     @Override
     protected void send(DataBuffer buffer) throws IOException {
-        serverSideCommunicator.addIncoming(b -> Util.addIncoming(buffer, b), 0);
+        serverSideCommunicator.addIncoming(0, b -> Util.addIncoming(buffer, b));
     }
 
     @Override
@@ -82,7 +82,7 @@ public abstract class AbstractLocalCommunicator extends AbstractCommunicator imp
 
         @Override
         protected void send(DataBuffer buffer) throws IOException {
-            clientSideCommunicator.addIncoming(b -> Util.addIncoming(buffer, b), 0);
+            clientSideCommunicator.addIncoming(0, b -> Util.addIncoming(buffer, b));
         }
 
         @Override

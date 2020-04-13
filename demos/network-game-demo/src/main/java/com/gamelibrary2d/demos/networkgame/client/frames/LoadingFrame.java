@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractLoadingFrame;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.LoadingContext;
@@ -45,7 +45,7 @@ public class LoadingFrame extends AbstractLoadingFrame {
     }
 
     @Override
-    protected void loadFrame(Frame frame, LoadingContext context) throws LoadFailedException {
+    protected void loadFrame(Frame frame, LoadingContext context) throws InitializationException {
         if (loadingAction != null) {
             loadingAction.invoke();
         }
@@ -54,6 +54,6 @@ public class LoadingFrame extends AbstractLoadingFrame {
     }
 
     public interface LoadingAction {
-        void invoke() throws LoadFailedException;
+        void invoke() throws InitializationException;
     }
 }

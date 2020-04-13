@@ -46,7 +46,7 @@ public interface Communicator {
      * Adds bytes from the specified {@link DataReader} to the communicator's
      * incoming buffer.
      */
-    void addIncoming(DataReader dataReader, int channel) throws IOException;
+    void addIncoming(int channel, DataReader dataReader) throws IOException;
 
     /**
      * Reads bytes from the communicator's incoming buffer to the specified output

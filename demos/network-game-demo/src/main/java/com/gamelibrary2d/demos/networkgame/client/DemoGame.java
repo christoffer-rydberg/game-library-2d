@@ -8,7 +8,7 @@ import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Window;
@@ -30,7 +30,7 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    public void start(Window window) {
+    public void start(Window window) throws InitializationException {
         super.start(window);
     }
 
@@ -48,36 +48,53 @@ public class DemoGame extends AbstractGame {
         }
     }
 
-    public void goToMenu() {
-        setFrame(menuFrame, FrameDisposal.UNLOAD);
-    }
-
-    private void loadDemoFrame(Future<Communicator> futureCommunicator) {
+    private void loadDemoFrame(Future<Communicator> futureCommunicator) throws InitializationException {
         loadingFrame.setLoadingAction(() -> {
             try {
+                // TODO: Set communicator is not thread-safe
                 demoFrame.getClient().setCommunicator(
                         futureCommunicator.get(10, TimeUnit.SECONDS));
             } catch (Exception e) {
-                throw new LoadFailedException("Failed to get server communicator", e);
+                throw new InitializationException("Failed to get server communicator", e);
             }
         });
 
         loadFrame(demoFrame);
     }
 
+    public void goToMenu() {
+        try {
+            setFrame(menuFrame, FrameDisposal.UNLOAD);
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startLocalGame() {
-        loadDemoFrame(serverManager.hostLocalServer());
+        try {
+            loadDemoFrame(serverManager.hostLocalServer());
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
     }
 
     public void hostNetworkGame(int port) {
-        loadDemoFrame(serverManager.hostNetworkServer(port));
+        try {
+            loadDemoFrame(serverManager.hostNetworkServer(port));
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
     }
 
     public void joinNetworkGame(String ip, int port) {
-        loadDemoFrame(serverManager.joinNetworkServer(ip, port));
+        try {
+            loadDemoFrame(serverManager.joinNetworkServer(ip, port));
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void showSplashScreen() {
+    private void showSplashScreen() throws InitializationException {
         var splashFrame = new SplashFrame(this);
         setFrame(splashFrame);
         getWindow().show();
@@ -90,7 +107,7 @@ public class DemoGame extends AbstractGame {
         Textures.create(this);
     }
 
-    private void initializeFrames() {
+    private void initializeFrames() throws InitializationException {
         loadingFrame = new LoadingFrame(this);
         loadingFrame.initialize();
 

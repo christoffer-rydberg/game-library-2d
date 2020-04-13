@@ -17,8 +17,6 @@ import com.gamelibrary2d.renderers.AbstractShaderRenderer;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
 import com.gamelibrary2d.resources.Surface;
@@ -31,11 +29,12 @@ import com.gamelibrary2d.tools.particlegenerator.panels.common.BooleanPropertyPa
 import com.gamelibrary2d.tools.particlegenerator.panels.common.EnumPropertyPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.common.FloatPropertyPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.common.PropertyParameters;
+import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.util.io.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class RenderSettingsPanel extends StackPanel {
@@ -394,25 +393,21 @@ public class RenderSettingsPanel extends StackPanel {
     }
 
     private void loadTexture(Button textureButton, Surface quad) {
-
-        File file = fileChooser.browse();
-
-        if (file == null)
-            return;
-
-        URL url;
         try {
-            url = file.toURI().toURL();
-        } catch (MalformedURLException e) {
+            File file = fileChooser.browse();
+
+            if (file != null) {
+                var url = file.toURI().toURL();
+
+                loadTexture(url, useOriginalSize ? null : quad);
+
+                setText(textureButton, file.getName());
+
+                setRenderer(texturedRenderer);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
-
-        loadTexture(url, useOriginalSize ? null : quad);
-
-        setText(textureButton, file.getName());
-
-        setRenderer(texturedRenderer);
     }
 
     private void loadTexture(URL url, Surface quad) {

@@ -1,7 +1,7 @@
 package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
@@ -81,7 +81,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) throws LoadFailedException {
+    protected void onLoad(LoadingContext context) throws InitializationException {
 
     }
 

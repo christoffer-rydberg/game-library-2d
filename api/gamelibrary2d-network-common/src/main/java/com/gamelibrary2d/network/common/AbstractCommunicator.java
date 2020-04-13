@@ -17,8 +17,7 @@ public abstract class AbstractCommunicator implements Communicator {
 
     private volatile int id;
     private volatile boolean connected;
-
-    private boolean authenticated;
+    private volatile boolean authenticated;
 
     protected AbstractCommunicator(int incomingChannels, boolean connected) {
         incomingBufferMonitor = new IncomingBufferMonitor[incomingChannels];
@@ -124,7 +123,7 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     @Override
-    public void addIncoming(DataReader dataReader, int channel) throws IOException {
+    public void addIncoming(int channel, DataReader dataReader) throws IOException {
         incomingBufferMonitor[channel].addIncoming(dataReader);
     }
 

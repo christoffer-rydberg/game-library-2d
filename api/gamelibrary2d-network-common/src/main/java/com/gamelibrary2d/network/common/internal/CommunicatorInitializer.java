@@ -1,10 +1,10 @@
 package com.gamelibrary2d.network.common.internal;
 
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationStep;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -17,7 +17,7 @@ public class CommunicatorInitializer {
     }
 
     public InitializationResult runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStepRunner runner)
-            throws InitializationException {
+            throws IOException {
 
         if (initializationSteps.isEmpty()) {
             return InitializationResult.FINISHED;

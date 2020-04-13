@@ -3,6 +3,7 @@ package com.gamelibrary2d;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Window;
@@ -13,7 +14,7 @@ public interface Game extends Disposer, Updatable {
     /**
      * Starts the game inside the specified {@link Window}.
      */
-    void start(Window window);
+    void start(Window window) throws InitializationException;
 
     Window getWindow();
 
@@ -41,7 +42,7 @@ public interface Game extends Disposer, Updatable {
      * @param frame                 - New frame.
      * @param previousFrameDisposal - Disposal of previous frame.
      */
-    void setFrame(Frame frame, FrameDisposal previousFrameDisposal);
+    void setFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException;
 
     /**
      * Gets the current frame.

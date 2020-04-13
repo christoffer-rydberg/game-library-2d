@@ -68,8 +68,8 @@ public class InputBinding implements Serializable {
 
     @Override
     public void serialize(DataBuffer buffer) {
-        buffer.putInt(inputId);
         buffer.putInt(sourceId);
+        buffer.putInt(inputId);
         buffer.putInt(inputType.ordinal());
     }
 

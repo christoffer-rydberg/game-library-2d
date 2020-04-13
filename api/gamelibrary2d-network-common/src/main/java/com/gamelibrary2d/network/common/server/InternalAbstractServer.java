@@ -9,7 +9,6 @@ import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer.InitializationResult;
@@ -40,25 +39,27 @@ abstract class InternalAbstractServer implements Server {
         pendingCommunicators = new ArrayList<>();
     }
 
-    void addCommunicator(Communicator communicator) throws InitializationException {
+    void addConnectedCommunicator(Communicator communicator) throws IOException {
         if (!communicator.isConnected()) {
-            throw new InitializationException("Communicator is not connected");
+            throw new IOException("Communicator is not connected");
         }
 
-        communicator.addDisconnectedListener(disconnectedEventListener);
-
         var steps = new InternalCommunicationSteps();
-        try {
-            steps.add(new IdentityProducer(communicatorIdFactory));
-            steps.add(this::connectedStep);
-            communicator.configureAuthentication(steps);
-            steps.add(this::authenticatedStep);
-            configureClientInitialization(steps);
-        } finally {
-            pendingCommunicators.add(new PendingCommunicator(
-                    communicator,
-                    new DefaultCommunicationContext(),
-                    new CommunicatorInitializer(steps.getAll())));
+        steps.add(new IdentityProducer(communicatorIdFactory));
+        steps.add(this::connectedStep);
+        communicator.configureAuthentication(steps);
+        steps.add(this::authenticatedStep);
+        configureClientInitialization(steps);
+
+        pendingCommunicators.add(new PendingCommunicator(
+                communicator,
+                new DefaultCommunicationContext(),
+                new CommunicatorInitializer(steps.getAll())));
+
+        if (communicator.isConnected()) {
+            communicator.addDisconnectedListener(disconnectedEventListener);
+        } else {
+            onDisconnected(communicator);
         }
     }
 
@@ -76,11 +77,8 @@ abstract class InternalAbstractServer implements Server {
      * for it to be reinitialized. This is useful if the client has changed frame and wants
      * to initialize that frame.
      */
-    protected void deinitialize(Communicator communicator) throws InitializationException {
-        if (!communicators.remove(communicator)) {
-            throw new InitializationException("Communicator has not been initialized");
-        }
-
+    protected void deinitialize(Communicator communicator) {
+        communicators.remove(communicator);
         var steps = new InternalCommunicationSteps();
         try {
             configureClientInitialization(steps);
@@ -161,36 +159,30 @@ abstract class InternalAbstractServer implements Server {
             var pending = pendingCommunicators.get(i);
             try {
                 runCommunicationSteps(pending.communicator, pending.context, pending.initializer);
-            } catch (InitializationException e) {
+            } catch (IOException e) {
                 pending.communicator.disconnect(e);
             }
         }
     }
 
-    private void runCommunicationSteps(Communicator communicator, CommunicationContext context, CommunicatorInitializer initializer) throws InitializationException {
-        try {
-            InitializationResult result;
-            do {
+    private void runCommunicationSteps(Communicator communicator, CommunicationContext context, CommunicatorInitializer initializer)
+            throws IOException {
+        InitializationResult result;
+        do {
+            result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
+            if (result == InitializationResult.AWAITING_DATA && communicator.readIncoming(incomingBuffer)) {
                 result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
-                if (result == InitializationResult.AWAITING_DATA && communicator.readIncoming(incomingBuffer)) {
-                    result = initializer.runCommunicationStep(context, communicator, this::runCommunicationStep);
-                }
-            } while (result == InitializationResult.PENDING);
-
-            if (result == InitializationResult.FINISHED) {
-                initialized(context, communicator);
-                handleMesages(communicator);
             }
-        } catch (InitializationException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InitializationException("Internal server error", e);
+        } while (result == InitializationResult.PENDING);
+
+        if (result == InitializationResult.FINISHED) {
+            initialized(context, communicator);
+            handleMesages(communicator);
         }
     }
 
     private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
-            throws InitializationException {
+            throws IOException {
         if (step instanceof ConsumerStep) {
             while (true) {
                 int remaining = incomingBuffer.remaining();
@@ -204,7 +196,7 @@ abstract class InternalAbstractServer implements Server {
                 }
 
                 if (remaining == incomingBuffer.remaining()) {
-                    throw new InitializationException("Unexpected message");
+                    throw new IOException("Unexpected message");
                 }
             }
 
@@ -212,7 +204,7 @@ abstract class InternalAbstractServer implements Server {
             ((ProducerStep) step).run(context, communicator);
             return true;
         } else {
-            throw new InitializationException("Unknown communication step");
+            throw new IOException("Unknown communication step");
         }
     }
 
@@ -392,7 +384,7 @@ abstract class InternalAbstractServer implements Server {
     }
 
     @Override
-    public final void stop() throws IOException {
+    public final void stop() throws IOException, InterruptedException {
         if (running.compareAndSet(true, false)) {
             onStop();
         }
@@ -405,7 +397,7 @@ abstract class InternalAbstractServer implements Server {
 
     protected abstract void onStart() throws IOException;
 
-    protected abstract void onStop() throws IOException;
+    protected abstract void onStop() throws IOException, InterruptedException;
 
     protected abstract void onConnected(Communicator communicator);
 

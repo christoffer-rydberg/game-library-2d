@@ -2,7 +2,7 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.updaters.Updater;
@@ -12,7 +12,7 @@ public interface Frame extends Layer<Renderable>, Disposer {
     /**
      * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.method.
      */
-    void initialize();
+    void initialize() throws InitializationException;
 
     /**
      * @return True if the frame has been {@link #initialize initialized}, false otherwise.
@@ -29,16 +29,16 @@ public interface Frame extends Layer<Renderable>, Disposer {
      * This method is invoked after {@link #initialize}.
      *
      * @param context Used to registered loaded items.
-     * @throws LoadFailedException
+     * @throws InitializationException
      */
-    void load(LoadingContext context) throws LoadFailedException;
+    void load(LoadingContext context) throws InitializationException;
 
     /**
      * Invoked after {@link #load} from the main thread with the loaded resources.
      *
      * @param context The loaded context.
      */
-    void loaded(LoadingContext context);
+    void loaded(LoadingContext context) throws InitializationException;
 
     /**
      * @return True if the frame has been {@link #load loaded}, false otherwise.

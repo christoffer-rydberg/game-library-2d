@@ -10,12 +10,12 @@ import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.settings.*;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
 
 import java.io.File;
@@ -61,33 +61,32 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     }
 
     private void saveParticleSystem() {
-
-        File file = fileChooser.browse();
-
-        if (file == null)
-            return;
-
         try {
-            saveLoadManager.save(particleSystem.getSpawnSettings(), particleSystem.getUpdateSettings(), file, true);
+            File file = fileChooser.browse();
+
+            if (file != null) {
+                saveLoadManager.save(particleSystem.getSpawnSettings(), particleSystem.getUpdateSettings(), file, true);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void loadParticleSystem() {
-
-        File file = fileChooser.browse();
-
-        if (file == null)
-            return;
-
         ParticleSpawnSettings spawnSettings;
         ParticleUpdateSettings updateSettings;
         Renderer renderer = particleSystem.getUpdateSettings().getRenderer();
         try {
-            var result = new ParticleSettingsSaveLoadManager().load(file);
-            spawnSettings = result.getSpawnSettings();
-            updateSettings = result.getUpdateSettings();
+            File file = fileChooser.browse();
+
+            if (file != null) {
+                var result = new ParticleSettingsSaveLoadManager().load(file);
+                spawnSettings = result.getSpawnSettings();
+                updateSettings = result.getUpdateSettings();
+            } else {
+                spawnSettings = new BasicSpawnSettings();
+                updateSettings = new ParticleUpdateSettings();
+            }
         } catch (IOException e) {
             spawnSettings = new BasicSpawnSettings();
             updateSettings = new ParticleUpdateSettings();

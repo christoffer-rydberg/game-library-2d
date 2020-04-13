@@ -1,6 +1,7 @@
 package com.gamelibrary2d.demos.gifviewer;
 
 import com.gamelibrary2d.AbstractGame;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 
 public class DemoGame extends AbstractGame {
@@ -10,7 +11,7 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() throws InitializationException {
         setFrame(new DemoFrame(this));
     }
 

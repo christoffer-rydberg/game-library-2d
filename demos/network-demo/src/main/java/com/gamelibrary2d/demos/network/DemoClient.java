@@ -4,7 +4,8 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
@@ -18,8 +19,19 @@ public class DemoClient extends AbstractClient {
         updateLoop = new UpdateLoop(this::update, 10);
     }
 
-    void run() throws InitializationException {
-        authenticateAndInitialize();
+    void run() {
+        try {
+            authenticateAndInitialize();
+        } catch (NetworkInitializationException e) {
+            System.err.println("Failed to initialize client");
+            e.printStackTrace();
+            return;
+        } catch (NetworkAuthenticationException e) {
+            System.err.println("Failed to authenticate client");
+            e.printStackTrace();
+            return;
+        }
+
         updateLoop.run();
     }
 

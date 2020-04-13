@@ -2,7 +2,8 @@ package com.gamelibrary2d.network.common.initialization;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+
+import java.io.IOException;
 
 /**
  * Defines a communication step that reads one or more messages.
@@ -20,8 +21,7 @@ public interface ConsumerStep extends CommunicationStep {
      * @param communicator The communicator.
      * @param inbox        The inbox buffer.
      * @return True if the step has completed, false otherwise.
-     * @throws InitializationException Occurs if the communication step fails.
      */
-    boolean run(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws InitializationException;
+    boolean run(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws IOException;
 
 }

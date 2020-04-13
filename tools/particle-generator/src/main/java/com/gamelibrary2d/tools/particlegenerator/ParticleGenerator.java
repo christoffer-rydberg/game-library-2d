@@ -1,6 +1,7 @@
 package com.gamelibrary2d.tools.particlegenerator;
 
 import com.gamelibrary2d.AbstractGame;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 import com.gamelibrary2d.frames.Frame;
@@ -16,7 +17,7 @@ public class ParticleGenerator extends AbstractGame {
         frame = new ParticleFrame(this);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InitializationException {
         new ParticleGenerator().start(GlfwWindow.createWindowed("Particle Generator", 1280, 900));
     }
 
@@ -27,7 +28,7 @@ public class ParticleGenerator extends AbstractGame {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() throws InitializationException {
 
         // Create global resources:
         Fonts.create(this);

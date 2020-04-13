@@ -4,10 +4,8 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.AbstractDisposer;
 import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.DefaultLoadingContext;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
@@ -95,7 +93,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     }
 
     @Override
-    public void start(Window window) {
+    public void start(Window window) throws InitializationException {
         this.window = window;
 
         window.initialize();
@@ -108,7 +106,10 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         invokeLater = new ArrayDeque<>();
         mainLoop = new GameLoop(this, window);
 
-        mainLoop.start(this::onLoopStarted);
+        mainLoop.run(() -> {
+            onStart();
+            window.show();
+        });
 
         onExit();
 
@@ -116,11 +117,6 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         dispose();
 
         Runtime.dispose();
-    }
-
-    private void onLoopStarted() {
-        onStart();
-        window.show();
     }
 
     private void initializeOpenGLSettings() {
@@ -254,7 +250,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         window.render(frame, 1.0f);
     }
 
-    protected void loadFrame(Frame frame) {
+    protected void loadFrame(Frame frame) throws InitializationException {
         loadFrame(frame, FrameDisposal.NONE);
     }
 
@@ -267,15 +263,9 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
      * @param frame                 - New frame.
      * @param previousFrameDisposal - Disposal of previous frame.
      */
-    protected void loadFrame(Frame frame, FrameDisposal previousFrameDisposal) {
+    protected void loadFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException {
         if (loadingFrame == null) {
-            throw new GameLibrary2DRuntimeException("No loading frame has been set.");
-        }
-
-        if (updating) {
-            // Invoke at the end of update cycle
-            invokeLater(() -> loadFrame(frame, previousFrameDisposal));
-            return;
+            throw new InitializationException("No loading frame has been set.");
         }
 
         if (!frame.isInitialized()) {
@@ -287,13 +277,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         loadingFrame.load(frame, previousFrame, previousFrameDisposal);
     }
 
-    public void setFrame(Frame frame, FrameDisposal previousFrameDisposal) {
-        if (updating) {
-            // Invoke at the end of update cycle
-            invokeLater(() -> setFrame(frame, previousFrameDisposal));
-            return;
-        }
-
+    public void setFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException {
         disposeFrame(previousFrameDisposal);
 
         if (frame != null) {
@@ -306,13 +290,21 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
                     var loadContext = new DefaultLoadingContext();
                     frame.load(loadContext);
                     frame.loaded(loadContext);
-                } catch (LoadFailedException e) {
-                    e.printStackTrace();
-                    return;
+                } catch (InitializationException e) {
+                    frame.dispose(FrameDisposal.UNLOAD);
+                    throw e;
                 }
             }
         }
 
+        if (updating) {
+            invokeLater(() -> beginFrame(frame));
+        } else {
+            beginFrame(frame);
+        }
+    }
+
+    private void beginFrame(Frame frame) {
         this.frame = frame;
         frameNotUpdated = true;
 
@@ -348,7 +340,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         return frame;
     }
 
-    public void setFrame(Frame frame) {
+    public void setFrame(Frame frame) throws InitializationException {
         setFrame(frame, FrameDisposal.NONE);
     }
 
@@ -431,7 +423,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     }
 
-    protected abstract void onStart();
+    protected abstract void onStart() throws InitializationException;
 
     protected abstract void onExit();
 
@@ -448,13 +440,12 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             timer = Timer.create();
         }
 
-        public void start(Action onStart) {
+        public void run(StartAction onStart) throws InitializationException {
             running = true;
-
-            timer.init();
 
             onStart.invoke();
 
+            timer.init();
             while (running && !window.isCloseRequested()) {
                 game.update((float) timer.update());
             }
@@ -472,6 +463,10 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
         float getFPS() {
             return (float) timer.getUPS();
+        }
+
+        private interface StartAction {
+            void invoke() throws InitializationException;
         }
     }
 }

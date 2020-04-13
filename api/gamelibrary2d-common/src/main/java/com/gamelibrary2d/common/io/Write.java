@@ -8,14 +8,9 @@ import java.util.Random;
 
 public class Write {
 
-    private static boolean createFileAndDirs(File file) {
+    private static boolean createFileAndDirs(File file) throws IOException {
         File parent = file.getParentFile();
-        try {
-            return parent != null && (parent.mkdirs() || file.createNewFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return parent != null && (parent.mkdirs() || file.createNewFile());
     }
 
     private static void writeToFile(byte[] array, int off, int len, File file) throws IOException {

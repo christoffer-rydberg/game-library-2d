@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.transparentwindow;
 
 import com.gamelibrary2d.AbstractGame;
 import com.gamelibrary2d.common.Color;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
@@ -15,7 +16,7 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    public void start(Window window) {
+    public void start(Window window) throws InitializationException {
         var glfwWindow = (GlfwWindow) window;
         glfwWindow.additionalWindowHint(GLFW_DECORATED, GLFW_FALSE);
         glfwWindow.additionalWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
@@ -23,7 +24,7 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() throws InitializationException {
         setBackgroundColor(Color.TRANSPARENT);
         setFrame(new DemoFrame(this));
     }

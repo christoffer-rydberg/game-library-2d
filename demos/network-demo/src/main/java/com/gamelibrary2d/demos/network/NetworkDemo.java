@@ -3,15 +3,14 @@ package com.gamelibrary2d.demos.network;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.client.DefaultClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
 
 import java.io.IOException;
 
 public class NetworkDemo {
 
-    private static void exitWithError(String message, Throwable e) {
+    private static void exitWithError(String message, Throwable cause) {
         System.out.println(message);
-        e.printStackTrace();
+        cause.printStackTrace();
         System.exit(-1);
     }
 
@@ -23,7 +22,7 @@ public class NetworkDemo {
                 server.listenForConnections(true);
                 new UpdateLoop(server::update, 10).run();
                 server.stop();
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 exitWithError("Failed to start connection server", e);
             }
         });
@@ -43,11 +42,7 @@ public class NetworkDemo {
             }
 
             // Run update loop that will send outgoing messages and listen for incoming messages once connected (blocking).
-            try {
-                client.run();
-            } catch (InitializationException e) {
-                e.printStackTrace();
-            }
+            client.run();
         });
         thread.start();
         return thread;

@@ -1,11 +1,12 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.exceptions.LoadFailedException;
+import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.LoadingContext;
 import com.gamelibrary2d.network.common.client.Client;
-import com.gamelibrary2d.network.common.exceptions.InitializationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
 
@@ -27,7 +28,7 @@ public abstract class AbstractNetworkFrame<T extends Client>
     }
 
     @Override
-    public void load(LoadingContext context) throws LoadFailedException {
+    public void load(LoadingContext context) throws InitializationException {
         if (isLoaded())
             return;
 
@@ -36,24 +37,36 @@ public abstract class AbstractNetworkFrame<T extends Client>
             return;
         }
 
+        // TODO: How to guarantee that connect is always threadsafe?
         if (!client.isConnected()) {
             try {
                 client.connect().get();
             } catch (InterruptedException | ExecutionException e) {
-                throw new LoadFailedException("Failed to connect to server", e);
+                throw new InitializationException("Failed to connect to server", e);
             }
         }
 
+        client.clearInbox();
+        var clientContext = new DefaultCommunicationContext();
+        authenticate(client, clientContext);
+        super.load(context);
+        initialize(client, clientContext);
+        context.register(clientContextKey, clientContext);
+    }
+
+    private void authenticate(Client client, CommunicationContext context) throws InitializationException {
         try {
-            client.clearInbox();
-            var clientContext = new DefaultCommunicationContext();
-            client.authenticate(clientContext);
-            super.load(context);
-            client.initialize(clientContext);
-            context.register(clientContextKey, clientContext);
-        } catch (InitializationException e) {
-            unload();
-            throw new LoadFailedException("Client/server communication failed", e);
+            client.authenticate(context);
+        } catch (NetworkAuthenticationException e) {
+            throw new InitializationException("Failed to authenticate client", e);
+        }
+    }
+
+    private void initialize(Client client, CommunicationContext context) throws InitializationException {
+        try {
+            client.initialize(context);
+        } catch (NetworkInitializationException e) {
+            throw new InitializationException("Failed to initialize client", e);
         }
     }
 

@@ -88,11 +88,7 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
         } catch (IOException e) {
             connectingTcp = false;
             if (!communicationServerWasRunning) {
-                try {
-                    communicationServer.stop();
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
+                stopCommunicatorServer(communicationServer);
             }
             future.completeExceptionally(e);
         }
@@ -101,6 +97,14 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
             disconnect(e);
             throw new NotHandledException();
         });
+    }
+
+    private void stopCommunicatorServer(CommunicationServer communicationServer) {
+        try {
+            communicationServer.stop();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -128,11 +132,7 @@ public abstract class AbstractClientSideCommunicator extends AbstractNetworkComm
         connectingTcp = false;
         super.onDisconnected(cause);
         if (ownsCommunicationServer) {
-            try {
-                getCommunicationServer().stop();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            stopCommunicatorServer(getCommunicationServer());
         }
     }
 
