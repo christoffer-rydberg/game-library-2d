@@ -1,8 +1,8 @@
 package com.gamelibrary2d.network.common.exceptions;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DException;
+import java.io.IOException;
 
-public class NetworkAuthenticationException extends GameLibrary2DException {
+public class NetworkAuthenticationException extends IOException {
 
     public NetworkAuthenticationException() {
     }

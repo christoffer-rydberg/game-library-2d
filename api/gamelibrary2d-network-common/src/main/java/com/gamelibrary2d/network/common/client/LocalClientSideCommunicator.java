@@ -8,33 +8,35 @@ import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.LocalServer;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
-public abstract class AbstractLocalCommunicator extends AbstractCommunicator implements LocalCommunicator, Connectable {
+public class LocalClientSideCommunicator extends AbstractCommunicator implements LocalCommunicator {
 
     private final LocalServer localServer;
     private final LocalServerSideCommunicator serverSideCommunicator;
+    private ParameterizedAction<CommunicationSteps> configureAuthentication;
 
-    protected AbstractLocalCommunicator(LocalServer localServer) {
-        super(1, false);
+    private LocalClientSideCommunicator(LocalServer localServer) {
+        super(1, true);
         this.localServer = localServer;
         serverSideCommunicator = new LocalServerSideCommunicator(this, localServer);
     }
 
+    public static Communicator connect(LocalServer localServer) {
+        return connect(localServer, null);
+    }
+
+    public static Communicator connect(LocalServer localServer, ParameterizedAction<CommunicationSteps> configureAuthentication) {
+        var communicator = new LocalClientSideCommunicator(localServer);
+        communicator.configureAuthentication = configureAuthentication;
+        localServer.connectCommunicator(communicator.serverSideCommunicator);
+        return communicator;
+    }
+
     @Override
-    public Future<Void> connect() {
-        if (setConnected()) {
-            try {
-                if (!localServer.isRunning()) {
-                    localServer.start();
-                }
-                localServer.connectCommunicator(serverSideCommunicator);
-            } catch (Exception e) {
-                return CompletableFuture.failedFuture(e);
-            }
+    public void configureAuthentication(CommunicationSteps steps) {
+        if (configureAuthentication != null) {
+            configureAuthentication.invoke(steps);
         }
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.gamelibrary2d.network.common.server;
 
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.network.common.CommunicationServer;
+import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
@@ -17,8 +17,8 @@ public final class DefaultNetworkServer extends AbstractNetworkServer {
         this.serverContext = serverContextFactory.invoke(this);
     }
 
-    public DefaultNetworkServer(int port, CommunicationServer communicationServer, Func<Server, ServerContext> serverContextFactory) {
-        super(port, communicationServer);
+    public DefaultNetworkServer(int port, NetworkService networkService, Func<Server, ServerContext> serverContextFactory) {
+        super(port, networkService);
         this.serverContext = serverContextFactory.invoke(this);
     }
 

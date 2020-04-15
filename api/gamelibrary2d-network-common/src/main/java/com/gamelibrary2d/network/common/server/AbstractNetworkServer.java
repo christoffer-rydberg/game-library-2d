@@ -1,7 +1,7 @@
 package com.gamelibrary2d.network.common.server;
 
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-import com.gamelibrary2d.network.common.CommunicationServer;
+import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.ServerSocketChannelRegistration;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
@@ -9,39 +9,39 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 public abstract class AbstractNetworkServer extends InternalAbstractServer {
-    private final CommunicationServer communicationServer;
-    private final boolean ownsCommunicationServer;
+    private final NetworkService networkService;
+    private final boolean ownsNetworkService;
 
     private int port;
     private ServerSocketChannelRegistration registration;
 
-    private AbstractNetworkServer(int port, CommunicationServer communicationServer, boolean ownsCommunicationServer) {
+    private AbstractNetworkServer(int port, NetworkService networkService, boolean ownsNetworkService) {
         this.port = port;
-        this.communicationServer = communicationServer;
-        this.ownsCommunicationServer = ownsCommunicationServer;
+        this.networkService = networkService;
+        this.ownsNetworkService = ownsNetworkService;
     }
 
     protected AbstractNetworkServer(int port) {
-        this(port, new CommunicationServer(), true);
+        this(port, new NetworkService(), true);
     }
 
-    protected AbstractNetworkServer(int port, CommunicationServer communicationServer) {
-        this(port, communicationServer, false);
+    protected AbstractNetworkServer(int port, NetworkService networkService) {
+        this(port, networkService, false);
     }
 
     private void onConnected(SocketChannel channel) {
         invokeLater(() -> {
             var endpoint = channel.socket().getInetAddress().getHostAddress();
             if (!acceptConnection(endpoint)) {
-                communicationServer.disconnect(channel);
+                networkService.disconnect(channel);
                 onConnectionFailed(endpoint, new IOException("Connection refused by server"));
             } else {
                 try {
                     // Disable Nagle's algorithm
                     channel.socket().setTcpNoDelay(true);
-                    addConnectedCommunicator(new ServerSideCommunicator(communicationServer, channel, this::configureClientAuthentication));
+                    addConnectedCommunicator(new ServerSideCommunicator(networkService, channel, this::configureClientAuthentication));
                 } catch (IOException e) {
-                    communicationServer.disconnect(channel);
+                    networkService.disconnect(channel);
                     onConnectionFailed(endpoint, e);
                 }
             }
@@ -65,7 +65,7 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
     }
 
     private void enableConnections() throws IOException {
-        registration = communicationServer.registerConnectionListener(
+        registration = networkService.registerConnectionListener(
                 "localhost",
                 port,
                 this::onConnected,
@@ -74,21 +74,21 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
 
     private void disableConnections() throws IOException {
         if (registration != null) {
-            communicationServer.deregisterConnectionListener(registration);
+            networkService.deregisterConnectionListener(registration);
             registration = null;
         }
     }
 
     @Override
     protected void onStart() throws IOException {
-        communicationServer.start();
+        networkService.start();
     }
 
     @Override
     protected void onStop() throws IOException, InterruptedException {
         disableConnections();
-        if (ownsCommunicationServer) {
-            communicationServer.stop();
+        if (ownsNetworkService) {
+            networkService.stop();
         }
     }
 

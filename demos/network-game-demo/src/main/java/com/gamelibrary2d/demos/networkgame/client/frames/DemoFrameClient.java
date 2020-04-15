@@ -52,7 +52,7 @@ public class DemoFrameClient extends AbstractClient {
     }
 
     @Override
-    public void initialized(CommunicationContext context) {
+    protected void onPrepared(CommunicationContext context) {
         serverUpdatesPerSecond = context.get(Float.class, "updateRate");
         frame.applySettings(context.get(GameSettings.class));
         addObjects(context.get(InitialState.class).getObjects());

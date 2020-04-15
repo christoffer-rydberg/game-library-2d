@@ -1,25 +1,22 @@
 package com.gamelibrary2d.demos.networkgame.client;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.Write;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameServer;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.client.Connectable;
-import com.gamelibrary2d.network.common.client.DefaultClientSideCommunicator;
-import com.gamelibrary2d.network.common.client.DefaultLocalCommunicator;
+import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
+import com.gamelibrary2d.network.common.client.LocalClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 import com.gamelibrary2d.network.common.server.DefaultLocalServer;
 import com.gamelibrary2d.network.common.server.DefaultNetworkServer;
+import com.gamelibrary2d.network.common.server.LocalServer;
 import com.gamelibrary2d.network.common.server.Server;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class ServerManager {
@@ -33,18 +30,6 @@ public class ServerManager {
         return startServer(() -> createNetworkServer(port));
     }
 
-    public Future<Communicator> joinNetworkServer(String ip, int port) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                var communicator = createNetworkCommunicator(ip, port);
-                connectCommunicator(communicator);
-                return communicator;
-            } catch (Exception e) {
-                throw new CompletionException(e);
-            }
-        });
-    }
-
     public void stopHostedServer() {
         if (serverThread != null) {
             try {
@@ -56,10 +41,40 @@ public class ServerManager {
         }
     }
 
-    private void connectCommunicator(Communicator communicator) throws ExecutionException, InterruptedException {
-        if (communicator instanceof Connectable) {
-            ((Connectable) communicator).connect().get();
+    public Future<Communicator> connectToServer(String ip, int port) {
+        return ClientSideCommunicator.connect(new TcpConnectionSettings(ip, port), this::authenticate);
+    }
+
+    private Future<Communicator> connectToLocalServer(LocalServer server) {
+        return CompletableFuture.completedFuture(
+                LocalClientSideCommunicator.connect(server, this::authenticate)
+        );
+    }
+
+    private ServerResult createLocalServer() {
+        var localServer = new DefaultLocalServer(DemoGameServer::new);
+        try {
+            localServer.start();
+            return new ServerResult(localServer, () -> connectToLocalServer(localServer));
+        } catch (IOException e) {
+            return new ServerResult(localServer, () -> CompletableFuture.failedFuture(e));
         }
+    }
+
+    private ServerResult createNetworkServer(int port) {
+        var server = new DefaultNetworkServer(port, DemoGameServer::new);
+        try {
+            server.start();
+            server.listenForConnections(true);
+            return new ServerResult(server, () -> connectToServer("localhost", port));
+        } catch (IOException e) {
+            return new ServerResult(server, () -> CompletableFuture.failedFuture(e));
+        }
+    }
+
+    private void authenticate(CommunicationSteps steps) {
+        steps.add((context, communicator) ->
+                Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, communicator.getOutgoing()));
     }
 
     private Future<Communicator> startServer(Factory<ServerResult> serverFactory) {
@@ -68,8 +83,7 @@ public class ServerManager {
             var serverResult = serverFactory.create();
 
             try {
-                connectCommunicator(serverResult.communicator);
-                futureCommunicator.complete(serverResult.communicator);
+                futureCommunicator.complete(serverResult.communicatorFactory.create().get());
             } catch (Exception e) {
                 futureCommunicator.completeExceptionally(e);
                 stopServer(serverResult.server);
@@ -94,46 +108,13 @@ public class ServerManager {
         }
     }
 
-    private void authenticate(CommunicationSteps steps) {
-        steps.add((context, communicator) -> {
-            var outgoing = communicator.getOutgoing();
-            Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, outgoing);
-        });
-    }
-
-    private ServerResult createLocalServer() {
-        var localServer = new DefaultLocalServer(DemoGameServer::new);
-        var communicator = new DefaultLocalCommunicator(localServer);
-        communicator.onConfigureAuthentication(this::authenticate);
-        return new ServerResult(localServer, communicator);
-    }
-
-    private Communicator createNetworkCommunicator(String ip, int port) {
-        var communicator = new DefaultClientSideCommunicator(
-                new TcpConnectionSettings(ip, port));
-        communicator.onConfigureAuthentication(this::authenticate);
-        return communicator;
-    }
-
-    private ServerResult createNetworkServer(int port) {
-        try {
-            var server = new DefaultNetworkServer(port, DemoGameServer::new);
-            server.start();
-            server.listenForConnections(true);
-            var communicator = createNetworkCommunicator("localhost", port);
-            return new ServerResult(server, communicator);
-        } catch (IOException e) {
-            throw new GameLibrary2DRuntimeException("Failed to create network server", e);
-        }
-    }
-
     private static class ServerResult {
         private final Server server;
-        private final Communicator communicator;
+        private final Factory<Future<Communicator>> communicatorFactory;
 
-        ServerResult(Server server, Communicator communicator) {
+        ServerResult(Server server, Factory<Future<Communicator>> communicatorFactory) {
             this.server = server;
-            this.communicator = communicator;
+            this.communicatorFactory = communicatorFactory;
         }
     }
 }

@@ -39,11 +39,7 @@ abstract class InternalAbstractServer implements Server {
         pendingCommunicators = new ArrayList<>();
     }
 
-    void addConnectedCommunicator(Communicator communicator) throws IOException {
-        if (!communicator.isConnected()) {
-            throw new IOException("Communicator is not connected");
-        }
-
+    void addConnectedCommunicator(Communicator communicator) {
         var steps = new InternalCommunicationSteps();
         steps.add(new IdentityProducer(communicatorIdFactory));
         steps.add(this::connectedStep);
@@ -199,7 +195,6 @@ abstract class InternalAbstractServer implements Server {
                     throw new IOException("Unexpected message");
                 }
             }
-
         } else if (step instanceof ProducerStep) {
             ((ProducerStep) step).run(context, communicator);
             return true;

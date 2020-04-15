@@ -6,6 +6,7 @@ import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
+import com.gamelibrary2d.frames.LoadingFrame;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.markers.Updatable;
 
@@ -36,13 +37,30 @@ public interface Game extends Disposer, Updatable {
     void invokeLater(Runnable runnable);
 
     /**
-     * Sets the current frame. If the game is in the middle of an update cycle, the
-     * call to this method will be delayed and invoked at the end of the cycle.
+     * @return The {@link LoadingFrame} that is displayed when a frame is being {@link #loadFrame loaded}.
+     */
+    LoadingFrame getLoadingFrame();
+
+    /**
+     * Sets the {@link #getLoadingFrame() loading frame}.
+     */
+    void setLoadingFrame(LoadingFrame frame);
+
+    /**
+     * Sets the specified frame.
      *
-     * @param frame                 - New frame.
+     * @param frame                 - The new frame.
      * @param previousFrameDisposal - Disposal of previous frame.
      */
     void setFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException;
+
+    /**
+     * Loads the specified frame while showing the set {@link #getLoadingFrame() loading frame}.
+     *
+     * @param frame                 - The new frame.
+     * @param previousFrameDisposal - Disposal of previous frame.
+     */
+    void loadFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException;
 
     /**
      * Gets the current frame.

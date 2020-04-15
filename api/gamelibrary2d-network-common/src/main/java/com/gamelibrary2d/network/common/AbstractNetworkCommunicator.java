@@ -8,24 +8,21 @@ import java.nio.channels.SocketChannel;
 
 public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
-    private final CommunicationServer communicationServer;
+    private final NetworkService networkService;
 
-    private DatagramChannel datagramChannel;
-
+    private volatile DatagramChannel datagramChannel;
     private volatile SocketChannel socketChannel;
-
     private volatile ClosedSocketChannel closedSocketChannel;
-
     private volatile ClosedDatagramChannel closedDatagramChannel;
 
-    protected AbstractNetworkCommunicator(CommunicationServer communicationServer, int incomingChannels,
+    protected AbstractNetworkCommunicator(NetworkService networkService, int incomingChannels,
                                           boolean connected) {
         super(incomingChannels, connected);
-        this.communicationServer = communicationServer;
+        this.networkService = networkService;
     }
 
-    protected CommunicationServer getCommunicationServer() {
-        return communicationServer;
+    protected NetworkService getNetworkService() {
+        return networkService;
     }
 
     protected SocketChannel getSocketChannel() {
@@ -47,16 +44,14 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
     }
 
     /**
-     * This method is invoked from the {@link CommunicationServer communication
-     * server} thread and must be thread safe.
+     * This method is invoked from the {@link NetworkService}-thread and must be thread safe.
      */
     protected void onSocketChannelDisconnected(IOException ioException) {
         this.closedSocketChannel = new ClosedSocketChannel(ioException);
     }
 
     /**
-     * This method is invoked from the {@link CommunicationServer communication
-     * server} thread and must be thread safe.
+     * This method is invoked from the {@link NetworkService}-thread and must be thread safe.
      */
     protected void onDatagramChannelDisconnected(IOException ioException) {
         this.closedDatagramChannel = new ClosedDatagramChannel(ioException);
@@ -73,7 +68,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         var socketChannel = this.socketChannel;
         if (socketChannel == null)
             throw new IOException("Socket channel not connected");
-        communicationServer.send(socketChannel, buffer);
+        networkService.send(socketChannel, buffer);
     }
 
     @Override
@@ -88,9 +83,9 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
     /**
      * Since UDP is a connection less protocol we won't know if the client closes the UDP socket.
-     * A UDP disconnect can still occur if the {@link CommunicationServer} closes the UDP channel, e.g. due to an exception.
+     * A UDP disconnect can still occur if the {@link NetworkService} closes the UDP channel, e.g. due to an exception.
      *
-     * @throws IOException The cause of the disconnect in the {@link CommunicationServer}.
+     * @throws IOException The cause of the disconnect in the {@link NetworkService}.
      */
     private void handleUdpDisconnect() throws IOException {
         if (datagramChannelConnected() && closedDatagramChannel != null) {
@@ -108,7 +103,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
      * TCP is the only protocol that lets us know if the client (UDP is a connection less protocol).
      * Therefore, if TCP has been disconnected, the UDP connection will be closed as well.
      *
-     * @throws IOException The cause of the disconnect in the {@link CommunicationServer}.
+     * @throws IOException The cause of the disconnect in the {@link NetworkService}.
      */
     private void handleTcpDisconnect() throws IOException {
         if (socketChannelConnected() && closedSocketChannel != null) {
@@ -133,7 +128,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         if (socketChannelConnected()) {
             var socketChannel = this.socketChannel;
             setSocketChannel(null);
-            communicationServer.closeAfterLastScheduledSend(socketChannel);
+            networkService.closeAfterLastScheduledSend(socketChannel);
         }
     }
 
@@ -142,7 +137,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
             throw new IOException("Communicator is not connected");
         }
 
-        setDatagramChannel(communicationServer.openDatagramChannel(this, allowedOperations,
+        setDatagramChannel(networkService.openDatagramChannel(this, allowedOperations,
                 this::onDatagramChannelDisconnected, localPort, hostPort));
     }
 
@@ -150,7 +145,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         if (datagramChannelConnected()) {
             var datagramChannel = this.datagramChannel;
             setDatagramChannel(null);
-            communicationServer.disconnect(datagramChannel);
+            networkService.disconnect(datagramChannel);
         }
     }
 

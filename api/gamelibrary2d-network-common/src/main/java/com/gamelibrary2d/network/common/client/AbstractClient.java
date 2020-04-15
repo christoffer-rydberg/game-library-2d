@@ -8,23 +8,26 @@ import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractClient implements Client {
     private final DataBuffer inbox;
     private final CommunicatorDisconnectedListener disconnectedListener = this::onDisconnected;
+    private final Object communicatorKey = new Object();
 
     private Communicator communicator;
     private int initializationRetries = 100;
     private int initializationRetryDelay = 100;
     private boolean updateLocalServer;
+
+    private volatile CommunicatorFactory communicatorFactory;
 
     protected AbstractClient() {
         this.inbox = new DynamicByteBuffer();
@@ -38,6 +41,11 @@ public abstract class AbstractClient implements Client {
             com.disconnect(e);
             throw e;
         }
+    }
+
+    @Override
+    public void setCommunicatorFactory(CommunicatorFactory communicatorFactory) {
+        this.communicatorFactory = communicatorFactory;
     }
 
     public boolean isUpdatingLocalServer() {
@@ -56,61 +64,90 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public boolean isConnected() {
-        var communicator = getCommunicator();
         return communicator != null && communicator.isConnected();
     }
 
     @Override
-    public Future<Void> connect() {
-        var communicator = getCommunicator();
-        if (communicator instanceof Connectable) {
-            return ((Connectable) getCommunicator()).connect();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
     public void disconnect() {
-        var communicator = getCommunicator();
-        if (communicator != null)
+        if (communicator != null) {
             communicator.disconnect();
+        }
+    }
+
+    /**
+     * Reallocates the outgoing buffer in order to clear stale data and ensure
+     * that the state of the buffer isn't read from an obsolete thread-cache.
+     */
+    private void reallocateOutgoingBuffer(Communicator communicator) {
+        communicator.reallocateOutgoing();
     }
 
     @Override
-    public void authenticate(CommunicationContext context) throws NetworkAuthenticationException {
-        var communicator = getCommunicator();
+    public void prepare(CommunicationContext context)
+            throws NetworkConnectionException, NetworkAuthenticationException, NetworkInitializationException {
+        var communicator = connect();
+        reallocateOutgoingBuffer(communicator);
+        authenticate(context, communicator);
+        initialize(context, communicator);
+        context.register(communicatorKey, communicator);
+    }
+
+    private Communicator connect() throws NetworkConnectionException {
+        if (isConnected()) {
+            return communicator;
+        }
+
+        try {
+            var communicator = communicatorFactory.create().get();
+            if (!communicator.isConnected()) {
+                throw new NetworkConnectionException("Created communicator is not connected");
+            }
+            return communicator;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new NetworkConnectionException("Failed to create communicator", e);
+        }
+    }
+
+    private void authenticate(CommunicationContext context, Communicator communicator) throws NetworkAuthenticationException {
         if (!communicator.isAuthenticated()) {
             var steps = new InternalCommunicationSteps();
             configureAuthentication(communicator, steps);
             try {
                 runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
-            } catch (IOException e) {
-                throw new NetworkAuthenticationException("Authentication failed", e);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new NetworkAuthenticationException("Authentication failed", e);
             }
         }
     }
 
-    @Override
-    public void initialize(CommunicationContext context) throws NetworkInitializationException {
-        var communicator = getCommunicator();
+    private void initialize(CommunicationContext context, Communicator communicator) throws NetworkInitializationException {
         var steps = new InternalCommunicationSteps();
         configureInitialization(steps);
         try {
+            context.register(communicatorKey, communicator);
             runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
-        } catch (IOException e) {
-            throw new NetworkInitializationException("Initialization failed", e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new NetworkInitializationException("Initialization failed", e);
         }
     }
 
-    public void authenticateAndInitialize() throws NetworkInitializationException, NetworkAuthenticationException {
-        var context = new DefaultCommunicationContext();
-        authenticate(context);
-        initialize(context);
-        initialized(context);
+    @Override
+    public final void prepared(CommunicationContext context) {
+        var communicator = context.get(Communicator.class, communicatorKey);
+
+        reallocateOutgoingBuffer(communicator);
+
+        if (this.communicator != null) {
+            this.communicator.removeDisconnectedListener(disconnectedListener);
+        }
+
+        this.communicator = communicator;
+
+        if (this.communicator != null) {
+            this.communicator.addDisconnectedListener(disconnectedListener);
+        }
+
+        onPrepared(context);
     }
 
     @Override
@@ -175,19 +212,6 @@ public abstract class AbstractClient implements Client {
     @Override
     public Communicator getCommunicator() {
         return communicator;
-    }
-
-    @Override
-    public void setCommunicator(Communicator communicator) {
-        if (this.communicator != null) {
-            this.communicator.removeDisconnectedListener(disconnectedListener);
-        }
-
-        this.communicator = communicator;
-
-        if (this.communicator != null) {
-            this.communicator.addDisconnectedListener(disconnectedListener);
-        }
     }
 
     private void readMessages() {
@@ -285,8 +309,9 @@ public abstract class AbstractClient implements Client {
         steps.add(this::onAuthenticated);
     }
 
-    private void onDisconnected(CommunicatorDisconnected communicatorDisconnected) {
-        onDisconnected(communicatorDisconnected.getCommunicator(), communicatorDisconnected.getCause());
+    private void onDisconnected(CommunicatorDisconnected disconnected) {
+        var communicator = disconnected.getCommunicator();
+        onDisconnected(communicator, disconnected.getCause());
     }
 
     private void onAuthenticated(CommunicationContext context, Communicator communicator) {
@@ -294,6 +319,8 @@ public abstract class AbstractClient implements Client {
     }
 
     protected abstract void onConfigureInitialization(CommunicationSteps steps);
+
+    protected abstract void onPrepared(CommunicationContext context);
 
     protected abstract void onMessage(DataBuffer buffer);
 

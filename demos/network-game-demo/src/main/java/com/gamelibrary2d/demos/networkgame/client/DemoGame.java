@@ -13,11 +13,9 @@ import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
-import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 
 import java.io.IOException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class DemoGame extends AbstractGame {
     private final ServerManager serverManager = new ServerManager();
@@ -48,50 +46,34 @@ public class DemoGame extends AbstractGame {
         }
     }
 
-    private void loadDemoFrame(Future<Communicator> futureCommunicator) throws InitializationException {
-        loadingFrame.setLoadingAction(() -> {
-            try {
-                // TODO: Set communicator is not thread-safe
-                demoFrame.getClient().setCommunicator(
-                        futureCommunicator.get(10, TimeUnit.SECONDS));
-            } catch (Exception e) {
-                throw new InitializationException("Failed to get server communicator", e);
-            }
-        });
-
-        loadFrame(demoFrame);
+    private void loadDemoFrame(CommunicatorFactory communicatorFactory) {
+        demoFrame.getClient().setCommunicatorFactory(communicatorFactory);
+        try {
+            loadFrame(demoFrame, FrameDisposal.NONE);
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
     }
 
     public void goToMenu() {
         try {
             setFrame(menuFrame, FrameDisposal.UNLOAD);
+            serverManager.stopHostedServer();
         } catch (InitializationException e) {
             e.printStackTrace();
         }
     }
 
     public void startLocalGame() {
-        try {
-            loadDemoFrame(serverManager.hostLocalServer());
-        } catch (InitializationException e) {
-            e.printStackTrace();
-        }
+        loadDemoFrame(serverManager::hostLocalServer);
     }
 
     public void hostNetworkGame(int port) {
-        try {
-            loadDemoFrame(serverManager.hostNetworkServer(port));
-        } catch (InitializationException e) {
-            e.printStackTrace();
-        }
+        loadDemoFrame(() -> serverManager.hostNetworkServer(port));
     }
 
     public void joinNetworkGame(String ip, int port) {
-        try {
-            loadDemoFrame(serverManager.joinNetworkServer(ip, port));
-        } catch (InitializationException e) {
-            e.printStackTrace();
-        }
+        loadDemoFrame(() -> serverManager.connectToServer(ip, port));
     }
 
     private void showSplashScreen() throws InitializationException {
@@ -120,9 +102,6 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onExit() {
-        demoFrame.getClient().disconnect();
         serverManager.stopHostedServer();
     }
-
-
 }

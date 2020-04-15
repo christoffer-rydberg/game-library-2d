@@ -1,7 +1,7 @@
 package com.gamelibrary2d.network.common;
 
-import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
+import com.gamelibrary2d.common.event.SynchronizedEventPublisher;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
@@ -11,20 +11,22 @@ import java.io.IOException;
 
 public abstract class AbstractCommunicator implements Communicator {
 
-    private final DataBuffer outgoingBuffer;
-    private final EventPublisher<CommunicatorDisconnected> disconnectedPublisher = new DefaultEventPublisher<>();
     private final IncomingBufferMonitor[] incomingBufferMonitor;
+    private final EventPublisher<CommunicatorDisconnected> disconnectedPublisher = new SynchronizedEventPublisher<>();
 
     private volatile int id;
     private volatile boolean connected;
     private volatile boolean authenticated;
 
+    private DataBuffer outgoingBuffer;
+
     protected AbstractCommunicator(int incomingChannels, boolean connected) {
         incomingBufferMonitor = new IncomingBufferMonitor[incomingChannels];
-        for (int i = 0; i < incomingChannels; ++i)
+        for (int i = 0; i < incomingChannels; ++i) {
             incomingBufferMonitor[i] = new IncomingBufferMonitor(new DynamicByteBuffer());
-        outgoingBuffer = new DynamicByteBuffer();
+        }
         this.connected = connected;
+        reallocateOutgoing();
     }
 
     protected boolean setConnected() {
@@ -52,6 +54,11 @@ public abstract class AbstractCommunicator implements Communicator {
     @Override
     public DataBuffer getOutgoing() {
         return outgoingBuffer;
+    }
+
+    @Override
+    public void reallocateOutgoing() {
+        outgoingBuffer = new DynamicByteBuffer();
     }
 
     @Override

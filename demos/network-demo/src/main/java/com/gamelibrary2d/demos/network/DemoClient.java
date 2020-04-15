@@ -4,30 +4,39 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
+import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
+import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
 
 import java.nio.charset.StandardCharsets;
 
 public class DemoClient extends AbstractClient {
     private final UpdateLoop updateLoop;
 
-    DemoClient(Communicator communicator) {
-        setCommunicator(communicator);
+    DemoClient() {
         updateLoop = new UpdateLoop(this::update, 10);
     }
 
-    void run() {
+    void run(CommunicatorFactory communicatorFactory) {
         try {
-            authenticateAndInitialize();
-        } catch (NetworkInitializationException e) {
-            System.err.println("Failed to initialize client");
+            setCommunicatorFactory(communicatorFactory);
+            var context = new DefaultCommunicationContext();
+            prepare(context);
+            prepared(context);
+        } catch (NetworkConnectionException e) {
+            System.err.println("Failed to connect client");
             e.printStackTrace();
             return;
         } catch (NetworkAuthenticationException e) {
             System.err.println("Failed to authenticate client");
+            e.printStackTrace();
+            return;
+        } catch (NetworkInitializationException e) {
+            System.err.println("Failed to initialize client");
             e.printStackTrace();
             return;
         }
@@ -58,7 +67,7 @@ public class DemoClient extends AbstractClient {
     }
 
     @Override
-    public void initialized(CommunicationContext context) {
+    protected void onPrepared(CommunicationContext context) {
         sendMessage("What do you call a guy with a rubber toe?");
     }
 

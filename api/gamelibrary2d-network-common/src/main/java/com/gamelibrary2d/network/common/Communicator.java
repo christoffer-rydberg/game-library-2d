@@ -94,4 +94,9 @@ public interface Communicator {
      * Invoked when the client/server connection has been authenticated.
      */
     void onAuthenticated();
+
+    /**
+     * Reallocates the outgoing buffer.
+     */
+    void reallocateOutgoing();
 }

@@ -25,5 +25,4 @@ public interface CommunicationContext {
      * Gets the object of the specified type registered with the specified key.
      */
     <T> T get(Class<T> type, Object key);
-
 }

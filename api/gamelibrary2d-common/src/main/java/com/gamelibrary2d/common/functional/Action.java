@@ -5,7 +5,7 @@ package com.gamelibrary2d.common.functional;
  */
 public interface Action {
 
-    public static final Action EMPTY = () -> {
+    Action EMPTY = () -> {
     };
 
     void invoke();

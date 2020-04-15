@@ -12,7 +12,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-public class CommunicationServer {
+public class NetworkService {
 
     private final Map<SelectableChannel, ConnectionListener> connectionListeners = new Hashtable<>();
 
@@ -26,11 +26,11 @@ public class CommunicationServer {
 
     private Thread thread;
 
-    public CommunicationServer() {
+    public NetworkService() {
         this(8192);
     }
 
-    public CommunicationServer(int readBufferSize) {
+    public NetworkService(int readBufferSize) {
         readBuffer = ByteBuffer.allocateDirect(readBufferSize);
     }
 
