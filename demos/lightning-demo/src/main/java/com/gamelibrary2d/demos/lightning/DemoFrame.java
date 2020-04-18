@@ -3,7 +3,7 @@ package com.gamelibrary2d.demos.lightning;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DynamicLayer;
@@ -20,8 +20,10 @@ import java.net.URL;
 
 class DemoFrame extends AbstractFrame {
 
+    private final Game game;
+
     DemoFrame(Game game) {
-        super(game);
+        this.game = game;
     }
 
     private URL getUrl(String resource) {
@@ -43,7 +45,7 @@ class DemoFrame extends AbstractFrame {
     private Renderable createTorch(DefaultParticleSystem particleSystem, DefaultDynamicLightMap lightMap) throws IOException {
         var bounds = Rectangle.fromTopLeft(32, 64).move(-5, 10);
         var renderer = createRenderer(bounds, "torch.png");
-        return new Cursor(getGame(), renderer, lightMap, particleSystem);
+        return new Cursor(game, renderer, lightMap, particleSystem);
     }
 
     private LightRenderer createLightRenderer(Window window, LightMap lightMap) {
@@ -59,9 +61,9 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(InitializationContext context) {
         try {
-            var window = getGame().getWindow();
+            var window = game.getWindow();
             var particleSystem = createParticleSystem();
             var lightMap = new DefaultDynamicLightMap(new DefaultLightSpreadMatrix(20));
             var frameLayer = new DynamicLayer<>();
@@ -81,12 +83,12 @@ class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
 
     }
 

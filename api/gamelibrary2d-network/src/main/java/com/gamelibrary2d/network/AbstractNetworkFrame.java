@@ -1,9 +1,8 @@
 package com.gamelibrary2d.network;
 
-import com.gamelibrary2d.Game;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.network.common.client.Client;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
@@ -17,8 +16,7 @@ public abstract class AbstractNetworkFrame<T extends Client>
     private final T client;
     private final Object clientContextKey = new Object();
 
-    protected AbstractNetworkFrame(Game game, T client) {
-        super(game);
+    protected AbstractNetworkFrame(T client) {
         this.client = client;
     }
 
@@ -27,21 +25,12 @@ public abstract class AbstractNetworkFrame<T extends Client>
     }
 
     @Override
-    public void load(LoadingContext context) throws InitializationException {
-        if (isLoaded())
-            return;
-
-        if (!isInitialized()) {
-            System.err.println("Must call initialize prior to load");
-            return;
-        }
-
+    protected void handleLoad(InitializationContext context) throws InitializationException {
         initializeClient(client, context);
-
-        super.load(context);
+        super.handleLoad(context);
     }
 
-    private void initializeClient(Client client, LoadingContext context) throws InitializationException {
+    private void initializeClient(Client client, InitializationContext context) throws InitializationException {
         try {
             client.clearInbox();
             var clientContext = new DefaultCommunicationContext();
@@ -53,17 +42,17 @@ public abstract class AbstractNetworkFrame<T extends Client>
     }
 
     @Override
-    public void loaded(LoadingContext context) {
-        client.prepared(context.get(CommunicationContext.class, clientContextKey));
+    public void loaded(InitializationContext context) {
         super.loaded(context);
+        client.prepared(context.get(CommunicationContext.class, clientContextKey));
     }
 
     @Override
-    protected final void onUpdate(float deltaTime) {
-        client.update(deltaTime, this::handleUpdate);
+    protected final void handleUpdate(float deltaTime) {
+        client.update(deltaTime, this::onUpdate);
     }
 
-    protected void handleUpdate(float deltaTime) {
-        super.onUpdate(deltaTime);
+    protected void onUpdate(float deltaTime) {
+        super.handleUpdate(deltaTime);
     }
 }

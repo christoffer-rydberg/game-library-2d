@@ -198,11 +198,11 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     @Override
     public final void update(float deltaTime) {
         if (isEnabled()) {
-            onUpdate(deltaTime);
+            handleUpdate(deltaTime);
         }
     }
 
-    protected void onUpdate(float deltaTime) {
+    protected void handleUpdate(float deltaTime) {
         int size = updatableObjects.size();
         for (int i = 0; i < size; ++i) {
             updatableObjects.get(i).update(deltaTime);

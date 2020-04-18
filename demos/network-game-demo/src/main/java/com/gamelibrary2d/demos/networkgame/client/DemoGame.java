@@ -91,17 +91,18 @@ public class DemoGame extends AbstractGame {
 
     private void initializeFrames() throws InitializationException {
         loadingFrame = new LoadingFrame(this);
-        loadingFrame.initialize();
+        loadingFrame.initialize(this);
 
         menuFrame = new MenuFrame(this);
-        menuFrame.initialize();
+        menuFrame.initialize(this);
 
         demoFrame = new DemoFrame(this);
-        demoFrame.initialize();
+        demoFrame.initialize(this);
     }
 
     @Override
     protected void onExit() {
         serverManager.stopHostedServer();
+        demoFrame.getClient().disconnect();
     }
 }

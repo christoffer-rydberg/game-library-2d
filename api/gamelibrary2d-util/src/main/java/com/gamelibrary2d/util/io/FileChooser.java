@@ -17,7 +17,7 @@ public class FileChooser {
 
     public FileChooser(String tmpPath) {
         try {
-            loadCurrentDirectoryFromTempPath();
+            loadCurrentDirectory(tmpPath);
         } catch (IOException e) {
             e.printStackTrace();
             tmpPath = null;
@@ -33,7 +33,7 @@ public class FileChooser {
     public void setCurrentDirectory(String currentDirectory) throws IOException {
         this.currentDirectory = currentDirectory;
         if (tmpPath != null) {
-            saveCurrentDirectoryToTempPath();
+            saveCurrentDirectory(tmpPath);
         }
     }
 
@@ -68,28 +68,20 @@ public class FileChooser {
         return null;
     }
 
-    private void loadCurrentDirectoryFromTempPath() throws IOException {
-        BufferedReader reader = null;
-        try {
-            File f = new File(tmpPath);
-            if (f.exists() && !f.isDirectory()) {
-                reader = new BufferedReader(new FileReader(f));
+    private void loadCurrentDirectory(String filePath) throws IOException {
+        var file = new File(filePath);
+        if (file.exists() && !file.isDirectory()) {
+            try (var reader = new BufferedReader(new FileReader(file))) {
                 currentDirectory = reader.readLine();
             }
-        } finally {
-            reader.close();
         }
     }
 
-    private void saveCurrentDirectoryToTempPath() throws IOException {
-        BufferedWriter writer = null;
-        try {
-            File file = new File(tmpPath);
-            file.getParentFile().mkdirs();
-            writer = new BufferedWriter(new FileWriter(file));
+    private void saveCurrentDirectory(String filePath) throws IOException {
+        var file = new File(filePath);
+        file.getParentFile().mkdirs();
+        try (var writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(currentDirectory);
-        } finally {
-            writer.close();
         }
     }
 }

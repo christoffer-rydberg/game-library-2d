@@ -4,9 +4,9 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.framework.OpenGL;
+import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
 import com.gamelibrary2d.glUtil.OpenGLIntBuffer;
-import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
@@ -281,13 +281,9 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
             return;
 
         if (positionTransform != null) {
-
             ModelMatrix.instance().pushMatrix();
-
             ModelMatrix.instance().translatef(positionTransform.getX(), positionTransform.getY(), 0);
-
             getRenderer().render(null, vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
-
             ModelMatrix.instance().popMatrix();
         } else {
             getRenderer().render(null, vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);

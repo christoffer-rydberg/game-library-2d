@@ -4,7 +4,7 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.animation.*;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 
@@ -14,10 +14,11 @@ import java.util.Collections;
 
 public class DemoFrame extends AbstractFrame {
 
+    private final Game game;
     private ComposableObject<AnimationRenderer> animationObj;
 
     DemoFrame(Game game) {
-        super(game);
+        this.game = game;
     }
 
     private Animation createAnimation() throws IOException {
@@ -32,8 +33,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
-        var game = getGame();
+    protected void onInitialize(InitializationContext context) {
         var window = game.getWindow();
         try {
             var animation = createAnimation();
@@ -46,12 +46,12 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
 
     }
 
@@ -66,11 +66,10 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onUpdate(float deltaTime) {
-        super.onUpdate(deltaTime);
+    protected void handleUpdate(float deltaTime) {
+        super.handleUpdate(deltaTime);
         if (animationObj.getContent().isAnimationFinished()) {
-            getGame().exit();
+            game.exit();
         }
     }
-
 }

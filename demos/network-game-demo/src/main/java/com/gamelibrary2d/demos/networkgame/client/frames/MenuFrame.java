@@ -3,7 +3,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.ObjectFactory;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultPanel;
 import com.gamelibrary2d.layers.NavigationPanel;
@@ -22,7 +22,6 @@ public class MenuFrame extends AbstractFrame {
     private GameObject joinPanel;
 
     public MenuFrame(DemoGame game) {
-        super(game);
         this.game = game;
     }
 
@@ -32,7 +31,7 @@ public class MenuFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(InitializationContext context) {
         navigationPanel = new NavigationPanel();
         mainPanel = createMainPanel();
         hostPanel = createHostPanel();
@@ -40,12 +39,12 @@ public class MenuFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
         add(navigationPanel);
         navigationPanel.navigateTo(mainPanel, false);
     }

@@ -10,13 +10,16 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     private volatile LoadResult loadResult;
 
     public AbstractLoadingFrame(Game game) {
-        super(game);
         this.game = game;
     }
 
+    protected Game getGame() {
+        return game;
+    }
+
     @Override
-    protected void onUpdate(float deltaTime) {
-        super.onUpdate(deltaTime);
+    protected void handleUpdate(float deltaTime) {
+        super.handleUpdate(deltaTime);
         if (workerThread != null && !workerThread.isAlive()) {
             var loadResult = this.loadResult;
             workerThread = null;
@@ -27,7 +30,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
                 } catch (InitializationException e) {
                     onLoadingFailed(new LoadResult(
                             loadResult.frame,
-                            loadResult.context,
+                            null,
                             loadResult.previousFrame,
                             loadResult.previousFrameDisposal,
                             e
@@ -71,8 +74,8 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         }
     }
 
-    protected void loadFrame(Frame frame, LoadingContext context) throws InitializationException {
-        frame.load(context);
+    protected InitializationContext loadFrame(Frame frame) throws InitializationException {
+        return frame.load();
     }
 
     @Override
@@ -82,13 +85,12 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
             changeFrame(frame, previousFrame, previousFrameDisposal);
         } else {
             workerThread = new Thread(() -> {
-                var context = new DefaultLoadingContext();
                 try {
-                    loadFrame(frame, context);
+                    var context = loadFrame(frame);
                     loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, null);
                 } catch (InitializationException e) {
                     frame.dispose(FrameDisposal.UNLOAD);
-                    loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, e);
+                    loadResult = new LoadResult(frame, null, previousFrame, previousFrameDisposal, e);
                 }
             });
             workerThread.start();
@@ -98,11 +100,11 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     protected static class LoadResult {
         public final Frame frame;
         public final Frame previousFrame;
-        public final LoadingContext context;
         public final FrameDisposal previousFrameDisposal;
         public final InitializationException error;
+        public final InitializationContext context;
 
-        private LoadResult(Frame frame, LoadingContext context, Frame previousFrame,
+        private LoadResult(Frame frame, InitializationContext context, Frame previousFrame,
                            FrameDisposal previousFrameDisposal, InitializationException error) {
             this.frame = frame;
             this.previousFrame = previousFrame;

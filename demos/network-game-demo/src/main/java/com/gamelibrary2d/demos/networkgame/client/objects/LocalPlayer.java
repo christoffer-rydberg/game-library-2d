@@ -7,7 +7,7 @@ import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.input.InputBinding;
 import com.gamelibrary2d.input.InputController;
 
-public class LocalPlayer extends AbstractDemoClientObject {
+public class LocalPlayer extends AbstractClientObject {
     private final InputController controller;
     private final PlayerRotation rotation;
 
@@ -30,7 +30,8 @@ public class LocalPlayer extends AbstractDemoClientObject {
     }
 
     @Override
-    protected void onUpdate(float deltaTime) {
+    public void update(float deltaTime) {
+        super.update(deltaTime);
         controller.update();
         rotation.updateServer();
     }

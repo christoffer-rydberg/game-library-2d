@@ -18,7 +18,7 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onStart() throws InitializationException {
-        setFrame(new DemoFrame(this));
+        setFrame(new DemoFrame());
     }
 
     @Override

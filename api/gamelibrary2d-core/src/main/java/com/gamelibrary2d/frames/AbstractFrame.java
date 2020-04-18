@@ -1,7 +1,7 @@
 package com.gamelibrary2d.frames;
 
-import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposable;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Renderable;
@@ -13,18 +13,13 @@ import java.util.Deque;
 
 public abstract class AbstractFrame extends AbstractLayer<Renderable> implements Frame {
     private final Deque<Runnable> invokeLater = new ArrayDeque<>();
+    private final DefaultInitializationContext initializationContext = new DefaultInitializationContext();
+    private final Deque<Updater> updaters = new ArrayDeque<>();
+    private final DisposerStack disposerStack = new DisposerStack();
 
-    private Game game;
-    private DisposerStack disposer;
-    private Deque<Updater> updaters;
     private boolean paused;
-    private boolean disposed;
     private boolean initialized;
     private volatile boolean loaded;
-
-    protected AbstractFrame(Game game) {
-        this.game = game;
-    }
 
     public void invokeLater(Runnable runnable) {
         invokeLater.addLast(runnable);
@@ -32,25 +27,26 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     @Override
     public void registerDisposal(Disposable disposable) {
-        disposer.push(disposable);
+        disposerStack.push(disposable);
     }
 
     @Override
-    public void initialize() throws InitializationException {
-        if (disposed) {
-            throw new InitializationException("This object has been disposed");
+    public void initialize(Disposer disposer) throws InitializationException {
+        if (isInitialized()) {
+            return;
         }
 
-        if (isInitialized())
-            return;
+        if (disposer == this) {
+            throw new InitializationException("Cannot register itself as disposer");
+        }
 
-        game.registerDisposal(this);
-        disposer = new DisposerStack();
-        updaters = new ArrayDeque<>();
+        disposer.registerDisposal(this);
 
-        onInitialize();
+        var context = new DefaultInitializationContext();
+        onInitialize(context);
+        this.initializationContext.registerAll(context);
 
-        disposer.pushBreak();
+        disposerStack.pushBreak();
         initialized = true;
     }
 
@@ -60,21 +56,27 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void load(LoadingContext context) throws InitializationException {
-        if (isLoaded())
-            return;
+    public final InitializationContext load() throws InitializationException {
+        if (isLoaded()) {
+            throw new InitializationException("Frame has already been loaded");
+        }
 
         if (!isInitialized()) {
             throw new InitializationException("Frame has not been initialized");
         }
 
-        onLoad(context);
+        var context = new DefaultInitializationContext(this.initializationContext);
+        handleLoad(context);
+        return context;
+    }
 
+    protected void handleLoad(InitializationContext context) throws InitializationException {
+        onLoad(context);
         loaded = true;
     }
 
     @Override
-    public void loaded(LoadingContext context) {
+    public void loaded(InitializationContext context) {
         onLoaded(context);
     }
 
@@ -99,26 +101,24 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
     protected void unload() {
         // Dispose all resources created after the initialization phase.
-        disposer.disposeUntilBreak();
+        disposerStack.disposeUntilBreak();
         commonCleanUp();
     }
 
     @Override
     public void dispose() {
-        if (!disposed) {
-            disposer.dispose();
+        if (initialized) {
+            disposerStack.dispose();
+            initializationContext.clear();
             commonCleanUp();
             initialized = false;
-            game = null;
-            disposer = null;
-            updaters = null;
-            disposed = true;
         }
     }
 
     private void commonCleanUp() {
         clear();
         updaters.clear();
+        invokeLater.clear();
         loaded = false;
     }
 
@@ -136,9 +136,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    protected void onUpdate(float deltaTime) {
+    protected void handleUpdate(float deltaTime) {
         if (!isPaused()) {
-            super.onUpdate(deltaTime);
+            super.handleUpdate(deltaTime);
 
             for (int i = 0; i < updaters.size(); ++i) {
                 Updater updater = updaters.pollFirst();
@@ -152,11 +152,6 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         while (!invokeLater.isEmpty()) {
             invokeLater.pollFirst().run();
         }
-    }
-
-    @Override
-    public Game getGame() {
-        return game;
     }
 
     @Override
@@ -189,11 +184,11 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         invokeLater.clear();
     }
 
-    protected abstract void onInitialize() throws InitializationException;
+    protected abstract void onInitialize(InitializationContext context) throws InitializationException;
 
-    protected abstract void onLoad(LoadingContext context) throws InitializationException;
+    protected abstract void onLoad(InitializationContext context) throws InitializationException;
 
-    protected abstract void onLoaded(LoadingContext context);
+    protected abstract void onLoaded(InitializationContext context);
 
     protected abstract void onBegin();
 

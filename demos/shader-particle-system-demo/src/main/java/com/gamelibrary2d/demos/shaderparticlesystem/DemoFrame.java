@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.shaderparticlesystem;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.resources.Texture;
@@ -12,14 +12,16 @@ import java.io.IOException;
 
 public class DemoFrame extends AbstractFrame {
 
+    private final Game game;
+
     DemoFrame(Game game) {
-        super(game);
+        this.game = game;
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(InitializationContext context) {
         try {
-            Window window = getGame().getWindow();
+            Window window = game.getWindow();
             float windowWidth = window.width();
             float windowHeight = window.height();
             BufferedImage init = Texture.load(DemoFrame.class.getResource("/Images/before.jpg"));
@@ -44,12 +46,12 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
 
     }
 

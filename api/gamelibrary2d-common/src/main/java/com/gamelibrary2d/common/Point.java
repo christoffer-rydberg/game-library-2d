@@ -57,9 +57,13 @@ public class Point {
         this.y = y;
     }
 
-    public void lerp(float x, float y, float alpha) {
-        this.x = this.x * (1f - alpha) + x * alpha;
-        this.y = this.y * (1f - alpha) + y * alpha;
+    public void lerp(Point p0, Point p1, float alpha) {
+        lerp(p0.x, p0.y, p1.x, p1.y, alpha);
+    }
+    
+    public void lerp(float x0, float y0, float x1, float y1, float alpha) {
+        this.x = x0 * (1f - alpha) + x1 * alpha;
+        this.y = y0 * (1f - alpha) + y1 * alpha;
     }
 
     public void add(float x, float y) {

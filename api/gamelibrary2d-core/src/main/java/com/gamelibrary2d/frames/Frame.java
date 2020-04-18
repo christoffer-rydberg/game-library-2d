@@ -1,6 +1,5 @@
 package com.gamelibrary2d.frames;
 
-import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Renderable;
@@ -10,9 +9,9 @@ import com.gamelibrary2d.updaters.Updater;
 public interface Frame extends Layer<Renderable>, Disposer {
 
     /**
-     * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.method.
+     * Initializes the frame. This method is always invoked from the main thread with an OpenGL context available.
      */
-    void initialize() throws InitializationException;
+    void initialize(Disposer disposer) throws InitializationException;
 
     /**
      * @return True if the frame has been {@link #initialize initialized}, false otherwise.
@@ -22,23 +21,23 @@ public interface Frame extends Layer<Renderable>, Disposer {
     /**
      * Typically invoked from a separate thread by a {@link LoadingFrame}.
      * No OpenGL context is available and the implementation of this method must be thread safe.
-     * Loaded resources should be registered in the specified {@link LoadingContext} and can be
+     * Loaded resources should be registered in the specified {@link InitializationContext} and can be
      * added to the frame in a thread-safe manner when {@link #loaded} is invoked.
      * <br>
      * <br>
      * This method is invoked after {@link #initialize}.
      *
-     * @param context Used to registered loaded items.
+     * @return Context with loaded items.
      * @throws InitializationException
      */
-    void load(LoadingContext context) throws InitializationException;
+    InitializationContext load() throws InitializationException;
 
     /**
      * Invoked after {@link #load} from the main thread with the loaded resources.
      *
      * @param context The loaded context.
      */
-    void loaded(LoadingContext context) throws InitializationException;
+    void loaded(InitializationContext context) throws InitializationException;
 
     /**
      * @return True if the frame has been {@link #load loaded}, false otherwise.
@@ -54,11 +53,6 @@ public interface Frame extends Layer<Renderable>, Disposer {
      * Invoked when the frame ends.
      */
     void end();
-
-    /**
-     * @return The game instance.
-     */
-    Game getGame();
 
     /**
      * Pauses the game.

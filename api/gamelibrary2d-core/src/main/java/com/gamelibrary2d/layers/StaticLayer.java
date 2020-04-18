@@ -30,8 +30,8 @@ public class StaticLayer<T extends Renderable> extends AbstractLayer<T> {
     }
 
     @Override
-    public void onUpdate(float deltaTime) {
-        super.onUpdate(deltaTime);
+    public void handleUpdate(float deltaTime) {
+        super.handleUpdate(deltaTime);
         background.update(deltaTime);
         foreground.update(deltaTime);
     }

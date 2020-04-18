@@ -1,5 +1,6 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.renderSettings;
 
+import com.gamelibrary2d.Game;
 import com.gamelibrary2d.animation.AnimationFactory;
 import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
@@ -70,7 +71,7 @@ public class RenderSettingsPanel extends StackPanel {
     private EfficientParticleRenderer defaultParticleRenderer;
     private IterativeParticleRenderer iterativeParticleRenderer;
 
-    public RenderSettingsPanel(ParticleSystemModel particleSystem, ParticleFrame frame) {
+    public RenderSettingsPanel(ParticleSystemModel particleSystem, Game game, ParticleFrame frame) {
 
         super(Orientation.VERTICAL, -ROW_HEIGHT);
 
@@ -102,8 +103,8 @@ public class RenderSettingsPanel extends StackPanel {
         defaultParticleShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional since the fragment shader only
         // have one "out" variable
         defaultParticleShaderProgram.initialize();
-        defaultParticleShaderProgram.initializeMvp(frame.getGame().getWindow().width(),
-                frame.getGame().getWindow().height());
+        defaultParticleShaderProgram.initializeMvp(game.getWindow().width(),
+                game.getWindow().height());
 
         defaultRenderer = new SurfaceRenderer(quad);
         defaultRenderer.setShaderProgram(defaultParticleShaderProgram);

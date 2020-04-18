@@ -3,7 +3,7 @@ package com.gamelibrary2d.demos.particlesystem;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.settings.BasicSpawnSettings;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DemoFrame extends AbstractFrame {
+    private final Game game;
     private List<SequentialParticleEmitter> emitters = new ArrayList<>();
     private DefaultParticleSystem fireSystem;
     private DefaultParticleSystem explosionSystem;
 
     DemoFrame(Game game) {
-        super(game);
+        this.game = game;
     }
 
     private ParticleSpawnSettings createSpawnSettings() {
@@ -56,7 +57,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(InitializationContext context) {
         try {
             // Example of particle system created from code:
             fireSystem = DefaultParticleSystem.create(
@@ -76,17 +77,17 @@ public class DemoFrame extends AbstractFrame {
             add(explosionSystem);
         } catch (IOException e) {
             e.printStackTrace();
-            getGame().exit();
+            game.exit();
         }
     }
 
     @Override
-    protected void onLoad(LoadingContext context) throws InitializationException {
+    protected void onLoad(InitializationContext context) throws InitializationException {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
 
     }
 
@@ -117,10 +118,10 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    public void onUpdate(float deltaTime) {
+    public void handleUpdate(float deltaTime) {
         for (var emitter : emitters) {
             emitter.update(deltaTime);
         }
-        super.onUpdate(deltaTime);
+        super.handleUpdate(deltaTime);
     }
 }

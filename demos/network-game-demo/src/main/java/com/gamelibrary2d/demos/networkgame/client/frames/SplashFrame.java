@@ -3,36 +3,38 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 
 public class SplashFrame extends AbstractFrame {
 
+    private final Game game;
+
     public SplashFrame(Game game) {
-        super(game);
+        this.game = game;
     }
 
     @Override
-    protected void onInitialize() {
-
-    }
-
-    @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onInitialize(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
+
+    }
+
+    @Override
+    protected void onLoaded(InitializationContext context) {
 
     }
 
     @Override
     protected void onBegin() {
-        getGame().setBackgroundColor(Color.WHITE);
+        game.setBackgroundColor(Color.WHITE);
     }
 
     @Override
     protected void onEnd() {
-        getGame().setBackgroundColor(Color.BLACK);
+        game.setBackgroundColor(Color.BLACK);
     }
 }

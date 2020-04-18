@@ -1,5 +1,6 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 
+import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
@@ -27,12 +28,15 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
     private final ParticleSettingsSaveLoadManager saveLoadManager = new ParticleSettingsSaveLoadManager();
 
+    private final Game game;
+
     private final ParticleFrame frame;
 
     private final FileChooser fileChooser;
 
-    public SaveLoadResetPanel(ParticleSystemModel particleSystem, ParticleFrame frame) {
+    public SaveLoadResetPanel(ParticleSystemModel particleSystem, Game game, ParticleFrame frame) {
         this.particleSystem = particleSystem;
+        this.game = game;
         this.frame = frame;
 
         fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/particle_path.txt");
@@ -224,9 +228,9 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         if (ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()) != null) {
 
             ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings()).setPositionVar(
-                    round(random.nextFloat() * frame.getGame().getWindow().width() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0));
+                    round(random.nextFloat() * game.getWindow().width() / 2, 0),
+                    round(random.nextFloat() * game.getWindow().height() / 2, 0),
+                    round(random.nextFloat() * game.getWindow().height() / 2, 0));
 
             ParticleSettingsUtils.asBasic(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));
@@ -241,9 +245,9 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         } else if (ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()) != null) {
 
             ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings()).setRadius(
-                    round(random.nextFloat() * frame.getGame().getWindow().width() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0),
-                    round(random.nextFloat() * frame.getGame().getWindow().height() / 2, 0));
+                    round(random.nextFloat() * game.getWindow().width() / 2, 0),
+                    round(random.nextFloat() * game.getWindow().height() / 2, 0),
+                    round(random.nextFloat() * game.getWindow().height() / 2, 0));
 
             ParticleSettingsUtils.asEllipsoid(particleSystem.getSpawnSettings())
                     .setPositionYaw(round(random.nextFloat() * 360 - 180, 1));

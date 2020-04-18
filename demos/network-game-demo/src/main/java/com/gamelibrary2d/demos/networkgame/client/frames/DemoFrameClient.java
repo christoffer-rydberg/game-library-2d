@@ -3,8 +3,8 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.client.objects.DefaultDemoClientObject;
-import com.gamelibrary2d.demos.networkgame.client.objects.DemoClientObject;
+import com.gamelibrary2d.demos.networkgame.client.objects.ClientObject;
+import com.gamelibrary2d.demos.networkgame.client.objects.DefaultClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.LocalPlayer;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
@@ -24,13 +24,13 @@ import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.DESTROY;
 import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.SPAWN;
 
 public class DemoFrameClient extends AbstractClient {
+    private final DemoFrame frame;
     private final BitParser bitParser = new BitParser();
-    private final Map<Integer, DemoClientObject> objects = new HashMap<>();
+    private final Map<Integer, ClientObject> objects = new HashMap<>();
 
-    private DemoFrame frame;
     private float serverUpdatesPerSecond;
 
-    void initialize(DemoFrame frame) {
+    public DemoFrameClient(DemoFrame frame) {
         this.frame = frame;
     }
 
@@ -74,18 +74,18 @@ public class DemoFrameClient extends AbstractClient {
         }
     }
 
-    private DemoClientObject readObject(byte id, DataBuffer buffer) {
+    private ClientObject readObject(byte id, DataBuffer buffer) {
         switch (id) {
             case ObjectIdentifiers.PLAYER:
                 var isLocal = buffer.getBool();
                 if (isLocal) {
                     return new LocalPlayer(id, this, buffer);
                 } else {
-                    return new DefaultDemoClientObject(id, this, buffer);
+                    return new DefaultClientObject(id, this, buffer);
                 }
             case ObjectIdentifiers.PORTAL:
             case ObjectIdentifiers.BOULDER:
-                return new DefaultDemoClientObject(id, this, buffer);
+                return new DefaultClientObject(id, this, buffer);
         }
 
         throw new GameLibrary2DRuntimeException("Invalid object id");
@@ -96,12 +96,12 @@ public class DemoFrameClient extends AbstractClient {
         frame.destroy(obj);
     }
 
-    private void spawn(DemoClientObject obj) {
+    private void spawn(ClientObject obj) {
         objects.put(obj.getId(), obj);
         frame.spawn(obj);
     }
 
-    private <T extends DemoClientObject> void addObjects(List<T> objects) {
+    private <T extends ClientObject> void addObjects(List<T> objects) {
         for (var obj : objects) {
             spawn(obj);
         }
@@ -156,7 +156,7 @@ public class DemoFrameClient extends AbstractClient {
     }
 
     private class InitialState {
-        private final List<DemoClientObject> objects;
+        private final List<ClientObject> objects;
 
         InitialState(DataBuffer buffer) {
             var size = buffer.getInt();
@@ -167,7 +167,7 @@ public class DemoFrameClient extends AbstractClient {
             }
         }
 
-        List<DemoClientObject> getObjects() {
+        List<ClientObject> getObjects() {
             return objects;
         }
     }

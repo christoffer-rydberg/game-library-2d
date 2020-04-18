@@ -158,7 +158,6 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
     }
 
     private static class ClosedSocketChannel {
-
         private final IOException exception;
 
         ClosedSocketChannel(IOException exception) {
@@ -167,7 +166,6 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
     }
 
     private static class ClosedDatagramChannel {
-
         private final IOException exception;
 
         ClosedDatagramChannel(IOException exception) {

@@ -6,7 +6,6 @@ import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.exceptions.InitializationException;
-import com.gamelibrary2d.frames.DefaultLoadingContext;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.frames.LoadingFrame;
@@ -262,7 +261,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         }
 
         if (!frame.isInitialized()) {
-            frame.initialize();
+            frame.initialize(this);
         }
 
         var previousFrame = this.frame;
@@ -274,14 +273,13 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     public void setFrame(Frame frame, FrameDisposal previousFrameDisposal) throws InitializationException {
         if (frame != null) {
             if (!frame.isInitialized()) {
-                frame.initialize();
+                frame.initialize(this);
             }
 
             if (!frame.isLoaded()) {
                 try {
-                    var loadContext = new DefaultLoadingContext();
-                    frame.load(loadContext);
-                    frame.loaded(loadContext);
+                    var context = frame.load();
+                    frame.loaded(context);
                 } catch (InitializationException e) {
                     frame.dispose(FrameDisposal.UNLOAD);
                     throw e;

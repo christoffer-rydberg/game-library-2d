@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.LoadingContext;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.PositionBuffer;
@@ -33,6 +33,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private final static Color BACKGROUND_COLOR = Color.BLACK;
     private final static int INITIAL_SPACECRAFT_COUNT = 5;
     private final DynamicLayer<Renderable> spacecraftLayer;
+    private final Game game;
 
     private GameObject view;
     private Quad spaceCraftQuad;
@@ -40,7 +41,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private List<SpaceCraft> spaceCrafts;
 
     DemoFrame(Game game) {
-        super(game);
+        this.game = game;
         spacecraftLayer = new DynamicLayer<>();
     }
 
@@ -60,7 +61,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         return spaceCraft;
     }
 
-    private BasicObject<Renderable> createStars(int count) {
+    private Renderable createStars(int count) {
         var random = RandomInstance.get();
         float[] positions = new float[count * 2];
         for (int i = 0; i < count; ++i) {
@@ -76,7 +77,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
         starsRenderer.setColor(Color.LIGHT_YELLOW);
 
-        return new BasicObject<>(a -> starsRenderer.render(a, starPositions, 0, starPositions.capacity()));
+        return a -> starsRenderer.render(a, starPositions, 0, starPositions.capacity());
     }
 
     private void prepareView(SpaceCraft spaceCraft, Rectangle viewArea) {
@@ -137,7 +138,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     private void refreshSplitLayout(List<SpaceCraft> spaceCrafts) {
-        var window = getGame().getWindow();
+        var window = game.getWindow();
         if (view != null) {
             remove(view);
         }
@@ -168,7 +169,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onInitialize() {
+    protected void onInitialize(InitializationContext context) {
         try {
             spacecraftLayer.getBackground().add(createBackground());
 
@@ -190,18 +191,18 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onLoad(LoadingContext context) {
+    protected void onLoad(InitializationContext context) {
 
     }
 
     @Override
-    protected void onLoaded(LoadingContext context) {
+    protected void onLoaded(InitializationContext context) {
 
     }
 
     @Override
     protected void onBegin() {
-        getGame().setBackgroundColor(SPLIT_COLOR);
+        game.setBackgroundColor(SPLIT_COLOR);
     }
 
     @Override
