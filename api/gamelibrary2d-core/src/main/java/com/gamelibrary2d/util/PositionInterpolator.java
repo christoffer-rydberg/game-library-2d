@@ -1,4 +1,4 @@
-package com.gamelibrary2d.network;
+package com.gamelibrary2d.util;
 
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.Transformable;

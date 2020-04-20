@@ -7,7 +7,7 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
 
     private final byte objectIdentifier;
 
-    private float rotation;
+    private float direction;
 
     protected AbstractDemoServerObject(byte objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
@@ -29,12 +29,12 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
     }
 
     @Override
-    public float getRotation() {
-        return rotation;
+    public float getDirection() {
+        return direction;
     }
 
-    protected void setRotation(float rotation) {
-        this.rotation = (((rotation % 360f) + 360f) % 360f);
+    protected void setDirection(float direction) {
+        this.direction = (((direction % 360f) + 360f) % 360f);
     }
 
     @Override

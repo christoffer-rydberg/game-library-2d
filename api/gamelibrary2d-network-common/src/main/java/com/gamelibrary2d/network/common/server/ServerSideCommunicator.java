@@ -3,8 +3,8 @@ package com.gamelibrary2d.network.common.server;
 import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.AbstractNetworkCommunicator;
-import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.ConnectionOperations;
+import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.UdpTransmitter;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
@@ -17,7 +17,7 @@ public class ServerSideCommunicator extends AbstractNetworkCommunicator implemen
     private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
     public ServerSideCommunicator(NetworkService networkService, SocketChannel socketChannel, ParameterizedAction<CommunicationSteps> configureAuthentication) {
-        super(networkService, 1, true);
+        super(networkService, 1, false);
         setSocketChannel(socketChannel);
         endpoint = socketChannel.socket().getInetAddress().getHostAddress();
         this.configureAuthentication = configureAuthentication;

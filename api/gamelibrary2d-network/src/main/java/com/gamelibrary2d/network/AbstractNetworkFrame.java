@@ -8,13 +8,14 @@ import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationExceptio
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
-import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
 
-public abstract class AbstractNetworkFrame<T extends Client>
-        extends AbstractFrame {
-
-    private final T client;
+public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFrame {
     private final Object clientContextKey = new Object();
+    private T client;
+
+    protected AbstractNetworkFrame() {
+
+    }
 
     protected AbstractNetworkFrame(T client) {
         this.client = client;
@@ -22,6 +23,10 @@ public abstract class AbstractNetworkFrame<T extends Client>
 
     public T getClient() {
         return client;
+    }
+
+    protected void setClient(T client) {
+        this.client = client;
     }
 
     @Override
@@ -33,9 +38,8 @@ public abstract class AbstractNetworkFrame<T extends Client>
     private void initializeClient(Client client, InitializationContext context) throws InitializationException {
         try {
             client.clearInbox();
-            var clientContext = new DefaultCommunicationContext();
+            var clientContext = client.initialize();
             context.register(clientContextKey, clientContext);
-            client.prepare(clientContext);
         } catch (NetworkInitializationException | NetworkConnectionException | NetworkAuthenticationException e) {
             throw new InitializationException("Failed to initialize client", e);
         }
@@ -44,7 +48,7 @@ public abstract class AbstractNetworkFrame<T extends Client>
     @Override
     public void loaded(InitializationContext context) {
         super.loaded(context);
-        client.prepared(context.get(CommunicationContext.class, clientContextKey));
+        client.initialized(context.get(CommunicationContext.class, clientContextKey));
     }
 
     @Override

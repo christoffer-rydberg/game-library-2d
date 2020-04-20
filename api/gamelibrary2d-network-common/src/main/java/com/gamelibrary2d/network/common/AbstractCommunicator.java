@@ -1,10 +1,10 @@
 package com.gamelibrary2d.network.common;
 
+import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
-import com.gamelibrary2d.common.event.SynchronizedEventPublisher;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 
 import java.io.IOException;
@@ -12,33 +12,21 @@ import java.io.IOException;
 public abstract class AbstractCommunicator implements Communicator {
 
     private final IncomingBufferMonitor[] incomingBufferMonitor;
-    private final EventPublisher<CommunicatorDisconnected> disconnectedPublisher = new SynchronizedEventPublisher<>();
+    private final EventPublisher<CommunicatorDisconnectedEvent> disconnectedPublisher = new DefaultEventPublisher<>();
 
     private volatile int id;
-    private volatile boolean connected;
+    private volatile boolean connected = true;
     private volatile boolean authenticated;
+    private volatile Throwable disconnectionCause;
 
     private DataBuffer outgoingBuffer;
 
-    protected AbstractCommunicator(int incomingChannels, boolean connected) {
+    protected AbstractCommunicator(int incomingChannels) {
         incomingBufferMonitor = new IncomingBufferMonitor[incomingChannels];
         for (int i = 0; i < incomingChannels; ++i) {
             incomingBufferMonitor[i] = new IncomingBufferMonitor(new DynamicByteBuffer());
         }
-        this.connected = connected;
         reallocateOutgoing();
-    }
-
-    protected boolean setConnected() {
-        if (connected) {
-            return false;
-        }
-
-        connected = true;
-        for (int i = 0; i < incomingBufferMonitor.length; ++i) {
-            incomingBufferMonitor[i].incomingBuffer.clear();
-        }
-        return true;
     }
 
     @Override
@@ -72,27 +60,32 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     @Override
-    public void addDisconnectedListener(CommunicatorDisconnectedListener listener) {
-        disconnectedPublisher.addListener(listener);
-    }
-
-    @Override
-    public void removeDisconnectedListener(CommunicatorDisconnectedListener listener) {
-        disconnectedPublisher.removeListener(listener);
-    }
-
-    @Override
     public void disconnect() {
         disconnect(null);
     }
 
     @Override
-    public void disconnect(Throwable cause) {
+    public synchronized void addDisconnectedListener(CommunicatorDisconnectedListener listener) {
+        if (connected) {
+            disconnectedPublisher.addListener(listener);
+        } else {
+            listener.onEvent(new CommunicatorDisconnectedEvent(AbstractCommunicator.this, disconnectionCause));
+        }
+    }
+
+    @Override
+    public synchronized void removeDisconnectedListener(CommunicatorDisconnectedListener listener) {
+        disconnectedPublisher.removeListener(listener);
+    }
+
+    @Override
+    public synchronized void disconnect(Throwable cause) {
         if (connected) {
             connected = false;
             authenticated = false;
+            disconnectionCause = cause;
             onDisconnected(cause);
-            disconnectedPublisher.publish(new CommunicatorDisconnected(AbstractCommunicator.this, cause));
+            disconnectedPublisher.publish(new CommunicatorDisconnectedEvent(AbstractCommunicator.this, cause));
         }
     }
 
@@ -121,7 +114,7 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     @Override
-    public boolean readIncoming(DataBuffer buffer) throws IOException {
+    public boolean readIncoming(DataBuffer buffer) {
         buffer.clear();
         for (int i = 0; i < incomingBufferMonitor.length; ++i)
             incomingBufferMonitor[i].readIncoming(buffer);

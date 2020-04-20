@@ -2,15 +2,14 @@ package com.gamelibrary2d.demos.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
-import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
-import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
 
 import java.nio.charset.StandardCharsets;
 
@@ -24,9 +23,8 @@ public class DemoClient extends AbstractClient {
     void run(CommunicatorFactory communicatorFactory) {
         try {
             setCommunicatorFactory(communicatorFactory);
-            var context = new DefaultCommunicationContext();
-            prepare(context);
-            prepared(context);
+            var context = initialize();
+            initialized(context);
         } catch (NetworkConnectionException e) {
             System.err.println("Failed to connect client");
             e.printStackTrace();
@@ -68,11 +66,11 @@ public class DemoClient extends AbstractClient {
 
     @Override
     protected void onPrepared(CommunicationContext context) {
+        getCommunicator().addDisconnectedListener(this::onDisconnected);
         sendMessage("What do you call a guy with a rubber toe?");
     }
 
-    @Override
-    protected void onDisconnected(Communicator communicator, Throwable cause) {
+    private void onDisconnected(CommunicatorDisconnectedEvent event) {
         updateLoop.stop();
     }
 }

@@ -7,7 +7,7 @@ import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
@@ -52,11 +52,7 @@ abstract class InternalAbstractServer implements Server {
                 new DefaultCommunicationContext(),
                 new CommunicatorInitializer(steps.getAll())));
 
-        if (communicator.isConnected()) {
-            communicator.addDisconnectedListener(disconnectedEventListener);
-        } else {
-            onDisconnected(communicator);
-        }
+        communicator.addDisconnectedListener(disconnectedEventListener);
     }
 
     private void connectedStep(CommunicationContext context, Communicator communicator) {
@@ -93,9 +89,8 @@ abstract class InternalAbstractServer implements Server {
         onClientInitialized(context, communicator);
     }
 
-    private void onDisonnectedEvent(CommunicatorDisconnected event) {
+    private void onDisonnectedEvent(CommunicatorDisconnectedEvent event) {
         var communicator = event.getCommunicator();
-        communicator.removeDisconnectedListener(disconnectedEventListener);
         invokeLater(() -> onDisconnected(communicator));
     }
 
@@ -211,16 +206,7 @@ abstract class InternalAbstractServer implements Server {
     }
 
     private void readAndHandleMessages(Communicator communicator) {
-        boolean hasIncoming;
-
-        try {
-            hasIncoming = communicator.readIncoming(incomingBuffer);
-        } catch (IOException e) {
-            communicator.disconnect(e);
-            return;
-        }
-
-        if (hasIncoming) {
+        if (communicator.readIncoming(incomingBuffer)) {
             handleMesages(communicator);
         }
     }

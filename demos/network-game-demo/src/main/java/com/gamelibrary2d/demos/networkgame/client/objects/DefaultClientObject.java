@@ -5,8 +5,8 @@ import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 
 public class DefaultClientObject extends AbstractClientObject {
 
-    public DefaultClientObject(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, buffer);
+    public DefaultClientObject(byte objectIdentifier, DemoFrameClient client, boolean autoRotate, DataBuffer buffer) {
+        super(objectIdentifier, client, autoRotate, buffer);
     }
 
 }

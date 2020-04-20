@@ -5,8 +5,6 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.updating.UpdateAction;
 import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnected;
-import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
@@ -19,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractClient implements Client {
     private final DataBuffer inbox;
-    private final CommunicatorDisconnectedListener disconnectedListener = this::onDisconnected;
     private final Object communicatorKey = new Object();
 
     private Communicator communicator;
@@ -83,16 +80,18 @@ public abstract class AbstractClient implements Client {
     }
 
     @Override
-    public void prepare(CommunicationContext context)
+    public CommunicationContext initialize()
             throws NetworkConnectionException, NetworkAuthenticationException, NetworkInitializationException {
-        var communicator = connect();
+        var communicator = connectCommunicator();
         reallocateOutgoingBuffer(communicator);
+        var context = new DefaultCommunicationContext();
         authenticate(context, communicator);
         initialize(context, communicator);
         context.register(communicatorKey, communicator);
+        return context;
     }
 
-    private Communicator connect() throws NetworkConnectionException {
+    private Communicator connectCommunicator() throws NetworkConnectionException {
         if (isConnected()) {
             return communicator;
         }
@@ -132,21 +131,10 @@ public abstract class AbstractClient implements Client {
     }
 
     @Override
-    public final void prepared(CommunicationContext context) {
+    public final void initialized(CommunicationContext context) {
         var communicator = context.get(Communicator.class, communicatorKey);
-
         reallocateOutgoingBuffer(communicator);
-
-        if (this.communicator != null) {
-            this.communicator.removeDisconnectedListener(disconnectedListener);
-        }
-
         this.communicator = communicator;
-
-        if (this.communicator != null) {
-            this.communicator.addDisconnectedListener(disconnectedListener);
-        }
-
         onPrepared(context);
     }
 
@@ -158,11 +146,7 @@ public abstract class AbstractClient implements Client {
     @Override
     public void update(float deltaTime, UpdateAction updateAction) {
         var communicator = getCommunicator();
-        if (communicator == null) {
-            return;
-        }
-
-        if (communicator.isConnected()) {
+        if (communicator != null && communicator.isConnected()) {
             try {
                 triggerLocalServerUpdate(communicator, deltaTime);
 
@@ -309,11 +293,6 @@ public abstract class AbstractClient implements Client {
         steps.add(this::onAuthenticated);
     }
 
-    private void onDisconnected(CommunicatorDisconnected disconnected) {
-        var communicator = disconnected.getCommunicator();
-        onDisconnected(communicator, disconnected.getCause());
-    }
-
     private void onAuthenticated(CommunicationContext context, Communicator communicator) {
         communicator.onAuthenticated();
     }
@@ -323,6 +302,4 @@ public abstract class AbstractClient implements Client {
     protected abstract void onPrepared(CommunicationContext context);
 
     protected abstract void onMessage(DataBuffer buffer);
-
-    protected abstract void onDisconnected(Communicator communicator, Throwable cause);
 }

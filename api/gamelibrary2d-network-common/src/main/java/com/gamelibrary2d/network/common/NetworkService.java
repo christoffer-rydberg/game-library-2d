@@ -22,9 +22,9 @@ public class NetworkService {
 
     private final ByteBuffer readBuffer;
 
-    private Selector selector;
+    private final Thread thread;
 
-    private Thread thread;
+    private Selector selector;
 
     public NetworkService() {
         this(8192);
@@ -32,6 +32,7 @@ public class NetworkService {
 
     public NetworkService(int readBufferSize) {
         readBuffer = ByteBuffer.allocateDirect(readBufferSize);
+        thread = new Thread(this::run);
     }
 
     public boolean isRunning() {
@@ -41,7 +42,6 @@ public class NetworkService {
     public void start() throws IOException {
         if (!isRunning()) {
             selector = Selector.open();
-            thread = new Thread(this::run);
             thread.start();
         }
     }
@@ -49,10 +49,8 @@ public class NetworkService {
     public void stop() throws InterruptedException {
         if (isRunning()) {
             thread.interrupt();
-            try {
+            if (!Thread.currentThread().equals(thread)) {
                 thread.join();
-            } finally {
-                thread = null;
             }
         }
     }

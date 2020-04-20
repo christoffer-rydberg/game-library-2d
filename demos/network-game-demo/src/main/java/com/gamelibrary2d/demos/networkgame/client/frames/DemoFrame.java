@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.ClientObject;
@@ -9,18 +10,14 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.exceptions.InitializationException;
-import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.DynamicLayer;
 import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.network.common.client.Client;
-import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
-import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
-import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
-import com.gamelibrary2d.network.common.initialization.DefaultCommunicationContext;
+import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.network.AbstractNetworkFrame;
 import com.gamelibrary2d.objects.BasicObject;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
@@ -38,11 +35,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DemoFrame extends AbstractFrame {
+public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private final DemoGame game;
-    private final DemoFrameClient client;
     private final Map<Byte, Renderable> contents = new HashMap<>();
-    private final Map<Byte, ClientObject.UpdateAction> updateActions = new HashMap<>();
+    private final Map<Byte, Func<ClientObject, Updatable>> updateActions = new HashMap<>();
     private final Layer<Renderable> backgroundLayer = new BasicLayer<>();
     private final DynamicLayer<Renderable> gameLayer = new DynamicLayer<>();
     private final Layer<Renderable> backgroundEffects = new BasicLayer<>();
@@ -51,7 +47,7 @@ public class DemoFrame extends AbstractFrame {
 
     public DemoFrame(DemoGame game) {
         this.game = game;
-        this.client = new DemoFrameClient(this);
+        setClient(new DemoFrameClient(this));
     }
 
     private DefaultParticleSystem loadParticleSystem(String resourceName, int capacity) throws IOException {
@@ -62,15 +58,17 @@ public class DemoFrame extends AbstractFrame {
 
     private void initializeObjectParticles(InitializationContext context, byte objectIdentifier, String resourceName)
             throws IOException {
-        var portalSystem = loadParticleSystem(resourceName, 10000);
-        var portalEmitter = new SequentialParticleEmitter(portalSystem);
+        var particleSystem = loadParticleSystem(resourceName, 10000);
 
-        updateActions.put(objectIdentifier, (obj, deltaTime) -> {
-            portalEmitter.getPosition().set(obj.getPosition());
-            portalEmitter.update(deltaTime);
+        updateActions.put(objectIdentifier, obj -> {
+            var particleEmitter = new SequentialParticleEmitter(particleSystem);
+            return deltaTime -> {
+                particleEmitter.getPosition().set(obj.getPosition());
+                particleEmitter.update(deltaTime);
+            };
         });
 
-        context.register(resourceName, portalSystem);
+        context.register(resourceName, particleSystem);
     }
 
     private Renderable createStars(int count, Rectangle bounds) {
@@ -103,21 +101,14 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected void onLoad(InitializationContext context) throws InitializationException {
-        try {
-            client.clearInbox();
-            var clientContext = new DefaultCommunicationContext();
-            context.register(clientContext);
-            client.prepare(clientContext);
-        } catch (NetworkInitializationException | NetworkConnectionException | NetworkAuthenticationException e) {
-            throw new InitializationException("Failed to initialize client", e);
-        }
+    protected void onLoad(InitializationContext context) {
+
     }
 
     @Override
     protected void onLoaded(InitializationContext context) {
         backgroundEffects.add(context.get(ParticleSystem.class, "portal.particle"));
-        foregroundEffects.add(context.get(ParticleSystem.class, "boulder.particle"));
+        backgroundEffects.add(context.get(ParticleSystem.class, "boulder.particle"));
 
         gameLayer.add(backgroundEffects);
         gameLayer.add(objectLayer);
@@ -125,13 +116,6 @@ public class DemoFrame extends AbstractFrame {
 
         add(backgroundLayer);
         add(gameLayer);
-
-        client.prepared(context.get(DefaultCommunicationContext.class));
-    }
-
-    @Override
-    protected final void handleUpdate(float deltaTime) {
-        client.update(deltaTime, dt -> super.handleUpdate(dt));
     }
 
     void applySettings(GameSettings gameSettings) {
@@ -196,15 +180,16 @@ public class DemoFrame extends AbstractFrame {
 
     void spawn(ClientObject obj) {
         obj.setContent(contents.get(obj.getObjectIdentifier()));
-        obj.setUpdateAction(updateActions.get(obj.getObjectIdentifier()));
+
+        var updateActionFactory = updateActions.get(obj.getObjectIdentifier());
+        if (updateActionFactory != null) {
+            obj.setUpdateAction(updateActionFactory.invoke(obj));
+        }
+
         objectLayer.add(obj);
     }
 
     void goToMenu() {
         game.goToMenu();
-    }
-
-    public Client getClient() {
-        return client;
     }
 }

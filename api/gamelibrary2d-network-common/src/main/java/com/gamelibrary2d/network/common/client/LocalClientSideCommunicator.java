@@ -16,7 +16,7 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
     private ParameterizedAction<CommunicationSteps> configureAuthentication;
 
     private LocalClientSideCommunicator(LocalServer localServer) {
-        super(1, true);
+        super(1);
         this.localServer = localServer;
         serverSideCommunicator = new LocalServerSideCommunicator(this, localServer);
     }
@@ -51,10 +51,7 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
 
     @Override
     protected void onDisconnected(Throwable cause) {
-        if (localServer != null) {
-            serverSideCommunicator.disconnect();
-            localServer.update(0);
-        }
+        serverSideCommunicator.disconnect();
     }
 
     @Override
@@ -67,7 +64,7 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
         private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
         LocalServerSideCommunicator(Communicator clientSideCommunicator, LocalServer server) {
-            super(1, true);
+            super(1);
             this.clientSideCommunicator = clientSideCommunicator;
             this.configureAuthentication = server::configureClientAuthentication;
         }

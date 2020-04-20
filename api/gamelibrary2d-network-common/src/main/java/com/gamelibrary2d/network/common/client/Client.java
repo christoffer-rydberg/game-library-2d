@@ -21,16 +21,16 @@ public interface Client {
 
     /**
      * Connects, authenticates and initializes the client.
-     * This method can be invoked from an arbitrary thread, and when it has finished, {@link #prepared} should
+     * This method can be invoked from an arbitrary thread, and when it has finished, {@link #initialized} should
      * be invoked from the main thread.
      */
-    void prepare(CommunicationContext context)
+    CommunicationContext initialize()
             throws NetworkConnectionException, NetworkAuthenticationException, NetworkInitializationException;
 
     /**
-     * Invoked from the main thread when the client has been {@link #prepare initialized).
+     * Invoked from the main thread when the client has been {@link #initialize initialized).
      */
-    void prepared(CommunicationContext context);
+    void initialized(CommunicationContext context);
 
     /**
      * Checks if the client is connected.

@@ -12,7 +12,7 @@ public class LocalPlayer extends AbstractClientObject {
     private final PlayerRotation rotation;
 
     public LocalPlayer(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, buffer);
+        super(objectIdentifier, client, true, buffer);
 
         rotation = new PlayerRotation(client, getId());
 

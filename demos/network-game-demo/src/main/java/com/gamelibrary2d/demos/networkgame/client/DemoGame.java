@@ -103,6 +103,5 @@ public class DemoGame extends AbstractGame {
     @Override
     protected void onExit() {
         serverManager.stopHostedServer();
-        demoFrame.getClient().disconnect();
     }
 }

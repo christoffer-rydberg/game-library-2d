@@ -2,12 +2,12 @@ package com.gamelibrary2d.network.common.events;
 
 import com.gamelibrary2d.network.common.Communicator;
 
-public class CommunicatorDisconnected {
+public class CommunicatorDisconnectedEvent {
 
     private final Communicator communicator;
     private final Throwable cause;
 
-    public CommunicatorDisconnected(Communicator communicator, Throwable cause) {
+    public CommunicatorDisconnectedEvent(Communicator communicator, Throwable cause) {
         this.communicator = communicator;
         this.cause = cause;
     }

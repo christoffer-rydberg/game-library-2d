@@ -7,5 +7,5 @@ public interface DemoServerObject extends ServerObject, Collidable {
 
     byte getObjectIdentifier();
 
-    float getRotation();
+    float getDirection();
 }

@@ -9,16 +9,15 @@ import java.nio.channels.SocketChannel;
 public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
     private final NetworkService networkService;
+    private final boolean ownsNetworkService;
 
     private volatile DatagramChannel datagramChannel;
     private volatile SocketChannel socketChannel;
-    private volatile ClosedSocketChannel closedSocketChannel;
-    private volatile ClosedDatagramChannel closedDatagramChannel;
 
-    protected AbstractNetworkCommunicator(NetworkService networkService, int incomingChannels,
-                                          boolean connected) {
-        super(incomingChannels, connected);
+    protected AbstractNetworkCommunicator(NetworkService networkService, int incomingChannels, boolean ownsNetworkService) {
+        super(incomingChannels);
         this.networkService = networkService;
+        this.ownsNetworkService = ownsNetworkService;
     }
 
     protected NetworkService getNetworkService() {
@@ -31,7 +30,6 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
     protected void setSocketChannel(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
-        closedSocketChannel = null;
     }
 
     protected DatagramChannel getDatagramChannel() {
@@ -40,27 +38,27 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
     protected void setDatagramChannel(DatagramChannel datagramChannel) {
         this.datagramChannel = datagramChannel;
-        closedDatagramChannel = null;
     }
 
-    /**
-     * This method is invoked from the {@link NetworkService}-thread and must be thread safe.
-     */
     protected void onSocketChannelDisconnected(IOException ioException) {
-        this.closedSocketChannel = new ClosedSocketChannel(ioException);
+        disconnect(ioException);
     }
 
-    /**
-     * This method is invoked from the {@link NetworkService}-thread and must be thread safe.
-     */
     protected void onDatagramChannelDisconnected(IOException ioException) {
-        this.closedDatagramChannel = new ClosedDatagramChannel(ioException);
+        disconnect(ioException);
     }
 
     @Override
     protected void onDisconnected(Throwable cause) {
         disconnectTcp();
         disconnectUdp();
+        if (ownsNetworkService) {
+            try {
+                networkService.stop();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -69,59 +67,6 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         if (socketChannel == null)
             throw new IOException("Socket channel not connected");
         networkService.send(socketChannel, buffer);
-    }
-
-    @Override
-    public boolean readIncoming(DataBuffer buffer) throws IOException {
-        handleUdpDisconnect();
-        handleTcpDisconnect();
-        if (isConnected() && isCommunicationClosed()) {
-            disconnect();
-        }
-        return super.readIncoming(buffer);
-    }
-
-    /**
-     * Since UDP is a connection less protocol we won't know if the client closes the UDP socket.
-     * A UDP disconnect can still occur if the {@link NetworkService} closes the UDP channel, e.g. due to an exception.
-     *
-     * @throws IOException The cause of the disconnect in the {@link NetworkService}.
-     */
-    private void handleUdpDisconnect() throws IOException {
-        if (datagramChannelConnected() && closedDatagramChannel != null) {
-            try {
-                if (closedDatagramChannel.exception != null) {
-                    throw closedDatagramChannel.exception;
-                }
-            } finally {
-                setDatagramChannel(null);
-            }
-        }
-    }
-
-    /**
-     * TCP is the only protocol that lets us know if the client (UDP is a connection less protocol).
-     * Therefore, if TCP has been disconnected, the UDP connection will be closed as well.
-     *
-     * @throws IOException The cause of the disconnect in the {@link NetworkService}.
-     */
-    private void handleTcpDisconnect() throws IOException {
-        if (socketChannelConnected() && closedSocketChannel != null) {
-            try {
-                if (datagramChannelConnected()) {
-                    disconnectUdp();
-                }
-                if (closedSocketChannel.exception != null) {
-                    throw closedSocketChannel.exception;
-                }
-            } finally {
-                setSocketChannel(null);
-            }
-        }
-    }
-
-    protected boolean isCommunicationClosed() {
-        return !socketChannelConnected() && !datagramChannelConnected();
     }
 
     protected void disconnectTcp() {
@@ -155,21 +100,5 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
 
     protected boolean socketChannelConnected() {
         return socketChannel != null;
-    }
-
-    private static class ClosedSocketChannel {
-        private final IOException exception;
-
-        ClosedSocketChannel(IOException exception) {
-            this.exception = exception;
-        }
-    }
-
-    private static class ClosedDatagramChannel {
-        private final IOException exception;
-
-        ClosedDatagramChannel(IOException exception) {
-            this.exception = exception;
-        }
     }
 }

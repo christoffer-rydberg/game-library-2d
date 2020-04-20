@@ -3,6 +3,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.demos.networkgame.client.objects.Boulder;
 import com.gamelibrary2d.demos.networkgame.client.objects.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.DefaultClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.LocalPlayer;
@@ -12,6 +13,7 @@ import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
+import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
@@ -53,9 +55,21 @@ public class DemoFrameClient extends AbstractClient {
 
     @Override
     protected void onPrepared(CommunicationContext context) {
+        getCommunicator().addDisconnectedListener(this::onDisconnected);
         serverUpdatesPerSecond = context.get(Float.class, "updateRate");
         frame.applySettings(context.get(GameSettings.class));
         addObjects(context.get(InitialState.class).getObjects());
+    }
+
+    private void onDisconnected(CommunicatorDisconnectedEvent event) {
+        frame.invokeLater(() -> {
+            System.err.println("Disconnected from server");
+            var cause = event.getCause();
+            if (cause != null) {
+                cause.printStackTrace();
+            }
+            frame.goToMenu();
+        });
     }
 
     @Override
@@ -76,16 +90,17 @@ public class DemoFrameClient extends AbstractClient {
 
     private ClientObject readObject(byte id, DataBuffer buffer) {
         switch (id) {
+            case ObjectIdentifiers.BOULDER:
+                return new Boulder(id, this, buffer);
             case ObjectIdentifiers.PLAYER:
                 var isLocal = buffer.getBool();
                 if (isLocal) {
                     return new LocalPlayer(id, this, buffer);
                 } else {
-                    return new DefaultClientObject(id, this, buffer);
+                    return new DefaultClientObject(id, this, true, buffer);
                 }
             case ObjectIdentifiers.PORTAL:
-            case ObjectIdentifiers.BOULDER:
-                return new DefaultClientObject(id, this, buffer);
+                return new DefaultClientObject(id, this, false, buffer);
         }
 
         throw new GameLibrary2DRuntimeException("Invalid object id");
@@ -123,11 +138,11 @@ public class DemoFrameClient extends AbstractClient {
             int id = bitParser.getInt(NetworkConstants.OBJECT_ID_BIT_SIZE);
             float x = bitParser.getInt(NetworkConstants.POS_X_BIT_SIZE);
             float y = bitParser.getInt(NetworkConstants.POS_Y_BIT_SIZE);
-            float rotation = bitParser.getInt(NetworkConstants.ROTATION_BIT_SIZE);
+            float direction = bitParser.getInt(NetworkConstants.DIRECTION_BIT_SIZE);
             var obj = objects.get(id);
             if (obj != null) {
                 obj.setGoalPosition(x, y);
-                obj.setGoalRotation(rotation);
+                obj.setGoalDirection(direction);
             }
         }
 
@@ -136,19 +151,6 @@ public class DemoFrameClient extends AbstractClient {
         }
 
         buffer.position(buffer.position() + byteSize);
-    }
-
-    @Override
-    protected void onDisconnected(Communicator communicator, Throwable cause) {
-        frame.invokeLater(() -> onDisconnected(cause));
-    }
-
-    private void onDisconnected(Throwable cause) {
-        System.err.println("Disconnected from server");
-        if (cause != null) {
-            cause.printStackTrace();
-        }
-        frame.goToMenu();
     }
 
     public float getServerUpdatesPerSecond() {

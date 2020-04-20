@@ -4,24 +4,28 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.network.PositionInterpolator;
-import com.gamelibrary2d.network.RotationInterpolator;
 import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.util.DirectionAware;
+import com.gamelibrary2d.util.DirectionInterpolation;
+import com.gamelibrary2d.util.PositionInterpolator;
 
 public abstract class AbstractClientObject
-        extends AbstractGameObject<Renderable> implements ClientObject, Updatable {
+        extends AbstractGameObject<Renderable> implements ClientObject, Updatable, DirectionAware {
 
     private final int id;
     private final byte objectIdentifier;
     private final DemoFrameClient client;
+    private final boolean autoRotate;
     private final PositionInterpolator positionInterpolator = new PositionInterpolator(this);
-    private final RotationInterpolator rotationInterpolator = new RotationInterpolator(this);
+    private final DirectionInterpolation directionInterpolation = new DirectionInterpolation(this);
 
-    private UpdateAction updateAction;
+    private float direction;
+    private Updatable updateAction;
 
-    protected AbstractClientObject(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
+    protected AbstractClientObject(byte objectIdentifier, DemoFrameClient client, boolean autoRotate, DataBuffer buffer) {
         this.client = client;
         this.objectIdentifier = objectIdentifier;
+        this.autoRotate = autoRotate;
         id = buffer.getInt();
         setPosition(buffer.getFloat(), buffer.getFloat());
     }
@@ -42,17 +46,17 @@ public abstract class AbstractClientObject
     }
 
     @Override
-    public void setUpdateAction(UpdateAction action) {
-        this.updateAction = action;
+    public void setUpdateAction(Updatable updateAction) {
+        this.updateAction = updateAction;
     }
 
     @Override
     public void update(float deltaTime) {
         positionInterpolator.update(deltaTime);
-        rotationInterpolator.update(deltaTime);
+        directionInterpolation.update(deltaTime);
 
         if (updateAction != null) {
-            updateAction.invoke(this, deltaTime);
+            updateAction.update(deltaTime);
         }
 
         var content = getContent();
@@ -62,12 +66,25 @@ public abstract class AbstractClientObject
     }
 
     @Override
+    public float getDirection() {
+        return direction;
+    }
+
+    @Override
+    public void setDirection(float direction) {
+        this.direction = direction;
+        if (autoRotate) {
+            setRotation(direction);
+        }
+    }
+
+    @Override
     public void setGoalPosition(float x, float y) {
         positionInterpolator.setGoal(x, y, 1f / client.getServerUpdatesPerSecond());
     }
 
     @Override
-    public void setGoalRotation(float rotation) {
-        rotationInterpolator.setGoal(rotation, 1f / client.getServerUpdatesPerSecond());
+    public void setGoalDirection(float direction) {
+        directionInterpolation.setGoal(direction, 1f / client.getServerUpdatesPerSecond());
     }
 }

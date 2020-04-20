@@ -171,7 +171,7 @@ public class DemoGameServer implements ServerContext {
             bitParser.putInt(object.getId(), NetworkConstants.OBJECT_ID_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.POS_X_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getY()), NetworkConstants.POS_Y_BIT_SIZE);
-            bitParser.putInt(Math.round(object.getRotation()), NetworkConstants.ROTATION_BIT_SIZE);
+            bitParser.putInt(Math.round(object.getDirection()), NetworkConstants.DIRECTION_BIT_SIZE);
         }
 
         int bitPosition = (int) bitParser.position();

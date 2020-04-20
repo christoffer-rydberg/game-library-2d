@@ -27,7 +27,7 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
         this.gameBounds = gameBounds;
         this.setBounds(bounds);
         velocity = new Point();
-        setRotation(RandomInstance.get().nextFloat() * 360f);
+        setDirection(RandomInstance.get().nextFloat() * 360f);
     }
 
     @Override
@@ -56,19 +56,19 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
             case NONE:
                 break;
             case LEFT:
-                setRotation(getRotation() - deltaTime * 180);
+                setDirection(getDirection() - deltaTime * 180);
                 break;
             case RIGHT:
-                setRotation(getRotation() + deltaTime * 180);
+                setDirection(getDirection() + deltaTime * 180);
                 break;
         }
     }
 
     @Override
-    protected void setRotation(float rotation) {
-        super.setRotation(rotation);
+    protected void setDirection(float direction) {
+        super.setDirection(direction);
         velocity.set(0f, 120f);
-        velocity.rotate(getRotation());
+        velocity.rotate(getDirection());
     }
 
     @Override

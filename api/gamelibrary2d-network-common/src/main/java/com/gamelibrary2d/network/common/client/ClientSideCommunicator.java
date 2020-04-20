@@ -10,7 +10,6 @@ import java.util.concurrent.Future;
 
 public class ClientSideCommunicator extends AbstractNetworkCommunicator implements UdpReceiver {
 
-    private final boolean ownsNetworkService;
     private final ParameterizedAction<CommunicationSteps> configureAuthentication;
     private final TcpConnectionSettings tcpSettings;
 
@@ -19,10 +18,9 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator implemen
             NetworkService networkService,
             ParameterizedAction<CommunicationSteps> configureAuthentication,
             boolean ownsNetworkService) {
-        super(networkService, 2, true);
+        super(networkService, 2, ownsNetworkService);
         this.tcpSettings = tcpSettings;
         this.configureAuthentication = configureAuthentication;
-        this.ownsNetworkService = ownsNetworkService;
     }
 
     public static Future<Communicator> connect(TcpConnectionSettings tcpSettings) {
@@ -74,20 +72,16 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator implemen
             networkService.connect(tcpSettings.getHost(), tcpSettings.getPort(), onConnected, onConnectionFailed);
         } catch (IOException e) {
             if (!networkServiceWasRunning) {
-                stopCommunicatorServer(networkService);
+                try {
+                    networkService.stop();
+                } catch (InterruptedException ie) {
+                    ie.printStackTrace();
+                }
             }
             future.completeExceptionally(e);
         }
 
         return future;
-    }
-
-    private static void stopCommunicatorServer(NetworkService networkService) {
-        try {
-            networkService.stop();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -100,14 +94,6 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator implemen
     @Override
     public String getEndpoint() {
         return tcpSettings.getHost();
-    }
-
-    @Override
-    protected void onDisconnected(Throwable cause) {
-        super.onDisconnected(cause);
-        if (ownsNetworkService) {
-            stopCommunicatorServer(getNetworkService());
-        }
     }
 
     @Override

@@ -54,7 +54,7 @@ public interface Communicator {
      *
      * @return True if any bytes were read, false otherwise.
      */
-    boolean readIncoming(DataBuffer outputBuffer) throws IOException;
+    boolean readIncoming(DataBuffer outputBuffer);
 
     /**
      * Gets the outgoing buffer.

@@ -9,7 +9,7 @@ public class NetworkConstants {
     public static final int OBJECT_ID_BIT_SIZE = 10;
     public static final int POS_X_BIT_SIZE = 10;
     public static final int POS_Y_BIT_SIZE = 10;
-    public static final int ROTATION_BIT_SIZE = 9;
+    public static final int DIRECTION_BIT_SIZE = 9;
 
     private static final int OBJECT_BIT_SIZE = OBJECT_ID_BIT_SIZE + POS_X_BIT_SIZE + POS_Y_BIT_SIZE;
     private static final int OBJECTS_BIT_SIZE = OBJECT_BIT_SIZE * MAX_OBJECTS;

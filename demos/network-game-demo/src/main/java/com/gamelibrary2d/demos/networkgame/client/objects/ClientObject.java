@@ -1,6 +1,7 @@
 package com.gamelibrary2d.demos.networkgame.client.objects;
 
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.GameObject;
 
 public interface ClientObject extends GameObject {
@@ -13,13 +14,9 @@ public interface ClientObject extends GameObject {
 
     void setGoalPosition(float x, float y);
 
-    void setGoalRotation(float rotation);
+    void setGoalDirection(float direction);
 
-    void setUpdateAction(UpdateAction action);
-
-    interface UpdateAction {
-        void invoke(ClientObject obj, float deltaTime);
-    }
+    void setUpdateAction(Updatable updateAction);
 }
 
 
