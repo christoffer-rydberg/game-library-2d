@@ -4,7 +4,6 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
@@ -18,6 +17,7 @@ import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.widgets.events.MouseButtonReleased;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         addButton("Randomize", 300, 0, new RandomizeEventHandler());
     }
 
-    private void addButton(String text, float posX, float posY, MouseButtonReleaseListener mouseEventHandler) {
+    private void addButton(String text, float posX, float posY, MouseButtonReleased mouseEventHandler) {
         Button button = new Button();
 
         var buttonContext = button.getContent();
@@ -60,7 +60,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         button.setPosition(posX, posY);
         button.setBounds(Fonts.getDefaultFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
                 buttonContext.getVerticalAlignment()));
-        button.addMouseButtonReleaseListener(mouseEventHandler);
+        button.addMouseButtonReleasedListener(mouseEventHandler);
         add(button);
     }
 
@@ -267,30 +267,30 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         return (int) (value * tmp) / (float) tmp;
     }
 
-    private class SaveEventHandler implements MouseButtonReleaseListener {
+    private class SaveEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 saveParticleSystem();
             }
         }
     }
 
-    private class LoadEventHandler implements MouseButtonReleaseListener {
+    private class LoadEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 loadParticleSystem();
             }
         }
     }
 
-    private class ResetEventHandler implements MouseButtonReleaseListener {
+    private class ResetEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.setSpawnSettings(new BasicSpawnSettings());
                 particleSystem.setUpdateSettings(new ParticleUpdateSettings());
@@ -299,10 +299,10 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         }
     }
 
-    private class RandomizeEventHandler implements MouseButtonReleaseListener {
+    private class RandomizeEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 randomizeParticleSystem();
             }

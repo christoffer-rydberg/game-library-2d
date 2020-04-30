@@ -4,7 +4,7 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.layers.DynamicLayer;
+import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.resources.Texture;
 
 import java.awt.image.BufferedImage;
@@ -35,7 +35,7 @@ public class DemoFrame extends AbstractFrame {
             float scaleY = Math.min(1f, 0.5f * windowHeight / init.getHeight());
             float scale = Math.min(scaleX, scaleY);
 
-            var layer = new DynamicLayer<>();
+            var layer = new DefaultLayerObject<>();
             layer.setScale(scale, scale);
             layer.setScaleAndRotationCenter(windowWidth / 2, windowHeight / 2);
             layer.add(particleSystem);

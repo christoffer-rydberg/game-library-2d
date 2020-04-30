@@ -23,6 +23,10 @@ public interface Transformable {
         getScale().set(scale);
     }
 
+    default void setScale(float scale) {
+        getScale().set(scale, scale);
+    }
+
     default void setScale(float x, float y) {
         getScale().set(x, y);
     }

@@ -133,7 +133,7 @@ public class MusicPlayer {
 
         if (stopped) {
             fadeInTime /= 2;
-            updater.add(new DurationUpdater(new EmptyUpdate(), fadeInTime));
+            updater.add(new DurationUpdater(fadeInTime, new EmptyUpdate()));
         }
 
         updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume, fadeInTime));

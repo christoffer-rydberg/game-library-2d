@@ -4,7 +4,6 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.AbstractDisposer;
 import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventPublisher;
-import com.gamelibrary2d.eventlisteners.FrameChangedListener;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
@@ -13,7 +12,7 @@ import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.input.KeyAction;
+import com.gamelibrary2d.input.ButtonAction;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.resources.Shader;
 
@@ -359,7 +358,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onKeyCallback(int key, int scancode, int action, int mods) {
         var frame = getFrame();
-        if (action == Keyboard.instance().actionPress()) {
+        if (action == Keyboard.instance().actionPressed()) {
             if (frame instanceof KeyAware)
                 ((KeyAware) frame).onKeyDown(key, scancode, false, mods);
             FocusManager.keyDownEvent(key, scancode, false, mods);
@@ -369,7 +368,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             FocusManager.keyDownEvent(key, scancode, true, mods);
         } else {
             if (frame instanceof KeyAware)
-                ((KeyAware) frame).onKeyRelease(key, scancode, mods);
+                ((KeyAware) frame).onKeyReleased(key, scancode, mods);
             FocusManager.keyReleaseEvent(key, scancode, mods);
         }
     }
@@ -398,12 +397,12 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void onMouseButtonCallback(int button, int action, int mods) {
-        if (action == Mouse.instance().actionPress()) {
+        if (action == Mouse.instance().actionPressed()) {
             getFrame().onMouseButtonDown(button, mods, cursorPosX, cursorPosY);
-            FocusManager.mouseButtonEventFinished(button, KeyAction.PRESSED, mods);
-        } else if (action == Mouse.instance().actionRelease()) {
-            getFrame().onMouseButtonRelease(button, mods, cursorPosX, cursorPosY);
-            FocusManager.mouseButtonEventFinished(button, KeyAction.RELEASED, mods);
+            FocusManager.mouseButtonEventFinished(button, ButtonAction.PRESSED, mods);
+        } else if (action == Mouse.instance().actionReleased()) {
+            getFrame().onMouseButtonReleased(button, mods, cursorPosX, cursorPosY);
+            FocusManager.mouseButtonEventFinished(button, ButtonAction.RELEASED, mods);
         }
     }
 

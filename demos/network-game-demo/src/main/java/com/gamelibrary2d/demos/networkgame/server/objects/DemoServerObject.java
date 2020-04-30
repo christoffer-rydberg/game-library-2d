@@ -8,4 +8,10 @@ public interface DemoServerObject extends ServerObject, Collidable {
     byte getObjectIdentifier();
 
     float getDirection();
+
+    void setDirection(float direction);
+
+    void onDestroyed();
+
+    boolean isDestroyed();
 }

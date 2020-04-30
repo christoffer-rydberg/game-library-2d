@@ -2,7 +2,7 @@ package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.objects.Slider;
+import com.gamelibrary2d.widgets.Slider;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
 import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
 import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;

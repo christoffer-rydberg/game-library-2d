@@ -1,6 +1,6 @@
 package com.gamelibrary2d;
 
-import com.gamelibrary2d.input.KeyAction;
+import com.gamelibrary2d.input.ButtonAction;
 import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
@@ -78,7 +78,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).onKeyRelease(key, scanCode, mods);
+                iterationList.get(i).onKeyReleased(key, scanCode, mods);
             }
         } finally {
             iterationList.clear();
@@ -96,7 +96,7 @@ public class FocusManager {
         }
     }
 
-    static void mouseButtonEventFinished(int button, KeyAction action, int mods) {
+    static void mouseButtonEventFinished(int button, ButtonAction action, int mods) {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {

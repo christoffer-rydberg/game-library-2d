@@ -1,16 +1,15 @@
 package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
-import com.gamelibrary2d.demos.networkgame.client.objects.ObjectFactory;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.Button;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.InputField;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultPanel;
 import com.gamelibrary2d.layers.NavigationPanel;
 import com.gamelibrary2d.layers.Panel;
-import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.renderable.TextBox;
 import com.gamelibrary2d.util.StackOrientation;
 
 public class MenuFrame extends AbstractFrame {
@@ -66,10 +65,10 @@ public class MenuFrame extends AbstractFrame {
     private GameObject createMainPanel() {
         var panel = new DefaultPanel<>();
 
-        var localButton = ObjectFactory.createButton("Local", game::startLocalGame);
-        var joinButton = ObjectFactory.createButton("Join", () -> navigationPanel.navigateTo(joinPanel, true));
-        var hostButton = ObjectFactory.createButton("Host", () -> navigationPanel.navigateTo(hostPanel, true));
-        var exitButton = ObjectFactory.createButton("Exit", game::exit);
+        var localButton = new Button("Local", game::startLocalGame);
+        var joinButton = new Button("Join", () -> navigationPanel.navigateTo(joinPanel, true));
+        var hostButton = new Button("Host", () -> navigationPanel.navigateTo(hostPanel, true));
+        var exitButton = new Button("Exit", game::exit);
 
         stack(panel, localButton);
         stack(panel, joinButton);
@@ -81,22 +80,14 @@ public class MenuFrame extends AbstractFrame {
         return panel;
     }
 
-    private int getIntValue(ComposableObject<TextBox> inputField) {
-        return Integer.parseInt(inputField.getContent().getText());
-    }
-
-    private String getStringValue(ComposableObject<TextBox> inputField) {
-        return inputField.getContent().getText();
-    }
-
     private GameObject createHostPanel() {
         var panel = new DefaultPanel<>();
 
-        var tcpField = ObjectFactory.createInputField("4444");
-        var udpField = ObjectFactory.createInputField("4444");
+        var tcpField = new InputField("4444");
+        var udpField = new InputField("4444");
 
-        var startButton = ObjectFactory.createButton("Start game", () -> game.hostNetworkGame(getIntValue(tcpField)));
-        var backButton = ObjectFactory.createButton("Go back", navigationPanel::goBack);
+        var startButton = new Button("Start game", () -> game.hostNetworkGame(tcpField.getIntValue()));
+        var backButton = new Button("Go back", navigationPanel::goBack);
 
         stack(panel, tcpField);
         stack(panel, udpField);
@@ -111,14 +102,14 @@ public class MenuFrame extends AbstractFrame {
     private GameObject createJoinPanel() {
         var panel = new DefaultPanel<>();
 
-        var ipField = ObjectFactory.createInputField("localhost");
-        var tcpField = ObjectFactory.createInputField("4444");
-        var udpField = ObjectFactory.createInputField("4444");
+        var ipField = new InputField("localhost");
+        var tcpField = new InputField("4444");
+        var udpField = new InputField("4444");
 
-        var startButton = ObjectFactory.createButton("Start game",
-                () -> game.joinNetworkGame(getStringValue(ipField), getIntValue(tcpField)));
+        var startButton = new Button("Start game",
+                () -> game.joinNetworkGame(ipField.getStringValue(), tcpField.getIntValue()));
 
-        var backButton = ObjectFactory.createButton("Go back", navigationPanel::goBack);
+        var backButton = new Button("Go back", navigationPanel::goBack);
 
         stack(panel, ipField);
         stack(panel, tcpField);

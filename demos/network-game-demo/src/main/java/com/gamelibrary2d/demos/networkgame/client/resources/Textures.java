@@ -29,11 +29,11 @@ public class Textures {
         inputField = button;
 
         boulder = Texture.create(
-                Textures.class.getClassLoader().getResource("boulder.png"),
+                Textures.class.getClassLoader().getResource("images/boulder.png"),
                 disposer);
 
         spacecraft = Texture.create(
-                Textures.class.getClassLoader().getResource("spacecraft.png"),
+                Textures.class.getClassLoader().getResource("images/spacecraft.png"),
                 disposer);
     }
 

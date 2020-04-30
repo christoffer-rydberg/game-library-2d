@@ -35,7 +35,7 @@ public class EnumPropertyPanel<T extends Enum<T>> extends ButtonPropertyPanel<T>
     }
 
     @Override
-    public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+    protected void onMouseButtonReleased(GameObject obj, int button, int mods, float projectedX, float projectedY) {
         int increment;
         if (button == Mouse.instance().mouseButton1())
             increment = 1;

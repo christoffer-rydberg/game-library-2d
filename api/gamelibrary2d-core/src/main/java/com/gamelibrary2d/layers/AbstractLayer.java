@@ -162,16 +162,16 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public final void onMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
+    public final void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         if (isEnabled()) {
-            handleMouseButtonRelease(button, mods, projectedX, projectedY);
+            handleMouseButtonReleased(button, mods, projectedX, projectedY);
         }
     }
 
-    protected void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
+    protected void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            mouseAwareIterationList.get(i).onMouseButtonRelease(button, mods, projectedX, projectedY);
+            mouseAwareIterationList.get(i).onMouseButtonReleased(button, mods, projectedX, projectedY);
         }
 
         mouseAwareIterationList.clear();

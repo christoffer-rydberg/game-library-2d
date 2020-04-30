@@ -38,6 +38,6 @@ public interface MouseAware {
      * @param x      The x-coordinate of the mouse cursor projected to the parent of the object.
      * @param y      The y-coordinate of the mouse cursor projected to the parent of the object.
      */
-    void onMouseButtonRelease(int button, int mods, float x, float y);
+    void onMouseButtonReleased(int button, int mods, float x, float y);
 
 }

@@ -153,11 +153,11 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY) {
+    protected void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         if (button == dragging) {
             dragging = -1;
         }
-        super.handleMouseButtonRelease(button, mods, projectedX, projectedY);
+        super.handleMouseButtonReleased(button, mods, projectedX, projectedY);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void onKeyRelease(int key, int scanCode, int mods) {
+    public void onKeyReleased(int key, int scanCode, int mods) {
 
     }
 

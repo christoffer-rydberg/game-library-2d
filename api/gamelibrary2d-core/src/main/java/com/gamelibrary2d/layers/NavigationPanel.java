@@ -71,11 +71,11 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     }
 
     @Override
-    public void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public void onMouseButtonReleased(int button, int mods, float x, float y) {
         var content = getContent();
         if (content instanceof MouseAware) {
             var projected = Projection.projectTo(this, x, y);
-            ((MouseAware) content).onMouseButtonRelease(button, mods, projected.getX(), projected.getY());
+            ((MouseAware) content).onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
         }
     }
 

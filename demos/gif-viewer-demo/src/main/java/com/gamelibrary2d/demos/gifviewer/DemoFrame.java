@@ -10,12 +10,12 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.objects.ObservableObject;
-import com.gamelibrary2d.renderable.Label;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.widgets.DefaultObservableWidget;
+import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
 
@@ -36,10 +36,10 @@ public class DemoFrame extends AbstractFrame {
         loadButtonContext.setText("Click here to load GIF");
         var textBounds = font.textSize(loadButtonContext.getText(), loadButtonContext.getHorizontalAlignment(), loadButtonContext.getVerticalAlignment());
 
-        var loadButton = new ObservableObject<>();
+        var loadButton = new DefaultObservableWidget<>();
         loadButton.setContent(loadButtonContext);
         loadButton.setBounds(textBounds);
-        loadButton.addMouseButtonReleaseListener(this::onLoadButtonClicked);
+        loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);
 
         return loadButton;
     }
@@ -91,7 +91,7 @@ public class DemoFrame extends AbstractFrame {
         }
     }
 
-    private void onLoadButtonClicked(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+    private void onLoadButtonClicked(int button, int mods, float projectedX, float projectedY) {
         try {
             selectGif();
         } catch (IOException e) {

@@ -16,9 +16,9 @@ public class GameSettings implements Message {
     }
 
     public GameSettings(DataBuffer buffer) {
-        gameBounds = MessageParser.readRectangle(buffer);
-        boulderBounds = MessageParser.readRectangle(buffer);
-        spaceCraftBounds = MessageParser.readRectangle(buffer);
+        gameBounds = SerializationUtil.deserializeRectangle(buffer);
+        boulderBounds = SerializationUtil.deserializeRectangle(buffer);
+        spaceCraftBounds = SerializationUtil.deserializeRectangle(buffer);
     }
 
     public Rectangle getGameBounds() {
@@ -39,9 +39,9 @@ public class GameSettings implements Message {
 
     @Override
     public void serializeMessage(DataBuffer buffer) {
-        MessageParser.writeRectangle(gameBounds, buffer);
-        MessageParser.writeRectangle(boulderBounds, buffer);
-        MessageParser.writeRectangle(spaceCraftBounds, buffer);
+        SerializationUtil.serializeRectangle(gameBounds, buffer);
+        SerializationUtil.serializeRectangle(boulderBounds, buffer);
+        SerializationUtil.serializeRectangle(spaceCraftBounds, buffer);
     }
 }
 

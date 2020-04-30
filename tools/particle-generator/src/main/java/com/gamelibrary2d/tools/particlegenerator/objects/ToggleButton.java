@@ -1,11 +1,11 @@
 package com.gamelibrary2d.tools.particlegenerator.objects;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.objects.AbstractObservableObject;
+import com.gamelibrary2d.widgets.AbstractObservableWidget;
 import com.gamelibrary2d.objects.ComposableObject;
-import com.gamelibrary2d.renderable.Label;
+import com.gamelibrary2d.widgets.Label;
 
-public class ToggleButton extends AbstractObservableObject<Label> implements ComposableObject<Label> {
+public class ToggleButton extends AbstractObservableWidget<Label> implements ComposableObject<Label> {
     private boolean toggled;
 
     public ToggleButton() {

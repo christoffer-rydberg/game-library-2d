@@ -3,7 +3,6 @@ package com.gamelibrary2d.demos.networkgame.server;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Read;
-import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.common.ClientMessages;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.RotationDirection;
@@ -28,12 +27,15 @@ public class DemoGameServer implements ServerContext {
     private final BitParser bitParser = new BitParser(ByteBuffer.wrap(new byte[NetworkConstants.UPDATE_BUFFER_BYTE_SIZE]));
 
     private final ServerState state = new ServerState();
-    private final PlayerLookup playerLookup = new PlayerLookup();
+    private final ClientStateService clientStateService = new ClientStateService();
 
     private final Server server;
     private final DemoGameLogic gameLogic;
 
     private int streamCounter;
+
+    private float startCountdown = 10f;
+    private float timer;
 
     public DemoGameServer(Server server) {
         this.server = server;
@@ -87,23 +89,24 @@ public class DemoGameServer implements ServerContext {
         var requestedPlayers = context.get(Integer.class, "requestedPlayers");
 
         var players = new ArrayList<ServerPlayer>(requestedPlayers);
-
         for (int i = 0; i < requestedPlayers; ++i) {
-            var player = new ServerPlayer(gameLogic, communicator, settings.getGameBounds(), settings.getBoulderBounds());
-            var posX = RandomInstance.get().nextFloat() * settings.getGameBounds().width();
-            var posY = RandomInstance.get().nextFloat() * settings.getGameBounds().height();
-            player.setPosition(posX, posY);
-            players.add(player);
-            gameLogic.spawn(player);
+            players.add(new ServerPlayer(gameLogic, communicator, settings.getGameBounds(), settings.getBoulderBounds()));
         }
 
-        playerLookup.setPlayers(communicator, players);
+        var communicatorState = new ClientState(communicator, players);
+        clientStateService.put(communicatorState);
+
+        if (!gameLogic.gameIsRunning()) {
+            communicator.getOutgoing().put(ServerMessages.GAME_ENDED);
+        } else {
+            communicatorState.setReady(true);
+        }
     }
 
     @Override
     public void onDisconnected(Communicator communicator, boolean pending) {
         log(String.format("Connection lost: %s", communicator.getEndpoint()));
-        playerLookup.removePlayers(communicator);
+        clientStateService.remove(communicator);
     }
 
     @Override
@@ -111,9 +114,13 @@ public class DemoGameServer implements ServerContext {
         byte id = buffer.get();
         switch (id) {
             case ClientMessages.PLAYER_ROTATION:
-                var player = playerLookup.getPlayer(communicator, buffer.getInt());
+                var player = clientStateService.get(communicator).getPlayer(buffer.getInt());
                 var rotationDirection = buffer.getEnum(RotationDirection.class);
-                player.setRotation(rotationDirection);
+                player.setRotationDirection(rotationDirection);
+                break;
+            case ClientMessages.PLAY_AGAIN:
+                clientStateService.get(communicator).setReady(true);
+                break;
         }
     }
 
@@ -137,15 +144,48 @@ public class DemoGameServer implements ServerContext {
 
     @Override
     public void update(float deltaTime) {
-        // Cap the delta time in case of lag to avoid big movement of objects
-        deltaTime = (Math.min(deltaTime, 0.1f));
+        if (clientStateService.size() > 0) {
+            if (!gameLogic.gameIsRunning()) {
+                startCountdown -= deltaTime;
+                if (startCountdown <= 0 || clientStateService.allReady()) {
+                    startCountdown = 10f;
+                    startGame();
+                }
+            } else {
+                // Cap the delta time in case of lag to avoid big movement of objects
+                deltaTime = (Math.min(deltaTime, 0.1f));
 
-        ++streamCounter;
-        gameLogic.update(deltaTime);
-        if (streamCounter == STREAM_UPDATE_RATE) {
-            updateClients();
-            streamCounter = 0;
+                timer += deltaTime;
+
+                ++streamCounter;
+                gameLogic.update(deltaTime);
+                if (streamCounter == STREAM_UPDATE_RATE) {
+                    updateClients();
+                    streamCounter = 0;
+                }
+            }
         }
+    }
+
+    private void startGame() {
+        timer = 0;
+
+        for (var clientState : clientStateService.getAll()) {
+            if (!clientState.isReady()) {
+                clientState.getCommunicator().disconnect();
+            }
+        }
+
+        gameLogic.startGame(clientStateService.getPlayers());
+    }
+
+    void endGame() {
+        state.clear();
+        for (var communicatorState : clientStateService.getAll()) {
+            communicatorState.setReady(false);
+        }
+
+        server.sendToAll(ServerMessages.GAME_OVER, false);
     }
 
     void spawn(DemoServerObject obj) {
@@ -155,16 +195,35 @@ public class DemoGameServer implements ServerContext {
         server.sendToAll(obj, false);
     }
 
+    private boolean allPlayersAreDead() {
+        var players = clientStateService.getPlayers();
+        for (var player : players) {
+            if (!player.isDestroyed()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void destroy(DemoServerObject obj) {
         state.deregister(obj);
         server.sendToAll(ServerMessages.DESTROY, false);
         server.sendToAll(obj.getId(), false);
+
+        if (obj instanceof ServerPlayer) {
+            if (allPlayersAreDead()) {
+                gameLogic.endGame();
+            }
+        }
     }
 
     private void updateClients() {
         server.sendToAll(ServerMessages.UPDATE, true);
 
         bitParser.position(NetworkConstants.HEADER_BIT_SIZE);
+
+        bitParser.putInt((int) timer);
 
         var objects = state.getAll();
         for (var object : objects) {

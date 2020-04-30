@@ -31,5 +31,7 @@ public class ServerState implements Message {
         }
     }
 
-
+    public void clear() {
+        objectRegister.clear();
+    }
 }

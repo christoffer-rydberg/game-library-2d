@@ -58,7 +58,7 @@ public class InputBinding implements Serializable {
         this.onActiveUnchanged = onActiveUnchanged;
     }
 
-    public void onRelease(Action onRelease) {
+    public void onReleased(Action onRelease) {
         this.onRelease = onRelease;
     }
 
@@ -157,7 +157,7 @@ public class InputBinding implements Serializable {
     /**
      * Updates the current {@link InputState state} and triggers the corresponding action:
      * {@link #onActive(Action) onActive}, {@link #onActiveUnchanged(Action) onActiveUnchanged},
-     * {@link #onRelease(Action) onRelease} or {@link #onReleaseUnchanged(Action) onReleaseUnchanged}.
+     * {@link #onReleased(Action) onRelease} or {@link #onReleaseUnchanged(Action) onReleaseUnchanged}.
      *
      * @param tiltThreshold    Threshold for a tilt if the input is an axis. Value range: (0, 1].
      * @param releaseThreshold Threshold for releasing a tilt if the input is an axis. Value

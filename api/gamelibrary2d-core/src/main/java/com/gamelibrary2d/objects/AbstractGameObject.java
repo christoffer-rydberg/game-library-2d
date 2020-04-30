@@ -60,10 +60,10 @@ public abstract class AbstractGameObject<T extends Renderable> implements KeyAwa
     }
 
     @Override
-    public void onKeyRelease(int key, int scanCode, int mods) {
+    public void onKeyReleased(int key, int scanCode, int mods) {
         var content = getContent();
         if (content instanceof KeyAware) {
-            ((KeyAware) (content)).onKeyRelease(key, scanCode, mods);
+            ((KeyAware) (content)).onKeyReleased(key, scanCode, mods);
         }
     }
 

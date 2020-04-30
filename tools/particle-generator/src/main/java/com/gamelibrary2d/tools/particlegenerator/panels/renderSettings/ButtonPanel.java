@@ -1,23 +1,22 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.renderSettings;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
+import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.layers.AbstractPanel;
-import com.gamelibrary2d.objects.BasicObject;
+import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.renderable.Label;
-import com.gamelibrary2d.eventlisteners.TextChangedListener;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.widgets.events.MouseButtonReleased;
 
 class ButtonPanel extends AbstractPanel<GameObject> {
 
-    ButtonPanel(String propertyName, String buttonText,
-                MouseButtonReleaseListener mouseListener, TextChangedListener textListener) {
+    ButtonPanel(String propertyName, String buttonText, Func<Button, MouseButtonReleased> mouseListener) {
 
         var labelContext = new Label();
         labelContext.setVerticalAlignment(VerticalAlignment.TOP);
@@ -26,7 +25,7 @@ class ButtonPanel extends AbstractPanel<GameObject> {
         labelContext.setFontColor(Color.WHITE);
         labelContext.setText(propertyName + ":");
 
-        var label = new BasicObject<>(labelContext);
+        var label = new DefaultGameObject<>(labelContext);
         label.setBounds(labelContext.getTextRenderer().getFont().textSize(
                 labelContext.getText(),
                 labelContext.getHorizontalAlignment(),
@@ -48,8 +47,7 @@ class ButtonPanel extends AbstractPanel<GameObject> {
         button.setPosition(offset, 0);
         button.setBounds(font.textSize(buttonContext.getText(),
                 buttonContext.getHorizontalAlignment(), buttonContext.getVerticalAlignment()));
-        button.addMouseButtonReleaseListener(mouseListener);
-        if (textListener != null) buttonContext.addTextChangedListener(textListener);
+        button.addMouseButtonReleasedListener(mouseListener.invoke(button));
 
         add(button);
     }

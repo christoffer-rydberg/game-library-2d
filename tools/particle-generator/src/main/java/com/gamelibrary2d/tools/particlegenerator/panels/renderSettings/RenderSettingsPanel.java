@@ -5,7 +5,6 @@ import com.gamelibrary2d.animation.AnimationFactory;
 import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
@@ -33,6 +32,7 @@ import com.gamelibrary2d.tools.particlegenerator.panels.common.PropertyParameter
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.widgets.events.MouseButtonReleased;
 
 import java.io.File;
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class RenderSettingsPanel extends StackPanel {
         Panel<GameObject> updateOnGpuPanel = new BooleanPropertyPanel("Update on GPU", getUpdateOnGpuParameters());
         Panel<GameObject> rendererPanel = new EnumPropertyPanel<>("Renderer", ParticleRendering.class,
                 getRendererParameters());
-        Panel<GameObject> texturePanel = new ButtonPanel("Texture", "Not loaded", getTextureMouseListener(), null);
+        Panel<GameObject> texturePanel = new ButtonPanel("Texture", "Not loaded", this::getTextureMouseListener);
         useTexturePanel = new BooleanPropertyPanel("Use Texture", getUseTextureParameters());
         Panel<GameObject> blendModePanel = new EnumPropertyPanel<>("Blend Mode", BlendMode.class, getBlendModeParameters());
         Panel<GameObject> pointSizePanel = new FloatPropertyPanel("Size", getPointSizeParameters());
@@ -385,10 +385,10 @@ public class RenderSettingsPanel extends StackPanel {
         };
     }
 
-    private MouseButtonReleaseListener getTextureMouseListener() {
-        return (obj, button, mods, projectedX, projectedY) -> {
+    private MouseButtonReleased getTextureMouseListener(Button obj) {
+        return (button, mods, projectedX, projectedY) -> {
             if (button == Mouse.instance().mouseButton1()) {
-                loadTexture((Button) obj, quad);
+                loadTexture(obj, quad);
             }
         };
     }

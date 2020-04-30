@@ -92,15 +92,15 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     @Override
-    public final void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public final void onMouseButtonReleased(int button, int mods, float x, float y) {
         if (isEnabled()) {
-            handleMouseButtonRelease(button, mods, x, y);
+            handleMouseButtonReleased(button, mods, x, y);
         }
     }
 
-    protected void handleMouseButtonRelease(int button, int mods, float x, float y) {
+    protected void handleMouseButtonReleased(int button, int mods, float x, float y) {
         var projected = Projection.projectTo(this, x, y);
-        getContent().onMouseButtonRelease(button, mods, projected.getX(), projected.getY());
+        getContent().onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
     }
 
     @Override

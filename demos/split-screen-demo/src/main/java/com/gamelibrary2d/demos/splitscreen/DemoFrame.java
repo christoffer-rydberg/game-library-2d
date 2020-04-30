@@ -10,9 +10,9 @@ import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.layers.BasicLayer;
-import com.gamelibrary2d.layers.DynamicLayer;
+import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.objects.BasicObject;
+import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.QuadsRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
@@ -32,7 +32,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private final static Color SPLIT_COLOR = Color.WHITE;
     private final static Color BACKGROUND_COLOR = Color.BLACK;
     private final static int INITIAL_SPACECRAFT_COUNT = 5;
-    private final DynamicLayer<Renderable> spacecraftLayer;
+    private final DefaultLayerObject<Renderable> spacecraftLayer;
     private final Game game;
 
     private GameObject view;
@@ -42,7 +42,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
     DemoFrame(Game game) {
         this.game = game;
-        spacecraftLayer = new DynamicLayer<>();
+        spacecraftLayer = new DefaultLayerObject<>();
     }
 
     private SpaceCraft createSpaceCraft(Quad quad, Texture texture) {
@@ -117,7 +117,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         return createSplitLayoutHelper(spaceCrafts, SplitOrientation.HORIZONTAL);
     }
 
-    private BasicObject createBackgroundColor() {
+    private DefaultGameObject createBackgroundColor() {
         var quad = Quad.create(GAME_BOUNDS, this);
         var renderer = new SurfaceRenderer(quad);
         renderer.updateSettings(
@@ -126,7 +126,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
                 BACKGROUND_COLOR.getG(),
                 BACKGROUND_COLOR.getB(),
                 BACKGROUND_COLOR.getA());
-        return new BasicObject<>(renderer);
+        return new DefaultGameObject<>(renderer);
     }
 
     private Renderable createBackground() {
@@ -227,7 +227,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void onKeyRelease(int key, int scanCode, int mods) {
+    public void onKeyReleased(int key, int scanCode, int mods) {
 
     }
 }

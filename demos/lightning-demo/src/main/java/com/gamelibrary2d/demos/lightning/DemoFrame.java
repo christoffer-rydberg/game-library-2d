@@ -6,7 +6,7 @@ import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.layers.DynamicLayer;
+import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.lightning.*;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
@@ -66,7 +66,7 @@ class DemoFrame extends AbstractFrame {
             var window = game.getWindow();
             var particleSystem = createParticleSystem();
             var lightMap = new DefaultDynamicLightMap(new DefaultLightSpreadMatrix(20));
-            var frameLayer = new DynamicLayer<>();
+            var frameLayer = new DefaultLayerObject<>();
             frameLayer.getBackground().add(createBackground(window));
             frameLayer.add(createTorch(particleSystem, lightMap));
             frameLayer.getForeground().add(particleSystem);

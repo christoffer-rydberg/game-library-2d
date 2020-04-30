@@ -33,7 +33,7 @@ public abstract class AbstractCursor<T extends Renderable> extends AbstractGameO
     }
 
     @Override
-    public void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public void onMouseButtonReleased(int button, int mods, float x, float y) {
         onInteracted();
     }
 

@@ -52,9 +52,9 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public void onKeyRelease(int key, int scanCode, int mods) {
+    public void onKeyReleased(int key, int scanCode, int mods) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).onKeyRelease(key, scanCode, mods);
+            ((KeyAware) wrapped).onKeyReleased(key, scanCode, mods);
         }
     }
 
@@ -100,9 +100,9 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public void onMouseButtonReleased(int button, int mods, float x, float y) {
         if (wrapped instanceof MouseAware) {
-            ((MouseAware) wrapped).onMouseButtonRelease(button, mods, x, y);
+            ((MouseAware) wrapped).onMouseButtonReleased(button, mods, x, y);
         }
     }
     

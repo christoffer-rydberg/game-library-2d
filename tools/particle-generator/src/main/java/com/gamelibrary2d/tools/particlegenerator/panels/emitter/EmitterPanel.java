@@ -1,19 +1,19 @@
 package com.gamelibrary2d.tools.particlegenerator.panels.emitter;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.eventlisteners.MouseButtonReleaseListener;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.objects.ToggleButton;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.widgets.events.MouseButtonReleased;
 
 public class EmitterPanel extends AbstractPanel<GameObject> {
 
@@ -37,7 +37,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         launchButton.setBounds(font.textSize(launchButtonContext.getText(),
                 launchButtonContext.getHorizontalAlignment(), launchButtonContext.getVerticalAlignment()));
         launchButton.setPosition(0, 0);
-        launchButton.addMouseButtonReleaseListener(new LaunchEventHandler());
+        launchButton.addMouseButtonReleasedListener(new LaunchEventHandler());
 
         launchSequentialButton = new ToggleButton();
 
@@ -51,7 +51,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         launchSequentialButton.setBounds(font.textSize(seqContext.getText(),
                 seqContext.getHorizontalAlignment(), seqContext.getVerticalAlignment()));
         launchSequentialButton.setPosition(0, -50);
-        launchSequentialButton.addMouseButtonReleaseListener(new LaunchSequentialEventHandler());
+        launchSequentialButton.addMouseButtonReleasedListener(new LaunchSequentialEventHandler());
 
         Button launchAllButton = new Button();
 
@@ -65,7 +65,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         launchAllButton.setBounds(font.textSize(launchContext.getText(),
                 launchContext.getHorizontalAlignment(), launchContext.getVerticalAlignment()));
         launchAllButton.setPosition(0, -100);
-        launchAllButton.addMouseButtonReleaseListener(new LaunchAllEventHandler());
+        launchAllButton.addMouseButtonReleasedListener(new LaunchAllEventHandler());
 
         add(launchButton);
         add(launchSequentialButton);
@@ -76,32 +76,30 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         return launchSequentialButton.isToggled();
     }
 
-    private class LaunchEventHandler implements MouseButtonReleaseListener {
+    private class LaunchEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY, 0);
             }
         }
     }
 
-    private class LaunchSequentialEventHandler implements MouseButtonReleaseListener {
+    private class LaunchSequentialEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods,
-                                   float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 launchSequentialButton.setToggled(!launchSequentialButton.isToggled());
             }
         }
     }
 
-    private class LaunchAllEventHandler implements MouseButtonReleaseListener {
+    private class LaunchAllEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonRelease(GameObject obj, int button, int mods,
-                                   float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY, 0);
             }

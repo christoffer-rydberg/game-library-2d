@@ -22,12 +22,12 @@ public class Lwjgl_Mouse implements Mouse {
     }
 
     @Override
-    public int actionPress() {
+    public int actionPressed() {
         return GLFW.GLFW_PRESS;
     }
 
     @Override
-    public int actionRelease() {
+    public int actionReleased() {
         return GLFW.GLFW_RELEASE;
     }
 
@@ -43,6 +43,6 @@ public class Lwjgl_Mouse implements Mouse {
 
     @Override
     public boolean isButtonDown(int button) {
-        return GLFW.glfwGetMouseButton(glfwGetCurrentContext(), button) == actionPress();
+        return GLFW.glfwGetMouseButton(glfwGetCurrentContext(), button) == actionPressed();
     }
 }

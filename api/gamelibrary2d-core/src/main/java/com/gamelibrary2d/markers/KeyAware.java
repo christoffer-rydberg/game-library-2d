@@ -26,6 +26,6 @@ public interface KeyAware {
      * @param scanCode The system-specific scancode of the key.
      * @param mods     Describes which modifier keys were held down.
      */
-    void onKeyRelease(int key, int scanCode, int mods);
+    void onKeyReleased(int key, int scanCode, int mods);
 
 }

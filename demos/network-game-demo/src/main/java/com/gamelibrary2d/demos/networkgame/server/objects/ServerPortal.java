@@ -13,8 +13,8 @@ public class ServerPortal extends AbstractDemoServerObject implements CollisionA
     private float spawnTimer;
     private boolean collided;
 
-    public ServerPortal(DemoGameLogic gameLogic, Rectangle bounds) {
-        super(ObjectIdentifiers.PORTAL);
+    public ServerPortal(DemoGameLogic gameLogic, Rectangle gameBounds, Rectangle bounds) {
+        super(ObjectIdentifiers.PORTAL, gameBounds);
         this.gameLogic = gameLogic;
         setBounds(bounds);
     }
@@ -33,11 +33,12 @@ public class ServerPortal extends AbstractDemoServerObject implements CollisionA
     @Override
     public UpdateResult update(float deltaTime) {
         spawnTimer += deltaTime;
-        return UpdateResult.STILL;
+        return super.update(deltaTime);
     }
 
     @Override
     public void updated() {
+        super.updated();
         if (!collided && spawnTimer > SPAWN_RATE) {
             var boulder = new ServerBoulder(
                     gameLogic.getGameSettings().getGameBounds(),

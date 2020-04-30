@@ -1,8 +1,8 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.renderers.BitmapRenderer;
@@ -77,7 +77,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     @Override
     public final boolean onMouseButtonDown(int button, int mods, float x, float y) {
-        if (isEnabled() && isListeningToMouseClickEvents()) {
+        if (isEnabled()) {
             var projected = Projection.projectTo(this, x, y);
             if (isPixelVisible(projected.getX(), projected.getY())) {
                 if (handleMouseButtonDown(button, mods, projected.getX(), projected.getY())) {
@@ -110,15 +110,13 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public final void onMouseButtonReleased(int button, int mods, float x, float y) {
         if (isEnabled() && mouseButtonStates.isActive(button)) {
             mouseButtonStates.setActive(button, false);
             var projected = Projection.projectTo(this, x, y);
-            handleMouseButtonRelease(button, mods, projected.getX(), projected.getY());
+            handleMouseButtonReleased(button, mods, projected.getX(), projected.getY());
         }
     }
-
-    protected abstract boolean isListeningToMouseClickEvents();
 
     protected abstract boolean isListeningToMouseHoverEvents();
 
@@ -130,7 +128,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     protected abstract boolean handleMouseDrag(float projectedX, float projectedY);
 
-    protected abstract void handleMouseButtonRelease(int button, int mods, float projectedX, float projectedY);
+    protected abstract void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY);
 
     private static class MouseButtonStates {
 

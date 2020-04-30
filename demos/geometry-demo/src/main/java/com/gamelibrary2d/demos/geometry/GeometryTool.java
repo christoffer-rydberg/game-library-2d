@@ -60,7 +60,7 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public void onMouseButtonReleased(int button, int mods, float x, float y) {
         if (drawButton == button) {
             drawButton = -1;
             lineCreated.publish(drawnGeometry);

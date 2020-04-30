@@ -10,7 +10,7 @@ public class DurationUpdater implements Updater {
 
     private float timeLeft;
 
-    public DurationUpdater(Update update, float duration) {
+    public DurationUpdater(float duration, Update update) {
         this.update = update;
         this.duration = duration;
         timeLeft = duration;

@@ -40,7 +40,7 @@ public class BooleanPropertyPanel extends ButtonPropertyPanel<Boolean> {
     }
 
     @Override
-    public void onMouseButtonRelease(GameObject obj, int button, int mods, float projectedX, float projectedY) {
+    public void onMouseButtonReleased(GameObject obj, int button, int mods, float projectedX, float projectedY) {
         Button buttonObj = (Button) obj;
 
         var buttonContext = buttonObj.getContent();

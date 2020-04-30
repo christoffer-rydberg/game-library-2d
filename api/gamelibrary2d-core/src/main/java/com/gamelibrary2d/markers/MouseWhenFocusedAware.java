@@ -1,7 +1,7 @@
 package com.gamelibrary2d.markers;
 
 import com.gamelibrary2d.FocusManager;
-import com.gamelibrary2d.input.KeyAction;
+import com.gamelibrary2d.input.ButtonAction;
 
 public interface MouseWhenFocusedAware {
 
@@ -12,5 +12,5 @@ public interface MouseWhenFocusedAware {
      * @param action The key action (press or release).
      * @param mods   Describes which modifier keys were held down.
      */
-    void onMouseButtonWhenFocused(int button, KeyAction action, int mods);
+    void onMouseButtonWhenFocused(int button, ButtonAction action, int mods);
 }

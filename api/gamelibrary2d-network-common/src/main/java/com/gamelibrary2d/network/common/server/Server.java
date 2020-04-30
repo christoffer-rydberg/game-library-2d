@@ -14,6 +14,13 @@ public interface Server {
 
     void update(float deltaTime);
 
+    /**
+     * Marks the specified communicator as pending and invokes {@link #configureClientInitialization}
+     * for it to be reinitialized. This is useful if the client has changed frame and wants
+     * to initialize that frame.
+     */
+    void deinitialize(Communicator communicator);
+
     void send(Communicator communicator, int message);
 
     void send(Communicator communicator, float message);

@@ -6,9 +6,9 @@ public interface Keyboard {
         return Runtime.getFramework().getKeyboard();
     }
 
-    int actionPress();
+    int actionPressed();
 
-    int actionRelease();
+    int actionReleased();
 
     int actionRepeat();
 

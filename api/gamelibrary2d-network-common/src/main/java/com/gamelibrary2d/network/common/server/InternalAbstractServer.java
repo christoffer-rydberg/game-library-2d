@@ -64,12 +64,8 @@ abstract class InternalAbstractServer implements Server {
         onClientAuthenticated(context, communicator);
     }
 
-    /**
-     * Marks the specified communicator as pending and invokes {@link #configureClientInitialization}
-     * for it to be reinitialized. This is useful if the client has changed frame and wants
-     * to initialize that frame.
-     */
-    protected void deinitialize(Communicator communicator) {
+    @Override
+    public void deinitialize(Communicator communicator) {
         communicators.remove(communicator);
         var steps = new InternalCommunicationSteps();
         try {

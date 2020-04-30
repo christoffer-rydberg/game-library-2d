@@ -2,6 +2,7 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.util.Projection;
 
 public class AbstractMouseRoutingObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
@@ -31,12 +32,12 @@ public class AbstractMouseRoutingObject<T extends Renderable> extends AbstractGa
     }
 
     @Override
-    public void onMouseButtonRelease(int button, int mods, float x, float y) {
+    public void onMouseButtonReleased(int button, int mods, float x, float y) {
         if (isEnabled()) {
             var content = getContent();
             if (content instanceof MouseAware) {
                 var projected = Projection.projectTo(this, x, y);
-                ((MouseAware) content).onMouseButtonRelease(button, mods, projected.getX(), projected.getY());
+                ((MouseAware) content).onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
             }
         }
     }

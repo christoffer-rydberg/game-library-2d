@@ -6,9 +6,9 @@ public interface Mouse {
         return Runtime.getFramework().getMouse();
     }
 
-    int actionPress();
+    int actionPressed();
 
-    int actionRelease();
+    int actionReleased();
 
     int mouseButton1();
 

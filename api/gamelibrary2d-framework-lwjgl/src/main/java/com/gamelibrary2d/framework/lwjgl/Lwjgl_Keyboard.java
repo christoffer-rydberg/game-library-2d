@@ -18,12 +18,12 @@ public class Lwjgl_Keyboard implements Keyboard {
     }
 
     @Override
-    public int actionPress() {
+    public int actionPressed() {
         return GLFW.GLFW_PRESS;
     }
 
     @Override
-    public int actionRelease() {
+    public int actionReleased() {
         return GLFW.GLFW_RELEASE;
     }
 
@@ -224,7 +224,7 @@ public class Lwjgl_Keyboard implements Keyboard {
 
     @Override
     public boolean isKeyDown(int key) {
-        return GLFW.glfwGetKey(glfwGetCurrentContext(), key) == actionPress();
+        return GLFW.glfwGetKey(glfwGetCurrentContext(), key) == actionPressed();
     }
 
     @Override

@@ -60,7 +60,7 @@ public class Point {
     public void lerp(Point p0, Point p1, float alpha) {
         lerp(p0.x, p0.y, p1.x, p1.y, alpha);
     }
-    
+
     public void lerp(float x0, float y0, float x1, float y1, float alpha) {
         this.x = x0 * (1f - alpha) + x1 * alpha;
         this.y = y0 * (1f - alpha) + y1 * alpha;
@@ -90,9 +90,29 @@ public class Point {
         y *= factor;
     }
 
+    public void multiply(float factorX, float factorY) {
+        x *= factorX;
+        y *= factorY;
+    }
+
+    public void multiply(Point factor) {
+        x *= factor.x;
+        y *= factor.y;
+    }
+
     public void divide(float divisor) {
         x /= divisor;
         y /= divisor;
+    }
+
+    public void divide(float divisorX, float divisorY) {
+        x /= divisorX;
+        y /= divisorY;
+    }
+
+    public void divide(Point divisor) {
+        x /= divisor.x;
+        y /= divisor.y;
     }
 
     public void normalize() {

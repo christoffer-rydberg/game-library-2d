@@ -3,14 +3,8 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.client.objects.Boulder;
-import com.gamelibrary2d.demos.networkgame.client.objects.ClientObject;
-import com.gamelibrary2d.demos.networkgame.client.objects.DefaultClientObject;
-import com.gamelibrary2d.demos.networkgame.client.objects.LocalPlayer;
-import com.gamelibrary2d.demos.networkgame.common.GameSettings;
-import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
-import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
-import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.*;
+import com.gamelibrary2d.demos.networkgame.common.*;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
@@ -22,8 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.DESTROY;
-import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.SPAWN;
+import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.*;
 
 public class DemoFrameClient extends AbstractClient {
     private final DemoFrame frame;
@@ -85,7 +78,23 @@ public class DemoFrameClient extends AbstractClient {
             case DESTROY:
                 destroy(buffer.getInt());
                 break;
+            case GAME_OVER:
+                gameOver();
+                break;
+            case GAME_ENDED:
+                gameEnded();
+                break;
         }
+    }
+
+    private void gameOver() {
+        objects.clear();
+        frame.gameOver();
+    }
+
+    private void gameEnded() {
+        objects.clear();
+        frame.gameEnded();
     }
 
     private ClientObject readObject(byte id, DataBuffer buffer) {
@@ -97,10 +106,10 @@ public class DemoFrameClient extends AbstractClient {
                 if (isLocal) {
                     return new LocalPlayer(id, this, buffer);
                 } else {
-                    return new DefaultClientObject(id, this, true, buffer);
+                    return new RemotePlayer(id, this, buffer);
                 }
             case ObjectIdentifiers.PORTAL:
-                return new DefaultClientObject(id, this, false, buffer);
+                return new Portal(id, this, buffer);
         }
 
         throw new GameLibrary2DRuntimeException("Invalid object id");
@@ -134,6 +143,10 @@ public class DemoFrameClient extends AbstractClient {
         int positionInByte = totalBitSize - byteSize * 8;
         byteSize = positionInByte == 0 ? byteSize : byteSize + 1;
 
+        int time = bitParser.getInt();
+
+        frame.setTime(time);
+
         while (bitParser.position() < endOfUpdate) {
             int id = bitParser.getInt(NetworkConstants.OBJECT_ID_BIT_SIZE);
             float x = bitParser.getInt(NetworkConstants.POS_X_BIT_SIZE);
@@ -155,6 +168,10 @@ public class DemoFrameClient extends AbstractClient {
 
     public float getServerUpdatesPerSecond() {
         return serverUpdatesPerSecond;
+    }
+
+    public void requestNewGame() {
+        getCommunicator().getOutgoing().put(ClientMessages.PLAY_AGAIN);
     }
 
     private class InitialState {

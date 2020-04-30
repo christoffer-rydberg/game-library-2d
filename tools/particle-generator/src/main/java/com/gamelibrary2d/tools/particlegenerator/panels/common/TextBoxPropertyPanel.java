@@ -2,16 +2,16 @@ package com.gamelibrary2d.tools.particlegenerator.panels.common;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.objects.BasicObject;
-import com.gamelibrary2d.objects.InputObject;
-import com.gamelibrary2d.renderable.Label;
-import com.gamelibrary2d.renderable.TextBox;
+import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.objects.StackPanel;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.widgets.DefaultWidget;
+import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.widgets.TextBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
     private final static VerticalAlignment VERTICAL_ALIGNMENT = VerticalAlignment.TOP;
 
     private final Rectangle minBounds;
-    private final List<InputObject<TextBox>> textBoxes = new ArrayList<>();
+    private final List<DefaultWidget<TextBox>> textBoxes = new ArrayList<>();
     private final PropertyParameters<T> params;
 
     private boolean valid;
@@ -45,7 +45,7 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
         labelContext.setFontColor(Color.WHITE);
         labelContext.setText(propertyName + ":");
 
-        add(new BasicObject<>(labelContext));
+        add(new DefaultGameObject<>(labelContext));
 
         for (int i = 0; i < params.getCount(); ++i) {
             params.setParameter(i, params.getParameter(i));
@@ -59,16 +59,12 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
             textBoxContext.setTextRenderer(textRenderer);
             textBoxContext.setFontColor(Color.WHITE);
 
-            var textBox = new InputObject<>(textBoxContext);
-            textBox.setFocusedHandler(content -> {
-                focused = true;
-                content.setFontColor(statusColor());
+            var textBox = new DefaultWidget<>(textBoxContext);
+            textBox.setFocusChangedAction(focused -> {
+                this.focused = focused;
+                textBox.getContent().setFontColor(getStatusColor());
             });
-            textBox.setUnfocusedHandler(content -> {
-                focused = false;
-                content.setFontColor(statusColor());
-            });
-            textBoxContext.addTextChangedListener((sender, x, y) -> update(textBox));
+            textBoxContext.addTextChangedListener((before, after) -> update(textBox));
             textBox.setBounds(font.textSize(textBoxContext.getText(), textBoxContext.getHorizontalAlignment(),
                     textBoxContext.getVerticalAlignment()));
             textBoxes.add(textBox);
@@ -76,7 +72,7 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
         }
     }
 
-    private Color statusColor() {
+    private Color getStatusColor() {
         if (focused) {
             return valid ? Color.GREEN : Color.ORANGE;
         } else {
@@ -94,16 +90,16 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
         super.onUpdate(deltaTime);
     }
 
-    private void update(InputObject<TextBox> textBox) {
+    private void update(DefaultWidget<TextBox> textBox) {
         var textBoxContext = textBox.getContent();
         try {
             params.setParameter(textBoxes.indexOf(textBox), fromString(textBoxContext.getText()));
             params.updateSetting();
             valid = true;
-            textBoxContext.setFontColor(statusColor());
+            textBoxContext.setFontColor(getStatusColor());
         } catch (Exception e) {
             valid = false;
-            textBoxContext.setFontColor(statusColor());
+            textBoxContext.setFontColor(getStatusColor());
         }
 
         Rectangle textBounds = textBoxContext.getTextRenderer().getFont().textSize(textBoxContext.getText(),

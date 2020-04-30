@@ -2,7 +2,7 @@ package com.gamelibrary2d;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.eventlisteners.FrameChangedListener;
+import com.gamelibrary2d.common.event.EventListener;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
@@ -93,4 +93,8 @@ public interface Game extends Disposer, Updatable {
      * listener.
      */
     void removeFrameChangedListener(FrameChangedListener listener);
+
+    interface FrameChangedListener extends EventListener<Frame> {
+
+    }
 }
