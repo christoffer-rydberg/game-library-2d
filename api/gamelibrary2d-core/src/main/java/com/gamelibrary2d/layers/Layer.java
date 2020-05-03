@@ -1,7 +1,10 @@
 package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.*;
+import com.gamelibrary2d.markers.Clearable;
+import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.Parent;
+import com.gamelibrary2d.markers.Updatable;
 
 import java.util.Comparator;
 

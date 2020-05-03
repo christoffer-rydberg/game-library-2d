@@ -113,21 +113,19 @@ public abstract class AbstractObservableWidget<T
     }
 
     @Override
-    protected boolean handleMouseHover(float projectedX, float projectedY) {
+    protected void handleMouseHover(float projectedX, float projectedY) {
         for (var listener : mouseHoverListeners) {
             listener.onMouseMoved(projectedX, projectedY, false);
         }
-        return true;
     }
 
     @Override
-    protected boolean handleMouseDrag(float projectedX, float projectedY) {
+    protected void handleMouseDrag(float projectedX, float projectedY) {
         for (var listener : mouseDragListeners) {
             listener.onMouseMoved(projectedX, projectedY, true);
         }
-        return true;
     }
-
+    
     @Override
     protected void onHandleMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         for (var listener : mouseButtonReleasedListeners) {

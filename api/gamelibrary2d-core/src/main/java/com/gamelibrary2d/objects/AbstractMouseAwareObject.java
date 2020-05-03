@@ -80,10 +80,9 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
         if (isEnabled()) {
             var projected = Projection.projectTo(this, x, y);
             if (isPixelVisible(projected.getX(), projected.getY())) {
-                if (handleMouseButtonDown(button, mods, projected.getX(), projected.getY())) {
-                    mouseButtonStates.setActive(button, true);
-                    return true;
-                }
+                handleMouseButtonDown(button, mods, projected.getX(), projected.getY());
+                mouseButtonStates.setActive(button, true);
+                return true;
             }
 
             mouseButtonStates.setActive(button, false);
@@ -97,11 +96,13 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
         if (isEnabled()) {
             if (mouseButtonStates.hasActiveButtons() && isListeningToMouseDragEvents()) {
                 var projected = Projection.projectTo(this, x, y);
-                return handleMouseDrag(projected.getX(), projected.getY());
+                handleMouseDrag(projected.getX(), projected.getY());
+                return true;
             } else if (isListeningToMouseHoverEvents()) {
                 var projected = Projection.projectTo(this, x, y);
                 if (isPixelVisible(projected.getX(), projected.getY())) {
-                    return handleMouseHover(projected.getX(), projected.getY());
+                    handleMouseHover(projected.getX(), projected.getY());
+                    return true;
                 }
             }
         }
@@ -122,13 +123,13 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     protected abstract boolean isListeningToMouseDragEvents();
 
-    protected abstract boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY);
-
-    protected abstract boolean handleMouseHover(float projectedX, float projectedY);
-
-    protected abstract boolean handleMouseDrag(float projectedX, float projectedY);
+    protected abstract void handleMouseButtonDown(int button, int mods, float projectedX, float projectedY);
 
     protected abstract void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY);
+
+    protected abstract void handleMouseHover(float projectedX, float projectedY);
+
+    protected abstract void handleMouseDrag(float projectedX, float projectedY);
 
     private static class MouseButtonStates {
 

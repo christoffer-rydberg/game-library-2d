@@ -3,13 +3,12 @@ package com.gamelibrary2d.widgets;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.objects.AbstractMouseRoutingObject;
 import com.gamelibrary2d.objects.GameObject;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Slider extends AbstractMouseRoutingObject<Layer<Renderable>> {
+public class Slider extends AbstractAggregatingWidget<Layer> {
     private final List<DragBeginListener> dragBeginListeners = new CopyOnWriteArrayList<>();
     private final List<DragStopListener> dragStopListeners = new CopyOnWriteArrayList<>();
     private final List<ValueChangedListener> valueChangedListeners = new CopyOnWriteArrayList<>();

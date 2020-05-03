@@ -5,8 +5,8 @@ import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
 import com.gamelibrary2d.widgets.events.*;
 
-public abstract class AbstractWidget<T
-        extends Renderable> extends InternalAbstractWidget<T> implements FocusAware, MouseWhenFocusedAware {
+public abstract class AbstractWidget<T extends Renderable>
+        extends InternalAbstractWidget<T> implements FocusAware, MouseWhenFocusedAware {
     private MouseButtonDown onMouseButtonDown;
     private MouseMoved onMouseHover;
     private MouseMoved onMouseDrag;
@@ -74,15 +74,13 @@ public abstract class AbstractWidget<T
     }
 
     @Override
-    protected boolean handleMouseHover(float projectedX, float projectedY) {
+    protected void handleMouseHover(float projectedX, float projectedY) {
         onMouseHover.onMouseMoved(projectedX, projectedY, false);
-        return true;
     }
 
     @Override
-    protected boolean handleMouseDrag(float projectedX, float projectedY) {
+    protected void handleMouseDrag(float projectedX, float projectedY) {
         onMouseDrag.onMouseMoved(projectedX, projectedY, true);
-        return true;
     }
 
     @Override
