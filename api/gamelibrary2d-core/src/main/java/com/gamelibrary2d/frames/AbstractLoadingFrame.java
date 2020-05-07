@@ -1,7 +1,6 @@
 package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.exceptions.InitializationException;
 
 public abstract class AbstractLoadingFrame extends AbstractFrame implements LoadingFrame {
@@ -49,7 +48,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
 
     private void verifyNotLoading() {
         if (workerThread != null) {
-            throw new GameLibrary2DRuntimeException("Loading is in progress");
+            throw new IllegalStateException("Loading is in progress");
         }
     }
 
@@ -64,7 +63,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         try {
             game.setFrame(result.previousFrame, FrameDisposal.NONE);
         } catch (InitializationException e) {
-            var exception = new GameLibrary2DRuntimeException(
+            var exception = new IllegalStateException(
                     "Failed to restore previous frame after failed load",
                     e);
 

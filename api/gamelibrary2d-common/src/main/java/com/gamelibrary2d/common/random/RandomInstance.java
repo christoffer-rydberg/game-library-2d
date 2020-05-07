@@ -1,7 +1,5 @@
 package com.gamelibrary2d.common.random;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -45,7 +43,7 @@ public class RandomInstance {
      */
     public static synchronized void initialize(RandomGenerator instance) {
         if (RandomInstance.instance != null)
-            throw new GameLibrary2DRuntimeException("RandomInstance has already been initialized.");
+            throw new IllegalStateException("RandomInstance has already been initialized.");
         RandomInstance.instance = instance;
     }
 

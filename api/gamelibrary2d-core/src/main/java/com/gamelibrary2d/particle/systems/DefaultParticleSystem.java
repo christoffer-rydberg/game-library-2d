@@ -164,7 +164,6 @@ public class DefaultParticleSystem implements ParticleSystem {
      * @param count The number of emitted particles.
      */
     public void emitAll(float x, float y, float z, int count) {
-
         int remaining = getCapacity() - particleCount;
         if (remaining < count) {
             count = remaining;

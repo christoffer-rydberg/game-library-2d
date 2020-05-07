@@ -1,6 +1,5 @@
 package com.gamelibrary2d.network.common.server;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
@@ -12,7 +11,9 @@ import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer.InitializationResult;
-import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
+import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
+import com.gamelibrary2d.network.common.initialization.ConsumerStep;
+import com.gamelibrary2d.network.common.internal.DefaultCommunicationSteps;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -40,7 +41,7 @@ abstract class InternalAbstractServer implements Server {
     }
 
     void addConnectedCommunicator(Communicator communicator) {
-        var steps = new InternalCommunicationSteps();
+        var steps = new DefaultCommunicationSteps();
         steps.add(new IdentityProducer(communicatorIdFactory));
         steps.add(this::connectedStep);
         communicator.configureAuthentication(steps);
@@ -67,7 +68,7 @@ abstract class InternalAbstractServer implements Server {
     @Override
     public void deinitialize(Communicator communicator) {
         communicators.remove(communicator);
-        var steps = new InternalCommunicationSteps();
+        var steps = new DefaultCommunicationSteps();
         try {
             configureClientInitialization(steps);
         } finally {
@@ -111,7 +112,7 @@ abstract class InternalAbstractServer implements Server {
             if (pending != null) {
                 onDisconnected(communicator, true);
             } else {
-                throw new GameLibrary2DRuntimeException(String.format(
+                throw new IllegalStateException(String.format(
                         "Faulty state! Disconnected communicator '%s' is neither active nor pending. Endpoint: %s.",
                         communicator.getId(),
                         communicator.getEndpoint()));
@@ -168,8 +169,13 @@ abstract class InternalAbstractServer implements Server {
         }
     }
 
-    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
-            throws IOException {
+    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator,
+                                         ConditionalCommunicationStep conditionalStep) throws IOException {
+        if (!conditionalStep.condition.evaluate(context, communicator)) {
+            return true;
+        }
+
+        var step = conditionalStep.step;
         if (step instanceof ConsumerStep) {
             while (true) {
                 int remaining = incomingBuffer.remaining();

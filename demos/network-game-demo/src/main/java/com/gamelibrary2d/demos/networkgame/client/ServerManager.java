@@ -5,6 +5,8 @@ import com.gamelibrary2d.common.io.Write;
 import com.gamelibrary2d.common.updating.UpdateLoop;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameServer;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.ConnectionType;
+import com.gamelibrary2d.network.common.NetworkCommunicator;
 import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.LocalClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
@@ -26,8 +28,8 @@ public class ServerManager {
         return startServer(this::createLocalServer);
     }
 
-    public Future<Communicator> hostNetworkServer(int port) {
-        return startServer(() -> createNetworkServer(port));
+    public Future<Communicator> hostNetworkServer(int port, int localUdpPort) {
+        return startServer(() -> createNetworkServer(port, localUdpPort));
     }
 
     public void stopHostedServer() {
@@ -41,8 +43,10 @@ public class ServerManager {
         }
     }
 
-    public Future<Communicator> connectToServer(String ip, int port) {
-        return ClientSideCommunicator.connect(new TcpConnectionSettings(ip, port), this::authenticate);
+    public Future<Communicator> connectToServer(String ip, int port, int localUpdPort) {
+        return ClientSideCommunicator.connect(
+                new TcpConnectionSettings(ip, port),
+                steps -> authenticate(steps, localUpdPort));
     }
 
     private Future<Communicator> connectToLocalServer(LocalServer server) {
@@ -61,12 +65,12 @@ public class ServerManager {
         }
     }
 
-    private ServerResult createNetworkServer(int port) {
+    private ServerResult createNetworkServer(int port, int localUpdPort) {
         var server = new DefaultNetworkServer(port, DemoGameServer::new);
         try {
             server.start();
             server.listenForConnections(true);
-            return new ServerResult(server, () -> connectToServer("localhost", port));
+            return new ServerResult(server, () -> connectToServer("localhost", port, localUpdPort));
         } catch (IOException e) {
             return new ServerResult(server, () -> CompletableFuture.failedFuture(e));
         }
@@ -75,6 +79,16 @@ public class ServerManager {
     private void authenticate(CommunicationSteps steps) {
         steps.add((context, communicator) ->
                 Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, communicator.getOutgoing()));
+    }
+
+    private void authenticate(CommunicationSteps steps, int localUdpPort) {
+        authenticate(steps);
+        steps.add((__, com) -> initializeUdp(com, localUdpPort));
+    }
+
+    private void initializeUdp(Communicator communicator, int port) throws IOException {
+        ((NetworkCommunicator) communicator).enableUdp(ConnectionType.READ, port, 0);
+        communicator.getOutgoing().putInt(port);
     }
 
     private Future<Communicator> startServer(Factory<ServerResult> serverFactory) {

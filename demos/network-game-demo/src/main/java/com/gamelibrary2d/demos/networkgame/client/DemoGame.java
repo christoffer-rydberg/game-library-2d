@@ -14,6 +14,9 @@ import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
+import com.gamelibrary2d.sound.SoundManager;
+import com.gamelibrary2d.util.sound.MusicPlayer;
+import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.io.IOException;
 
@@ -36,14 +39,25 @@ public class DemoGame extends AbstractGame {
     protected void onStart() {
         try {
             showSplashScreen();
+
+            var soundManager = SoundManager.create(this);
+            loadSoundBuffers(soundManager);
+
+            var musicPlayer = MusicPlayer.create(soundManager, 10, this);
+            var soundPlayer = SoundEffectPlayer.create(soundManager, 10);
+
             createGlobalResources();
-            initializeFrames();
+            initializeFrames(musicPlayer, soundPlayer);
             setLoadingFrame(loadingFrame);
             setFrame(menuFrame, FrameDisposal.DISPOSE);
         } catch (Exception e) {
             System.err.println("Failed to start game");
             e.printStackTrace();
         }
+    }
+
+    private void loadSoundBuffers(SoundManager soundManager) {
+
     }
 
     private void loadDemoFrame(CommunicatorFactory communicatorFactory) {
@@ -68,12 +82,12 @@ public class DemoGame extends AbstractGame {
         loadDemoFrame(serverManager::hostLocalServer);
     }
 
-    public void hostNetworkGame(int port) {
-        loadDemoFrame(() -> serverManager.hostNetworkServer(port));
+    public void hostNetworkGame(int port, int localUdpPort) {
+        loadDemoFrame(() -> serverManager.hostNetworkServer(port, localUdpPort));
     }
 
-    public void joinNetworkGame(String ip, int port) {
-        loadDemoFrame(() -> serverManager.connectToServer(ip, port));
+    public void joinNetworkGame(String ip, int port, int localUdpPort) {
+        loadDemoFrame(() -> serverManager.connectToServer(ip, port, localUdpPort));
     }
 
     private void showSplashScreen() throws InitializationException {
@@ -89,11 +103,11 @@ public class DemoGame extends AbstractGame {
         Textures.create(this);
     }
 
-    private void initializeFrames() throws InitializationException {
+    private void initializeFrames(MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) throws InitializationException {
         loadingFrame = new LoadingFrame(this);
         loadingFrame.initialize(this);
 
-        menuFrame = new MenuFrame(this);
+        menuFrame = new MenuFrame(musicPlayer, soundPlayer, this);
         menuFrame.initialize(this);
 
         demoFrame = new DemoFrame(this);

@@ -2,7 +2,6 @@ package com.gamelibrary2d.resources;
 
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderType;
 
@@ -32,7 +31,7 @@ public class Shader implements Disposable {
                 builder.append(line).append("\n");
             }
         } catch (IOException ex) {
-            throw new GameLibrary2DRuntimeException("Failed to load a shader file!"
+            throw new IllegalArgumentException("Failed to load a shader file!"
                     + System.lineSeparator() + ex.getMessage());
         }
 
@@ -56,14 +55,14 @@ public class Shader implements Disposable {
             case VERTEX:
                 return new Shader(src, OpenGL.GL_VERTEX_SHADER);
             default:
-                throw new GameLibrary2DRuntimeException("Argument out of range");
+                throw new IllegalStateException("Unexpected value: " + shaderType);
         }
     }
 
     private void checkCompileStatus() {
         int status = OpenGL.instance().glGetShaderi(id, OpenGL.GL_COMPILE_STATUS);
         if (status != OpenGL.GL_TRUE) {
-            throw new GameLibrary2DRuntimeException(OpenGL.instance().glGetShaderInfoLog(id));
+            throw new IllegalStateException(OpenGL.instance().glGetShaderInfoLog(id));
         }
     }
 

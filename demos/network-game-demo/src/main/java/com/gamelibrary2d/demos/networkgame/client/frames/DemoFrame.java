@@ -10,9 +10,9 @@ import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
+import com.gamelibrary2d.demos.networkgame.client.urls.Particles;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
-import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.PositionBuffer;
@@ -47,6 +47,7 @@ import com.gamelibrary2d.util.QuadShape;
 import com.gamelibrary2d.util.RenderSettings;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,18 +74,17 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     }
 
     private DefaultParticleSystem loadParticleSystem(
-            InitializationContext context, String resource, ParticleRenderer renderer, int capacity)
+            InitializationContext context, URL url, ParticleRenderer renderer, int capacity)
             throws IOException {
-        var url = getClass().getClassLoader().getResource("particle_systems/" + resource);
         var settings = new ParticleSettingsSaveLoadManager().load(url);
         var particleSystem = DefaultParticleSystem.create(capacity, settings, renderer, this);
-        context.register(resource, particleSystem);
+        context.register(url, particleSystem);
         return particleSystem;
     }
 
-    private DefaultParticleSystem loadParticleSystem(InitializationContext context, String resource, int capacity)
+    private DefaultParticleSystem loadParticleSystem(InitializationContext context, URL url, int capacity)
             throws IOException {
-        return loadParticleSystem(context, resource, new EfficientParticleRenderer(), capacity);
+        return loadParticleSystem(context, url, new EfficientParticleRenderer(), capacity);
     }
 
     private void initializeUpdateParticles(byte objectIdentifier, DefaultParticleSystem particleSystem) {
@@ -126,41 +126,36 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     }
 
     @Override
-    protected void onInitialize(InitializationContext context) throws InitializationException {
-        try {
-            var portalPS = loadParticleSystem(context, "portal.particle", 1000);
-            initializeUpdateParticles(ObjectIdentifiers.PORTAL, portalPS);
+    protected void onInitialize(InitializationContext context) throws IOException {
+        var portalPS = loadParticleSystem(context, Particles.PORTAL, 1000);
+        initializeUpdateParticles(ObjectIdentifiers.PORTAL, portalPS);
 
-            var boulderPS = loadParticleSystem(context, "boulder.particle", 10000);
-            initializeUpdateParticles(ObjectIdentifiers.BOULDER, boulderPS);
+        var boulderPS = loadParticleSystem(context, Particles.BOULDER, 10000);
+        initializeUpdateParticles(ObjectIdentifiers.BOULDER, boulderPS);
 
-            var enginePS = loadParticleSystem(context, "engine.particle", 1000);
-            initializeUpdateParticles(ObjectIdentifiers.PLAYER, enginePS);
+        var enginePS = loadParticleSystem(context, Particles.ENGINE, 1000);
+        initializeUpdateParticles(ObjectIdentifiers.PLAYER, enginePS);
 
-            var shockwavePS = loadParticleSystem(context, "shockwave.particle", 1000);
+        var shockwavePS = loadParticleSystem(context, Particles.SHOCK_WAVE, 1000);
 
-            var renderer = new EfficientParticleRenderer();
-            renderer.setBlendMode(BlendMode.TRANSPARENCY);
-            renderer.setTexture(Textures.boulder());
-            var boulderExplosionPS = loadParticleSystem(
-                    context, "boulder_explosion.particle", renderer, 1000);
+        var renderer = new EfficientParticleRenderer();
+        renderer.setBlendMode(BlendMode.TRANSPARENCY);
+        renderer.setTexture(Textures.boulder());
+        var boulderExplosionPS = loadParticleSystem(
+                context, Particles.BOULDER_EXPLOSION, renderer, 1000);
 
-            var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
-            timeLabel = new TimeLabel(new TextRenderer(Font.create(font, this)));
-            timeLabel.setPosition(game.getWindow().width() / 2f, 9 * game.getWindow().height() / 10f);
+        var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
+        timeLabel = new TimeLabel(new TextRenderer(Font.create(font, this)));
+        timeLabel.setPosition(game.getWindow().width() / 2f, 9 * game.getWindow().height() / 10f);
 
-            destroyActions.put(ObjectIdentifiers.BOULDER, obj -> {
-                var pos = obj.getPosition();
-                shockwavePS.emitAll(pos.getX(), pos.getY(), 0);
-                boulderExplosionPS.emitAll(pos.getX(), pos.getY(), 0);
-            });
+        destroyActions.put(ObjectIdentifiers.BOULDER, obj -> {
+            var pos = obj.getPosition();
+            shockwavePS.emitAll(pos.getX(), pos.getY(), 0);
+            boulderExplosionPS.emitAll(pos.getX(), pos.getY(), 0);
+        });
 
-            var explosionPS = loadParticleSystem(context, "explosion.particle", 1000);
-            initializeDestructionParticles(ObjectIdentifiers.PLAYER, explosionPS);
-
-        } catch (IOException e) {
-            throw new InitializationException(e);
-        }
+        var explosionPS = loadParticleSystem(context, Particles.EXPLOSION, 1000);
+        initializeDestructionParticles(ObjectIdentifiers.PLAYER, explosionPS);
     }
 
     @Override
@@ -170,13 +165,12 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
     @Override
     protected void onLoaded(InitializationContext context) {
-        backgroundEffects.add(context.get(ParticleSystem.class, "portal.particle"));
-        backgroundEffects.add(context.get(ParticleSystem.class, "boulder.particle"));
+        backgroundEffects.add(context.get(ParticleSystem.class, Particles.PORTAL));
+        backgroundEffects.add(context.get(ParticleSystem.class, Particles.BOULDER));
 
-        foregroundEffects.add(context.get(ParticleSystem.class, "engine.particle"));
-        foregroundEffects.add(context.get(ParticleSystem.class, "explosion.particle"));
-        foregroundEffects.add(context.get(ParticleSystem.class, "shockwave.particle"));
-        foregroundEffects.add(context.get(ParticleSystem.class, "boulder_explosion.particle"));
+        foregroundEffects.add(context.get(ParticleSystem.class, Particles.ENGINE));
+        foregroundEffects.add(context.get(ParticleSystem.class, Particles.EXPLOSION));
+        foregroundEffects.add(context.get(ParticleSystem.class, Particles.SHOCK_WAVE));
 
         gameLayer.add(backgroundEffects);
         gameLayer.add(objectLayer);

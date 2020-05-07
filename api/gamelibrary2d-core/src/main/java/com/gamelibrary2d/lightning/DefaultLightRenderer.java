@@ -2,19 +2,18 @@ package com.gamelibrary2d.lightning;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.util.RenderSettings;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -150,7 +149,7 @@ public class DefaultLightRenderer implements LightRenderer {
 
     public void reset() {
         if (!prepared) {
-            throw new GameLibrary2DRuntimeException("Must call prepare before reset");
+            throw new IllegalStateException("Must call prepare before reset");
         }
         clearLightTexture();
         for (LightMap lightMap : lightMaps) {

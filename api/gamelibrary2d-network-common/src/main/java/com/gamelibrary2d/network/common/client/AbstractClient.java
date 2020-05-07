@@ -1,6 +1,5 @@
 package com.gamelibrary2d.network.common.client;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.updating.UpdateAction;
@@ -10,7 +9,9 @@ import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
-import com.gamelibrary2d.network.common.internal.InternalCommunicationSteps;
+import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
+import com.gamelibrary2d.network.common.initialization.ConsumerStep;
+import com.gamelibrary2d.network.common.internal.DefaultCommunicationSteps;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -109,7 +110,7 @@ public abstract class AbstractClient implements Client {
 
     private void authenticate(CommunicationContext context, Communicator communicator) throws NetworkAuthenticationException {
         if (!communicator.isAuthenticated()) {
-            var steps = new InternalCommunicationSteps();
+            var steps = new DefaultCommunicationSteps();
             configureAuthentication(communicator, steps);
             try {
                 runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
@@ -120,7 +121,7 @@ public abstract class AbstractClient implements Client {
     }
 
     private void initialize(CommunicationContext context, Communicator communicator) throws NetworkInitializationException {
-        var steps = new InternalCommunicationSteps();
+        var steps = new DefaultCommunicationSteps();
         configureInitialization(steps);
         try {
             context.register(communicatorKey, communicator);
@@ -135,7 +136,7 @@ public abstract class AbstractClient implements Client {
         var communicator = context.get(Communicator.class, communicatorKey);
         reallocateOutgoingBuffer(communicator);
         this.communicator = communicator;
-        onPrepared(context);
+        onInitialized(context);
     }
 
     @Override
@@ -257,8 +258,13 @@ public abstract class AbstractClient implements Client {
         sendOutgoing(communicator);
     }
 
-    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator, CommunicationStep step)
-            throws IOException {
+    private boolean runCommunicationStep(CommunicationContext context, Communicator communicator,
+                                         ConditionalCommunicationStep conditionalStep) throws IOException {
+        if (!conditionalStep.condition.evaluate(context, communicator)) {
+            return true;
+        }
+
+        var step = conditionalStep.step;
         if (step instanceof ConsumerStep) {
             try {
                 return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(context, communicator, inbox);
@@ -270,7 +276,7 @@ public abstract class AbstractClient implements Client {
             ((ProducerStep) step).run(context, communicator);
             return true;
         } else {
-            throw new GameLibrary2DRuntimeException("Unknown communication step");
+            throw new IllegalStateException("Unknown communication step: " + step.getClass().getName());
         }
     }
 
@@ -299,7 +305,7 @@ public abstract class AbstractClient implements Client {
 
     protected abstract void onConfigureInitialization(CommunicationSteps steps);
 
-    protected abstract void onPrepared(CommunicationContext context);
+    protected abstract void onInitialized(CommunicationContext context);
 
     protected abstract void onMessage(DataBuffer buffer);
 }

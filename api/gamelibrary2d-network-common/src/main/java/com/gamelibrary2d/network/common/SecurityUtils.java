@@ -1,7 +1,5 @@
 package com.gamelibrary2d.network.common;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -38,7 +36,7 @@ public class SecurityUtils {
             var encoded = skf.generateSecret(spec).getEncoded();
             return Base64.getEncoder().encodeToString(encoded);
         } catch (Exception ex) {
-            throw new GameLibrary2DRuntimeException("Hashing failed", ex);
+            throw new IllegalStateException("Hash generation failed", ex);
         } finally {
             if (spec != null)
                 spec.clearPassword();
@@ -55,7 +53,7 @@ public class SecurityUtils {
             SecretKey skey = kgen.generateKey();
             return Base64.getEncoder().encodeToString(skey.getEncoded());
         } catch (NoSuchAlgorithmException ex) {
-            throw new GameLibrary2DRuntimeException("Key generation failed", ex);
+            throw new IllegalStateException("Key generation failed", ex);
         }
     }
 
@@ -75,7 +73,7 @@ public class SecurityUtils {
             return Base64.getEncoder().encodeToString(combine(initVector, encrypted));
 
         } catch (Exception ex) {
-            throw new GameLibrary2DRuntimeException("Encryption failed", ex);
+            throw new IllegalStateException("Encryption failed", ex);
         }
     }
 
@@ -94,7 +92,7 @@ public class SecurityUtils {
 
             return new String(original);
         } catch (Exception ex) {
-            throw new GameLibrary2DRuntimeException("Decryption failed", ex);
+            throw new IllegalStateException("Decryption failed", ex);
         }
     }
 

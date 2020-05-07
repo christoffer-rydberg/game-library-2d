@@ -59,13 +59,15 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
         return localServer;
     }
 
-    private static class LocalServerSideCommunicator extends AbstractCommunicator {
+    private static class LocalServerSideCommunicator extends AbstractCommunicator implements LocalCommunicator {
         private final Communicator clientSideCommunicator;
+        private final LocalServer server;
         private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
         LocalServerSideCommunicator(Communicator clientSideCommunicator, LocalServer server) {
             super(1);
             this.clientSideCommunicator = clientSideCommunicator;
+            this.server = server;
             this.configureAuthentication = server::configureClientAuthentication;
         }
 
@@ -87,6 +89,11 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
         @Override
         protected void onDisconnected(Throwable cause) {
             clientSideCommunicator.disconnect();
+        }
+
+        @Override
+        public LocalServer getLocalServer() {
+            return server;
         }
     }
 

@@ -34,7 +34,7 @@ public class MusicPlayer {
         setFrame(frame);
     }
 
-    public static MusicPlayer create(Game game, SoundManager manager, int channels) {
+    public static MusicPlayer create(SoundManager manager, int channels, Game game) {
         var musicManager = new MusicPlayer(game.getFrame(), manager, channels);
         game.addFrameChangedListener(musicManager::setFrame);
         return musicManager;

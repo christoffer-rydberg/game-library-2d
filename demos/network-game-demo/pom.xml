@@ -41,6 +41,18 @@
             <version>0.2.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.gamelibrary2d</groupId>
+            <artifactId>gamelibrary2d-sound</artifactId>
+            <version>0.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gamelibrary2d</groupId>
+            <artifactId>gamelibrary2d-util</artifactId>
+            <version>0.2.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,6 +1,5 @@
 package com.gamelibrary2d.network.common.server;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.ServerSocketChannelRegistration;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
@@ -54,7 +53,7 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
 
     public void listenForConnections(boolean listen) throws IOException {
         if (!isRunning()) {
-            throw new GameLibrary2DRuntimeException("Server is not running");
+            throw new IllegalStateException("Server is not running");
         }
 
         if (listen) {

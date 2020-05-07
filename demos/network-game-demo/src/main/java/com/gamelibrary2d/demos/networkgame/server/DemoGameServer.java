@@ -10,8 +10,11 @@ import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.demos.networkgame.server.objects.DemoServerObject;
 import com.gamelibrary2d.demos.networkgame.server.objects.ServerPlayer;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.ConnectionType;
+import com.gamelibrary2d.network.common.NetworkCommunicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.initialization.StepCondition;
 import com.gamelibrary2d.network.common.server.Server;
 import com.gamelibrary2d.network.common.server.ServerContext;
 
@@ -45,6 +48,29 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void configureClientAuthentication(CommunicationSteps steps) {
         steps.add(this::authenticate);
+        steps.add(StepCondition.IS_NETWORK_COMMUNICATOR, this::initializeUdp);
+    }
+
+    @Override
+    public void configureClientInitialization(CommunicationSteps steps) {
+        steps.add(this::sendUpdateRate);
+        steps.write(gameLogic::getGameSettings);
+        steps.read(DataBuffer::getInt, "requestedPlayers");
+        steps.write(() -> state);
+    }
+
+    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
+        var serverPassword = Read.textWithSizeHeader(buffer, StandardCharsets.UTF_8);
+        if (!serverPassword.equals("serverPassword123")) {
+            throw new IOException("Wrong password");
+        }
+        return true;
+    }
+
+    private boolean initializeUdp(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
+        var udpPort = buffer.getInt();
+        ((NetworkCommunicator) communicator).enableUdp(ConnectionType.WRITE, 0, udpPort);
+        return true;
     }
 
     @Override
@@ -66,14 +92,6 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void onConnected(Communicator communicator) {
         log(String.format("Connection established: %s", communicator.getEndpoint()));
-    }
-
-    @Override
-    public void configureClientInitialization(CommunicationSteps steps) {
-        steps.add(this::sendUpdateRate);
-        steps.write(gameLogic::getGameSettings);
-        steps.read("requestedPlayers", DataBuffer::getInt);
-        steps.write(() -> state);
     }
 
     private void sendUpdateRate(CommunicationContext context, Communicator communicator) {
@@ -132,14 +150,6 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void stop() {
         log("Server has stopped");
-    }
-
-    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
-        var serverPassword = Read.textWithSizeHeader(buffer, StandardCharsets.UTF_8);
-        if (!serverPassword.equals("serverPassword123")) {
-            throw new IOException("Wrong password");
-        }
-        return true;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public class ClientSideCommunicator extends AbstractNetworkCommunicator implements UdpReceiver {
+public class ClientSideCommunicator extends AbstractNetworkCommunicator {
 
     private final ParameterizedAction<CommunicationSteps> configureAuthentication;
     private final TcpConnectionSettings tcpSettings;
@@ -94,15 +94,5 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator implemen
     @Override
     public String getEndpoint() {
         return tcpSettings.getHost();
-    }
-
-    @Override
-    public void connectUdpReceiver(int localPort) throws IOException {
-        super.connectUdp(ConnectionOperations.READ, localPort, 0);
-    }
-
-    @Override
-    public void disconnectUdpReceiver() {
-        disconnectUdp();
     }
 }

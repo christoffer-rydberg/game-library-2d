@@ -1,8 +1,6 @@
 package com.gamelibrary2d.exceptions;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DException;
-
-public class InitializationException extends GameLibrary2DException {
+public class InitializationException extends Exception {
 
     public InitializationException() {
     }

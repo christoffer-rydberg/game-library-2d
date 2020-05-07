@@ -2,7 +2,6 @@ package com.gamelibrary2d.network.common.internal;
 
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
-import com.gamelibrary2d.network.common.initialization.CommunicationStep;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -10,9 +9,9 @@ import java.util.Collection;
 import java.util.Deque;
 
 public class CommunicatorInitializer {
-    private final Deque<CommunicationStep> initializationSteps;
+    private final Deque<ConditionalCommunicationStep> initializationSteps;
 
-    public CommunicatorInitializer(Collection<CommunicationStep> initializationSteps) {
+    public CommunicatorInitializer(Collection<ConditionalCommunicationStep> initializationSteps) {
         this.initializationSteps = new ArrayDeque<>(initializationSteps);
     }
 

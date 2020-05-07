@@ -2,12 +2,12 @@ package com.gamelibrary2d.frames;
 
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractLayer;
 import com.gamelibrary2d.updaters.Updater;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -43,7 +43,11 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         disposer.registerDisposal(this);
 
         var context = new DefaultInitializationContext();
-        onInitialize(context);
+        try {
+            onInitialize(context);
+        } catch (IOException e) {
+            throw new InitializationException(e);
+        }
         this.initializationContext.registerAll(context);
 
         disposerStack.pushBreak();
@@ -76,8 +80,12 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    public void loaded(InitializationContext context) {
-        onLoaded(context);
+    public void loaded(InitializationContext context) throws InitializationException {
+        try {
+            onLoaded(context);
+        } catch (IOException e) {
+            throw new InitializationException(e);
+        }
     }
 
     @Override
@@ -172,7 +180,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     @Override
     public void begin() {
         if (!isLoaded()) {
-            throw new GameLibrary2DRuntimeException("Frame has not been loaded");
+            throw new IllegalStateException("Frame has not been loaded");
         }
 
         onBegin();
@@ -184,11 +192,11 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
         invokeLater.clear();
     }
 
-    protected abstract void onInitialize(InitializationContext context) throws InitializationException;
+    protected abstract void onInitialize(InitializationContext context) throws IOException, InitializationException;
 
     protected abstract void onLoad(InitializationContext context) throws InitializationException;
 
-    protected abstract void onLoaded(InitializationContext context);
+    protected abstract void onLoaded(InitializationContext context) throws IOException, InitializationException;
 
     protected abstract void onBegin();
 

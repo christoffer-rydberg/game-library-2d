@@ -55,14 +55,14 @@ public class NetworkService {
         }
     }
 
-    public DatagramChannel openDatagramChannel(Communicator communicator, ConnectionOperations operations,
+    public DatagramChannel openDatagramChannel(Communicator communicator, ConnectionType operations,
                                                ChannelDisconnectedHandler disconnectedHandler, int localPort, int hostPort) throws IOException {
         var udpConnection = new UdpConnection(communicator, operations, disconnectedHandler);
         DatagramChannel channel = DatagramChannel.open();
         channel.bind(new InetSocketAddress(localPort));
         channel.connect(new InetSocketAddress(communicator.getEndpoint(), hostPort));
         channel.configureBlocking(false);
-        if (operations != ConnectionOperations.WRITE)
+        if (operations != ConnectionType.WRITE)
             channel.register(selector, SelectionKey.OP_READ, udpConnection);
         udpConnections.put(channel, udpConnection);
         return channel;
@@ -97,9 +97,15 @@ public class NetworkService {
     public void send(DatagramChannel channel, DataBuffer buffer) throws IOException {
         try {
             var udpConnection = udpConnections.get(channel);
+
             if (udpConnection == null) {
                 throw new IOException("No connected UDP communicator");
             }
+
+            if (udpConnection.connectionType == ConnectionType.READ) {
+                throw new IOException("UDP connection is read-only");
+            }
+
             var byteBuffer = udpConnection.getWriteBuffer();
             synchronized (byteBuffer) {
                 var transmissionId = udpConnection.incrementTransmissionId();
@@ -289,7 +295,7 @@ public class NetworkService {
                     key.interestOps(SelectionKey.OP_WRITE);
                 } else {
                     byteBuffer.clear();
-                    if (udpConnection.getAllowedOperations() != ConnectionOperations.WRITE) {
+                    if (udpConnection.getConnectionType() != ConnectionType.WRITE) {
                         key.interestOps(SelectionKey.OP_READ);
                     }
                 }
@@ -500,16 +506,16 @@ public class NetworkService {
     }
 
     private static class UdpConnection extends AbstractConnection {
-        private final ConnectionOperations allowedOperations;
+        private final ConnectionType connectionType;
 
-        UdpConnection(Communicator communicator, ConnectionOperations allowedOperations,
+        UdpConnection(Communicator communicator, ConnectionType connectionType,
                       ChannelDisconnectedHandler disconnectedHandler) {
             super(communicator, disconnectedHandler, 1);
-            this.allowedOperations = allowedOperations;
+            this.connectionType = connectionType;
         }
 
-        ConnectionOperations getAllowedOperations() {
-            return allowedOperations;
+        ConnectionType getConnectionType() {
+            return connectionType;
         }
     }
 }

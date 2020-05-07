@@ -1,6 +1,5 @@
 package com.gamelibrary2d.renderers;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.util.RenderSettings;
 
 public abstract class AbstractRenderer implements Renderer {
@@ -81,9 +80,9 @@ public abstract class AbstractRenderer implements Renderer {
      */
     public void setSettingsSize(int settingsSize) {
         if (settingsSize < RenderSettings.DEFAULT_SETTINGS_SIZE) {
-            throw new GameLibrary2DRuntimeException("Minimum settings size is " + RenderSettings.DEFAULT_SETTINGS_SIZE);
+            throw new UnsupportedOperationException("Minimum settings size is " + RenderSettings.DEFAULT_SETTINGS_SIZE);
         } else if (settingsSize > RenderSettings.MAXIMUM_SETTINGS_SIZE) {
-            throw new GameLibrary2DRuntimeException("Maximum settings size is " + RenderSettings.MAXIMUM_SETTINGS_SIZE);
+            throw new UnsupportedOperationException("Maximum settings size is " + RenderSettings.MAXIMUM_SETTINGS_SIZE);
         }
         this.settingsSize = settingsSize;
     }

@@ -121,7 +121,6 @@ public class BasicSpawnSettings extends AbstractSpawnSettings {
 
     @Override
     protected void initialize(Particle particle, float x, float y, float z) {
-
         float xVar = getPositionVar()[0];
         float yVar = getPositionVar()[1];
         float zVar = getPositionVar()[2];

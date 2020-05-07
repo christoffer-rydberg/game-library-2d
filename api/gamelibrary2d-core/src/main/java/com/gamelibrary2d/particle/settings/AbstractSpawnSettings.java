@@ -139,7 +139,6 @@ public abstract class AbstractSpawnSettings implements ParticleSpawnSettings {
 
     @Override
     public void emit(Particle particle, float x, float y, float z) {
-
         x += offsetX;
         y += offsetY;
         z += offsetZ;

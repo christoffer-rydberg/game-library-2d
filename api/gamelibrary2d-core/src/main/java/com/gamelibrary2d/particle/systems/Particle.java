@@ -322,10 +322,8 @@ public class Particle {
     }
 
     void update(float[] externalAcceleration, float deltaTime) {
-
         float deltaX, deltaY, deltaZ;
         if (!isInitialized()) {
-
             float time = getTime();
             if (time < getDelay()) {
                 setTime(time + deltaTime);
@@ -373,8 +371,8 @@ public class Particle {
         float gravityCenterY = getGravityCenterY();
         float gravityCenterZ = getGravityCenterZ();
         float radialDirX, radialDirY, radialDirZ;
-        if (gravityCenterX == posX && gravityCenterY == posY && gravityCenterZ == posZ) {
 
+        if (gravityCenterX == posX && gravityCenterY == posY && gravityCenterZ == posZ) {
             double initialYaw = -Math.atan2(deltaY, deltaX);
             double initialPitch = Math.atan2(deltaZ, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
 
@@ -385,15 +383,14 @@ public class Particle {
             radialDirZ = (float) Math.sin(initialPitch);
 
         } else {
-
             // Calculate radial direction
             radialDirX = gravityCenterX - posX;
             radialDirY = gravityCenterY - posY;
             radialDirZ = gravityCenterZ - posZ;
 
             // Calculate distance to origin
-            float distance = (float) Math
-                    .sqrt(radialDirX * radialDirX + radialDirY * radialDirY + radialDirZ * radialDirZ);
+            float distance = (float) Math.sqrt(
+                    radialDirX * radialDirX + radialDirY * radialDirY + radialDirZ * radialDirZ);
 
             // Normalize radial direction
             radialDirX = radialDirX / distance;

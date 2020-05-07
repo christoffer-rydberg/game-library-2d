@@ -621,17 +621,13 @@ public class ParticleUpdateSettings {
         boolean speedSet = false;
 
         if (isInitialDirFromGravityCenter()) {
-
             float dirX = particle.getPosX() - particle.getGravityCenterX();
             float dirY = particle.getPosY() - particle.getGravityCenterY();
             float dirZ = particle.getPosZ() - particle.getGravityCenterZ();
 
-            if (dirX != 0 && dirY != 0 && dirZ != 0) {
-
+            if (dirX != 0 || dirY != 0 || dirZ != 0) {
                 float length = (float) Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-
                 particle.setVelocity((dirX / length) * speed, (dirY / length) * speed, (dirZ / length) * speed);
-
                 speedSet = true;
             }
         }

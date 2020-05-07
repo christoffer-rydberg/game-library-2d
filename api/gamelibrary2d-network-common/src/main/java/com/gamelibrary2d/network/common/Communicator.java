@@ -14,14 +14,12 @@ public interface Communicator {
     String getEndpoint();
 
     /**
-     * Gets the unique ID of the communicator.
-     *
-     * @return Unique ID of the communicator.
+     * @return The unique ID of the communicator.
      */
     int getId();
 
     /**
-     * Sets the unique ID of the communicator.
+     * Sets the communicator {@link #getId id}.
      */
     void setId(int id);
 
@@ -62,16 +60,21 @@ public interface Communicator {
     DataBuffer getOutgoing();
 
     /**
-     * Sends and clears the outgoing buffer.
+     * Sends and clears the {@link #getOutgoing() outgoing buffer}.
      */
     void sendOutgoing() throws IOException;
 
     /**
-     * Sends the update buffer. Only the latest version of this buffer is important,
-     * which gives the communicator freedom to send this buffer using a faster
-     * protocol than that for other messages (which must guarantee delivery).
+     * Reallocates the outgoing buffer.
      */
-    void sendUpdate(DataBuffer updateBuffer) throws IOException;
+    void reallocateOutgoing();
+
+    /**
+     * Sends the content of the specified buffer.
+     *
+     * @param buffer The buffer to send.
+     */
+    void sendUpdate(DataBuffer buffer) throws IOException;
 
     /**
      * Adds a listener for events from this communicator
@@ -84,19 +87,18 @@ public interface Communicator {
     void removeDisconnectedListener(CommunicatorDisconnectedListener listener);
 
     /**
+     * Configures authentication steps.
+     */
+    void configureAuthentication(CommunicationSteps steps);
+
+    /**
      * @return True if the communicator has been authenticated, false otherwise.
      */
     boolean isAuthenticated();
-
-    void configureAuthentication(CommunicationSteps steps);
 
     /**
      * Invoked when the client/server connection has been authenticated.
      */
     void onAuthenticated();
 
-    /**
-     * Reallocates the outgoing buffer.
-     */
-    void reallocateOutgoing();
 }

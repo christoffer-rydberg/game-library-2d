@@ -2,11 +2,10 @@ package com.gamelibrary2d.glUtil;
 
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Shader;
+import com.gamelibrary2d.util.RenderSettings;
 
 import java.nio.FloatBuffer;
 
@@ -117,16 +116,15 @@ public class ShaderProgram implements Disposable {
         // Check that the program was linked successfully.
         int status = OpenGL.instance().glGetProgrami(programId, OpenGL.GL_LINK_STATUS);
         if (status != OpenGL.GL_TRUE) {
-            throw new GameLibrary2DRuntimeException(OpenGL.instance().glGetProgramInfoLog(programId));
+            throw new IllegalStateException(OpenGL.instance().glGetProgramInfoLog(programId));
         }
 
         initialized = true;
     }
 
     public void initializeMvp(int windowWidth, int windowHeight) {
-
         if (!initialized) {
-            throw new GameLibrary2DRuntimeException("The shader program has not been initialized.");
+            throw new IllegalStateException("The shader program has not been initialized.");
         }
 
         int boundProgram = activeProgram;

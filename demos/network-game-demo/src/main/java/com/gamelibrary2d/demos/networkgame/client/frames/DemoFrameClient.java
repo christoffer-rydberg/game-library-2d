@@ -1,6 +1,5 @@
 package com.gamelibrary2d.demos.networkgame.client.frames;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.*;
@@ -31,7 +30,7 @@ public class DemoFrameClient extends AbstractClient {
 
     @Override
     public void onConfigureInitialization(CommunicationSteps steps) {
-        steps.read("updateRate", DataBuffer::getFloat);
+        steps.read(DataBuffer::getFloat, "updateRate");
         steps.read(GameSettings::new);
         steps.add(this::requestPlayers);
         steps.add(this::readState);
@@ -47,7 +46,7 @@ public class DemoFrameClient extends AbstractClient {
     }
 
     @Override
-    protected void onPrepared(CommunicationContext context) {
+    protected void onInitialized(CommunicationContext context) {
         getCommunicator().addDisconnectedListener(this::onDisconnected);
         serverUpdatesPerSecond = context.get(Float.class, "updateRate");
         frame.applySettings(context.get(GameSettings.class));
@@ -110,9 +109,9 @@ public class DemoFrameClient extends AbstractClient {
                 }
             case ObjectIdentifiers.PORTAL:
                 return new Portal(id, this, buffer);
+            default:
+                throw new IllegalStateException("Unexpected value: " + id);
         }
-
-        throw new GameLibrary2DRuntimeException("Invalid object id");
     }
 
     private void destroy(int id) {

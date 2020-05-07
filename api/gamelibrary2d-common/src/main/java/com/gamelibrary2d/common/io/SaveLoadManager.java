@@ -1,7 +1,5 @@
 package com.gamelibrary2d.common.io;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,8 +30,8 @@ public class SaveLoadManager {
         try {
             return clazz.getDeclaredConstructor(DataBuffer.class).newInstance(dataBuffer);
         } catch (Exception e) {
-            throw new GameLibrary2DRuntimeException("Failed to instantiate class '" + clazz.getName()
-                    + "'. Ensure that the class has a public constructor accepting a DataBuffer as a single parameter.");
+            throw new UnsupportedOperationException(
+                    String.format("%s does not have a public constructor accepting a DataBuffer as a single parameter", clazz.getName(), e));
         }
     }
 

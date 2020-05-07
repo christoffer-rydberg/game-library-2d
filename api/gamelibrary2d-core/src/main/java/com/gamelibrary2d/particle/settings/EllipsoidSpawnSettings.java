@@ -141,7 +141,6 @@ public class EllipsoidSpawnSettings extends AbstractSpawnSettings {
 
     @Override
     protected void initialize(Particle particle, float x, float y, float z) {
-
         float posYawDegrees = getPositionYaw() - getPositionYawVar() * RandomInstance.random11() - 90;
         double posYawRadians = posYawDegrees * Math.PI / 180d;
 

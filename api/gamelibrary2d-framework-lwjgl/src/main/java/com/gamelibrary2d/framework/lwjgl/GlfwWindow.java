@@ -1,7 +1,6 @@
 package com.gamelibrary2d.framework.lwjgl;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.CallbackHandler;
 import com.gamelibrary2d.framework.MouseCursorMode;
 import com.gamelibrary2d.framework.Renderable;
@@ -165,11 +164,12 @@ public class GlfwWindow implements Window {
 
     @Override
     public void initialize() {
-
         if (!initialized) {
+            GLFWErrorCallback.createPrint(System.err).set();
 
-            if (!glfwInit())
-                throw new GameLibrary2DRuntimeException("Unable to initialize GLFW");
+            if (!glfwInit()) {
+                throw new IllegalStateException("Unable to initialize GLFW");
+            }
 
             glfwDefaultWindowHints();
 
@@ -200,7 +200,7 @@ public class GlfwWindow implements Window {
     @Override
     public void create() {
         if (!initialized) {
-            throw new GameLibrary2DRuntimeException("Not initialized");
+            throw new IllegalStateException("Not initialized");
         }
 
         if (!created) {
@@ -213,6 +213,7 @@ public class GlfwWindow implements Window {
                 onCreate(title, actualWidth, actualHeight, monitor);
             } else {
                 boolean isWindowedFullscreen = width <= 0;
+
                 if (isWindowedFullscreen) {
                     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
                     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
@@ -246,7 +247,6 @@ public class GlfwWindow implements Window {
     }
 
     private void onCreate(String title, int width, int height, long monitor) {
-
         for (var hint : additionalWindowHints)
             glfwWindowHint(hint.hint, hint.value);
 
@@ -272,7 +272,6 @@ public class GlfwWindow implements Window {
 
     @Override
     public void createCallBacks(CallbackHandler game) {
-
         glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
         glfwSetKeyCallback(windowHandle, new GLFWKeyCallback() {

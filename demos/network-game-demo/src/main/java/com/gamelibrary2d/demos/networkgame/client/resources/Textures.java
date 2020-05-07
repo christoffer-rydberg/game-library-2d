@@ -4,6 +4,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.demos.networkgame.client.Settings;
+import com.gamelibrary2d.demos.networkgame.client.urls.Images;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
@@ -28,13 +29,8 @@ public class Textures {
 
         inputField = button;
 
-        boulder = Texture.create(
-                Textures.class.getClassLoader().getResource("images/boulder.png"),
-                disposer);
-
-        spacecraft = Texture.create(
-                Textures.class.getClassLoader().getResource("images/spacecraft.png"),
-                disposer);
+        boulder = Texture.create(Images.BOULDER, disposer);
+        spacecraft = Texture.create(Images.SPACECRAFT, disposer);
     }
 
     public static Texture button() {

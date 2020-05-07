@@ -65,7 +65,7 @@ public class DemoClient extends AbstractClient {
     }
 
     @Override
-    protected void onPrepared(CommunicationContext context) {
+    protected void onInitialized(CommunicationContext context) {
         getCommunicator().addDisconnectedListener(this::onDisconnected);
         sendMessage("What do you call a guy with a rubber toe?");
     }

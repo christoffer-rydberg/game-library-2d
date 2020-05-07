@@ -1,7 +1,5 @@
 package com.gamelibrary2d.network;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +22,7 @@ public class ServerObjectRegister<T extends ServerObject> {
         var previous = dictionary.put(key, obj);
         if (previous != null) {
             dictionary.put(key, previous);
-            throw new GameLibrary2DRuntimeException("Failed to resolve a unique key for object!");
+            throw new IllegalStateException("Id is already in use");
         }
 
         obj.onRegistered(key);

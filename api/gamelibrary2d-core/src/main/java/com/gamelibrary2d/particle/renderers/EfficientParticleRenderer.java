@@ -1,10 +1,9 @@
 package com.gamelibrary2d.particle.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
+import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.particle.systems.Particle;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
 import com.gamelibrary2d.resources.Texture;
@@ -123,7 +122,7 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
                     OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
                     break;
                 default:
-                    throw new GameLibrary2DRuntimeException("Argument out of range");
+                    throw new IllegalStateException("Unexpected value: " + pointSmoothing);
             }
         }
     }

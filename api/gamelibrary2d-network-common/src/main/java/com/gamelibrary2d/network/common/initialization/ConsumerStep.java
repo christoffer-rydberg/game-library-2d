@@ -2,6 +2,7 @@ package com.gamelibrary2d.network.common.initialization;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.internal.CommunicationStep;
 
 import java.io.IOException;
 

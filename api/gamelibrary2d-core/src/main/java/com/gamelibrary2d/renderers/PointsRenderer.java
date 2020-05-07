@@ -1,9 +1,8 @@
 package com.gamelibrary2d.renderers;
 
-import com.gamelibrary2d.common.exceptions.GameLibrary2DRuntimeException;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.PositionBuffer;
+import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.util.PointSmoothing;
 
 public class PointsRenderer extends AbstractArrayRenderer<PositionBuffer> {
@@ -57,7 +56,7 @@ public class PointsRenderer extends AbstractArrayRenderer<PositionBuffer> {
                 OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
                 break;
             default:
-                throw new GameLibrary2DRuntimeException("Argument out of range");
+                throw new IllegalStateException("Unexpected value: " + pointSmoothing);
         }
     }
 

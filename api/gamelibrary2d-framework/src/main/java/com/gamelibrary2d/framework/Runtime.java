@@ -5,7 +5,6 @@ public class Runtime {
     private static Framework framework;
 
     public static void initialize(Framework framework) {
-
         if (Runtime.framework != null) {
             throw new IllegalStateException("GameLibrary2D runtime has already been initialized!");
         }
@@ -14,7 +13,6 @@ public class Runtime {
     }
 
     public static Framework getFramework() {
-
         if (framework == null) {
             throw new IllegalStateException("GameLibrary2D runtime has not been initialized");
         }

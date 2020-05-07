@@ -46,7 +46,7 @@ public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFra
     }
 
     @Override
-    public void loaded(InitializationContext context) {
+    public void loaded(InitializationContext context) throws InitializationException {
         super.loaded(context);
         client.initialized(context.get(CommunicationContext.class, clientContextKey));
     }

@@ -6,12 +6,11 @@ import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
 
-public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
-
+public abstract class AbstractNetworkCommunicator extends AbstractCommunicator implements NetworkCommunicator {
     private final NetworkService networkService;
     private final boolean ownsNetworkService;
 
-    private volatile DatagramChannel datagramChannel;
+    private volatile UdpConnection udpConnection;
     private volatile SocketChannel socketChannel;
 
     protected AbstractNetworkCommunicator(NetworkService networkService, int incomingChannels, boolean ownsNetworkService) {
@@ -32,26 +31,20 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         this.socketChannel = socketChannel;
     }
 
-    protected DatagramChannel getDatagramChannel() {
-        return datagramChannel;
+    protected void onSocketChannelDisconnected(IOException error) {
+        disconnect(error);
     }
 
-    protected void setDatagramChannel(DatagramChannel datagramChannel) {
-        this.datagramChannel = datagramChannel;
-    }
-
-    protected void onSocketChannelDisconnected(IOException ioException) {
-        disconnect(ioException);
-    }
-
-    protected void onDatagramChannelDisconnected(IOException ioException) {
-        disconnect(ioException);
+    protected void onDatagramChannelDisconnected(IOException error) {
+        if (error != null) {
+            disconnect(error);
+        }
     }
 
     @Override
     protected void onDisconnected(Throwable cause) {
         disconnectTcp();
-        disconnectUdp();
+        disableUdp();
         if (ownsNetworkService) {
             try {
                 networkService.stop();
@@ -69,6 +62,16 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         networkService.send(socketChannel, buffer);
     }
 
+
+    @Override
+    public void sendUpdate(DataBuffer buffer) throws IOException {
+        if (udpConnection != null && udpConnection.connectionType != ConnectionType.READ) {
+            getNetworkService().send(udpConnection.channel, buffer);
+        } else {
+            super.sendUpdate(buffer);
+        }
+    }
+
     protected void disconnectTcp() {
         if (socketChannelConnected()) {
             var socketChannel = this.socketChannel;
@@ -77,28 +80,40 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator {
         }
     }
 
-    protected void connectUdp(ConnectionOperations allowedOperations, int localPort, int hostPort) throws IOException {
+    @Override
+    public void enableUdp(ConnectionType connectionType, int localPort, int hostPort) throws IOException {
         if (!isConnected()) {
             throw new IOException("Communicator is not connected");
         }
 
-        setDatagramChannel(networkService.openDatagramChannel(this, allowedOperations,
-                this::onDatagramChannelDisconnected, localPort, hostPort));
+        disableUdp();
+
+        var channel = networkService.openDatagramChannel(this, connectionType,
+                this::onDatagramChannelDisconnected, localPort, hostPort);
+
+        this.udpConnection = new UdpConnection(channel, connectionType);
     }
 
-    protected void disconnectUdp() {
-        if (datagramChannelConnected()) {
-            var datagramChannel = this.datagramChannel;
-            setDatagramChannel(null);
-            networkService.disconnect(datagramChannel);
+    @Override
+    public void disableUdp() {
+        if (this.udpConnection != null) {
+            var connection = this.udpConnection;
+            this.udpConnection = null;
+            networkService.disconnect(connection.channel);
         }
-    }
-
-    protected boolean datagramChannelConnected() {
-        return datagramChannel != null;
     }
 
     protected boolean socketChannelConnected() {
         return socketChannel != null;
+    }
+
+    private class UdpConnection {
+        private final DatagramChannel channel;
+        private final ConnectionType connectionType;
+
+        public UdpConnection(DatagramChannel channel, ConnectionType connectionType) {
+            this.channel = channel;
+            this.connectionType = connectionType;
+        }
     }
 }

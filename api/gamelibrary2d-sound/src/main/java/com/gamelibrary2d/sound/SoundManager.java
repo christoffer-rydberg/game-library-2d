@@ -1,6 +1,8 @@
 package com.gamelibrary2d.sound;
 
 import com.gamelibrary2d.common.disposal.AbstractDisposer;
+import com.gamelibrary2d.common.disposal.Disposable;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.sound.decoders.AudioDecoder;
 import org.lwjgl.openal.*;
 
@@ -16,54 +18,40 @@ import static org.lwjgl.openal.AL10.alDistanceModel;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-/**
- * This class is used to generate and play {@link SoundSource SoundSources}, and
- * will also handle their disposal. It also provides functionalty to create and
- * store {@link SoundBuffer SoundBuffers} and activate a {@link SoundListener}.
- * Basically, it manages most things related to sound.
- */
-public class SoundManager extends AbstractDisposer {
+public class SoundManager extends AbstractDisposer implements Disposable {
 
+    private final long device;
+    private final long context;
     private final HashMap<URL, SoundBuffer> soundBufferMap;
-
     private final List<SoundSource> soundSources;
-
-    private long device;
-
-    private long context;
 
     private SoundListener listener;
 
-    /**
-     * Creates a new instance of {@link SoundManager}.
-     */
-    public SoundManager() {
-        soundBufferMap = new HashMap<URL, SoundBuffer>();
-        soundSources = new ArrayList<SoundSource>();
+    private SoundManager(long device, long context) {
+        this.device = device;
+        this.context = context;
+        soundBufferMap = new HashMap<>();
+        soundSources = new ArrayList<>();
     }
 
-    /**
-     * Initializes the {@link SoundManager}.
-     */
-    public void init() {
-
-        this.device = alcOpenDevice((ByteBuffer) null);
-
+    public static SoundManager create(Disposer disposer) {
+        var device = alcOpenDevice((ByteBuffer) null);
         if (device == NULL) {
             throw new IllegalStateException("Failed to open the default OpenAL device.");
         }
 
         ALCCapabilities deviceCaps = ALC.createCapabilities(device);
-
-        this.context = alcCreateContext(device, (IntBuffer) null);
-
+        var context = alcCreateContext(device, (IntBuffer) null);
         if (context == NULL) {
             throw new IllegalStateException("Failed to create OpenAL context.");
         }
 
         alcMakeContextCurrent(context);
-
         AL.createCapabilities(deviceCaps);
+
+        var soundManager = new SoundManager(device, context);
+        disposer.registerDisposal(soundManager);
+        return soundManager;
     }
 
     /**
@@ -90,7 +78,7 @@ public class SoundManager extends AbstractDisposer {
      *
      * @param source The sound source.
      */
-    public void diposeSoundSource(SoundSource source) {
+    public void disposeSoundSource(SoundSource source) {
         soundSources.remove(source);
         source.dispose();
     }
@@ -138,7 +126,7 @@ public class SoundManager extends AbstractDisposer {
     /**
      * Registers the specified {@link SoundBuffer}. Note that this method is
      * automatically called when a {@link SoundBuffer} is created with the
-     * {@link #createSoundBuffer} method.
+     * {@link #loadSoundBuffer} method.
      *
      * @param identifier  The {@link URL} identifier.
      * @param soundBuffer The sound buffer.
@@ -166,7 +154,6 @@ public class SoundManager extends AbstractDisposer {
      * Setter for the {@link #getListener() attached sound listener}.
      */
     public void setListener(SoundListener listener) {
-
         if (this.listener == listener) {
             return;
         }
@@ -187,19 +174,15 @@ public class SoundManager extends AbstractDisposer {
 
     @Override
     protected void onDispose() {
-
         soundSources.clear();
-
         soundBufferMap.clear();
 
         if (context != NULL) {
             alcDestroyContext(context);
-            context = NULL;
         }
 
         if (device != NULL) {
             alcCloseDevice(device);
-            device = NULL;
         }
     }
 }
