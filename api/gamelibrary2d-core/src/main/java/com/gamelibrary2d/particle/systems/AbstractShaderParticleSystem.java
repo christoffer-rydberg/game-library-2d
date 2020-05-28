@@ -2,7 +2,6 @@ package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 
 public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
@@ -10,16 +9,12 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
     private final ShaderProgram updaterProgram;
 
-    private EfficientParticleRenderer renderer;
-
     private int glUniformDeltaTime;
 
     private int glUniformParticleCount;
 
-    protected AbstractShaderParticleSystem(ShaderProgram updaterProgram, EfficientParticleRenderer renderer) {
+    protected AbstractShaderParticleSystem(ShaderProgram updaterProgram) {
         this.updaterProgram = updaterProgram;
-
-        this.renderer = renderer;
 
         boolean updateProgramInUse = updaterProgram.inUse();
         if (!updateProgramInUse)
@@ -35,14 +30,6 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
     public ShaderProgram getUpdaterProgram() {
         return updaterProgram;
-    }
-
-    public EfficientParticleRenderer getRenderer() {
-        return renderer;
-    }
-
-    public void setRenderer(EfficientParticleRenderer renderer) {
-        this.renderer = renderer;
     }
 
     @Override

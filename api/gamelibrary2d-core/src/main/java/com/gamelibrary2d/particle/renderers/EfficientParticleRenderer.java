@@ -4,7 +4,6 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.particle.systems.Particle;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.PointSmoothing;
@@ -76,14 +75,13 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
     }
 
     @Override
-    public void render(Particle[] particles, OpenGLBuffer vertexBuffer, boolean gpuOutdated, int offset, int len,
-                       float alpha) {
+    public void render(OpenGLBuffer buffer, boolean gpuOutdated, int offset, int len, float alpha) {
         if (gpuOutdated) {
-            vertexBuffer.bind();
-            vertexBuffer.updateGPU(offset, len);
+            buffer.bind();
+            buffer.updateGPU(offset, len);
         }
 
-        super.render(alpha, vertexBuffer, offset, len);
+        super.render(alpha, buffer, offset, len);
 
         OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
         if (particleShape == ParticleShape.RECTANGLE && texture != null) {

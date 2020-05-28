@@ -1,14 +1,14 @@
 package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.common.io.SaveLoadManager;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.settings.BasicSpawnSettings;
-import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
-import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
-import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;
+import com.gamelibrary2d.particle.settings.ParticleParameters;
+import com.gamelibrary2d.particle.settings.ParticlePositioner;
+import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
@@ -29,24 +29,24 @@ public class DemoFrame extends AbstractFrame {
         this.game = game;
     }
 
-    private ParticleSpawnSettings createSpawnSettings() {
-        var spawnSettings = new BasicSpawnSettings();
-        spawnSettings.setDefaultInterval(1f / 350f);
-        spawnSettings.setPositionVar(75f, 25f, 0);
+    private ParticlePositioner createSpawnSettings() {
+        var spawnSettings = new ParticlePositioner();
+        spawnSettings.setSpawnAreaWidthVar(75f);
+        spawnSettings.setSpawnAreaHeightVar(25f);
         return spawnSettings;
     }
 
-    private ParticleUpdateSettings createUpdateSettings() {
-        var updateSettings = new ParticleUpdateSettings();
+    private ParticleParameters createUpdateSettings() {
+        var updateSettings = new ParticleParameters();
         updateSettings.setLife(1.5f);
         updateSettings.setLifeVar(0.5f);
         updateSettings.setDelay(0.25f);
         updateSettings.setDelayVar(0.25f);
         updateSettings.setSpeed(250f);
         updateSettings.setSpeedVar(100f);
-        updateSettings.setAccelerationX(150f);
-        updateSettings.setAccelerationXVar(100f);
-        updateSettings.setScale(2.5f, 2.5f);
+        updateSettings.setHorizontalAcceleration(150f);
+        updateSettings.setHorizontalAccelerationVar(100f);
+        updateSettings.setScale(2.5f);
         updateSettings.setScaleVar(2.4f);
         updateSettings.setColor(175f, 50f, 30f);
         updateSettings.setUpdateColor(true);
@@ -59,19 +59,18 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onInitialize(InitializationContext context) {
         try {
-            // Example of particle system created from code:
-            fireSystem = DefaultParticleSystem.create(
-                    10000, // Particles won't spawn if capacity is exceeded.
-                    createSpawnSettings(),
-                    createUpdateSettings(),
-                    this);
+            // Example of particle system settings created from code:
+            var fireSystemSettings = new ParticleSystemSettings(createSpawnSettings(), createUpdateSettings());
+            fireSystemSettings.setDefaultInterval(1f / 350f);
 
-            // Example of particle system loaded from file:
-            explosionSystem = DefaultParticleSystem.create(
-                    300,
-                    new ParticleSettingsSaveLoadManager().load(
-                            getClass().getClassLoader().getResource("explosion.particle")),
-                    this);
+            fireSystem = DefaultParticleSystem.create(10000, fireSystemSettings, this);
+
+            // Example of particle system settings loaded from file:
+            var explosionSystemSettings = new SaveLoadManager().load(
+                    getClass().getClassLoader().getResource("explosion.particle"),
+                    ParticleSystemSettings::new);
+
+            explosionSystem = DefaultParticleSystem.create(300, explosionSystemSettings, this);
 
             add(fireSystem);
             add(explosionSystem);
@@ -112,7 +111,7 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
-        explosionSystem.emitAll(projectedX, projectedY, 0);
+        explosionSystem.emitAll(projectedX, projectedY);
         createFire(projectedX, projectedY, 1f);
         return true;
     }

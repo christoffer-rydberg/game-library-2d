@@ -50,8 +50,8 @@ public class SequentialParticleEmitter implements Updatable {
     @Override
     public void update(float deltaTime) {
         if (interval > 0)
-            time = particleSystem.emitSequential(position.getX(), position.getY(), 0, time, deltaTime, interval);
+            time = particleSystem.emitSequential(position.getX(), position.getY(), time, deltaTime, interval);
         else
-            time = particleSystem.emitSequential(position.getX(), position.getY(), 0, time, deltaTime);
+            time = particleSystem.emitSequential(position.getX(), position.getY(), time, deltaTime);
     }
 }

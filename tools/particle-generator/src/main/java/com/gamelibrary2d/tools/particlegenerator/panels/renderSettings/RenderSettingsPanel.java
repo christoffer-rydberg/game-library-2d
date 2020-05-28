@@ -85,16 +85,6 @@ public class RenderSettingsPanel extends StackPanel {
 
         defaultParticleRenderer = (EfficientParticleRenderer) particleSystem.getRenderer();
 
-        iterativeParticleRenderer = new IterativeParticleRenderer();
-
-        quad = Quad.create(defaultParticleRenderer.getBounds(), frame);
-        width = quad.getBounds().width();
-        height = quad.getBounds().height();
-        defaultParticleRenderer.setPointSize(width);
-        pointSize = defaultParticleRenderer.getPointSize();
-
-        blendMode = defaultParticleRenderer.getBlendMode();
-
         ShaderProgram defaultParticleShaderProgram = ShaderProgram.create(frame);
         defaultParticleShaderProgram
                 .attachShader(Shader.fromFile("Shaders/Particle.vertex", ShaderType.VERTEX, frame));
@@ -109,7 +99,15 @@ public class RenderSettingsPanel extends StackPanel {
         defaultRenderer = new SurfaceRenderer(quad);
         defaultRenderer.setShaderProgram(defaultParticleShaderProgram);
         defaultRenderer.setBlendMode(BlendMode.ADDITIVE);
-        particleSystem.getUpdateSettings().setRenderer(defaultRenderer);
+        iterativeParticleRenderer = new IterativeParticleRenderer(defaultRenderer);
+
+        quad = Quad.create(defaultParticleRenderer.getBounds(), frame);
+        width = quad.getBounds().width();
+        height = quad.getBounds().height();
+        defaultParticleRenderer.setPointSize(width);
+        pointSize = defaultParticleRenderer.getPointSize();
+
+        blendMode = defaultParticleRenderer.getBlendMode();
 
         // Create property panels
         Panel<GameObject> updateOnGpuPanel = new BooleanPropertyPanel("Update on GPU", getUpdateOnGpuParameters());
@@ -368,13 +366,10 @@ public class RenderSettingsPanel extends StackPanel {
             }
 
             public boolean updateIfChanged() {
-
-                Renderer renderer = particleSystem.getUpdateSettings().getRenderer();
-
+                Renderer renderer = iterativeParticleRenderer.getRenderer();
                 if (renderer == defaultRenderer) {
                     return setParameter(0, false);
                 } else {
-
                     if (texturedRenderer == null) {
                         return setParameter(0, false);
                     }
@@ -492,6 +487,6 @@ public class RenderSettingsPanel extends StackPanel {
             defaultParticleRenderer.setTexture(null);
         }
 
-        particleSystem.getUpdateSettings().setRenderer(renderer);
+        iterativeParticleRenderer.setRenderer(renderer);
     }
 }

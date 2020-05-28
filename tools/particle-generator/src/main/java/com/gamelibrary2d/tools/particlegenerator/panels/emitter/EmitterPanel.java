@@ -81,7 +81,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         @Override
         public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
-                particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY, 0);
+                particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY);
             }
         }
     }
@@ -101,7 +101,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         @Override
         public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
-                particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY, 0);
+                particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY);
             }
         }
     }

@@ -2,32 +2,37 @@ package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.widgets.Slider;
-import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
-import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
-import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;
-import com.gamelibrary2d.particle.settings.ParticleSettingsUtils;
+import com.gamelibrary2d.common.io.SaveLoadManager;
+import com.gamelibrary2d.particle.settings.ParticleParameters;
+import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.util.RenderSettings;
+import com.gamelibrary2d.widgets.Slider;
 
 class ResizeSlider extends Slider {
-    private ParticleSpawnSettings originalSpawnSettings;
-    private ParticleUpdateSettings originalUpdateSettings;
+    private ParticlePositioner originalParticlePositioner;
+    private ParticleParameters originalParticleParameters;
 
     private ResizeSlider(Renderer handle, ParticleSystemModel particleSystem) {
         super(handle, SliderDirection.HORIZONTAL, -50, 50, 3);
-        var saveLoadManager = new ParticleSettingsSaveLoadManager();
+        var saveLoadManager = new SaveLoadManager();
         addDragBeginListener(value -> {
-            originalSpawnSettings = saveLoadManager.clone(particleSystem.getSpawnSettings());
-            originalUpdateSettings = saveLoadManager.clone(particleSystem.getUpdateSettings());
+            originalParticlePositioner = saveLoadManager.clone(particleSystem.getSpawnSettings(), ParticlePositioner::new);
+            originalParticleParameters = saveLoadManager.clone(particleSystem.getUpdateSettings(), ParticleParameters::new);
         });
         addValueChangedListener(value -> {
-            float resizeValue = (value < 0 ? value : value * 2) + 100f;
-            ParticleSettingsUtils.scaleSpawnSettings(originalSpawnSettings, resizeValue * 0.01f, particleSystem.getSpawnSettings());
-            ParticleSettingsUtils.scaleUpdateSettings(originalUpdateSettings, resizeValue * 0.01f, particleSystem.getUpdateSettings());
+            float resizeValue = ((value < 0 ? value : value * 2) + 100f) * 0.01f;
+            var updatedParticlePositioner = saveLoadManager.clone(originalParticlePositioner, ParticlePositioner::new);
+            var updatedParticleParameters = saveLoadManager.clone(originalParticleParameters, ParticleParameters::new);
+
+            updatedParticlePositioner.scale(resizeValue);
+            updatedParticleParameters.scale(resizeValue);
+
+            particleSystem.setSpawnSettings(updatedParticlePositioner);
+            particleSystem.setUpdateSettings(updatedParticleParameters);
         });
         addDragStopListener(v -> setValue(0, false));
 

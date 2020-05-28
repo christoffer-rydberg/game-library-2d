@@ -26,30 +26,24 @@ public class ParticleSettingsPanel extends StackPanel {
         // Velocity
         add(new FloatPropertyPanel("Speed", getSpeedParameters()));
         add(new FloatPropertyPanel("End Speed Factor", getEndSpeedFactorParameters()));
-        add(new FloatPropertyPanel("Direction Yaw", getDirectionYawParameters()));
-        add(new FloatPropertyPanel("Direction Pitch", getDirectionPitchParameters()));
-        add(new BooleanPropertyPanel("Move From Gravity Center", getMoveFromOriginParameters()));
+        add(new FloatPropertyPanel("Direction", getDirectionParameters()));
+        add(new BooleanPropertyPanel("Move From Center", getMoveFromCenterParameters()));
 
         // Acceleration
-        add(new FloatPropertyPanel("Radial Acc", getRadialAccParameters()));
-        add(new FloatPropertyPanel("Tangental Acc", getTangentalAccParameters()));
-        add(new FloatPropertyPanel("Acceleration X", getAccelerationXParameters()));
-        add(new FloatPropertyPanel("Acceleration Y", getAccelerationYParameters()));
-        add(new FloatPropertyPanel("Acceleration Z", getAccelerationZParameters()));
+        add(new FloatPropertyPanel("Centripetal Acceleration", getCentripetalAccelerationParameters()));
+        add(new FloatPropertyPanel("Tangental Acceleration", getTangentalAccParameters()));
+        add(new FloatPropertyPanel("Horizontal Acceleration", getHorizontalAccelerationParameters()));
+        add(new FloatPropertyPanel("Vertical Acceleration", getVerticalAccelerationParameters()));
 
         // Scale
-        add(new FloatPropertyPanel("Scale X", getScaleXParameters()));
-        add(new FloatPropertyPanel("Scale Y", getScaleYParameters()));
-        add(new FloatPropertyPanel("Scale Var", getScaleVarParameters()));
+        add(new FloatPropertyPanel("Scale", getScaleParameters()));
         add(new BooleanPropertyPanel("Update Scale", getUpdateScaleParameters()));
-        add(new FloatPropertyPanel("End Scale X", getEndScaleXParameters()));
-        add(new FloatPropertyPanel("End Scale Y", getEndScaleYParameters()));
-        add(new FloatPropertyPanel("End Scale Var", getEndScaleVarParameters()));
+        add(new FloatPropertyPanel("End Scale", getEndScaleParameters()));
 
         // Rotation
         add(new FloatPropertyPanel("Rotation", getRotationParameters()));
         add(new FloatPropertyPanel("Rotation Speed", getRotationSpeedParameters()));
-        add(new FloatPropertyPanel("Rotation Acc", getRotationAccParameters()));
+        add(new FloatPropertyPanel("Rotation Acceleration", getRotationAccParameters()));
         add(new BooleanPropertyPanel("Rotated Forwards", getRotatedForwardsParameters()));
 
         // Color
@@ -132,163 +126,91 @@ public class ParticleSettingsPanel extends StackPanel {
         };
     }
 
-    private PropertyParameters<Float> getDirectionYawParameters() {
+    private PropertyParameters<Float> getDirectionParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setInitialYaw(getParameter(0));
-                particleSystem.getUpdateSettings().setInitialYawVar(getParameter(1));
+                particleSystem.getUpdateSettings().setDirection(getParameter(0));
+                particleSystem.getUpdateSettings().setDirectionVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getInitialYaw());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getInitialYawVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getDirection());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getDirectionVar());
                 return changed;
             }
         };
     }
 
-    private PropertyParameters<Float> getDirectionPitchParameters() {
+    private PropertyParameters<Float> getScaleParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setInitialPitch(getParameter(0));
-                particleSystem.getUpdateSettings().setInitialPitchVar(getParameter(1));
+                particleSystem.getUpdateSettings().setScale(getParameter(0));
+                particleSystem.getUpdateSettings().setScaleVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getInitialPitch());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getInitialPitchVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getScale());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getScaleVar());
                 return changed;
             }
         };
     }
 
-    private PropertyParameters<Float> getScaleXParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setScaleX(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getScaleX());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getScaleYParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setScaleY(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getScaleY());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getScaleVarParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setScaleVar(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getScaleVar());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getEndScaleXParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setEndScaleX(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getEndScaleX());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getEndScaleYParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setEndScaleY(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getEndScaleY());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getEndScaleVarParameters() {
-        return new PropertyParameters<>(1) {
-            public void updateSetting() {
-                particleSystem.getUpdateSettings().setEndScaleVar(getParameter(0));
-            }
-
-            public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().getEndScaleVar());
-            }
-        };
-    }
-
-    private PropertyParameters<Float> getAccelerationXParameters() {
+    private PropertyParameters<Float> getEndScaleParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setAccelerationX(getParameter(0));
-                particleSystem.getUpdateSettings().setAccelerationXVar(getParameter(1));
+                particleSystem.getUpdateSettings().setEndScale(getParameter(0));
+                particleSystem.getUpdateSettings().setEndScaleVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getAccelerationX());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getAccelerationXVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getEndScale());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getEndScaleVar());
                 return changed;
             }
         };
     }
 
-    private PropertyParameters<Float> getAccelerationYParameters() {
+    private PropertyParameters<Float> getHorizontalAccelerationParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setAccelerationY(getParameter(0));
-                particleSystem.getUpdateSettings().setAccelerationYVar(getParameter(1));
+                particleSystem.getUpdateSettings().setHorizontalAcceleration(getParameter(0));
+                particleSystem.getUpdateSettings().setHorizontalAccelerationVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getAccelerationY());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getAccelerationYVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getHorizontalAcceleration());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getHorizontalAccelerationVar());
                 return changed;
             }
         };
     }
 
-    private PropertyParameters<Float> getAccelerationZParameters() {
+    private PropertyParameters<Float> getVerticalAccelerationParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setAccelerationZ(getParameter(0));
-                particleSystem.getUpdateSettings().setAccelerationZVar(getParameter(1));
+                particleSystem.getUpdateSettings().setVerticalAcceleration(getParameter(0));
+                particleSystem.getUpdateSettings().setVerticalAccelerationVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getAccelerationZ());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getAccelerationZVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getVerticalAcceleration());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getVerticalAccelerationVar());
                 return changed;
             }
         };
     }
 
-    private PropertyParameters<Float> getRadialAccParameters() {
+    private PropertyParameters<Float> getCentripetalAccelerationParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setRadialAcc(getParameter(0));
-                particleSystem.getUpdateSettings().setRadialAccVar(getParameter(1));
+                particleSystem.getUpdateSettings().setCentripetalAcceleration(getParameter(0));
+                particleSystem.getUpdateSettings().setCentripetalAccelerationVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getRadialAcc());
-                changed |= setParameter(1, particleSystem.getUpdateSettings().getRadialAccVar());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getCentripetalAcceleration());
+                changed |= setParameter(1, particleSystem.getUpdateSettings().getCentripetalAccelerationVar());
                 return changed;
             }
         };
@@ -297,12 +219,12 @@ public class ParticleSettingsPanel extends StackPanel {
     private PropertyParameters<Float> getTangentalAccParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setTangentalAcc(getParameter(0));
+                particleSystem.getUpdateSettings().setTangentalAcceleration(getParameter(0));
                 particleSystem.getUpdateSettings().setTangentalAccVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getTangentalAcc());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getTangentalAcceleration());
                 changed |= setParameter(1, particleSystem.getUpdateSettings().getTangentalAccVar());
                 return changed;
             }
@@ -462,12 +384,12 @@ public class ParticleSettingsPanel extends StackPanel {
     private PropertyParameters<Float> getRotationAccParameters() {
         return new PropertyParameters<>(2) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setRotationAcc(getParameter(0));
+                particleSystem.getUpdateSettings().setRotationAcceleration(getParameter(0));
                 particleSystem.getUpdateSettings().setRotationAccVar(getParameter(1));
             }
 
             public boolean updateIfChanged() {
-                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getRotationAcc());
+                boolean changed = setParameter(0, particleSystem.getUpdateSettings().getRotationAcceleration());
                 changed |= setParameter(1, particleSystem.getUpdateSettings().getRotationAccVar());
                 return changed;
             }
@@ -510,14 +432,14 @@ public class ParticleSettingsPanel extends StackPanel {
         };
     }
 
-    private PropertyParameters<Boolean> getMoveFromOriginParameters() {
+    private PropertyParameters<Boolean> getMoveFromCenterParameters() {
         return new PropertyParameters<>(1) {
             public void updateSetting() {
-                particleSystem.getUpdateSettings().setInitialDirFromGravityCenter(getParameter(0));
+                particleSystem.getUpdateSettings().setMoveAwayFromCenter(getParameter(0));
             }
 
             public boolean updateIfChanged() {
-                return setParameter(0, particleSystem.getUpdateSettings().isInitialDirFromGravityCenter());
+                return setParameter(0, particleSystem.getUpdateSettings().isMovingAwayFromCenter());
             }
         };
     }

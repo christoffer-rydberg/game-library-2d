@@ -3,21 +3,23 @@ package com.gamelibrary2d.particle.systems;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.AbstractVertexArrayBuffer;
+import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 
 public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
 
     private final OpenGLFloatBuffer updateBuffer;
     private final OpenGLBuffer arrayBuffer;
+    private final EfficientParticleRenderer renderer;
 
     protected CustomShaderParticleSystem(ShaderProgram updaterProgram, OpenGLFloatBuffer updateBuffer,
                                          OpenGLBuffer arrayBuffer, EfficientParticleRenderer renderer) {
-        super(updaterProgram, renderer);
+        super(updaterProgram);
         this.updateBuffer = updateBuffer;
         this.arrayBuffer = arrayBuffer;
+        this.renderer = renderer;
     }
 
     public static CustomShaderParticleSystem create(float[] state, float[] update, int stride,
@@ -25,11 +27,11 @@ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
         var updateBuffer = OpenGLFloatBuffer.create(
                 update, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
-        var stateBuffer = OpenGLFloatBuffer.create(
+        var renderBuffer = OpenGLFloatBuffer.create(
                 state, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
         var arrayBuffer = CustomParticleBuffer.create(
-                stateBuffer,
+                renderBuffer,
                 stride,
                 4,
                 disposer);
@@ -48,7 +50,7 @@ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
 
     @Override
     public void render(float alpha) {
-        getRenderer().render(null, arrayBuffer, false, 0, arrayBuffer.capacity(), alpha);
+        renderer.render(arrayBuffer, false, 0, arrayBuffer.capacity(), alpha);
     }
 
     @Override

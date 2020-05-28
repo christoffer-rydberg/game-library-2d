@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.functional.ParameterizedAction;
+import com.gamelibrary2d.common.io.SaveLoadManager;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
@@ -25,7 +26,7 @@ import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
+import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.renderers.QuadsRenderer;
@@ -76,8 +77,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private DefaultParticleSystem loadParticleSystem(
             InitializationContext context, URL url, ParticleRenderer renderer, int capacity)
             throws IOException {
-        var settings = new ParticleSettingsSaveLoadManager().load(url);
-        var particleSystem = DefaultParticleSystem.create(capacity, settings, renderer, this);
+        var settings = new SaveLoadManager().load(url, b -> new ParticleSystemSettings(b, renderer));
+        var particleSystem = DefaultParticleSystem.create(capacity, settings, this);
         context.register(url, particleSystem);
         return particleSystem;
     }
@@ -102,7 +103,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private void initializeDestructionParticles(byte objectIdentifier, DefaultParticleSystem particleSystem) {
         destroyActions.put(objectIdentifier, obj -> {
             var pos = obj.getPosition();
-            particleSystem.emitAll(pos.getX(), pos.getY(), 0);
+            particleSystem.emitAll(pos.getX(), pos.getY());
         });
     }
 
@@ -150,8 +151,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
         destroyActions.put(ObjectIdentifiers.BOULDER, obj -> {
             var pos = obj.getPosition();
-            shockwavePS.emitAll(pos.getX(), pos.getY(), 0);
-            boulderExplosionPS.emitAll(pos.getX(), pos.getY(), 0);
+            shockwavePS.emitAll(pos.getX(), pos.getY());
+            boulderExplosionPS.emitAll(pos.getX(), pos.getY());
         });
 
         var explosionPS = loadParticleSystem(context, Particles.EXPLOSION, 1000);

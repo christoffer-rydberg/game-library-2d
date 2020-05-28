@@ -15,17 +15,22 @@ public abstract class AbstractDisposer implements Disposer {
 
     @Override
     public void registerDisposal(Disposable disposable) {
+        if (isDisposed) {
+            throw new IllegalStateException("Disposer has been disposed");
+        }
         disposables.push(disposable);
     }
 
     @Override
     public void dispose() {
-        isDisposed = true;
-        while (!disposables.isEmpty()) {
-            Disposable disposable = disposables.pop();
-            disposable.dispose();
+        if (!isDisposed) {
+            isDisposed = true;
+            while (!disposables.isEmpty()) {
+                Disposable disposable = disposables.pop();
+                disposable.dispose();
+            }
+            onDispose();
         }
-        onDispose();
     }
 
     protected abstract void onDispose();

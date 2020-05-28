@@ -7,14 +7,14 @@ uniform mat4 projection;
 uniform float alpha;
 uniform vec4 colorFactor;
 
-in layout (location = 0) vec4 position;
-in layout (location = 1) vec4 color;
+in layout (location = 0) vec4 orientation; // position, scale and rotation
+in layout (location = 1) vec4 color; // rgba
 
 out vec4 particleColor;
 
 void main() {
 	mat4 mvp = projection * view * model;
-    gl_Position = mvp * vec4(position.x, position.y, 0.0, 1.0);
+    gl_Position = mvp * vec4(orientation.x, orientation.y, 0.0, 1.0);
     particleColor = vec4(
         color[0] * colorFactor[0],
         color[1] * colorFactor[1],

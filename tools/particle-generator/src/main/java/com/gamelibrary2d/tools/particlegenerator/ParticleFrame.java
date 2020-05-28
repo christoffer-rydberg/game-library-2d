@@ -7,10 +7,11 @@ import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.particle.settings.ParticleSettingsUtils;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
-import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.*;
+import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SpawnSettingsPanel;
+import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.ParticleSettingsPanel;
+import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SaveLoadResetPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSettingsPanel;
 
 public class ParticleFrame extends AbstractFrame implements KeyAware {
@@ -30,11 +31,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
 
     private ParticleSettingsPanel particleSettingsPanel;
 
-    private AbstractSpawnSettingsPanel spawnSettingsPanel;
-
-    private BasicSpawnSettingsPanel basicSpawnSettingsPanel;
-
-    private EllipsoidSpawnSettingsPanel ellipsoidSpawnSettingsPanel;
+    private SpawnSettingsPanel spawnSettingsPanel;
 
     private RenderSettingsPanel renderSettingsPanel;
 
@@ -61,15 +58,9 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
         particleSettingsPanel.setPosition(WINDOW_MARGIN, game.getWindow().height() - WINDOW_MARGIN);
 
-        basicSpawnSettingsPanel = new BasicSpawnSettingsPanel(this, particleSystem);
-        basicSpawnSettingsPanel.setPosition(WINDOW_MARGIN,
+        spawnSettingsPanel = new SpawnSettingsPanel(this, particleSystem);
+        spawnSettingsPanel.setPosition(WINDOW_MARGIN,
                 game.getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
-
-        ellipsoidSpawnSettingsPanel = new EllipsoidSpawnSettingsPanel(this, particleSystem);
-        ellipsoidSpawnSettingsPanel.setPosition(WINDOW_MARGIN,
-                game.getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
-
-        spawnSettingsPanel = basicSpawnSettingsPanel;
 
         renderSettingsPanel = new RenderSettingsPanel(particleSystem, game, this);
         renderSettingsPanel.setPosition(
@@ -117,7 +108,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     protected void handleUpdate(float deltaTime) {
         super.handleUpdate(deltaTime);
         if (emitterPanel.isLaunchingSequential()) {
-            particleEmitterTime = particleSystem.emitSequential(PosX, PosY, 0, particleEmitterTime, deltaTime);
+            particleEmitterTime = particleSystem.emitSequential(PosX, PosY, particleEmitterTime, deltaTime);
         }
     }
 
@@ -186,22 +177,5 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     @Override
     public void onKeyReleased(int key, int scanCode, int mods) {
 
-    }
-
-    public void changeSpawnSettings(SpawnSettingsType type) {
-        switch (type) {
-            case BASIC:
-                screenLayer.remove(spawnSettingsPanel);
-                particleSystem.setSpawnSettings(ParticleSettingsUtils.convertToBasic(particleSystem.getSpawnSettings()));
-                spawnSettingsPanel = basicSpawnSettingsPanel;
-                screenLayer.add(spawnSettingsPanel);
-                break;
-            case ELLIPSOID:
-                screenLayer.remove(spawnSettingsPanel);
-                particleSystem.setSpawnSettings(ParticleSettingsUtils.convertToEllipsoid(particleSystem.getSpawnSettings()));
-                spawnSettingsPanel = ellipsoidSpawnSettingsPanel;
-                screenLayer.add(spawnSettingsPanel);
-                break;
-        }
     }
 }

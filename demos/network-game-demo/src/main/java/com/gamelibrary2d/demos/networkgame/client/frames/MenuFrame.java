@@ -1,9 +1,9 @@
 package com.gamelibrary2d.demos.networkgame.client.frames;
 
+import com.gamelibrary2d.common.io.SaveLoadManager;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.Button;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.InputField;
-import com.gamelibrary2d.demos.networkgame.client.urls.Music;
 import com.gamelibrary2d.demos.networkgame.client.urls.Particles;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
@@ -13,7 +13,7 @@ import com.gamelibrary2d.layers.NavigationPanel;
 import com.gamelibrary2d.layers.Panel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
+import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.updaters.InfiniteUpdater;
 import com.gamelibrary2d.util.StackOrientation;
@@ -50,7 +50,7 @@ public class MenuFrame extends AbstractFrame {
         hostPanel = createHostPanel();
         joinPanel = createJoinPanel();
 
-        var settings = new ParticleSettingsSaveLoadManager().load(Particles.MENU);
+        var settings = new SaveLoadManager().load(Particles.MENU, ParticleSystemSettings::new);
         var particleSystem = DefaultParticleSystem.create(10000, settings, this);
         var particleEmitter = new SequentialParticleEmitter(particleSystem);
         particleEmitter.getPosition().set(game.getWindow().width() / 2, game.getWindow().height() / 2);

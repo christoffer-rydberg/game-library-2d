@@ -10,63 +10,43 @@ import com.gamelibrary2d.glUtil.OpenGLIntBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleSpawnSettings;
-import com.gamelibrary2d.particle.settings.ParticleUpdateSettings;
+import com.gamelibrary2d.particle.settings.ParticleParameters;
+import com.gamelibrary2d.particle.settings.ParticlePositioner;
+import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 
 public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
-
-    private final float[] position = new float[3];
-
-    private final float[] externalSpeed = new float[3];
-
-    private final float[] externalAcceleration = new float[3];
-
+    private final float[] position = new float[2];
+    private final float[] externalAcceleration = new float[2];
     private final int[] atomicArray = new int[1];
 
     private final OpenGLIntBuffer atomicBuffer;
-
     private final OpenGLFloatBuffer initBuffer;
-
-    private final InternalParticleBuffer[] vertexBuffer;
-
+    private final ParticleRenderBuffer[] vertexBuffer;
     private final ParticleUpdateBuffer[] updateBuffer;
 
+    private int capacity;
+    private int particleCount;
     private int activeBuffer = 0;
 
-    private int particleCount;
-
-    private ParticleSpawnSettings spawnSettings;
-
-    private ParticleUpdateSettings updateSettings;
-
     private Point positionTransform;
-
+    private ParticleSystemSettings settings;
     private ParticleUpdateListener updateListener;
 
     private int glUniformPosition;
-
-    private int glUniformExternalSpeed;
-
     private int glUniformExternalAcceleration;
-
     private int glUniformParticlesInGpu;
-
     private int glUniformRandomSeed;
 
     private int particlesInGpuBuffer;
 
-    private int capacity;
-
     private DefaultShaderParticleSystem(int capacity, ShaderProgram updaterProgram, OpenGLFloatBuffer initBuffer,
-                                        ParticleUpdateBuffer[] updateBuffer, InternalParticleBuffer[] vertexBuffer,
-                                        EfficientParticleRenderer renderer, ParticleSpawnSettings spawnSettings,
-                                        ParticleUpdateSettings updateSettings, Disposer disposer) {
-        super(updaterProgram, renderer);
+                                        ParticleUpdateBuffer[] updateBuffer, ParticleRenderBuffer[] vertexBuffer,
+                                        ParticleSystemSettings settings, Disposer disposer) {
+        super(updaterProgram);
         this.capacity = capacity;
         this.vertexBuffer = vertexBuffer;
         this.updateBuffer = updateBuffer;
-        this.spawnSettings = spawnSettings;
-        this.updateSettings = updateSettings;
+        this.settings = settings;
         atomicBuffer = OpenGLIntBuffer.create(atomicArray, OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
         boolean updateProgramInUse = updaterProgram.inUse();
@@ -77,7 +57,6 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
         // Cache uniforms
         glUniformPosition = updaterProgram.getUniformLocation("position");
-        glUniformExternalSpeed = updaterProgram.getUniformLocation("externalSpeed");
         glUniformExternalAcceleration = updaterProgram.getUniformLocation("externalAcceleration");
         glUniformParticlesInGpu = updaterProgram.getUniformLocation("particlesInGpu");
         glUniformRandomSeed = updaterProgram.getUniformLocation("randomSeed");
@@ -86,15 +65,14 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
             updaterProgram.unbind();
     }
 
-    public static DefaultShaderParticleSystem create(int capacity, ParticleSpawnSettings spawnSettings,
-                                                     ParticleUpdateSettings updateSettings, EfficientParticleRenderer renderer, Disposer disposer) {
+    public static DefaultShaderParticleSystem create(int capacity, ParticleSystemSettings settings, Disposer disposer) {
         OpenGLFloatBuffer initBuffer = OpenGLFloatBuffer.create(
-                updateSettings.getInternalStateArray(),
+                settings.getParticleParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
                 OpenGL.GL_DYNAMIC_DRAW,
                 disposer);
 
-        var vertexBuffer = InternalParticleBuffer.createWithSharedData(capacity, 2, disposer);
+        var vertexBuffer = ParticleRenderBuffer.createWithSharedData(capacity, 2, disposer);
         vertexBuffer[0].updateGPU(0, capacity);
         vertexBuffer[1].updateGPU(0, capacity);
 
@@ -103,36 +81,33 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         updateBuffer[1].updateGPU(0, capacity);
 
         return new DefaultShaderParticleSystem(capacity, ShaderProgram.getDefaultParticleUpdaterProgram(), initBuffer,
-                updateBuffer, vertexBuffer, renderer, spawnSettings, updateSettings, disposer);
+                updateBuffer, vertexBuffer, settings, disposer);
     }
 
-    public void setPosition(float x, float y, float z) {
+    public void setPosition(float x, float y) {
         position[0] = x;
         position[1] = y;
-        position[2] = z;
     }
 
-    public void setExternalAcceleration(float x, float y, float z) {
+    public void setExternalAcceleration(float x, float y) {
         externalAcceleration[0] = x;
         externalAcceleration[1] = y;
-        externalAcceleration[2] = z;
     }
 
-    public ParticleSpawnSettings getSpawnSettings() {
-        return spawnSettings;
+    public ParticlePositioner getParticlePositioner() {
+        return settings.getParticlePositioner();
     }
 
-    public void setSpawnSettings(ParticleSpawnSettings spawnSettings) {
-        this.spawnSettings = spawnSettings;
+    public void setParticlePositioner(ParticlePositioner positioner) {
+        settings.setParticlePositioner(positioner);
     }
 
-    public ParticleUpdateSettings getUpdateSettings() {
-        return updateSettings;
+    public ParticleParameters getParticleParameters() {
+        return settings.getParticleParameters();
     }
 
-    public void setUpdateSettings(ParticleUpdateSettings updateSettings) {
-        this.updateSettings = updateSettings;
-        initBuffer.allocate(updateSettings.getInternalStateArray());
+    public void setParticleParameters(ParticleParameters parameters) {
+        settings.setParticleParameters(parameters);
     }
 
     /**
@@ -163,11 +138,11 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     /**
      * Emits all particles at once at the specified coordinates. The particles count
-     * is specified by {@link ParticleSpawnSettings#getDefaultCount()}.
+     * is specified by {@link ParticleSystemSettings#getDefaultCount()}.
      */
     public void emitAll() {
         emitAll(Math.round(
-                spawnSettings.getDefaultCount() + spawnSettings.getDefaultCountVar() * RandomInstance.random11()));
+                settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11()));
     }
 
     /**
@@ -186,7 +161,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     /**
      * Sequentially emits particles at the specified coordinates. The interval is
-     * specified by {@link ParticleSpawnSettings#getDefaultInterval()}.
+     * specified by {@link ParticleSystemSettings#getDefaultInterval()}.
      *
      * @param time      The current emitter time, in seconds. The delta time will be
      *                  added to this value. Particles will be emitted while the
@@ -196,7 +171,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
      * was emitted.
      */
     public float emitSequential(float time, float deltaTime) {
-        return emitSequential(time, deltaTime, spawnSettings.getDefaultInterval());
+        return emitSequential(time, deltaTime, settings.getDefaultInterval());
     }
 
     /**
@@ -218,8 +193,8 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
             float remainingTime = time - (iterations * interval);
 
-            int count = spawnSettings.isPulsating()
-                    ? (spawnSettings.getDefaultCount() + spawnSettings.getDefaultCountVar()) * iterations
+            int count = settings.isPulsating()
+                    ? (settings.getDefaultCount() + settings.getDefaultCountVar()) * iterations
                     : iterations;
 
             emitAll(count);
@@ -261,9 +236,11 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
         openGL.glUniform1i(glUniformRandomSeed, RandomInstance.get().nextInt());
         openGL.glUniform1i(glUniformParticlesInGpu, particlesInGpuBuffer);
-        openGL.glUniform3fv(glUniformPosition, position);
-        openGL.glUniform3fv(glUniformExternalSpeed, externalSpeed);
-        openGL.glUniform3fv(glUniformExternalAcceleration, externalAcceleration);
+        openGL.glUniform2fv(glUniformPosition, position);
+        openGL.glUniform2fv(glUniformExternalAcceleration, externalAcceleration);
+
+        // Reallocates buffer if particle parameter has changed
+        initBuffer.allocate(settings.getParticleParameters().getInternalStateArray());
 
         openGL.glBindBufferBase(OpenGL.GL_ATOMIC_COUNTER_BUFFER, 0, atomicBuffer.bufferId());
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, initBuffer.bufferId());
@@ -283,10 +260,10 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         if (positionTransform != null) {
             ModelMatrix.instance().pushMatrix();
             ModelMatrix.instance().translatef(positionTransform.getX(), positionTransform.getY(), 0);
-            getRenderer().render(null, vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
+            settings.getRenderer().render(vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
             ModelMatrix.instance().popMatrix();
         } else {
-            getRenderer().render(null, vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
+            settings.getRenderer().render(vertexBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
         }
     }
 
@@ -298,5 +275,13 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     @Override
     public int getParticleCount() {
         return particleCount;
+    }
+
+    public void setRenderer(EfficientParticleRenderer renderer) {
+        settings.setRenderer(renderer);
+    }
+
+    public void setSettings(ParticleSystemSettings settings) {
+        this.settings = settings;
     }
 }

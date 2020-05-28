@@ -2,14 +2,14 @@ package com.gamelibrary2d.demos.lightning;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.io.SaveLoadManager;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.lightning.*;
-import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleSettingsSaveLoadManager;
+import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
@@ -56,8 +56,8 @@ class DemoFrame extends AbstractFrame {
     }
 
     private DefaultParticleSystem createParticleSystem() throws IOException {
-        var settings = new ParticleSettingsSaveLoadManager().load(getUrl("fire.particle"));
-        return DefaultParticleSystem.create(1000, settings, new EfficientParticleRenderer(), this);
+        var settings = new SaveLoadManager().load(getUrl("fire.particle"), ParticleSystemSettings::new);
+        return DefaultParticleSystem.create(1000, settings, this);
     }
 
     @Override

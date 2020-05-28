@@ -14,7 +14,7 @@ uniform vec4 bounds;
 in vData
 {
 	vec4 color;
-    vec2 scale;
+    float scale;
     float rotation;
 } inputData[];
 
@@ -33,10 +33,10 @@ void main(void)
 
     for ( i = 0; i < gl_in.length(); i++)
     {
-    	float scaledXMin = bounds[0] * inputData[i].scale.x;
-    	float scaledYMin = bounds[1] * inputData[i].scale.y;
-    	float scaledXMax = bounds[2] * inputData[i].scale.x;
-    	float scaledYMax = bounds[3] * inputData[i].scale.y;
+    	float scaledXMin = bounds[0] * inputData[i].scale;
+    	float scaledYMin = bounds[1] * inputData[i].scale;
+    	float scaledXMax = bounds[2] * inputData[i].scale;
+    	float scaledYMax = bounds[3] * inputData[i].scale;
     	
     	float rotationRadians = inputData[i].rotation * M_PI / 180.0;
 	    float sinRotation = sin(rotationRadians);
