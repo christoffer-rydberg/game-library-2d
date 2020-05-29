@@ -69,6 +69,7 @@ public class ParticleParameters implements Serializable {
     private final static int END_ALPHA_VAR = 47;
 
     private float[] internalState;
+    private int updateCounter = 0;
 
     /**
      * Default constructor
@@ -106,45 +107,45 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setUpdateScale(boolean updateScale) {
-        internalState[UPDATE_SCALE] = updateScale ? 1f : 0f;
+        setInternalState(UPDATE_SCALE, updateScale ? 1f : 0f);
     }
 
     public void setAcceleration(float horizontal, float vertical) {
-        internalState[HORIZONTAL_ACCELERATION] = horizontal;
-        internalState[VERTICAL_ACCELERATION] = vertical;
+        setInternalState(HORIZONTAL_ACCELERATION, horizontal);
+        setInternalState(VERTICAL_ACCELERATION, vertical);
     }
 
     public void setAccelerationVar(float horizontalAccVar, float verticalAccVar) {
-        internalState[HORIZONTAL_ACCELERATION_VAR] = horizontalAccVar;
-        internalState[VERTICAL_ACCELERATION_VAR] = verticalAccVar;
+        setInternalState(HORIZONTAL_ACCELERATION_VAR, horizontalAccVar);
+        setInternalState(VERTICAL_ACCELERATION_VAR, verticalAccVar);
     }
 
     public void setUpdateColor(boolean updateColor) {
-        internalState[UPDATE_COLOR] = updateColor ? 1f : 0f;
+        setInternalState(UPDATE_COLOR, updateColor ? 1f : 0f);
     }
 
     public void setColor(float r, float g, float b) {
-        internalState[COLOR_R] = r;
-        internalState[COLOR_G] = g;
-        internalState[COLOR_B] = b;
+        setInternalState(COLOR_R, r);
+        setInternalState(COLOR_G, g);
+        setInternalState(COLOR_B, b);
     }
 
     public void setColorVar(float r, float g, float b) {
-        internalState[COLOR_R_VAR] = r;
-        internalState[COLOR_G_VAR] = g;
-        internalState[COLOR_B_VAR] = b;
+        setInternalState(COLOR_R_VAR, r);
+        setInternalState(COLOR_G_VAR, g);
+        setInternalState(COLOR_B_VAR, b);
     }
 
     public void setEndColor(float r, float g, float b) {
-        internalState[END_COLOR_R] = r;
-        internalState[END_COLOR_G] = g;
-        internalState[END_COLOR_B] = b;
+        setInternalState(END_COLOR_R, r);
+        setInternalState(END_COLOR_G, g);
+        setInternalState(END_COLOR_B, b);
     }
 
     public void setEndColorVar(float r, float g, float b) {
-        internalState[END_COLOR_R_VAR] = r;
-        internalState[END_COLOR_G_VAR] = g;
-        internalState[END_COLOR_B_VAR] = b;
+        setInternalState(END_COLOR_R_VAR, r);
+        setInternalState(END_COLOR_G_VAR, g);
+        setInternalState(END_COLOR_B_VAR, b);
     }
 
     public boolean isRotatedForward() {
@@ -152,7 +153,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotatedForward(boolean rotatedForward) {
-        internalState[ROTATED_FORWARD] = rotatedForward ? 1f : 0f;
+        setInternalState(ROTATED_FORWARD, rotatedForward ? 1f : 0f);
     }
 
     public float getDelay() {
@@ -160,7 +161,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setDelay(float delay) {
-        internalState[DELAY] = delay;
+        setInternalState(DELAY, delay);
     }
 
     public float getDelayVar() {
@@ -168,7 +169,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setDelayVar(float delayVar) {
-        internalState[DELAY_VAR] = delayVar;
+        setInternalState(DELAY_VAR, delayVar);
     }
 
     public float getLife() {
@@ -176,7 +177,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setLife(float life) {
-        internalState[LIFE] = life;
+        setInternalState(LIFE, life);
     }
 
     public float getLifeVar() {
@@ -184,7 +185,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setLifeVar(float lifeVar) {
-        internalState[LIFE_VAR] = lifeVar;
+        setInternalState(LIFE_VAR, lifeVar);
     }
 
     public float getSpeed() {
@@ -192,7 +193,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setSpeed(float speed) {
-        internalState[SPEED] = speed;
+        setInternalState(SPEED, speed);
     }
 
     public float getSpeedVar() {
@@ -200,7 +201,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setSpeedVar(float speedVar) {
-        internalState[SPEED_VAR] = speedVar;
+        setInternalState(SPEED_VAR, speedVar);
     }
 
     public float getEndSpeedFactor() {
@@ -208,7 +209,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndSpeedFactor(float endSpeedFactor) {
-        internalState[END_SPEED_FACTOR] = endSpeedFactor;
+        setInternalState(END_SPEED_FACTOR, endSpeedFactor);
     }
 
     public float getEndSpeedFactorVar() {
@@ -216,7 +217,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndSpeedFactorVar(float endSpeedFactorVar) {
-        internalState[END_SPEED_FACTOR_VAR] = endSpeedFactorVar;
+        setInternalState(END_SPEED_FACTOR_VAR, endSpeedFactorVar);
     }
 
     public float getDirection() {
@@ -224,7 +225,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setDirection(float direction) {
-        internalState[DIRECTION] = direction;
+        setInternalState(DIRECTION, direction);
     }
 
     public float getDirectionVar() {
@@ -232,7 +233,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setDirectionVar(float directionVar) {
-        internalState[DIRECTION_VAR] = directionVar;
+        setInternalState(DIRECTION_VAR, directionVar);
     }
 
     public boolean isMovingAwayFromCenter() {
@@ -240,7 +241,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setMoveAwayFromCenter(boolean moveAwayFromCenter) {
-        internalState[MOVE_AWAY_FROM_CENTER] = moveAwayFromCenter ? 1f : 0f;
+        setInternalState(MOVE_AWAY_FROM_CENTER, moveAwayFromCenter ? 1f : 0f);
     }
 
     public float getScale() {
@@ -248,7 +249,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setScale(float scale) {
-        internalState[SCALE] = scale;
+        setInternalState(SCALE, scale);
     }
 
     public boolean isUpdatingScale() {
@@ -260,7 +261,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setScaleVar(float scaleVar) {
-        internalState[SCALE_VAR] = scaleVar;
+        setInternalState(SCALE_VAR, scaleVar);
     }
 
     public float getEndScale() {
@@ -268,7 +269,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndScale(float endScale) {
-        internalState[END_SCALE] = endScale;
+        setInternalState(END_SCALE, endScale);
     }
 
     public float getEndScaleVar() {
@@ -276,7 +277,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndScaleVar(float endScaleVar) {
-        internalState[END_SCALE_VAR] = endScaleVar;
+        setInternalState(END_SCALE_VAR, endScaleVar);
     }
 
     public float getHorizontalAcceleration() {
@@ -284,7 +285,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setHorizontalAcceleration(float x) {
-        internalState[HORIZONTAL_ACCELERATION] = x;
+        setInternalState(HORIZONTAL_ACCELERATION, x);
     }
 
     public float getVerticalAcceleration() {
@@ -292,7 +293,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setVerticalAcceleration(float y) {
-        internalState[VERTICAL_ACCELERATION] = y;
+        setInternalState(VERTICAL_ACCELERATION, y);
     }
 
     public float getHorizontalAccelerationVar() {
@@ -300,7 +301,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setHorizontalAccelerationVar(float x) {
-        internalState[HORIZONTAL_ACCELERATION_VAR] = x;
+        setInternalState(HORIZONTAL_ACCELERATION_VAR, x);
     }
 
     public float getVerticalAccelerationVar() {
@@ -308,7 +309,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setVerticalAccelerationVar(float y) {
-        internalState[VERTICAL_ACCELERATION_VAR] = y;
+        setInternalState(VERTICAL_ACCELERATION_VAR, y);
     }
 
     public float getCentripetalAcceleration() {
@@ -316,7 +317,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setCentripetalAcceleration(float centripetalAcc) {
-        internalState[CENTRIPETAL_ACCELERATION] = centripetalAcc;
+        setInternalState(CENTRIPETAL_ACCELERATION, centripetalAcc);
     }
 
     public float getCentripetalAccelerationVar() {
@@ -324,7 +325,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setCentripetalAccelerationVar(float centripetalAccVar) {
-        internalState[CENTRIPETAL_ACCELERATION_VAR] = centripetalAccVar;
+        setInternalState(CENTRIPETAL_ACCELERATION_VAR, centripetalAccVar);
     }
 
     public float getTangentalAcceleration() {
@@ -332,7 +333,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setTangentalAcceleration(float tangentalAcc) {
-        internalState[TANGENTIAL_ACCELERATION] = tangentalAcc;
+        setInternalState(TANGENTIAL_ACCELERATION, tangentalAcc);
     }
 
     public float getTangentalAccVar() {
@@ -340,7 +341,19 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setTangentalAccVar(float tangentalAccVar) {
-        internalState[TANGENTIAL_ACCELERATION_VAR] = tangentalAccVar;
+        setInternalState(TANGENTIAL_ACCELERATION_VAR, tangentalAccVar);
+    }
+
+    /**
+     * The update counter is incremented whenever a parameter is changed.
+     */
+    public int getUpdateCounter() {
+        return updateCounter;
+    }
+
+    private void setInternalState(int index, float value) {
+        ++updateCounter;
+        internalState[index] = value;
     }
 
     public boolean isUpdatingColor() {
@@ -352,7 +365,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorR(float r) {
-        internalState[COLOR_R] = r;
+        setInternalState(COLOR_R, r);
     }
 
     public float getColorG() {
@@ -360,7 +373,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorG(float g) {
-        internalState[COLOR_G] = g;
+        setInternalState(COLOR_G, g);
     }
 
     public float getColorB() {
@@ -368,7 +381,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorB(float b) {
-        internalState[COLOR_B] = b;
+        setInternalState(COLOR_B, b);
     }
 
     public float getColorRVar() {
@@ -376,7 +389,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorRVar(float r) {
-        internalState[COLOR_R_VAR] = r;
+        setInternalState(COLOR_R_VAR, r);
     }
 
     public float getColorGVar() {
@@ -384,7 +397,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorGVar(float g) {
-        internalState[COLOR_G_VAR] = g;
+        setInternalState(COLOR_G_VAR, g);
     }
 
     public float getColorBVar() {
@@ -392,7 +405,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setColorBVar(float b) {
-        internalState[COLOR_B_VAR] = b;
+        setInternalState(COLOR_B_VAR, b);
     }
 
     public float getEndColorR() {
@@ -400,7 +413,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorR(float r) {
-        internalState[END_COLOR_R] = r;
+        setInternalState(END_COLOR_R, r);
     }
 
     public float getEndColorG() {
@@ -408,7 +421,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorG(float g) {
-        internalState[END_COLOR_G] = g;
+        setInternalState(END_COLOR_G, g);
     }
 
     public float getEndColorB() {
@@ -416,7 +429,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorB(float b) {
-        internalState[END_COLOR_B] = b;
+        setInternalState(END_COLOR_B, b);
     }
 
     public float getEndColorRVar() {
@@ -424,7 +437,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorRVar(float r) {
-        internalState[END_COLOR_R_VAR] = r;
+        setInternalState(END_COLOR_R_VAR, r);
     }
 
     public float getEndColorGVar() {
@@ -432,7 +445,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorGVar(float g) {
-        internalState[END_COLOR_G_VAR] = g;
+        setInternalState(END_COLOR_G_VAR, g);
     }
 
     public float getEndColorBVar() {
@@ -440,7 +453,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndColorBVar(float b) {
-        internalState[END_COLOR_B_VAR] = b;
+        setInternalState(END_COLOR_B_VAR, b);
     }
 
     public float getAlpha() {
@@ -448,7 +461,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setAlpha(float alpha) {
-        internalState[ALPHA] = alpha;
+        setInternalState(ALPHA, alpha);
     }
 
     public float getAlphaVar() {
@@ -456,7 +469,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setAlphaVar(float alphaVar) {
-        internalState[ALPHA_VAR] = alphaVar;
+        setInternalState(ALPHA_VAR, alphaVar);
     }
 
     public float getEndAlpha() {
@@ -464,7 +477,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndAlpha(float endAlpha) {
-        internalState[END_ALPHA] = endAlpha;
+        setInternalState(END_ALPHA, endAlpha);
     }
 
     public float getEndAlphaVar() {
@@ -472,7 +485,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setEndAlphaVar(float endAlphaVar) {
-        internalState[END_ALPHA_VAR] = endAlphaVar;
+        setInternalState(END_ALPHA_VAR, endAlphaVar);
     }
 
     public float getRotation() {
@@ -480,7 +493,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotation(float rotation) {
-        internalState[ROTATION] = rotation;
+        setInternalState(ROTATION, rotation);
     }
 
     public float getRotationVar() {
@@ -488,7 +501,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotationVar(float rotationVar) {
-        internalState[ROTATION_VAR] = rotationVar;
+        setInternalState(ROTATION_VAR, rotationVar);
     }
 
     public float getRotationSpeed() {
@@ -496,7 +509,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotationSpeed(float rotationSpeed) {
-        internalState[ROTATION_SPEED] = rotationSpeed;
+        setInternalState(ROTATION_SPEED, rotationSpeed);
     }
 
     public float getRotationSpeedVar() {
@@ -504,7 +517,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotationSpeedVar(float rotationSpeedVar) {
-        internalState[ROTATION_SPEED_VAR] = rotationSpeedVar;
+        setInternalState(ROTATION_SPEED_VAR, rotationSpeedVar);
     }
 
     public float getRotationAcceleration() {
@@ -512,7 +525,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotationAcceleration(float rotationAcceleration) {
-        internalState[ROTATION_ACCELERATION] = rotationAcceleration;
+        setInternalState(ROTATION_ACCELERATION, rotationAcceleration);
     }
 
     public float getRotationAccVar() {
@@ -520,7 +533,7 @@ public class ParticleParameters implements Serializable {
     }
 
     public void setRotationAccVar(float rotationAccelerationVar) {
-        internalState[ROTATION_ACCELERATION_VAR] = rotationAccelerationVar;
+        setInternalState(ROTATION_ACCELERATION_VAR, rotationAccelerationVar);
     }
 
     public void scale(float factor) {
