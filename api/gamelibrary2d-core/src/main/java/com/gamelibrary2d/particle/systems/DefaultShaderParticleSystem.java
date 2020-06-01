@@ -21,8 +21,12 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
 
     private final OpenGLIntBuffer atomicBuffer;
     private final OpenGLFloatBuffer parametersBuffer;
+    private final OpenGLFloatBuffer positionbuffer;
     private final ParticleRenderBuffer[] renderBuffer;
     private final ParticleUpdateBuffer[] updateBuffer;
+
+    private int parameterUpdateCounter;
+    private int positionUpdateCounter;
 
     private int capacity;
     private int particleCount;
@@ -38,9 +42,9 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     private int glUniformRandomSeed;
 
     private int particlesInGpuBuffer;
-    private int parameterUpdateCounter;
 
-    private DefaultShaderParticleSystem(int capacity, ShaderProgram updaterProgram, OpenGLFloatBuffer parametersBuffer,
+    private DefaultShaderParticleSystem(int capacity, ShaderProgram updaterProgram,
+                                        OpenGLFloatBuffer positionBuffer, OpenGLFloatBuffer parametersBuffer,
                                         ParticleUpdateBuffer[] updateBuffer, ParticleRenderBuffer[] renderBuffer,
                                         ParticleSystemSettings settings, Disposer disposer) {
         super(updaterProgram);
@@ -53,6 +57,9 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         boolean updateProgramInUse = updaterProgram.inUse();
         if (!updateProgramInUse)
             updaterProgram.bind();
+
+        this.positionbuffer = positionBuffer;
+        positionUpdateCounter = settings.getParticlePositioner().getUpdateCounter();
 
         this.parametersBuffer = parametersBuffer;
         parameterUpdateCounter = settings.getParticleParameters().getUpdateCounter();
@@ -68,6 +75,13 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     }
 
     public static DefaultShaderParticleSystem create(int capacity, ParticleSystemSettings settings, Disposer disposer) {
+        OpenGLFloatBuffer positionBuffer = OpenGLFloatBuffer.create(
+                settings.getParticlePositioner().getInternalStateArray(),
+                OpenGL.GL_SHADER_STORAGE_BUFFER,
+                OpenGL.GL_DYNAMIC_DRAW,
+                disposer);
+
+
         OpenGLFloatBuffer parametersBuffer = OpenGLFloatBuffer.create(
                 settings.getParticleParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
@@ -82,8 +96,8 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         updateBuffer[0].updateGPU(0, capacity);
         updateBuffer[1].updateGPU(0, capacity);
 
-        return new DefaultShaderParticleSystem(capacity, ShaderProgram.getDefaultParticleUpdaterProgram(), parametersBuffer,
-                updateBuffer, renderBuffer, settings, disposer);
+        return new DefaultShaderParticleSystem(capacity, ShaderProgram.getDefaultParticleUpdaterProgram(),
+                positionBuffer, parametersBuffer, updateBuffer, renderBuffer, settings, disposer);
     }
 
     public void setPosition(float x, float y) {
@@ -241,6 +255,14 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         openGL.glUniform2fv(glUniformPosition, position);
         openGL.glUniform2fv(glUniformExternalAcceleration, externalAcceleration);
 
+        var particlePositioner = settings.getParticlePositioner();
+        if (!positionbuffer.allocate(particlePositioner.getInternalStateArray())) {
+            if (positionUpdateCounter != particlePositioner.getUpdateCounter()) {
+                positionUpdateCounter = particlePositioner.getUpdateCounter();
+                positionbuffer.updateGPU(0, positionbuffer.capacity());
+            }
+        }
+
         var particleParameters = settings.getParticleParameters();
         if (!parametersBuffer.allocate(particleParameters.getInternalStateArray())) {
             if (parameterUpdateCounter != particleParameters.getUpdateCounter()) {
@@ -250,12 +272,13 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
         }
 
         openGL.glBindBufferBase(OpenGL.GL_ATOMIC_COUNTER_BUFFER, 0, atomicBuffer.bufferId());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, parametersBuffer.bufferId());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 2, renderBuffer[activeBuffer].bufferId());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 3, updateBuffer[activeBuffer].bufferId());
-        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 4,
-                renderBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, positionbuffer.bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 2, parametersBuffer.bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 3, renderBuffer[activeBuffer].bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 4, updateBuffer[activeBuffer].bufferId());
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 5,
+                renderBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
+        openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 6,
                 updateBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
     }
 

@@ -9,9 +9,9 @@ import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
-import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SpawnSettingsPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.ParticleSettingsPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SaveLoadResetPanel;
+import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SpawnSettingsPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSettingsPanel;
 
 public class ParticleFrame extends AbstractFrame implements KeyAware {
@@ -71,7 +71,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         emitterPanel.setPosition(game.getWindow().width() - WINDOW_MARGIN,
                 emitterPanel.getBounds().height() + WINDOW_MARGIN);
 
-        saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, game, this);
+        saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, game);
         saveLoadResetPanel.setPosition(WINDOW_MARGIN, WINDOW_MARGIN);
     }
 

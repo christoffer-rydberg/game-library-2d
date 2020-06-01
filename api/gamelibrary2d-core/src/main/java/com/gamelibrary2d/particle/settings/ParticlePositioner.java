@@ -6,83 +6,117 @@ import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.particle.systems.Particle;
 
 public class ParticlePositioner implements Serializable {
-    private float spawnAreaOffsetX, spawnAreaOffsetY;
-    private float spawnAreaWidth, spawnAreaHeight;
-    private float spawnAreaWidthVar, spawnAreaHeightVar;
+    private static final int STRIDE = 10;
 
-    private boolean localCenter;
-    private float spawnAngle;
-    private float spawnAngleVar;
+    private static final int SPAWN_AREA_OFFSET_X = 0;
+    private static final int SPAWN_AREA_OFFSET_Y = 1;
+    private static final int SPAWN_ANGLE = 2;
+    private static final int SPAWN_ANGLE_VAR = 3;
+
+    private static final int SPAWN_AREA_WIDTH = 4;
+    private static final int SPAWN_AREA_WIDTH_VAR = 5;
+    private static final int SPAWN_AREA_HEIGHT = 6;
+    private static final int SPAWN_AREA_HEIGHT_VAR = 7;
+
+    private static final int SPAWN_AREA = 8;
+    private static final int LOCAL_CENTER = 9;
+
     private SpawnArea spawnArea;
+    private float cachedSpawnArea = -1;
+
+    private float[] internalState = new float[STRIDE];
+    private int updateCounter;
 
     public ParticlePositioner() {
         spawnArea = SpawnArea.RECTANGLE;
     }
 
     public ParticlePositioner(DataBuffer buffer) {
-        spawnAreaOffsetX = buffer.getFloat();
-        spawnAreaOffsetY = buffer.getFloat();
-        localCenter = buffer.get() == 1;
-
-        spawnAngle = buffer.getFloat();
-        spawnAngleVar = buffer.getFloat();
-        spawnAreaWidth = buffer.getFloat();
-        spawnAreaHeight = buffer.getFloat();
-        spawnAreaWidthVar = buffer.getFloat();
-        spawnAreaHeightVar = buffer.getFloat();
-        spawnArea = buffer.getEnum(SpawnArea.class);
+        for (int i = 0; i < STRIDE; ++i) {
+            internalState[i] = buffer.getFloat();
+        }
     }
 
     @Override
     public final void serialize(DataBuffer buffer) {
-        buffer.putFloat(spawnAreaOffsetX);
-        buffer.putFloat(spawnAreaOffsetY);
-        buffer.put((byte) (localCenter ? 1 : 0));
+        for (int i = 0; i < STRIDE; ++i) {
+            buffer.putFloat(internalState[i]);
+        }
+    }
 
-        buffer.putFloat(spawnAngle);
-        buffer.putFloat(spawnAngleVar);
-        buffer.putFloat(spawnAreaWidth);
-        buffer.putFloat(spawnAreaHeight);
-        buffer.putFloat(spawnAreaWidthVar);
-        buffer.putFloat(spawnAreaHeightVar);
-        buffer.putEnum(spawnArea);
+    public float[] getInternalStateArray() {
+        return internalState;
     }
 
     public SpawnArea getSpawnArea() {
+        var value = internalState[SPAWN_AREA];
+        if (value != cachedSpawnArea) {
+            setSpawnAreaFromFloatValue(value);
+        }
+
         return spawnArea;
     }
 
     public void setSpawnArea(SpawnArea spawnArea) {
+        switch (spawnArea) {
+            case RECTANGLE:
+                cachedSpawnArea = 0;
+                break;
+            case ELLIPSE:
+                cachedSpawnArea = 1;
+                break;
+        }
         this.spawnArea = spawnArea;
     }
 
-    public float getSpawnAreaOffsetX() {
-        return spawnAreaOffsetX;
+    private void setSpawnAreaFromFloatValue(float value) {
+        cachedSpawnArea = value;
+        if (value == 0f) {
+            spawnArea = SpawnArea.RECTANGLE;
+        } else {
+            spawnArea = SpawnArea.ELLIPSE;
+        }
     }
 
-    public void setSpawnAreaOffset(float spawnAreaOffsetX) {
-        this.spawnAreaOffsetX = spawnAreaOffsetX;
+    public float getSpawnAreaOffsetX() {
+        return internalState[SPAWN_AREA_OFFSET_X];
+    }
+
+    public void setSpawnAreaOffsetX(float spawnAreaOffsetX) {
+        setInternalState(SPAWN_AREA_OFFSET_X, spawnAreaOffsetX);
+    }
+
+    private void setInternalState(int index, float value) {
+        ++updateCounter;
+        internalState[index] = value;
+    }
+
+    /**
+     * The update counter is incremented whenever a parameter is changed.
+     */
+    public int getUpdateCounter() {
+        return updateCounter;
     }
 
     public float getSpawnAreaOffsetY() {
-        return spawnAreaOffsetY;
+        return internalState[SPAWN_AREA_OFFSET_Y];
     }
 
     public void setSpawnAreaOffsetY(float spawnAreaOffsetY) {
-        this.spawnAreaOffsetY = spawnAreaOffsetY;
+        setInternalState(SPAWN_AREA_OFFSET_Y, spawnAreaOffsetY);
     }
 
     public boolean isLocalCenter() {
-        return localCenter;
+        return internalState[LOCAL_CENTER] != 0;
     }
 
     public void setLocalCenter(boolean localCenter) {
-        this.localCenter = localCenter;
+        setInternalState(LOCAL_CENTER, localCenter ? 1 : 0);
     }
 
     public void initialize(Particle particle, float x, float y) {
-        x += spawnAreaOffsetX;
-        y += spawnAreaOffsetY;
+        x += getSpawnAreaOffsetX();
+        y += getSpawnAreaOffsetY();
 
         double angle = getSpawnAngle() - getSpawnAngleVar() * RandomInstance.random11() - 90;
         double angleRadians = angle * Math.PI / 180d;
@@ -104,63 +138,68 @@ public class ParticlePositioner implements Serializable {
     }
 
     public float getSpawnAngle() {
-        return spawnAngle;
+        return internalState[SPAWN_ANGLE];
     }
 
     public void setSpawnAngle(float spawnAngle) {
-        this.spawnAngle = spawnAngle;
+        setInternalState(SPAWN_ANGLE, spawnAngle);
     }
 
     public float getSpawnAngleVar() {
-        return spawnAngleVar;
+        return internalState[SPAWN_ANGLE_VAR];
     }
 
     public void setSpawnAngleVar(float spawnAngleVar) {
-        this.spawnAngleVar = spawnAngleVar;
+        setInternalState(SPAWN_ANGLE_VAR, spawnAngleVar);
     }
 
     public float getSpawnAreaWidth() {
-        return spawnAreaWidth;
+        return internalState[SPAWN_AREA_WIDTH];
     }
 
     public void setSpawnAreaWidth(float spawnAreaWidth) {
-        this.spawnAreaWidth = spawnAreaWidth;
+        setInternalState(SPAWN_AREA_WIDTH, spawnAreaWidth);
     }
 
     public float getSpawnAreaHeight() {
-        return spawnAreaHeight;
+        return internalState[SPAWN_AREA_HEIGHT];
     }
 
     public void setSpawnAreaHeight(float spawnAreaHeight) {
-        this.spawnAreaHeight = spawnAreaHeight;
+        setInternalState(SPAWN_AREA_HEIGHT, spawnAreaHeight);
     }
 
     public float getSpawnAreaWidthVar() {
-        return spawnAreaWidthVar;
+        return internalState[SPAWN_AREA_WIDTH_VAR];
     }
 
     public void setSpawnAreaWidthVar(float spawnAreaWidthVar) {
-        this.spawnAreaWidthVar = spawnAreaWidthVar;
+        setInternalState(SPAWN_AREA_WIDTH_VAR, spawnAreaWidthVar);
     }
 
     public float getSpawnAreaHeightVar() {
-        return spawnAreaHeightVar;
+        return internalState[SPAWN_AREA_HEIGHT_VAR];
     }
 
     public void setSpawnAreaHeightVar(float spawnAreaHeightVar) {
-        this.spawnAreaHeightVar = spawnAreaHeightVar;
+        setInternalState(SPAWN_AREA_HEIGHT_VAR, spawnAreaHeightVar);
     }
 
     public void scale(float factor) {
-        spawnAreaOffsetX *= factor;
-        spawnAreaOffsetY *= factor;
-        spawnAreaWidth *= factor;
-        spawnAreaHeight *= factor;
-        spawnAreaWidthVar *= factor;
-        spawnAreaHeightVar *= factor;
+        setSpawnAreaOffsetX(getSpawnAreaOffsetX() * factor);
+        setSpawnAreaOffsetY(getSpawnAreaOffsetY() * factor);
+        setSpawnAreaWidth(getSpawnAreaWidth() * factor);
+        setSpawnAreaHeight(getSpawnAreaHeight() * factor);
+        setSpawnAreaWidthVar(getSpawnAreaWidthVar() * factor);
+        setSpawnAreaHeightVar(getSpawnAreaHeightVar() * factor);
     }
 
     private void positionInRectangleArea(Particle particle, float centerX, float centerY, double angleRadians) {
+        var spawnAreaWidth = getSpawnAreaWidth();
+        var spawnAreaWidthVar = getSpawnAreaWidthVar();
+        var spawnAreaHeight = getSpawnAreaHeight();
+        var spawnAreaHeightVar = getSpawnAreaHeightVar();
+
         // Create a circle that is touching the corners of the rectangle
         var radius = Math.sqrt(spawnAreaWidth * spawnAreaWidth + spawnAreaHeight * spawnAreaHeight);
         var posX = Math.cos(angleRadians) * radius;
@@ -180,13 +219,18 @@ public class ParticlePositioner implements Serializable {
     }
 
     private void positionInEllipseArea(Particle particle, float centerX, float centerY, double angleRadians) {
+        var spawnAreaWidth = getSpawnAreaWidth();
+        var spawnAreaWidthVar = getSpawnAreaWidthVar();
+        var spawnAreaHeight = getSpawnAreaHeight();
+        var spawnAreaHeightVar = getSpawnAreaHeightVar();
+
         // Randomize radius based on variation
-        float spawnAreaWidth = this.spawnAreaWidth + spawnAreaWidthVar * RandomInstance.random11();
-        float spawnAreaHeight = this.spawnAreaHeight + spawnAreaHeightVar * RandomInstance.random11();
+        float width = spawnAreaWidth + spawnAreaWidthVar * RandomInstance.random11();
+        float height = spawnAreaHeight + spawnAreaHeightVar * RandomInstance.random11();
 
         // Create an ellipse
-        var posX = Math.cos(angleRadians) * spawnAreaWidth;
-        var posY = -Math.sin(angleRadians) * spawnAreaHeight;
+        var posX = Math.cos(angleRadians) * width;
+        var posY = -Math.sin(angleRadians) * height;
 
         particle.setPosition(centerX + (float) posX, centerY + (float) posY);
     }

@@ -205,7 +205,6 @@ public class RenderSettingsPanel extends StackPanel {
     }
 
     private void updateQuad() {
-
         int prevouslyRegistered = quadDisposer.size();
 
         quad = Quad.create(Rectangle.centered(width, height), quadDisposer);
@@ -213,7 +212,6 @@ public class RenderSettingsPanel extends StackPanel {
         defaultRenderer.setSurface(quad);
 
         if (texturedRenderer != null) {
-
             // Recreate the texture renderer with the desired quad.
             loadTexture(textureURL, quad);
         }

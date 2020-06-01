@@ -68,14 +68,13 @@ public class ParticleParameters implements Serializable {
     private final static int END_ALPHA = 46;
     private final static int END_ALPHA_VAR = 47;
 
-    private float[] internalState;
-    private int updateCounter = 0;
+    private final float[] internalState = new float[STRIDE];
+    private int updateCounter;
 
     /**
      * Default constructor
      */
     public ParticleParameters() {
-        internalState = new float[STRIDE];
         internalState[LIFE] = 1;
         internalState[COLOR_R] = 255;
         internalState[COLOR_G] = 255;
@@ -89,7 +88,6 @@ public class ParticleParameters implements Serializable {
      * Copies settings from the serialized buffer.
      */
     public ParticleParameters(DataBuffer buffer) {
-        internalState = new float[STRIDE];
         for (int i = 0; i < STRIDE; ++i) {
             internalState[i] = buffer.getFloat();
         }
@@ -344,16 +342,16 @@ public class ParticleParameters implements Serializable {
         setInternalState(TANGENTIAL_ACCELERATION_VAR, tangentalAccVar);
     }
 
+    private void setInternalState(int index, float value) {
+        ++updateCounter;
+        internalState[index] = value;
+    }
+
     /**
      * The update counter is incremented whenever a parameter is changed.
      */
     public int getUpdateCounter() {
         return updateCounter;
-    }
-
-    private void setInternalState(int index, float value) {
-        ++updateCounter;
-        internalState[index] = value;
     }
 
     public boolean isUpdatingColor() {

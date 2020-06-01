@@ -118,7 +118,7 @@ public class SpawnSettingsPanel extends StackPanel {
                 float offsetX = getParameter(0);
                 float offsetY = getParameter(1);
                 ParticlePositioner spawnSettings = particleSystem.getSpawnSettings();
-                spawnSettings.setSpawnAreaOffset(offsetX);
+                spawnSettings.setSpawnAreaOffsetX(offsetX);
                 spawnSettings.setSpawnAreaOffsetY(offsetY);
             }
 

@@ -12,7 +12,6 @@ import com.gamelibrary2d.particle.settings.ParticleParameters;
 import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
@@ -31,15 +30,11 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private final SaveLoadManager saveLoadManager = new SaveLoadManager();
 
     private final Game game;
-
-    private final ParticleFrame frame;
-
     private final FileChooser fileChooser;
 
-    public SaveLoadResetPanel(ParticleSystemModel particleSystem, Game game, ParticleFrame frame) {
+    public SaveLoadResetPanel(ParticleSystemModel particleSystem, Game game) {
         this.particleSystem = particleSystem;
         this.game = game;
-        this.frame = frame;
 
         fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/particle_path.txt");
 
@@ -83,12 +78,18 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
             File file = fileChooser.browse();
 
             if (file != null) {
-                settings = saveLoadManager.load(file, ParticleSystemSettings::new);
+                settings = saveLoadManager.load(file, b -> new ParticleSystemSettings(b, particleSystem.getRenderer()));
             } else {
-                settings = new ParticleSystemSettings(new ParticlePositioner(), new ParticleParameters());
+                settings = new ParticleSystemSettings(
+                        new ParticlePositioner(),
+                        new ParticleParameters(),
+                        particleSystem.getRenderer());
             }
         } catch (IOException e) {
-            settings = new ParticleSystemSettings(new ParticlePositioner(), new ParticleParameters());
+            settings = new ParticleSystemSettings(
+                    new ParticlePositioner(),
+                    new ParticleParameters(),
+                    particleSystem.getRenderer());
         }
 
         particleSystem.setSettings(settings);
