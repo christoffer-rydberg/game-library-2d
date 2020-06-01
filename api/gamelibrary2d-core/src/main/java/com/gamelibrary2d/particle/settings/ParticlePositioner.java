@@ -121,7 +121,7 @@ public class ParticlePositioner implements Serializable {
         double angle = getSpawnAngle() - getSpawnAngleVar() * RandomInstance.random11() - 90;
         double angleRadians = angle * Math.PI / 180d;
 
-        switch (spawnArea) {
+        switch (getSpawnArea()) {
             case RECTANGLE:
                 positionInRectangleArea(particle, x, y, angleRadians);
                 break;
