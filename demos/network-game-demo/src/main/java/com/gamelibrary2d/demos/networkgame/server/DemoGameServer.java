@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.networkgame.server;
 
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.common.ClientMessages;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
@@ -14,13 +15,14 @@ import com.gamelibrary2d.network.common.ConnectionType;
 import com.gamelibrary2d.network.common.NetworkCommunicator;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
-import com.gamelibrary2d.network.common.initialization.StepCondition;
+import com.gamelibrary2d.network.common.security.ServerHandshake;
 import com.gamelibrary2d.network.common.server.Server;
 import com.gamelibrary2d.network.common.server.ServerContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
 import java.util.ArrayList;
 
 public class DemoGameServer implements ServerContext {
@@ -34,6 +36,8 @@ public class DemoGameServer implements ServerContext {
 
     private final Server server;
     private final DemoGameLogic gameLogic;
+    private final KeyPair keyPair;
+    private final DataBuffer decryptionBuffer = new DynamicByteBuffer();
 
     private int streamCounter;
 
@@ -41,34 +45,54 @@ public class DemoGameServer implements ServerContext {
     private float timer;
 
     public DemoGameServer(Server server) {
+        this(server, null);
+    }
+
+    public DemoGameServer(Server server, KeyPair keyPair) {
         this.server = server;
+        this.keyPair = keyPair;
         this.gameLogic = new DemoGameLogic(this);
+
     }
 
     @Override
     public void configureClientAuthentication(CommunicationSteps steps) {
-        steps.add(this::authenticate);
-        steps.add(StepCondition.IS_NETWORK_COMMUNICATOR, this::initializeUdp);
+        if (keyPair == null) {
+            throw new NullPointerException("Key pair has not been set");
+        }
+
+        var serverHandshake = new ServerHandshake(keyPair);
+        serverHandshake.configure(steps);
+        steps.add(this::readPassword);
+        steps.add(this::readUdpPort);
     }
 
     @Override
     public void configureClientInitialization(CommunicationSteps steps) {
         steps.add(this::sendUpdateRate);
         steps.write(gameLogic::getGameSettings);
-        steps.read(DataBuffer::getInt, "requestedPlayers");
+        steps.read("requestedPlayers", DataBuffer::getInt);
         steps.write(() -> state);
     }
 
-    private boolean authenticate(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
-        var serverPassword = Read.textWithSizeHeader(buffer, StandardCharsets.UTF_8);
+    private boolean readPassword(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws IOException {
+        decryptionBuffer.clear();
+        communicator.readEncrypted(inbox, decryptionBuffer);
+        decryptionBuffer.flip();
+
+        var serverPassword = Read.textWithSizeHeader(decryptionBuffer, StandardCharsets.UTF_8);
         if (!serverPassword.equals("serverPassword123")) {
             throw new IOException("Wrong password");
         }
         return true;
     }
 
-    private boolean initializeUdp(CommunicationContext context, Communicator communicator, DataBuffer buffer) throws IOException {
-        var udpPort = buffer.getInt();
+    private boolean readUdpPort(CommunicationContext context, Communicator communicator, DataBuffer inbox) throws IOException {
+        decryptionBuffer.clear();
+        communicator.readEncrypted(inbox, decryptionBuffer);
+        decryptionBuffer.flip();
+
+        var udpPort = decryptionBuffer.getInt();
         ((NetworkCommunicator) communicator).enableUdp(ConnectionType.WRITE, 0, udpPort);
         return true;
     }

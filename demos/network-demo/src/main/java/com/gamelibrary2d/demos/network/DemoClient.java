@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.updating.UpdateLoop;
+import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.client.AbstractClient;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
@@ -65,8 +66,8 @@ public class DemoClient extends AbstractClient {
     }
 
     @Override
-    protected void onInitialized(CommunicationContext context) {
-        getCommunicator().addDisconnectedListener(this::onDisconnected);
+    protected void onInitialized(CommunicationContext context, Communicator communicator) {
+        communicator.addDisconnectedListener(this::onDisconnected);
         sendMessage("What do you call a guy with a rubber toe?");
     }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Write {
@@ -66,9 +67,17 @@ public class Write {
         bytes(bytes, 0, bytes.length, file, overwrite);
     }
 
+    public static void text(String text, File file, boolean overwrite) throws IOException {
+        text(text, file, StandardCharsets.UTF_8, overwrite);
+    }
+
     public static void textWithSizeHeader(String text, Charset charset, DataBuffer dataBuffer) {
         var bytes = text.getBytes(charset);
         dataBuffer.putInt(bytes.length);
         dataBuffer.put(bytes);
+    }
+
+    public static void textWithSizeHeader(String text, DataBuffer dataBuffer) {
+        textWithSizeHeader(text, StandardCharsets.UTF_8, dataBuffer);
     }
 }

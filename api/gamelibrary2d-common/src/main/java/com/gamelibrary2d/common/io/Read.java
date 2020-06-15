@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class Read {
 
@@ -75,5 +76,9 @@ public class Read {
         byte[] bytes = new byte[length];
         dataBuffer.get(bytes, 0, length);
         return new String(bytes, charset);
+    }
+
+    public static String textWithSizeHeader(DataBuffer dataBuffer) {
+        return textWithSizeHeader(dataBuffer, StandardCharsets.UTF_8);
     }
 }

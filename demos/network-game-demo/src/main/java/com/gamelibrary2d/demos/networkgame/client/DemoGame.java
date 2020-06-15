@@ -19,9 +19,13 @@ import com.gamelibrary2d.util.sound.MusicPlayer;
 import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.io.IOException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 
 public class DemoGame extends AbstractGame {
-    private final ServerManager serverManager = new ServerManager();
+    private ServerManager serverManager;
+
     private Frame menuFrame;
     private LoadingFrame loadingFrame;
     private DemoFrame demoFrame;
@@ -40,6 +44,8 @@ public class DemoGame extends AbstractGame {
         try {
             showSplashScreen();
 
+            serverManager = new ServerManager(createKeyPair("RSA", 2048));
+
             var soundManager = SoundManager.create(this);
             loadSoundBuffers(soundManager);
 
@@ -54,6 +60,12 @@ public class DemoGame extends AbstractGame {
             System.err.println("Failed to start game");
             e.printStackTrace();
         }
+    }
+
+    private KeyPair createKeyPair(String algorithm, int keySize) throws NoSuchAlgorithmException {
+        var keyGen = KeyPairGenerator.getInstance(algorithm);
+        keyGen.initialize(keySize);
+        return keyGen.generateKeyPair();
     }
 
     private void loadSoundBuffers(SoundManager soundManager) {

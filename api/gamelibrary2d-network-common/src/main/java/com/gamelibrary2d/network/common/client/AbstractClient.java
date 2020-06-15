@@ -10,7 +10,6 @@ import com.gamelibrary2d.network.common.exceptions.NetworkInitializationExceptio
 import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
-import com.gamelibrary2d.network.common.initialization.ConsumerStep;
 import com.gamelibrary2d.network.common.internal.DefaultCommunicationSteps;
 
 import java.io.IOException;
@@ -117,6 +116,8 @@ public abstract class AbstractClient implements Client {
             } catch (IOException | InterruptedException e) {
                 throw new NetworkAuthenticationException("Authentication failed", e);
             }
+
+            communicator.setAuthenticated();
         }
     }
 
@@ -136,7 +137,7 @@ public abstract class AbstractClient implements Client {
         var communicator = context.get(Communicator.class, communicatorKey);
         reallocateOutgoingBuffer(communicator);
         this.communicator = communicator;
-        onInitialized(context);
+        onInitialized(context, communicator);
     }
 
     @Override
@@ -294,18 +295,19 @@ public abstract class AbstractClient implements Client {
     }
 
     private void configureAuthentication(Communicator communicator, CommunicationSteps steps) {
-        steps.add(new IdentityConsumer());
+        steps.add(this::readIdentifier);
         communicator.configureAuthentication(steps);
-        steps.add(this::onAuthenticated);
     }
 
-    private void onAuthenticated(CommunicationContext context, Communicator communicator) {
-        communicator.onAuthenticated();
+    private boolean readIdentifier(CommunicationContext context, Communicator communicator, DataBuffer inbox) {
+        int communicatorId = inbox.getInt();
+        communicator.setId(communicatorId);
+        return true;
     }
 
     protected abstract void onConfigureInitialization(CommunicationSteps steps);
 
-    protected abstract void onInitialized(CommunicationContext context);
+    protected abstract void onInitialized(CommunicationContext context, Communicator communicator);
 
     protected abstract void onMessage(DataBuffer buffer);
 }

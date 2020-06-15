@@ -1,5 +1,7 @@
 package com.gamelibrary2d.demos.networkgame.client;
 
+import com.gamelibrary2d.common.concurrent.NotHandledException;
+import com.gamelibrary2d.common.concurrent.ResultHandlingFuture;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.Write;
 import com.gamelibrary2d.common.updating.UpdateLoop;
@@ -11,18 +13,25 @@ import com.gamelibrary2d.network.common.client.ClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.LocalClientSideCommunicator;
 import com.gamelibrary2d.network.common.client.TcpConnectionSettings;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.security.ClientHandshake;
 import com.gamelibrary2d.network.common.server.DefaultLocalServer;
 import com.gamelibrary2d.network.common.server.DefaultNetworkServer;
 import com.gamelibrary2d.network.common.server.LocalServer;
 import com.gamelibrary2d.network.common.server.Server;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class ServerManager {
+    private final KeyPair keyPair;
+
     private Thread serverThread;
+
+    public ServerManager(KeyPair keyPair) {
+        this.keyPair = keyPair;
+    }
 
     public Future<Communicator> hostLocalServer() {
         return startServer(this::createLocalServer);
@@ -51,8 +60,7 @@ public class ServerManager {
 
     private Future<Communicator> connectToLocalServer(LocalServer server) {
         return CompletableFuture.completedFuture(
-                LocalClientSideCommunicator.connect(server, this::authenticate)
-        );
+                LocalClientSideCommunicator.connect(server));
     }
 
     private ServerResult createLocalServer() {
@@ -66,29 +74,38 @@ public class ServerManager {
     }
 
     private ServerResult createNetworkServer(int port, int localUpdPort) {
-        var server = new DefaultNetworkServer(port, DemoGameServer::new);
+        var server = new DefaultNetworkServer(port, s -> new DemoGameServer(s, keyPair));
+
         try {
             server.start();
             server.listenForConnections(true);
-            return new ServerResult(server, () -> connectToServer("localhost", port, localUpdPort));
+            return new ServerResult(server, () -> {
+                var future = connectToServer("localhost", port, localUpdPort);
+                return new ResultHandlingFuture<>(
+                        future,
+                        com -> {
+                            com.addDisconnectedListener(e -> stopServer(server));
+                            return com;
+                        },
+                        e -> {
+                            stopServer(server);
+                            throw new NotHandledException();
+                        }
+                );
+            });
         } catch (IOException e) {
             return new ServerResult(server, () -> CompletableFuture.failedFuture(e));
         }
     }
 
-    private void authenticate(CommunicationSteps steps) {
-        steps.add((context, communicator) ->
-                Write.textWithSizeHeader("serverPassword123", StandardCharsets.UTF_8, communicator.getOutgoing()));
-    }
-
-    private void authenticate(CommunicationSteps steps, int localUdpPort) {
-        authenticate(steps);
-        steps.add((__, com) -> initializeUdp(com, localUdpPort));
-    }
-
-    private void initializeUdp(Communicator communicator, int port) throws IOException {
-        ((NetworkCommunicator) communicator).enableUdp(ConnectionType.READ, port, 0);
-        communicator.getOutgoing().putInt(port);
+    private void authenticate(CommunicationSteps steps, int localUpdPort) {
+        var clientHandshake = new ClientHandshake();
+        clientHandshake.configure(steps);
+        steps.add((__, com) -> com.writeEncrypted(b -> Write.textWithSizeHeader("serverPassword123", b)));
+        steps.add((__, com) -> {
+            ((NetworkCommunicator) com).enableUdp(ConnectionType.READ, localUpdPort, 0);
+            com.writeEncrypted(b -> b.putInt(localUpdPort));
+        });
     }
 
     private Future<Communicator> startServer(Factory<ServerResult> serverFactory) {

@@ -30,8 +30,8 @@ public class DemoFrameClient extends AbstractClient {
 
     @Override
     public void onConfigureInitialization(CommunicationSteps steps) {
-        steps.read(DataBuffer::getFloat, "updateRate");
-        steps.read(GameSettings::new);
+        steps.read("updateRate", DataBuffer::getFloat);
+        steps.read(GameSettings.class, GameSettings::new);
         steps.add(this::requestPlayers);
         steps.add(this::readState);
     }
@@ -41,13 +41,13 @@ public class DemoFrameClient extends AbstractClient {
     }
 
     private boolean readState(CommunicationContext context, Communicator communicator, DataBuffer buffer) {
-        context.register(new InitialState(buffer));
+        context.register(InitialState.class, new InitialState(buffer));
         return true;
     }
 
     @Override
-    protected void onInitialized(CommunicationContext context) {
-        getCommunicator().addDisconnectedListener(this::onDisconnected);
+    protected void onInitialized(CommunicationContext context, Communicator communicator) {
+        communicator.addDisconnectedListener(this::onDisconnected);
         serverUpdatesPerSecond = context.get(Float.class, "updateRate");
         frame.applySettings(context.get(GameSettings.class));
         addObjects(context.get(InitialState.class).getObjects());

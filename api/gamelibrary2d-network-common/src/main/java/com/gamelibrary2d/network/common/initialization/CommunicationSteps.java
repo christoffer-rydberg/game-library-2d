@@ -1,10 +1,11 @@
 package com.gamelibrary2d.network.common.initialization;
 
 import com.gamelibrary2d.common.functional.Factory;
-import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.Communicator;
 import com.gamelibrary2d.network.common.Message;
+
+import java.io.IOException;
 
 /**
  * Configures a communication pipeline for a {@link Communicator}.
@@ -33,33 +34,10 @@ public interface CommunicationSteps {
 
     /**
      * Adds a {@link ConsumerStep} to the pipeline that reads an object of the
-     * specified generic type and registers it to the pipeline's {@link CommunicationContext}.
-     */
-    default <T> void read(Func<DataBuffer, T> consumerStep) {
-        add((context, communicator, buffer) -> {
-            context.register(consumerStep.invoke(buffer));
-            return true;
-        });
-    }
-
-    /**
-     * Adds a {@link ConsumerStep} to the pipeline that reads an object of the
-     * specified generic type and registers it to the pipeline's {@link CommunicationContext},
-     * if the given condition is met.
-     */
-    default <T> void read(StepCondition condition, Func<DataBuffer, T> consumerStep) {
-        add(condition, (context, communicator, buffer) -> {
-            context.register(consumerStep.invoke(buffer));
-            return true;
-        });
-    }
-
-    /**
-     * Adds a {@link ConsumerStep} to the pipeline that reads an object of the
      * specified generic type and registers it to the pipeline's {@link CommunicationContext}
      * with the specified key.
      */
-    default <T> void read(Func<DataBuffer, T> consumerStep, Object key) {
+    default <T> void read(Object key, ConsumerFunction<T> consumerStep) {
         add((context, communicator, buffer) -> {
             context.register(key, consumerStep.invoke(buffer));
             return true;
@@ -71,7 +49,7 @@ public interface CommunicationSteps {
      * specified generic type and registers it to the pipeline's {@link CommunicationContext}
      * with the specified key, if the given condition is met.
      */
-    default <T> void read(StepCondition condition, Func<DataBuffer, T> consumerStep, Object key) {
+    default <T> void read(Object key, StepCondition condition, ConsumerFunction<T> consumerStep) {
         add(condition, (context, communicator, buffer) -> {
             context.register(key, consumerStep.invoke(buffer));
             return true;
@@ -116,5 +94,9 @@ public interface CommunicationSteps {
         add(condition, (context, communicator) -> {
             obj.serializeMessage(communicator.getOutgoing());
         });
+    }
+
+    interface ConsumerFunction<T> {
+        T invoke(DataBuffer buffer) throws IOException;
     }
 }

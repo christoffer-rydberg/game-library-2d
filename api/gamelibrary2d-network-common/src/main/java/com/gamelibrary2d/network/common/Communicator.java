@@ -1,8 +1,11 @@
 package com.gamelibrary2d.network.common;
 
+import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
+import com.gamelibrary2d.network.common.security.EncryptionReader;
+import com.gamelibrary2d.network.common.security.EncryptionWriter;
 
 import java.io.IOException;
 
@@ -99,6 +102,59 @@ public interface Communicator {
     /**
      * Invoked when the client/server connection has been authenticated.
      */
-    void onAuthenticated();
+    void setAuthenticated();
 
+    /**
+     * Used to encrypt and write data to a {@link DataBuffer}.
+     */
+    EncryptionWriter getEncryptionWriter();
+
+    /**
+     * Sets the communicator's {@link #getEncryptionWriter encryption reader}.
+     */
+    void setEncryptionWriter(EncryptionWriter encryptionWriter);
+
+    /**
+     * Writes data to the {@link #getOutgoing() outgoing buffer} and then encrypts the written data.
+     * This method can only be used if the communicator has an {@link #setEncryptionWriter encryption writer}.
+     *
+     * @param plaintextWriter Writes plain data to the buffer.
+     * @throws IOException Occurs if the encryption fails.
+     */
+    default void writeEncrypted(ParameterizedAction<DataBuffer> plaintextWriter) throws IOException {
+        var encryptionWriter = getEncryptionWriter();
+        if (encryptionWriter == null) {
+            throw new NullPointerException("No encryption writer has been set");
+        }
+
+        encryptionWriter.write(getOutgoing(), plaintextWriter);
+    }
+
+    /**
+     * Used to read and decrypt data from a {@link DataBuffer}.
+     */
+    EncryptionReader getEncryptionReader();
+
+    /**
+     * Sets the communicator's {@link #getEncryptionReader encryption reader}.
+     */
+    void setEncryptionReader(EncryptionReader encryptionReader);
+
+    /**
+     * Reads encrypted data from the input buffer, decrypts it, and writes it to the output buffer.
+     * This method can only be used if the communicator has an {@link #setEncryptionReader encryption reader}.
+     *
+     * @param input  The input buffer.
+     * @param output The output buffer.
+     * @return True if encrypted data was read, false otherwise.
+     * @throws IOException Occurs if the decryption fails.
+     */
+    default boolean readEncrypted(DataBuffer input, DataBuffer output) throws IOException {
+        var encryptionReader = getEncryptionReader();
+        if (encryptionReader == null) {
+            throw new NullPointerException("No encryption reader has been set");
+        }
+
+        return encryptionReader.readNext(input, output);
+    }
 }

@@ -2,8 +2,8 @@ package com.gamelibrary2d.network.common.server;
 
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.NetworkService;
 import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 

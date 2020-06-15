@@ -6,6 +6,8 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
+import com.gamelibrary2d.network.common.security.EncryptionReader;
+import com.gamelibrary2d.network.common.security.EncryptionWriter;
 
 import java.io.IOException;
 
@@ -18,6 +20,8 @@ public abstract class AbstractCommunicator implements Communicator {
     private volatile boolean connected = true;
     private volatile boolean authenticated;
     private volatile Throwable disconnectionCause;
+    private volatile EncryptionWriter encryptionWriter;
+    private volatile EncryptionReader encryptionReader;
 
     private DataBuffer outgoingBuffer;
 
@@ -27,6 +31,26 @@ public abstract class AbstractCommunicator implements Communicator {
             incomingBufferMonitor[i] = new IncomingBufferMonitor(new DynamicByteBuffer());
         }
         reallocateOutgoing();
+    }
+
+    @Override
+    public EncryptionWriter getEncryptionWriter() {
+        return encryptionWriter;
+    }
+
+    @Override
+    public void setEncryptionWriter(EncryptionWriter encryptionWriter) {
+        this.encryptionWriter = encryptionWriter;
+    }
+
+    @Override
+    public EncryptionReader getEncryptionReader() {
+        return encryptionReader;
+    }
+
+    @Override
+    public void setEncryptionReader(EncryptionReader encryptionReader) {
+        this.encryptionReader = encryptionReader;
     }
 
     @Override
@@ -50,7 +74,7 @@ public abstract class AbstractCommunicator implements Communicator {
     }
 
     @Override
-    public void onAuthenticated() {
+    public void setAuthenticated() {
         authenticated = true;
     }
 

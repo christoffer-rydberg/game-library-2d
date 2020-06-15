@@ -1,7 +1,10 @@
 package com.gamelibrary2d.network.common.client;
 
 import com.gamelibrary2d.common.functional.ParameterizedAction;
-import com.gamelibrary2d.network.common.*;
+import com.gamelibrary2d.network.common.AbstractNetworkCommunicator;
+import com.gamelibrary2d.network.common.Communicator;
+import com.gamelibrary2d.network.common.SocketChannelConnectedHandler;
+import com.gamelibrary2d.network.common.SocketChannelFailedConnectionHandler;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
@@ -11,52 +14,30 @@ import java.util.concurrent.Future;
 public class ClientSideCommunicator extends AbstractNetworkCommunicator {
 
     private final ParameterizedAction<CommunicationSteps> configureAuthentication;
-    private final TcpConnectionSettings tcpSettings;
+    private final TcpConnectionSettings connectionSettings;
 
     private ClientSideCommunicator(
-            TcpConnectionSettings tcpSettings,
-            NetworkService networkService,
-            ParameterizedAction<CommunicationSteps> configureAuthentication,
-            boolean ownsNetworkService) {
-        super(networkService, 2, ownsNetworkService);
-        this.tcpSettings = tcpSettings;
+            TcpConnectionSettings connectionSettings,
+            ParameterizedAction<CommunicationSteps> configureAuthentication) {
+        super(connectionSettings.getNetworkService(), 2, connectionSettings.isOwningNetworkService());
+        this.connectionSettings = connectionSettings;
         this.configureAuthentication = configureAuthentication;
     }
 
-    public static Future<Communicator> connect(TcpConnectionSettings tcpSettings) {
-        return connect(tcpSettings, new NetworkService(), true, null);
+    public static Future<Communicator> connect(TcpConnectionSettings connectionSettings) {
+        return connect(connectionSettings, null);
     }
 
     public static Future<Communicator> connect(
-            TcpConnectionSettings tcpSettings,
-            ParameterizedAction<CommunicationSteps> configureAuthentication) {
-        return connect(tcpSettings, new NetworkService(), true, configureAuthentication);
-    }
-
-    public static Future<Communicator> connect(
-            TcpConnectionSettings tcpSettings,
-            NetworkService networkService) {
-        return connect(tcpSettings, networkService, false, null);
-    }
-
-    public static Future<Communicator> connect(
-            TcpConnectionSettings tcpSettings,
-            NetworkService networkService,
-            ParameterizedAction<CommunicationSteps> configureAuthentication) {
-        return connect(tcpSettings, networkService, false, configureAuthentication);
-    }
-
-    private static Future<Communicator> connect(
-            TcpConnectionSettings tcpSettings,
-            NetworkService networkService,
-            boolean ownsNetworkService,
+            TcpConnectionSettings connectionSettings,
             ParameterizedAction<CommunicationSteps> configureAuthentication) {
 
         var future = new CompletableFuture<Communicator>();
 
+        var networkService = connectionSettings.getNetworkService();
+
         SocketChannelConnectedHandler onConnected = socketChannel -> {
-            var communicator = new ClientSideCommunicator(
-                    tcpSettings, networkService, configureAuthentication, ownsNetworkService);
+            var communicator = new ClientSideCommunicator(connectionSettings, configureAuthentication);
             socketChannel.socket().setTcpNoDelay(true);
             communicator.setSocketChannel(socketChannel);
             networkService.connect(socketChannel, communicator, communicator::onSocketChannelDisconnected);
@@ -69,7 +50,11 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator {
         var networkServiceWasRunning = networkService.isRunning();
         try {
             networkService.start();
-            networkService.connect(tcpSettings.getHost(), tcpSettings.getPort(), onConnected, onConnectionFailed);
+            networkService.connect(
+                    connectionSettings.getHost(),
+                    connectionSettings.getPort(),
+                    onConnected,
+                    onConnectionFailed);
         } catch (IOException e) {
             if (!networkServiceWasRunning) {
                 try {
@@ -93,6 +78,6 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator {
 
     @Override
     public String getEndpoint() {
-        return tcpSettings.getHost();
+        return connectionSettings.getHost();
     }
 }

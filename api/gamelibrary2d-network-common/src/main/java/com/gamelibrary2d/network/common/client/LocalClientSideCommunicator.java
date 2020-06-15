@@ -13,21 +13,30 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
 
     private final LocalServer localServer;
     private final LocalServerSideCommunicator serverSideCommunicator;
-    private ParameterizedAction<CommunicationSteps> configureAuthentication;
+    private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
-    private LocalClientSideCommunicator(LocalServer localServer) {
+    private LocalClientSideCommunicator(
+            LocalServer localServer,
+            ParameterizedAction<CommunicationSteps> configureAuthentication) {
         super(1);
         this.localServer = localServer;
-        serverSideCommunicator = new LocalServerSideCommunicator(this, localServer);
+        this.configureAuthentication = configureAuthentication;
+        serverSideCommunicator = new LocalServerSideCommunicator(
+                this,
+                localServer,
+                configureAuthentication != null ? localServer::configureClientAuthentication : null
+        );
     }
 
     public static Communicator connect(LocalServer localServer) {
         return connect(localServer, null);
     }
 
-    public static Communicator connect(LocalServer localServer, ParameterizedAction<CommunicationSteps> configureAuthentication) {
-        var communicator = new LocalClientSideCommunicator(localServer);
-        communicator.configureAuthentication = configureAuthentication;
+    public static Communicator connect(
+            LocalServer localServer,
+            ParameterizedAction<CommunicationSteps> configureAuthentication) {
+
+        var communicator = new LocalClientSideCommunicator(localServer, configureAuthentication);
         localServer.connectCommunicator(communicator.serverSideCommunicator);
         return communicator;
     }
@@ -64,11 +73,14 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
         private final LocalServer server;
         private final ParameterizedAction<CommunicationSteps> configureAuthentication;
 
-        LocalServerSideCommunicator(Communicator clientSideCommunicator, LocalServer server) {
+        LocalServerSideCommunicator(
+                Communicator clientSideCommunicator,
+                LocalServer server,
+                ParameterizedAction<CommunicationSteps> configureAuthentication) {
             super(1);
             this.clientSideCommunicator = clientSideCommunicator;
             this.server = server;
-            this.configureAuthentication = server::configureClientAuthentication;
+            this.configureAuthentication = configureAuthentication;
         }
 
         @Override
@@ -78,7 +90,9 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
 
         @Override
         public void configureAuthentication(CommunicationSteps steps) {
-            configureAuthentication.invoke(steps);
+            if (configureAuthentication != null) {
+                configureAuthentication.invoke(steps);
+            }
         }
 
         @Override

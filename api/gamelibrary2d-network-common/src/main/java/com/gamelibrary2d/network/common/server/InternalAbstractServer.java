@@ -12,7 +12,6 @@ import com.gamelibrary2d.network.common.initialization.*;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer.InitializationResult;
 import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
-import com.gamelibrary2d.network.common.initialization.ConsumerStep;
 import com.gamelibrary2d.network.common.internal.DefaultCommunicationSteps;
 
 import java.io.IOException;
@@ -42,7 +41,7 @@ abstract class InternalAbstractServer implements Server {
 
     void addConnectedCommunicator(Communicator communicator) {
         var steps = new DefaultCommunicationSteps();
-        steps.add(new IdentityProducer(communicatorIdFactory));
+        steps.add((__, com) -> writeIdentifier(com, communicatorIdFactory));
         steps.add(this::connectedStep);
         communicator.configureAuthentication(steps);
         steps.add(this::authenticatedStep);
@@ -56,12 +55,18 @@ abstract class InternalAbstractServer implements Server {
         communicator.addDisconnectedListener(disconnectedEventListener);
     }
 
+    private void writeIdentifier(Communicator communicator, Factory<Integer> idFactory) {
+        int id = idFactory.create();
+        communicator.setId(id);
+        communicator.getOutgoing().putInt(id);
+    }
+
     private void connectedStep(CommunicationContext context, Communicator communicator) {
         onConnected(communicator);
     }
 
     private void authenticatedStep(CommunicationContext context, Communicator communicator) {
-        communicator.onAuthenticated();
+        communicator.setAuthenticated();
         onClientAuthenticated(context, communicator);
     }
 
@@ -82,7 +87,7 @@ abstract class InternalAbstractServer implements Server {
     private void initialized(CommunicationContext context, Communicator communicator) {
         removePending(communicator);
         communicators.add(communicator);
-        communicator.onAuthenticated();
+        communicator.setAuthenticated();
         onClientInitialized(context, communicator);
     }
 
