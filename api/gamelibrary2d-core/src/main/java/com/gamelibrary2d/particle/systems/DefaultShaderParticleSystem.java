@@ -8,13 +8,14 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
 import com.gamelibrary2d.glUtil.OpenGLIntBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleParameters;
 import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 
-public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
+public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem implements Clearable {
     private final float[] position = new float[2];
     private final float[] externalAcceleration = new float[2];
     private final int[] atomicArray = new int[1];
@@ -247,7 +248,7 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     }
 
     @Override
-    protected void bindUdateBuffers() {
+    protected void bindUpdateBuffers() {
         OpenGL openGL = OpenGL.instance();
 
         openGL.glUniform1i(glUniformRandomSeed, RandomInstance.get().nextInt());
@@ -300,6 +301,11 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem {
     @Override
     public void clear() {
         particleCount = 0;
+    }
+
+    @Override
+    public boolean isAutoClearing() {
+        return true;
     }
 
     @Override

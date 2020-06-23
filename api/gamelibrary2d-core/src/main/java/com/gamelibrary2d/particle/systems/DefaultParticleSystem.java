@@ -4,13 +4,14 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleParameters;
 import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 
-public class DefaultParticleSystem implements ParticleSystem {
+public class DefaultParticleSystem implements ParticleSystem, Clearable {
     private final int capacity;
     private final float[] externalSpeed = new float[2];
     private final float[] externalAcceleration = new float[2];
@@ -249,8 +250,14 @@ public class DefaultParticleSystem implements ParticleSystem {
         }
     }
 
+    @Override
     public void clear() {
         particleCount = 0;
+    }
+
+    @Override
+    public boolean isAutoClearing() {
+        return true;
     }
 
     public int getParticleCount() {

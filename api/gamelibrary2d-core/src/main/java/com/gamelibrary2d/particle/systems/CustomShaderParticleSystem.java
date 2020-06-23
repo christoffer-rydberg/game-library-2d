@@ -42,7 +42,7 @@ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
         return new CustomShaderParticleSystem(updateProgram, updateBuffer, arrayBuffer, renderer);
     }
 
-    protected void bindUdateBuffers() {
+    protected void bindUpdateBuffers() {
         OpenGL openGL = OpenGL.instance();
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 0, arrayBuffer.bufferId());
         openGL.glBindBufferBase(OpenGL.GL_SHADER_STORAGE_BUFFER, 1, updateBuffer.bufferId());
@@ -51,11 +51,6 @@ public class CustomShaderParticleSystem extends AbstractShaderParticleSystem {
     @Override
     public void render(float alpha) {
         renderer.render(arrayBuffer, false, 0, arrayBuffer.capacity(), alpha);
-    }
-
-    @Override
-    public void clear() {
-
     }
 
     @Override

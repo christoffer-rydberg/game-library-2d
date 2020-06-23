@@ -107,7 +107,6 @@ public class ShaderProgram implements Disposable {
     }
 
     public void initialize() {
-
         if (initialized)
             return;
 

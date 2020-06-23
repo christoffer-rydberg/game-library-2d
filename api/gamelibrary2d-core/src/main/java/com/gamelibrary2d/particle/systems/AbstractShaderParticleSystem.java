@@ -40,19 +40,23 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
         updaterProgram.bind();
 
-        // Update uniform variables
         openGL.glUniform1f(glUniformDeltaTime, deltaTime);
         openGL.glUniform1i(glUniformParticleCount, particleCount);
 
-        // Bind buffers
-        bindUdateBuffers();
+        bindUpdateBuffers();
 
-        // Dispatch work to the compute shader
         openGL.glDispatchCompute((int) Math.ceil((double) particleCount / WORK_GROUP_SIZE), 1, 1);
-        openGL.glMemoryBarrier(OpenGL.GL_SHADER_STORAGE_BARRIER_BIT | OpenGL.GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
+        applyMemoryBarriers();
 
         updaterProgram.unbind();
     }
 
-    protected abstract void bindUdateBuffers();
+    protected void applyMemoryBarriers() {
+        OpenGL.instance().glMemoryBarrier(
+                OpenGL.GL_SHADER_STORAGE_BARRIER_BIT |
+                        OpenGL.GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+    }
+
+    protected abstract void bindUpdateBuffers();
 }
