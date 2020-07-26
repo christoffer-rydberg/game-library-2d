@@ -236,7 +236,7 @@ void applyParameters(inout Render r, inout Update u, inout uint seed) {
 
     float emittedCentripetalAcc = centripetalAcc + centripetalAccVar * random11(++seed);
     if (emittedCentripetalAcc != 0 && emittedSpeed == 0) {
-        emittedSpeed = 1f; // A little bump to get a direction for the velocity vector.
+        emittedSpeed = 1.0; // A little bump to get a direction for the velocity vector.
     }
 
     float velocityX = 0;
@@ -268,9 +268,9 @@ void applyParameters(inout Render r, inout Update u, inout uint seed) {
     r.Part0[2] = emittedScale;
     r.Part0[3] = rotation + rotationVar * random11(++seed);
 
-    r.Part1[0] = emittedColor0 / 255f;
-    r.Part1[1] = emittedColor1 / 255f;
-    r.Part1[2] = emittedColor2 / 255f;
+    r.Part1[0] = emittedColor0 / 255.0;
+    r.Part1[1] = emittedColor1 / 255.0;
+    r.Part1[2] = emittedColor2 / 255.0;
     r.Part1[3] = emittedAlpha;
 
     u.Part0[3] = delay + delayVar * random11(++seed);
@@ -388,7 +388,7 @@ void update(inout Render r, inout Update u, inout uint seed) {
 
     // Update velocity factor
     float progress = u.Part5[0] / u.Part1[0];
-    float velocityFactor = (1f - progress) + progress * u.Part1[1];
+    float velocityFactor = (1.0 - progress) + progress * u.Part1[1];
 
     // Update position
     float velocityFactorTimesDeltaTime = velocityFactor * deltaTime;
