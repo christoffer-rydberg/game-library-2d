@@ -1,7 +1,8 @@
 package com.gamelibrary2d.demos.networkgame.server.objects;
 
+import com.gamelibrary2d.collision.CollisionParameters;
 import com.gamelibrary2d.collision.CollisionAware;
-import com.gamelibrary2d.collision.UpdateResult;
+import com.gamelibrary2d.collision.CollisionResult;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
@@ -39,9 +40,9 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
     }
 
     @Override
-    public UpdateResult update(float deltaTime) {
+    public void update(float deltaTime) {
         updateRotation(deltaTime);
-        return super.update(deltaTime);
+        super.update(deltaTime);
     }
 
     private void updateRotation(float deltaTime) {
@@ -58,10 +59,10 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
     }
 
     @Override
-    public boolean onCollisionWith(ServerBoulder other) {
+    public CollisionResult onCollision(ServerBoulder other, CollisionParameters params) {
         gameLogic.destroy(other);
         gameLogic.destroy(this);
-        return false;
+        return CollisionResult.ABORT;
     }
 
     public void setRotationDirection(RotationDirection rotationDirection) {

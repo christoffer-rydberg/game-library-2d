@@ -16,7 +16,10 @@ public interface CollisionAware<T extends Collidable> extends Collidable {
      * Invoked when a collision is detected with an instance of the generic {@link #getCollidableClass collidable class}.
      *
      * @param collidable The other object in the collision.
-     * @return True if the collision is handled. The collided object will be notified of a handled collision if it derives from {@link CollidedAware}).
+     * @param deltaTime  The time since the last update in seconds.
+     * @param prevX      The x-position before the update causing to the collision.
+     * @param prevY      The y-position before the update causing to the collision.
+     * @param attempt    Collision detection attempt. Incremented each time {@link CollisionResult#RERUN} is used.
      */
-    boolean onCollisionWith(T collidable);
+    CollisionResult onCollision(T collidable, CollisionParameters params);
 }

@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class CollisionDetection<T extends Collidable> {
     private final Pool<InternalQuadTreeNode> nodePool = new Pool<>();
-    private final ArrayList<CollisionDetectionArea> collisionDetectionAreas = new ArrayList<>();
-    private final ArrayList<T> collidable;
+    private final ArrayList<ActivationArea> activationAreas = new ArrayList<>();
+    private final ArrayList<T> participants;
     private final InternalQuadTreeNode rootNode;
     private final ArrayList<T> updateList;
     private final List<T> updateListReadOnly;
@@ -28,7 +28,7 @@ public class CollisionDetection<T extends Collidable> {
      * @param nodeCapacity The object capacity of each node. When exceeded, the node will split into child nodes (quadrants).
      */
     public CollisionDetection(Rectangle area, float minNodeWidth, int nodeCapacity) {
-        collidable = new ArrayList<>();
+        participants = new ArrayList<>();
         rootNode = new InternalQuadTreeNode(nodePool);
         updateList = new ArrayList<>();
         updateListReadOnly = Collections.unmodifiableList(updateList);
@@ -43,7 +43,7 @@ public class CollisionDetection<T extends Collidable> {
      * @param collidable The object to register.
      */
     public void add(T collidable) {
-        this.collidable.add(collidable);
+        this.participants.add(collidable);
     }
 
     /**
@@ -53,40 +53,25 @@ public class CollisionDetection<T extends Collidable> {
      * @return True if the object was unregistered, false otherwise.
      */
     public boolean remove(T collidable) {
-        return this.collidable.remove(collidable);
+        return this.participants.remove(collidable);
     }
 
     /**
      * Clears registered objects.
      */
     public void clear() {
-        collidable.clear();
+        participants.clear();
     }
 
     /**
-     * @return A modifiable list of restrictive {@link CollisionDetectionArea collision detection areas}. It is safe to move the areas
+     * @return A modifiable list of restrictive {@link ActivationArea collision detection areas}. It is safe to move the areas
      * as they are repositioned in the collision quad tree each update. Collision detection will only be performed for
      * {@link Collidable} objects inside one or more area. Objects near the edges can be collided with but are not
      * updated. This is to avoid undetected collisions with objects past the edges. If the list of areas is empty,
      * all objects in the quad tree will be updated and checked for collisions.
      */
-    public List<CollisionDetectionArea> getCollisionDetectionAreas() {
-        return collisionDetectionAreas;
-    }
-
-    protected boolean addIfDetected(T collidable) {
-        if (rootNode.insertIfDetected(collidable)) {
-            updateList.add(collidable);
-            return true;
-        }
-        return false;
-    }
-
-    private void addIfDetected(ArrayList<T> objects) {
-        int size = objects.size();
-        for (int i = 0; i < size; ++i) {
-            addIfDetected(objects.get(i));
-        }
+    public List<ActivationArea> getActivationAreas() {
+        return activationAreas;
     }
 
     /**
@@ -99,23 +84,26 @@ public class CollisionDetection<T extends Collidable> {
         nodePool.reset(0);
         updateList.clear();
 
-        for (int i = 0; i < collisionDetectionAreas.size(); ++i) {
-            rootNode.insertDetectionArea(collisionDetectionAreas.get(i));
+        for (int i = 0; i < activationAreas.size(); ++i) {
+            rootNode.insertActivationArea(activationAreas.get(i));
         }
 
-        int size;
-        if (!collisionDetectionAreas.isEmpty()) {
-            addIfDetected(collidable);
-            size = updateList.size();
+        if (!activationAreas.isEmpty()) {
+            for (int i = 0; i < participants.size(); ++i) {
+                var participant = participants.get(i);
+                var activationResult = rootNode.insert(participant);
+                if (activationResult == InsertionResult.INSERTED_ACTIVE) {
+                    updateList.add(participant);
+                }
+            }
         } else {
-            updateList.addAll(collidable);
-            size = updateList.size();
-            for (int i = 0; i < size; ++i) {
-                rootNode.insert(updateList.get(i));
+            updateList.addAll(participants);
+            for (int i = 0; i < updateList.size(); ++i) {
+                rootNode.insertWithoutActivation(updateList.get(i));
             }
         }
 
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < updateList.size(); ++i) {
             var obj = updateList.get(i);
             rootNode.update(obj, deltaTime);
             obj.updated();

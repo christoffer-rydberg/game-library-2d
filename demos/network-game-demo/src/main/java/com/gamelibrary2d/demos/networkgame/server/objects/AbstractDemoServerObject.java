@@ -1,7 +1,6 @@
 package com.gamelibrary2d.demos.networkgame.server.objects;
 
 import com.gamelibrary2d.collision.Collidable;
-import com.gamelibrary2d.collision.UpdateResult;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.network.AbstractServerObject;
@@ -37,25 +36,25 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
     }
 
     @Override
-    public UpdateResult update(float deltaTime) {
+    public void update(float deltaTime) {
         beforeUpdate.set(getPosition());
 
-        if (speed == 0f) {
-            return UpdateResult.STILL;
-        }
-
-        getPosition().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
-        if (bounceIfOutside(gameBounds)) {
-            reposition();
-            return UpdateResult.STILL;
-        } else {
-            return UpdateResult.MOVED;
+        if (speed != 0f) {
+            getPosition().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
+            if (bounceIfOutside(gameBounds)) {
+                reposition();
+            }
         }
     }
 
     @Override
     public void updated() {
 
+    }
+
+    @Override
+    public boolean canCollide() {
+        return !isDestroyed();
     }
 
     @Override

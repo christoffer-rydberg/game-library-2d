@@ -82,6 +82,14 @@ public abstract class AbstractGameObject<T extends Renderable> implements KeyAwa
         return position;
     }
 
+    public float getPosX() {
+        return position.getX();
+    }
+
+    public float getPosY() {
+        return position.getY();
+    }
+
     @Override
     public Point getScale() {
         return scale;

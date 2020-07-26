@@ -1,7 +1,8 @@
 package com.gamelibrary2d.demos.networkgame.server.objects;
 
+import com.gamelibrary2d.collision.CollisionParameters;
 import com.gamelibrary2d.collision.CollisionAware;
-import com.gamelibrary2d.collision.UpdateResult;
+import com.gamelibrary2d.collision.CollisionResult;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
@@ -25,15 +26,15 @@ public class ServerPortal extends AbstractDemoServerObject implements CollisionA
     }
 
     @Override
-    public boolean onCollisionWith(ServerBoulder collidable) {
+    public CollisionResult onCollision(ServerBoulder collidable, CollisionParameters params) {
         collided = true;
-        return true;
+        return CollisionResult.ABORT;
     }
 
     @Override
-    public UpdateResult update(float deltaTime) {
+    public void update(float deltaTime) {
         spawnTimer += deltaTime;
-        return super.update(deltaTime);
+        super.update(deltaTime);
     }
 
     @Override
