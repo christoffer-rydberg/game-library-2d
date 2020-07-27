@@ -1,8 +1,9 @@
 package com.gamelibrary2d.demos.networkgame.server.objects;
 
-import com.gamelibrary2d.collision.CollisionParameters;
-import com.gamelibrary2d.collision.CollisionAware;
-import com.gamelibrary2d.collision.CollisionResult;
+import com.gamelibrary2d.collision.CollisionDetection;
+import com.gamelibrary2d.collision.Obstacle;
+import com.gamelibrary2d.collision.handlers.BounceHandler;
+import com.gamelibrary2d.collision.handlers.RestrictedAreaHandler;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
@@ -11,20 +12,19 @@ import com.gamelibrary2d.demos.networkgame.common.RotationDirection;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 import com.gamelibrary2d.network.common.Communicator;
 
-public class ServerPlayer extends AbstractDemoServerObject implements CollisionAware<ServerBoulder> {
+public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
     private final DemoGameLogic gameLogic;
 
     private final Communicator communicator;
 
     private RotationDirection rotationDirection = RotationDirection.NONE;
 
-    public ServerPlayer(DemoGameLogic gameLogic, Communicator communicator, Rectangle gameBounds, Rectangle bounds) {
-        super(ObjectIdentifiers.PLAYER, gameBounds);
+    public ServerPlayer(DemoGameLogic gameLogic, Communicator communicator, Rectangle bounds) {
+        super(ObjectIdentifiers.PLAYER);
         this.gameLogic = gameLogic;
         this.communicator = communicator;
         this.setBounds(bounds);
-        setSpeed(100f);
-        setDirection(RandomInstance.get().nextFloat() * 360f);
+        setSpeedAndDirection(100f, RandomInstance.get().nextFloat() * 360f);
     }
 
     @Override
@@ -32,11 +32,6 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
         var isLocal = communicator.getOutgoing() == buffer;
         buffer.putBool(isLocal);
         super.serializeMessage(buffer);
-    }
-
-    @Override
-    public Class<ServerBoulder> getCollidableClass() {
-        return ServerBoulder.class;
     }
 
     @Override
@@ -58,14 +53,35 @@ public class ServerPlayer extends AbstractDemoServerObject implements CollisionA
         }
     }
 
+    public void setDirection(float direction) {
+        super.setSpeedAndDirection(getSpeed(), direction);
+    }
+
     @Override
-    public CollisionResult onCollision(ServerBoulder other, CollisionParameters params) {
-        gameLogic.destroy(other);
-        gameLogic.destroy(this);
-        return CollisionResult.ABORT;
+    public float getMass() {
+        return 1f;
+    }
+
+    @Override
+    public void onPushed(Obstacle pusher, float accelerationX, float accelerationY) {
+        if (pusher instanceof ServerBoulder) {
+            gameLogic.destroy((ServerBoulder) pusher);
+            gameLogic.destroy(this);
+        } else {
+            accelerate(accelerationX, accelerationY);
+        }
     }
 
     public void setRotationDirection(RotationDirection rotationDirection) {
         this.rotationDirection = rotationDirection;
+    }
+
+    @Override
+    public void addCollisionDetection(CollisionDetection collisionDetection) {
+        collisionDetection.add(
+                this,
+                new RestrictedAreaHandler<>(collisionDetection.getBounds(), ServerPlayer::accelerate),
+                new BounceHandler<>(Obstacle.class)
+        );
     }
 }

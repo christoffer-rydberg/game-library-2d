@@ -4,16 +4,15 @@ import com.gamelibrary2d.common.Pool;
 import com.gamelibrary2d.common.Rectangle;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 class InternalQuadTreeNode {
 
-    // Quadrant constants
+    // Node constants
     private static final int CROSSING_BOUNDARIES = -1;
-    private static final int TOP_LEFT_QUADRANT = 0;
-    private static final int TOP_RIGHT_QUADRANT = 1;
-    private static final int BOTTOM_LEFT_QUADRANT = 2;
-    private static final int BOTTOM_RIGHT_QUADRANT = 3;
+    private static final int TOP_LEFT_NODE = 0;
+    private static final int TOP_RIGHT_NODE = 1;
+    private static final int BOTTOM_LEFT_NODE = 2;
+    private static final int BOTTOM_RIGHT_NODE = 3;
 
     // Activation constants
     private static final int ACTIVATED_STOP_SEARCH = 3;
@@ -22,10 +21,9 @@ class InternalQuadTreeNode {
     private static final int NOT_ACTIVATED = 0;
 
     private final Pool<InternalQuadTreeNode> nodePool;
-    private final ArrayList<Collidable> objects;
+    private final ArrayList<InternalCollidableWrapper> objects;
     private final ArrayList<ActivationArea> activationAreas;
-    private final InternalQuadTreeNode[] quadrants;
-    private final CollisionParameters params = new CollisionParameters();
+    private final InternalQuadTreeNode[] nodes;
     private int depth;
     private int maxDepth;
     private int capacity;
@@ -35,7 +33,7 @@ class InternalQuadTreeNode {
         this.nodePool = nodePool;
         objects = new ArrayList<>();
         activationAreas = new ArrayList<>();
-        quadrants = new InternalQuadTreeNode[4];
+        nodes = new InternalQuadTreeNode[4];
     }
 
     private static boolean isColliding(Rectangle bounds, float xPos, float yPos, Rectangle bounds2, float xPos2, float yPos2) {
@@ -45,12 +43,12 @@ class InternalQuadTreeNode {
                 || bounds.yMax() + yPos < bounds2.yMin() + yPos2);
     }
 
-    private static boolean isColliding(InternalCollidable updated, InternalCollidable other) {
+    private static boolean isColliding(InternalArea updated, InternalArea other) {
         return isColliding(updated.getBounds(), updated.getPosX(), updated.getPosY(), other.getBounds(), other.getPosX(),
                 other.getPosY());
     }
 
-    private InternalQuadTreeNode createQuadrant(int depth, float xMin, float yMin, float xMax, float yMax) {
+    private InternalQuadTreeNode createNode(int depth, float xMin, float yMin, float xMax, float yMax) {
         InternalQuadTreeNode qt = nodePool.canGet() ? nodePool.get() : nodePool.store(new InternalQuadTreeNode(nodePool));
         qt.depth = depth;
         qt.maxDepth = maxDepth;
@@ -81,84 +79,88 @@ class InternalQuadTreeNode {
         objects.clear();
         activationAreas.clear();
         for (int i = 0; i < 4; ++i) {
-            if (quadrants[i] != null) {
-                quadrants[i].clear();
-                quadrants[i] = null;
+            if (nodes[i] != null) {
+                nodes[i].clear();
+                nodes[i] = null;
             }
         }
     }
 
-    private int getQuadrantIndex(InternalCollidable collidable) {
-        var bounds = collidable.getBounds();
+    private int getNodeIndex(InternalArea area) {
+        var bounds = area.getBounds();
         float xMin = bounds.xMin();
         float yMin = bounds.yMin();
         float xMax = bounds.xMax();
         float yMax = bounds.yMax();
 
-        float verticalMidpoint = (xMin + xMax) / 2 - collidable.getPosX();
-        float horizontalMidpoint = (yMin + yMax) / 2 - collidable.getPosY();
+        float verticalMidpoint = (xMin + xMax) / 2 - area.getPosX();
+        float horizontalMidpoint = (yMin + yMax) / 2 - area.getPosY();
 
         if (xMax < verticalMidpoint) {
             if (yMin > horizontalMidpoint) {
-                return TOP_LEFT_QUADRANT; // Top left quadrant
+                return TOP_LEFT_NODE; // Top left node
             } else if (yMax < horizontalMidpoint) {
-                return BOTTOM_LEFT_QUADRANT; // Bottom left quadrant
+                return BOTTOM_LEFT_NODE; // Bottom left node
             }
         } else if (xMin > verticalMidpoint) {
             if (yMin > horizontalMidpoint) {
-                return TOP_RIGHT_QUADRANT; // Top right quadrant
+                return TOP_RIGHT_NODE; // Top right node
             } else if (yMax < horizontalMidpoint) {
-                return BOTTOM_RIGHT_QUADRANT; // Bottom right quadrant
+                return BOTTOM_RIGHT_NODE; // Bottom right node
             }
         }
 
         return CROSSING_BOUNDARIES;
     }
 
-    private <T> void split(ArrayList<T> objects, boolean activationAreas) {
+    private void split(ArrayList<?> objects, boolean activationAreas) {
         float yMid = (yMin + yMax) / 2;
         float xMid = (xMin + xMax) / 2;
 
         var nextDepth = depth + 1;
-        quadrants[0] = createQuadrant(nextDepth, xMin, yMid, xMid, yMax);
-        quadrants[1] = createQuadrant(nextDepth, xMid, yMid, xMax, yMax);
-        quadrants[2] = createQuadrant(nextDepth, xMin, yMin, xMid, yMid);
-        quadrants[3] = createQuadrant(nextDepth, xMid, yMin, xMax, yMid);
+        nodes[0] = createNode(nextDepth, xMin, yMid, xMid, yMax);
+        nodes[1] = createNode(nextDepth, xMid, yMid, xMax, yMax);
+        nodes[2] = createNode(nextDepth, xMin, yMin, xMid, yMid);
+        nodes[3] = createNode(nextDepth, xMid, yMin, xMax, yMid);
 
-        Iterator<T> it = objects.iterator();
+        var it = objects.iterator();
         while (it.hasNext()) {
-            T next = it.next();
-            var collidable = (InternalCollidable) next;
-            int index = getQuadrantIndex(collidable);
-            if (index == CROSSING_BOUNDARIES)
-                continue;
+            var next = it.next();
             it.remove();
             if (activationAreas) {
-                quadrants[index].insertActivationAreaHere((ActivationArea) collidable);
+                var activationArea = (ActivationArea) next;
+                int index = getNodeIndex(activationArea);
+                if (index == CROSSING_BOUNDARIES)
+                    continue;
+                nodes[index].insertActivationAreaHere(activationArea);
             } else {
-                quadrants[index].insertHere((Collidable) collidable);
+                var obj = (InternalCollidableWrapper) next;
+                int index = getNodeIndex(obj.collidable);
+                if (index == CROSSING_BOUNDARIES)
+                    continue;
+                nodes[index].insertHere(obj);
             }
         }
     }
 
-    private void insertHere(Collidable obj) {
+    private void insertHere(InternalCollidableWrapper obj) {
         objects.add(obj);
-        if (quadrants[0] == null && objects.size() > capacity && depth < maxDepth) {
+        if (nodes[0] == null && objects.size() > capacity && depth < maxDepth) {
             split(objects, false);
         }
     }
 
     private void insertActivationAreaHere(ActivationArea area) {
         activationAreas.add(area);
-        if (quadrants[0] == null && activationAreas.size() > capacity && depth < maxDepth) {
+        if (nodes[0] == null && activationAreas.size() > capacity && depth < maxDepth) {
             split(activationAreas, true);
         }
     }
 
-    private InternalQuadTreeNode getQuadrant(InternalCollidable obj) {
-        if (hasQuadrants()) {
-            int index = getQuadrantIndex(obj);
-            return index != CROSSING_BOUNDARIES ? quadrants[index].getQuadrant(obj) : this;
+    private InternalQuadTreeNode getNode(InternalArea area) {
+        if (hasNodes()) {
+            int index = getNodeIndex(area);
+            return index != CROSSING_BOUNDARIES ? nodes[index].getNode(area) : this;
         } else {
             return this;
         }
@@ -187,22 +189,22 @@ class InternalQuadTreeNode {
         return result;
     }
 
-    private int insertHelper(Collidable obj, int detectionResult, boolean nodeFound) {
+    private int insertHelper(InternalCollidableWrapper obj, int detectionResult, boolean nodeFound) {
         detectionResult = detectionResult == ACTIVATED_STOP_SEARCH
                 ? ACTIVATED_STOP_SEARCH
-                : Math.max(detectionResult, detectInCurrentNode(obj));
+                : Math.max(detectionResult, detectInCurrentNode(obj.collidable));
 
-        if (hasQuadrants()) {
-            int quadrantIndex = nodeFound ? CROSSING_BOUNDARIES : getQuadrantIndex(obj);
-            if (quadrantIndex != CROSSING_BOUNDARIES) {
-                return quadrants[quadrantIndex].insertHelper(
+        if (hasNodes()) {
+            int nodeIndex = nodeFound ? CROSSING_BOUNDARIES : getNodeIndex(obj.collidable);
+            if (nodeIndex != CROSSING_BOUNDARIES) {
+                return nodes[nodeIndex].insertHelper(
                         obj,
                         detectionResult,
                         false);
             } else {
                 int index = 0;
                 while (detectionResult != ACTIVATED_STOP_SEARCH && index < 4) {
-                    detectionResult = quadrants[index].insertHelper(
+                    detectionResult = nodes[index].insertHelper(
                             obj,
                             detectionResult,
                             true);
@@ -218,7 +220,7 @@ class InternalQuadTreeNode {
         return detectionResult;
     }
 
-    InsertionResult insert(Collidable obj) {
+    InsertionResult insert(InternalCollidableWrapper obj) {
         var result = insertHelper(obj, NOT_ACTIVATED, false);
         if (result == ACTIVATED || result == ACTIVATED_STOP_SEARCH) {
             return InsertionResult.INSERTED_ACTIVE;
@@ -231,27 +233,31 @@ class InternalQuadTreeNode {
         }
     }
 
-    void insertWithoutActivation(Collidable obj) {
-        getQuadrant(obj).insertHere(obj);
+    void insertWithoutActivation(InternalCollidableWrapper obj) {
+        getNode(obj.collidable).insertHere(obj);
     }
 
     void insertActivationArea(ActivationArea obj) {
-        getQuadrant(obj).insertActivationAreaHere(obj);
+        getNode(obj).insertActivationAreaHere(obj);
     }
 
-    private boolean hasMoved(Collidable collidable, Rectangle prevBounds, float prevX, float prevY) {
-        return prevX != collidable.getPosX()
-                || prevY != collidable.getPosY()
-                || !prevBounds.equals(collidable.getBounds());
+    private boolean hasMoved(Collidable obj, Rectangle prevBounds, float prevX, float prevY) {
+        return prevX != obj.getPosX()
+                || prevY != obj.getPosY()
+                || !prevBounds.equals(obj.getBounds());
     }
 
     private InternalQuadTreeNode updateNode(
-            Collidable collidable, InternalQuadTreeNode prevNode, Rectangle prevBounds, float prevX, float prevY) {
-        if (hasMoved(collidable, prevBounds, prevX, prevY)) {
-            var newNode = getQuadrant(collidable);
+            InternalCollidableWrapper obj,
+            InternalQuadTreeNode prevNode,
+            Rectangle prevBounds,
+            float prevX,
+            float prevY) {
+        if (hasMoved(obj.collidable, prevBounds, prevX, prevY)) {
+            var newNode = getNode(obj.collidable);
             if (prevNode != newNode) {
-                prevNode.objects.remove(collidable);
-                newNode.insertHere(collidable);
+                prevNode.objects.remove(obj);
+                newNode.insertHere(obj);
             }
             return newNode;
         }
@@ -259,104 +265,68 @@ class InternalQuadTreeNode {
         return prevNode;
     }
 
-    public void update(Collidable collidable, float deltaTime) {
-        var boundsBeforeUpdate = collidable.getBounds();
-        var xBeforeUpdate = collidable.getPosX();
-        var yBeforeUpdate = collidable.getPosY();
+    public void update(InternalCollidableWrapper obj, float deltaTime) {
+        var nodeBeforeUpdate = getNode(obj.collidable);
 
-        // Node before update
-        var currentNode = getQuadrant(collidable);
+        obj.update(deltaTime);
 
-        collidable.update(deltaTime);
+        if (obj.collidable.canCollide()) {
+            var nodeAfterUpdate = updateNode(
+                    obj,
+                    nodeBeforeUpdate,
+                    obj.info.getPrevBounds(),
+                    obj.info.getPrevX(),
+                    obj.info.getPrevY());
 
-        if (collidable.canCollide()) {
-            // Node after update
-            currentNode = updateNode(
-                    collidable,
-                    currentNode,
-                    boundsBeforeUpdate,
-                    xBeforeUpdate,
-                    yBeforeUpdate);
+            if (obj.isHandlingCollisions()) {
+                obj.initializeCollisionHandlers();
 
-            if (collidable instanceof CollisionAware<?>) {
-                params.reset(
-                        deltaTime,
-                        xBeforeUpdate,
-                        yBeforeUpdate,
-                        collidable.getPosX(),
-                        collidable.getPosY());
+                var boundsAfterUpdate = obj.collidable.getBounds();
+                var posXAfterUpdate = obj.collidable.getPosX();
+                var posYAfterUpdate = obj.collidable.getPosY();
 
-                for (int i = 0; i < Integer.MAX_VALUE; ++i) {
-                    params.attempt = i;
+                nodeAfterUpdate.handleCollisions(obj);
 
-                    var boundsBeforeCollision = collidable.getBounds();
-                    var xBeforeCollision = collidable.getPosX();
-                    var yBeforeCollision = collidable.getPosY();
+                updateNode(
+                        obj,
+                        nodeAfterUpdate,
+                        boundsAfterUpdate,
+                        posXAfterUpdate,
+                        posYAfterUpdate);
 
-                    var result = currentNode.handleCollisions((CollisionAware<?>) collidable, params);
-
-                    // Node after collision detection
-                    currentNode = updateNode(
-                            collidable,
-                            currentNode,
-                            boundsBeforeCollision,
-                            xBeforeCollision,
-                            yBeforeCollision);
-
-                    if (result != CollisionResult.RERUN) {
-                        break;
-                    }
-                }
+                obj.finishCollisionHandlers();
             }
         }
     }
 
-    private boolean hasQuadrants() {
-        return quadrants[0] != null;
+    private boolean hasNodes() {
+        return nodes[0] != null;
     }
 
-    private <T extends Collidable> CollisionResult onCollision(
-            CollisionAware<T> collisionAware, Collidable other, CollisionParameters params) {
-        var type = collisionAware.getCollidableClass();
-        if (type.isAssignableFrom(other.getClass())) {
-            return collisionAware.onCollision(type.cast(other), params);
-        }
-
-        return CollisionResult.CONTINUE;
-    }
-
-    private <T extends Collidable> CollisionResult handleCollisions(
-            CollisionAware<T> collisionAware, CollisionParameters params) {
+    private CollisionResult handleCollisions(InternalCollidableWrapper updated) {
         int size = objects.size();
         for (int i = 0; i < size; ++i) {
             var other = objects.get(i);
-            if (collisionAware != other && other.canCollide() && isColliding(collisionAware, other)) {
-                var result = onCollision(collisionAware, other, params);
-                if (result == CollisionResult.CONTINUE) {
-                    if (collisionAware.canCollide()) {
-                        continue;
-                    }
-
-                    return CollisionResult.ABORT;
-                } else {
+            var collidable = other.collidable;
+            if (updated.collidable != collidable && collidable.canCollide() && isColliding(updated.collidable, collidable)) {
+                var result = updated.handleCollision(other);
+                if (result != CollisionResult.CONTINUE) {
                     return result;
                 }
             }
         }
 
-        if (hasQuadrants()) {
-            int quadrantIndex = getQuadrantIndex(collisionAware);
-            if (quadrantIndex == CROSSING_BOUNDARIES) {
+        if (hasNodes()) {
+            int nodeIndex = getNodeIndex(updated.collidable);
+            if (nodeIndex == CROSSING_BOUNDARIES) {
                 for (int i = 0; i < 4; ++i) {
-                    var result = quadrants[i].handleCollisions(collisionAware, params);
-                    if (result == CollisionResult.CONTINUE) {
-                        continue;
-                    } else {
+                    var result = nodes[i].handleCollisions(updated);
+                    if (result != CollisionResult.CONTINUE) {
                         return result;
                     }
                 }
             } else {
-                return quadrants[quadrantIndex].handleCollisions(collisionAware, params);
+                return nodes[nodeIndex].handleCollisions(updated);
             }
         }
 

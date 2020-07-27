@@ -3,7 +3,7 @@ package com.gamelibrary2d.collision;
 /**
  * Derived classes are subjects to collision detection.
  */
-public interface Collidable extends InternalCollidable {
+public interface Collidable extends InternalArea {
 
     /**
      * Invoked each collision detection cycle to update this {@link Collidable} instance and detect collisions.
@@ -21,7 +21,8 @@ public interface Collidable extends InternalCollidable {
     boolean canCollide();
 
     /**
-     * Invoked after {@link #update} and collision detection.
+     * Repositions this object at the specified coordinates.
      */
-    void updated();
+    void reposition(float x, float y);
+
 }

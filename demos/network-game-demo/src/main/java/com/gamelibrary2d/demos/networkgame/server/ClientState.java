@@ -4,37 +4,20 @@ import com.gamelibrary2d.demos.networkgame.server.objects.ServerPlayer;
 import com.gamelibrary2d.network.common.Communicator;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public class ClientState {
     private final Communicator communicator;
-    private final List<ServerPlayer> players;
-    private final List<ServerPlayer> playersReadonly;
+    private final ArrayList<ServerPlayer> players;
 
     private boolean ready;
 
-    public ClientState(Communicator communicator, Collection<ServerPlayer> players) {
+    public ClientState(Communicator communicator, ArrayList<ServerPlayer> players) {
         this.communicator = communicator;
-        this.players = new ArrayList<>(players);
-        playersReadonly = Collections.unmodifiableList(this.players);
+        this.players = players;
     }
 
     public Communicator getCommunicator() {
         return communicator;
-    }
-
-    public void addPlayers(Collection<ServerPlayer> players) {
-        players.addAll(players);
-    }
-
-    public void addPlayer(ServerPlayer player) {
-        players.add(player);
-    }
-
-    public void removePlayer(ServerPlayer player) {
-        players.remove(player);
     }
 
     public ServerPlayer getPlayer(int playerId) {
@@ -48,8 +31,8 @@ public class ClientState {
         return null;
     }
 
-    public List<ServerPlayer> getPlayers() {
-        return playersReadonly;
+    public ArrayList<ServerPlayer> getPlayers() {
+        return players;
     }
 
     public boolean isReady() {

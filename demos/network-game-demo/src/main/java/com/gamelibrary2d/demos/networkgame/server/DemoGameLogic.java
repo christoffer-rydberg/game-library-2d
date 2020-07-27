@@ -1,6 +1,5 @@
 package com.gamelibrary2d.demos.networkgame.server;
 
-import com.gamelibrary2d.collision.Collidable;
 import com.gamelibrary2d.collision.CollisionDetection;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.random.RandomInstance;
@@ -14,7 +13,7 @@ import java.util.List;
 public class DemoGameLogic {
     private final DemoGameServer server;
     private final GameSettings settings;
-    private final CollisionDetection<Collidable> collisionDetection;
+    private final CollisionDetection collisionDetection;
 
     private boolean gameRunning;
 
@@ -26,7 +25,7 @@ public class DemoGameLogic {
                 Rectangle.centered(32f, 32f),
                 Rectangle.centered(32f, 32f));
 
-        collisionDetection = new CollisionDetection<>(
+        collisionDetection = new CollisionDetection(
                 settings.getGameBounds(),
                 getGameSettings().getBoulderBounds().width() * 4,
                 10);
@@ -43,7 +42,7 @@ public class DemoGameLogic {
             spawn(player);
         }
 
-        var portal = new ServerPortal(this, settings.getGameBounds(), settings.getBoulderBounds());
+        var portal = new ServerPortal(this, settings.getPortalBounds());
         portal.setPosition(settings.getGameBounds().center());
         spawn(portal);
     }
@@ -67,7 +66,7 @@ public class DemoGameLogic {
     }
 
     public void spawn(DemoServerObject obj) {
-        collisionDetection.add(obj);
+        obj.addCollisionDetection(collisionDetection);
         server.spawn(obj);
     }
 

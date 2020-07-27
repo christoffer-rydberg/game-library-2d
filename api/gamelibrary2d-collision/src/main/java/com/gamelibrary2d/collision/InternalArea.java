@@ -2,7 +2,7 @@ package com.gamelibrary2d.collision;
 
 import com.gamelibrary2d.common.Rectangle;
 
-interface InternalCollidable {
+interface InternalArea {
 
     /**
      * Used together with the position to determine collisions.

@@ -5,22 +5,22 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class ResultHandlingFuture<T, TD> implements Future<TD> {
+public class ResultHandlingFuture<T1, T2> implements Future<T2> {
 
-    private final Future<T> future;
-    private final CompletionHandler<T, TD> onCompletion;
-    private final ExceptionHandler<TD> onException;
+    private final Future<T1> future;
+    private final CompletionHandler<T1, T2> onCompletion;
+    private final ExceptionHandler<T2> onException;
     private boolean completed;
-    private TD result;
+    private T2 result;
 
-    public ResultHandlingFuture(Future<T> future, CompletionHandler<T, TD> onCompletion,
-                                ExceptionHandler<TD> onException) {
+    public ResultHandlingFuture(Future<T1> future, CompletionHandler<T1, T2> onCompletion,
+                                ExceptionHandler<T2> onException) {
         this.future = future;
         this.onCompletion = onCompletion;
         this.onException = onException;
     }
 
-    public ResultHandlingFuture(Future<T> future, CompletionHandler<T, TD> onCompletion) {
+    public ResultHandlingFuture(Future<T1> future, CompletionHandler<T1, T2> onCompletion) {
         this.future = future;
         this.onCompletion = onCompletion;
         this.onException = e -> {
@@ -44,7 +44,7 @@ public class ResultHandlingFuture<T, TD> implements Future<TD> {
     }
 
     @Override
-    public TD get() throws InterruptedException, ExecutionException {
+    public T2 get() throws InterruptedException, ExecutionException {
         if (completed) {
             return result;
         }
@@ -64,7 +64,7 @@ public class ResultHandlingFuture<T, TD> implements Future<TD> {
     }
 
     @Override
-    public TD get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public T2 get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (completed) {
             return result;
         }

@@ -15,6 +15,7 @@ public class ServerState implements Message {
     }
 
     public void deregister(DemoServerObject obj) {
+        objectRegister.remove(obj.getId());
     }
 
     public Collection<DemoServerObject> getAll() {

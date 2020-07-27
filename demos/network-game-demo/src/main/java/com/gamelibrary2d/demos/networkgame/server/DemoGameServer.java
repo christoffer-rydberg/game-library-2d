@@ -132,7 +132,7 @@ public class DemoGameServer implements ServerContext {
 
         var players = new ArrayList<ServerPlayer>(requestedPlayers);
         for (int i = 0; i < requestedPlayers; ++i) {
-            players.add(new ServerPlayer(gameLogic, communicator, settings.getGameBounds(), settings.getBoulderBounds()));
+            players.add(new ServerPlayer(gameLogic, communicator, settings.getBoulderBounds()));
         }
 
         var communicatorState = new ClientState(communicator, players);

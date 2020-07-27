@@ -2,32 +2,18 @@ package com.gamelibrary2d.demos.networkgame.server.objects;
 
 import com.gamelibrary2d.collision.Collidable;
 import com.gamelibrary2d.common.Point;
-import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.network.AbstractServerObject;
 
 public abstract class AbstractDemoServerObject extends AbstractServerObject implements DemoServerObject, Collidable {
-
     private final byte objectIdentifier;
-
     private final Point velocity = new Point();
 
-    private final Point beforeUpdate = new Point();
-
-    private final Rectangle gameBounds;
-
+    private boolean destroyed;
+    private float speed;
     private float direction;
 
-    private boolean destroyed;
-
-    private float speed;
-
-    protected AbstractDemoServerObject(byte objectIdentifier, Rectangle gameBounds) {
+    protected AbstractDemoServerObject(byte objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
-        this.gameBounds = gameBounds;
-    }
-
-    protected void reposition() {
-        getPosition().set(beforeUpdate);
     }
 
     @Override
@@ -37,19 +23,7 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
 
     @Override
     public void update(float deltaTime) {
-        beforeUpdate.set(getPosition());
-
-        if (speed != 0f) {
-            getPosition().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
-            if (bounceIfOutside(gameBounds)) {
-                reposition();
-            }
-        }
-    }
-
-    @Override
-    public void updated() {
-
+        getPosition().add(velocity.getX() * deltaTime, velocity.getY() * deltaTime);
     }
 
     @Override
@@ -72,47 +46,34 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
         return direction;
     }
 
+    public void reposition(float x, float y) {
+        getPosition().set(x, y);
+    }
+
     @Override
-    public void setDirection(float direction) {
+    public float getSpeed() {
+        return speed;
+    }
+
+    protected void setSpeedAndDirection(float speed, float direction) {
+        this.speed = speed;
         this.direction = normalizeDirection(direction);
         velocity.set(0, speed);
         velocity.rotate(direction);
     }
 
-    protected void setSpeed(float speed) {
-        this.speed = speed;
-        velocity.normalize();
-        velocity.multiply(speed);
+    protected void setSpeed(float x, float y) {
+        velocity.set(x, y);
+        speed = velocity.getLength();
+        direction = normalizeDirection(velocity.getAngleDegrees());
     }
 
-    private void scaleVelocity(float x, float y) {
-        velocity.multiply(x, y);
-        direction = normalizeDirection(velocity.getAngleDegrees());
-        speed = velocity.getLength();
+    protected void accelerate(float x, float y) {
+        setSpeed(velocity.getX() + x, velocity.getY() + y);
     }
 
     private float normalizeDirection(float direction) {
         return (((direction % 360f) + 360f) % 360f);
-    }
-
-    private boolean bounceIfOutside(Rectangle area) {
-        var position = getPosition();
-        var bounds = getBounds();
-
-        var horizontalBounce =
-                position.getX() + bounds.xMax() > area.xMax()
-                        || position.getX() + bounds.xMin() < area.xMin();
-
-        var verticalBounce =
-                position.getY() + bounds.yMax() > area.yMax()
-                        || position.getY() + bounds.yMin() < area.yMin();
-
-        if (horizontalBounce || verticalBounce) {
-            scaleVelocity(horizontalBounce ? -1f : 1f, verticalBounce ? -1f : 1f);
-            return true;
-        }
-
-        return false;
     }
 
     @Override

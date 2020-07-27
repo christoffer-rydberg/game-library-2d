@@ -1,59 +1,110 @@
 package com.gamelibrary2d.collision;
 
+import com.gamelibrary2d.collision.handlers.CollisionHandler;
+import com.gamelibrary2d.collision.handlers.UpdatedHandler;
 import com.gamelibrary2d.common.Pool;
 import com.gamelibrary2d.common.Rectangle;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * Updates {@link Collidable} objects and performs collision detection. A collision is defined as the bounds of two
- * registered {@link Collidable} instances overlapping. {@link CollisionAware} instances are alerted of collisions
- * in order to perform more fine grained collision detection and/or decide the aftermath of the collision.
+ * Updates {@link Collidable} objects and performs collision detection. A collision is detected when the bounds of two
+ * registered {@link Collidable} overlap. {@link CollisionHandler}'s are used to handle collisions and perform more
+ * fine grained collision detection.
  */
-public class CollisionDetection<T extends Collidable> {
+public class CollisionDetection {
+    private final Rectangle bounds;
+    private final InternalQuadTreeNode rootNode;
     private final Pool<InternalQuadTreeNode> nodePool = new Pool<>();
     private final ArrayList<ActivationArea> activationAreas = new ArrayList<>();
-    private final ArrayList<T> participants;
-    private final InternalQuadTreeNode rootNode;
-    private final ArrayList<T> updateList;
-    private final List<T> updateListReadOnly;
+    private final ArrayList<InternalCollidableWrapper<?>> participants;
+    private final ArrayList<InternalCollidableWrapper<?>> updateList;
+    private final List<Collidable> updated;
 
     /**
      * Creates a new {@link CollisionDetection} instance.
      *
-     * @param area         The collision detection area.
+     * @param bounds       The collision detection bounds.
      * @param minNodeWidth The minimum node width of the collision quad tree.
      * @param nodeCapacity The object capacity of each node. When exceeded, the node will split into child nodes (quadrants).
      */
-    public CollisionDetection(Rectangle area, float minNodeWidth, int nodeCapacity) {
+    public CollisionDetection(Rectangle bounds, float minNodeWidth, int nodeCapacity) {
+        this.bounds = bounds;
         participants = new ArrayList<>();
         rootNode = new InternalQuadTreeNode(nodePool);
         updateList = new ArrayList<>();
-        updateListReadOnly = Collections.unmodifiableList(updateList);
-        rootNode.setBounds(area.xMin(), area.yMin(), area.xMax(), area.yMax());
-        rootNode.setMaxDepth((int) Math.round(Math.log(area.width() / minNodeWidth) / Math.log(2)));
+        updated = new ArrayList<>();
+        rootNode.setBounds(bounds.xMin(), bounds.yMin(), bounds.xMax(), bounds.yMax());
+        rootNode.setMaxDepth((int) Math.round(Math.log(bounds.width() / minNodeWidth) / Math.log(2)));
         rootNode.setCapacity(nodeCapacity);
+    }
+
+    public Rectangle getBounds() {
+        return bounds;
     }
 
     /**
      * Registers the object for automatic updating and collision detection.
-     *
-     * @param collidable The object to register.
      */
-    public void add(T collidable) {
-        this.participants.add(collidable);
+    public void add(Collidable obj) {
+        participants.add(new InternalCollidableWrapper<>(obj));
+    }
+
+    /**
+     * Registers the object for automatic updating and collision detection.
+     */
+    public <T extends Collidable> void add(T obj, CollisionHandler<T, ?> collisionHandler) {
+        participants.add(new InternalCollidableWrapper<>(obj, collisionHandler));
+    }
+
+    /**
+     * Registers the object for automatic updating and collision detection.
+     */
+    public <T extends Collidable> void add(T obj, Collection<CollisionHandler<T, ?>> collisionHandlers) {
+        participants.add(new InternalCollidableWrapper<>(obj, new ArrayList<>(collisionHandlers)));
+    }
+
+    /**
+     * Registers the object for automatic updating and collision detection.
+     */
+    public <T extends Collidable> void add(T obj, UpdatedHandler<T> updatedHandler) {
+        participants.add(new InternalCollidableWrapper<>(obj, updatedHandler));
+    }
+
+    /**
+     * Registers the object for automatic updating and collision detection.
+     */
+    public <T extends Collidable> void add(T obj,
+                                           UpdatedHandler<T> updatedHandler,
+                                           CollisionHandler<T, ?> collisionHandler) {
+        participants.add(new InternalCollidableWrapper<>(obj, updatedHandler, collisionHandler));
+    }
+
+    /**
+     * Registers the object for automatic updating and collision detection.
+     */
+    public <T extends Collidable> void add(T obj,
+                                           UpdatedHandler<T> updatedHandler,
+                                           Collection<CollisionHandler<T, ?>> collisionHandlers) {
+        participants.add(new InternalCollidableWrapper<>(obj, updatedHandler, new ArrayList<>(collisionHandlers)));
     }
 
     /**
      * Unregisters the object for automatic updating and collision detection.
      *
-     * @param collidable The object to unregister.
      * @return True if the object was unregistered, false otherwise.
      */
-    public boolean remove(T collidable) {
-        return this.participants.remove(collidable);
+    public boolean remove(Object obj) {
+        for (int i = 0; i < participants.size(); ++i) {
+            if (participants.get(i).collidable.equals(obj)) {
+                participants.remove(i);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -78,11 +129,17 @@ public class CollisionDetection<T extends Collidable> {
      * Updates all registered objects and performs collision detection.
      *
      * @param deltaTime The time since the last update, in seconds.
+     * @return A list of updated objects.
      */
-    public List<T> update(float deltaTime) {
+    public List<Collidable> update(float deltaTime) {
+        updated.clear();
         rootNode.clear();
         nodePool.reset(0);
         updateList.clear();
+
+        if (deltaTime <= 0) {
+            return updated;
+        }
 
         for (int i = 0; i < activationAreas.size(); ++i) {
             rootNode.insertActivationArea(activationAreas.get(i));
@@ -106,9 +163,9 @@ public class CollisionDetection<T extends Collidable> {
         for (int i = 0; i < updateList.size(); ++i) {
             var obj = updateList.get(i);
             rootNode.update(obj, deltaTime);
-            obj.updated();
+            updated.add(obj.collidable);
         }
 
-        return updateListReadOnly;
+        return updated;
     }
 }
