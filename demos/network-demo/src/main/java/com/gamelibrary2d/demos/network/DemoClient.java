@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 public class DemoClient extends AbstractClient {
     private final UpdateLoop updateLoop;
 
+    private volatile boolean disconnected;
+
     DemoClient() {
         updateLoop = new UpdateLoop(this::update, 10);
     }
@@ -41,6 +43,15 @@ public class DemoClient extends AbstractClient {
         }
 
         updateLoop.run();
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        if (disconnected) {
+            readMessages(); // Read and handle any last messages
+            updateLoop.stop();
+        }
     }
 
     private void sendMessage(String message) {
@@ -72,6 +83,6 @@ public class DemoClient extends AbstractClient {
     }
 
     private void onDisconnected(CommunicatorDisconnectedEvent event) {
-        updateLoop.stop();
+        disconnected = true;
     }
 }

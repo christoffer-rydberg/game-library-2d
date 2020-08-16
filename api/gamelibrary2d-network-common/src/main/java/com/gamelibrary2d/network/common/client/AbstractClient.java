@@ -200,19 +200,9 @@ public abstract class AbstractClient implements Client {
         return communicator;
     }
 
-    private void readMessages() {
+    protected void readMessages() {
         handleMessages();
-
-        var communicator = getCommunicator();
-        boolean hasIncoming;
-        try {
-            hasIncoming = refreshInboxIfEmpty(communicator);
-        } catch (IOException e) {
-            communicator.disconnect(e);
-            return;
-        }
-
-        if (hasIncoming) {
+        if (refreshInboxIfEmpty(getCommunicator())) {
             handleMessages();
         }
     }
@@ -223,7 +213,7 @@ public abstract class AbstractClient implements Client {
         }
     }
 
-    private boolean refreshInboxIfEmpty(Communicator communicator) throws IOException {
+    private boolean refreshInboxIfEmpty(Communicator communicator) {
         return inbox.remaining() > 0 || communicator.readIncoming(inbox);
     }
 
