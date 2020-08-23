@@ -42,7 +42,6 @@ import com.gamelibrary2d.updaters.ParallelUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
 import com.gamelibrary2d.updates.EmptyUpdate;
 import com.gamelibrary2d.updates.ScaleUpdate;
-import com.gamelibrary2d.updates.Update;
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.QuadShape;
 import com.gamelibrary2d.util.RenderSettings;
@@ -270,15 +269,18 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
         var parallelUpdater = new ParallelUpdater();
         objectLayer.getChildren().stream()
-                .map(obj -> new DurationUpdater(2f, new SuckedIntoPortalUpdate(obj, portalPosition)))
+                .map(obj -> new DurationUpdater(
+                        2f,
+                        true,
+                        new SuckedIntoPortalUpdate(obj, portalPosition)))
                 .forEach(updater -> parallelUpdater.add(updater));
 
         var sequentialUpdater = new SequentialUpdater();
         sequentialUpdater.add(new DurationUpdater(1.5f, new EmptyUpdate()));
         sequentialUpdater.add(parallelUpdater);
-        sequentialUpdater.add(new InstantUpdater((x, y) -> objectLayer.clear()));
+        sequentialUpdater.add(new InstantUpdater(dt -> objectLayer.clear()));
         sequentialUpdater.add(new DurationUpdater(5f, new EmptyUpdate()));
-        sequentialUpdater.add(new InstantUpdater((x, y) -> getClient().requestNewGame()));
+        sequentialUpdater.add(new InstantUpdater(dt -> getClient().requestNewGame()));
 
         runUpdater(sequentialUpdater);
     }
@@ -292,7 +294,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         timeLabel.setTimeFromSeconds(seconds);
     }
 
-    private class SuckedIntoPortalUpdate implements Update {
+    private class SuckedIntoPortalUpdate implements Updatable {
         private final ClientObject target;
         private final float originX;
         private final float originY;
@@ -310,8 +312,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         }
 
         @Override
-        public void apply(float deltaTime, float scaledDeltaTime) {
-            timer += scaledDeltaTime;
+        public void update(float deltaTime) {
+            timer += deltaTime;
             target.getPosition().lerp(originX, originY, goalX, goalY, Math.min(timer * 2f, 1f));
             target.setScale(1f - timer);
         }

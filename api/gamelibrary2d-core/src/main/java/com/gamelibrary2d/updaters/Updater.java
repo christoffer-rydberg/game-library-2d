@@ -1,10 +1,10 @@
 package com.gamelibrary2d.updaters;
 
 import com.gamelibrary2d.frames.Frame;
-import com.gamelibrary2d.updates.Update;
+import com.gamelibrary2d.markers.Updatable;
 
 /**
- * The {@link Updater} is used to apply one or more {@link Update updates}. You
+ * The {@link Updater} is used to apply one or more {@link Updatable updates}. You
  * can run an updater by invoking {@link Frame#runUpdater}.
  */
 public interface Updater {

@@ -29,11 +29,11 @@ public class InfiniteUpdater implements Updater {
     @Override
     public float update(float deltaTime) {
         if (aborted) {
-            return 0;
+            return 0f;
         }
 
         onUpdate.update(deltaTime);
-        
+
         return deltaTime;
     }
 }

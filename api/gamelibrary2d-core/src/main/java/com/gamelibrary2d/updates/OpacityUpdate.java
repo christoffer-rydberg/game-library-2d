@@ -9,11 +9,7 @@ public class OpacityUpdate extends AbstractAttributeUpdate {
     private float deltaOpacity;
 
     public OpacityUpdate(GameObject target, float deltaOpacity) {
-        this(target, deltaOpacity, true);
-    }
-
-    public OpacityUpdate(GameObject target, float deltaOpacity, boolean scaleOverDuration) {
-        super(target, scaleOverDuration);
+        super(target);
         this.originalDeltaOpacity = deltaOpacity;
         this.deltaOpacity = deltaOpacity;
     }
@@ -29,7 +25,7 @@ public class OpacityUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    protected void onApply(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         getTarget().setOpacity(getTarget().getOpacity() + deltaOpacity * deltaTime);
     }
 }

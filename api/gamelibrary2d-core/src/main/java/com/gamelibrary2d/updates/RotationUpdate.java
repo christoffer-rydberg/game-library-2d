@@ -9,11 +9,7 @@ public class RotationUpdate extends AbstractAttributeUpdate {
     private float deltaRotation;
 
     public RotationUpdate(GameObject target, float deltaRotation) {
-        this(target, deltaRotation, true);
-    }
-
-    public RotationUpdate(GameObject target, float deltaRotation, boolean scaleOverDuration) {
-        super(target, scaleOverDuration);
+        super(target);
         this.originalDeltaRotation = deltaRotation;
         this.deltaRotation = deltaRotation;
     }
@@ -29,7 +25,7 @@ public class RotationUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    protected void onApply(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         getTarget().setRotation(getTarget().getRotation() + deltaRotation * deltaTime);
     }
 }

@@ -25,9 +25,9 @@ public class SoundUpdaterFactory {
         SequentialUpdater updater = new SequentialUpdater(2);
         updater.add(createVolumeUpdater(soundSource, 0, duration));
         if (pause) {
-            updater.add(new InstantUpdater((x, y) -> soundManager.pause(soundSource)));
+            updater.add(new InstantUpdater(dt -> soundManager.pause(soundSource)));
         } else {
-            updater.add(new InstantUpdater((x, y) -> soundManager.stop(soundSource)));
+            updater.add(new InstantUpdater(dt -> soundManager.stop(soundSource)));
         }
 
         return updater;
@@ -44,7 +44,7 @@ public class SoundUpdaterFactory {
     public static Updater createFadeInUpdater(SoundManager soundManager, SoundSource soundSource, float volume,
                                               float duration) {
         SequentialUpdater updater = new SequentialUpdater(2);
-        updater.add(new InstantUpdater((x, y) -> {
+        updater.add(new InstantUpdater(dt -> {
             soundSource.setVolume(0);
             soundManager.play(soundSource);
         }));

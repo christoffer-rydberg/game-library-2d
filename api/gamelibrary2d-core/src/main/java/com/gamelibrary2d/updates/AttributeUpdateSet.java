@@ -44,9 +44,9 @@ public class AttributeUpdateSet implements AttributeUpdate {
     }
 
     @Override
-    public void apply(float deltaTime, float scaledDeltaTime) {
+    public void update(float deltaTime) {
         for (int i = 0; i < targetUpdates.size(); ++i) {
-            targetUpdates.get(i).apply(deltaTime, scaledDeltaTime);
+            targetUpdates.get(i).update(deltaTime);
         }
     }
 

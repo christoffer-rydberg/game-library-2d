@@ -103,9 +103,8 @@ public class DemoFrame extends AbstractFrame {
     private void createFire(float posX, float posY, float delay) {
         var updater = new SequentialUpdater();
         updater.add(new DurationUpdater(delay, new EmptyUpdate()));
-        updater.add(new InstantUpdater((dt, sdt) -> {
-            emitters.add(new SequentialParticleEmitter(fireSystem, posX, posY));
-        }));
+        updater.add(new InstantUpdater(dt ->
+                emitters.add(new SequentialParticleEmitter(fireSystem, posX, posY))));
         runUpdater(updater);
     }
 

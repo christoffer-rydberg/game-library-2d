@@ -105,9 +105,9 @@ public class ValueUpdater implements Updater {
 
     @Override
     public float update(float deltaTime) {
-
-        if (deltaTime <= 0)
-            return 0;
+        if (deltaTime <= 0) {
+            return 0f;
+        }
 
         float value = getter.get();
 

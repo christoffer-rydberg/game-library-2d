@@ -14,16 +14,8 @@ public class ScaleUpdate extends AbstractAttributeUpdate {
         this(target, deltaScale, deltaScale);
     }
 
-    public ScaleUpdate(GameObject target, float deltaScale, boolean scaleOverDuration) {
-        this(target, deltaScale, deltaScale, scaleOverDuration);
-    }
-
     public ScaleUpdate(GameObject target, float deltaX, float deltaY) {
-        this(target, deltaX, deltaY, true);
-    }
-
-    public ScaleUpdate(GameObject target, float deltaX, float deltaY, boolean scaleOverDuration) {
-        super(target, scaleOverDuration);
+        super(target);
         this.originalDeltaX = deltaX;
         this.originalDeltaY = deltaY;
         this.deltaX = deltaX;
@@ -43,7 +35,7 @@ public class ScaleUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    protected void onApply(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         getTarget().getScale().add(deltaX * deltaTime, deltaY * deltaTime);
     }
 

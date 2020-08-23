@@ -154,7 +154,7 @@ public class MusicPlayer {
 
         SoundSource source = getSource();
         SequentialUpdater updater = getUpdater();
-        updater.add(new InstantUpdater((x, y) -> source.setSoundBuffer(activeBuffer)));
+        updater.add(new InstantUpdater(dt -> source.setSoundBuffer(activeBuffer)));
         updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume,
                 stopped ? fadeInTime / 2 : fadeInTime));
         frame.runUpdater(updater, false);

@@ -11,11 +11,7 @@ public class PositionUpdate extends AbstractAttributeUpdate {
     private float deltaY;
 
     public PositionUpdate(GameObject target, float deltaX, float deltaY) {
-        this(target, deltaX, deltaY, true);
-    }
-
-    public PositionUpdate(GameObject target, float deltaX, float deltaY, boolean scaleOverDuration) {
-        super(target, scaleOverDuration);
+        super(target);
         this.originalDeltaX = deltaX;
         this.originalDeltaY = deltaY;
         this.deltaX = deltaX;
@@ -34,7 +30,7 @@ public class PositionUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    protected void onApply(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         getTarget().getPosition().add(deltaX * deltaTime, deltaY * deltaTime);
     }
 }

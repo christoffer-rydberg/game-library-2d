@@ -1,14 +1,14 @@
 package com.gamelibrary2d.updaters;
 
-import com.gamelibrary2d.updates.Update;
+import com.gamelibrary2d.markers.Updatable;
 
 public class InstantUpdater implements Updater {
 
-    private final Update update;
+    private final Updatable update;
 
     private boolean finished = false;
 
-    public InstantUpdater(Update update) {
+    public InstantUpdater(Updatable update) {
         this.update = update;
     }
 
@@ -24,10 +24,11 @@ public class InstantUpdater implements Updater {
 
     @Override
     public float update(float deltaTime) {
-        if (isFinished())
-            return deltaTime;
+        if (isFinished()) {
+            return 0f;
+        }
 
-        update.apply(deltaTime, 1f);
+        update.update(1f);
 
         finished = true;
 

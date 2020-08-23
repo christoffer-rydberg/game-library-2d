@@ -6,11 +6,8 @@ abstract class AbstractAttributeUpdate implements AttributeUpdate {
 
     private final GameObject target;
 
-    private final boolean scaleOverDuration;
-
-    protected AbstractAttributeUpdate(GameObject target, boolean scaleOverDuration) {
+    protected AbstractAttributeUpdate(GameObject target) {
         this.target = target;
-        this.scaleOverDuration = scaleOverDuration;
     }
 
     public GameObject getTarget() {
@@ -18,9 +15,9 @@ abstract class AbstractAttributeUpdate implements AttributeUpdate {
     }
 
     @Override
-    public void apply(float deltaTime, float scaledDeltaTime) {
-        onApply(scaleOverDuration ? scaledDeltaTime : deltaTime);
+    public void update(float deltaTime) {
+        onUpdate(deltaTime);
     }
 
-    protected abstract void onApply(float deltaTime);
+    protected abstract void onUpdate(float deltaTime);
 }
