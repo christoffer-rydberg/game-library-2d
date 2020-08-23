@@ -29,6 +29,7 @@
 	  <module>demos/network-game-demo</module>
 	  <module>demos/lightning-demo</module>
 	  <module>demos/split-screen-demo</module>
+	  <module>demos/collision-detection-demo</module>
   </modules>
 
 </project>

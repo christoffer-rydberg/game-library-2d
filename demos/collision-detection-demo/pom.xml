@@ -46,7 +46,7 @@
                     <outputDirectory>${project.basedir}/../../jar/demos</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.gamelibrary2d.demos.lightning.LightningDemo</mainClass>
+                            <mainClass>com.gamelibrary2d.demos.collisiondetection.CollisionDetectionDemo</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
