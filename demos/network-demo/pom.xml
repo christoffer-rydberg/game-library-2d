@@ -7,7 +7,7 @@
     <groupId>com.gamelibrary2d.demos</groupId>
     <artifactId>network-demo</artifactId>
     <version>0.5.0</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>13</maven.compiler.source>
