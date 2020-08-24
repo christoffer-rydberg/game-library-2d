@@ -21,14 +21,11 @@ public class ParticlePositioner implements Serializable {
     private static final int SPAWN_AREA = 8;
     private static final int LOCAL_CENTER = 9;
 
-    private SpawnArea spawnArea;
-    private float cachedSpawnArea = -1;
-
     private float[] internalState = new float[STRIDE];
     private int updateCounter;
 
     public ParticlePositioner() {
-        spawnArea = SpawnArea.RECTANGLE;
+
     }
 
     public ParticlePositioner(DataBuffer buffer) {
@@ -50,31 +47,21 @@ public class ParticlePositioner implements Serializable {
 
     public SpawnArea getSpawnArea() {
         var value = internalState[SPAWN_AREA];
-        if (value != cachedSpawnArea) {
-            setSpawnAreaFromFloatValue(value);
+        if (value == 0f) {
+            return SpawnArea.RECTANGLE;
+        } else {
+            return SpawnArea.ELLIPSE;
         }
-
-        return spawnArea;
     }
 
     public void setSpawnArea(SpawnArea spawnArea) {
         switch (spawnArea) {
             case RECTANGLE:
-                cachedSpawnArea = 0;
+                setInternalState(SPAWN_AREA, 0f);
                 break;
             case ELLIPSE:
-                cachedSpawnArea = 1;
+                setInternalState(SPAWN_AREA, 1f);
                 break;
-        }
-        this.spawnArea = spawnArea;
-    }
-
-    private void setSpawnAreaFromFloatValue(float value) {
-        cachedSpawnArea = value;
-        if (value == 0f) {
-            spawnArea = SpawnArea.RECTANGLE;
-        } else {
-            spawnArea = SpawnArea.ELLIPSE;
         }
     }
 
@@ -87,8 +74,10 @@ public class ParticlePositioner implements Serializable {
     }
 
     private void setInternalState(int index, float value) {
-        ++updateCounter;
-        internalState[index] = value;
+        if (internalState[index] != value) {
+            internalState[index] = value;
+            ++updateCounter;
+        }
     }
 
     /**
