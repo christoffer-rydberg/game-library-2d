@@ -211,12 +211,12 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void onCharInput(char charInput) {
+    public void charInput(char charInput) {
 
     }
 
     @Override
-    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
         if (key == Keyboard.instance().keyUp()) {
             addSpaceCraft();
             refreshSplitLayout(spaceCrafts);
@@ -227,7 +227,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void onKeyReleased(int key, int scanCode, int mods) {
+    public void keyReleased(int key, int scanCode, int mods) {
 
     }
 }

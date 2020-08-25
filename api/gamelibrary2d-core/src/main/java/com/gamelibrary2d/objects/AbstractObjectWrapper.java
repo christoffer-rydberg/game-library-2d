@@ -38,23 +38,23 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public void onCharInput(char charInput) {
+    public void charInput(char charInput) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).onCharInput(charInput);
+            ((KeyAware) wrapped).charInput(charInput);
         }
     }
 
     @Override
-    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).onKeyDown(key, scanCode, repeat, mods);
+            ((KeyAware) wrapped).keyDown(key, scanCode, repeat, mods);
         }
     }
 
     @Override
-    public void onKeyReleased(int key, int scanCode, int mods) {
+    public void keyReleased(int key, int scanCode, int mods) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).onKeyReleased(key, scanCode, mods);
+            ((KeyAware) wrapped).keyReleased(key, scanCode, mods);
         }
     }
 
@@ -84,25 +84,25 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public boolean onMouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y) {
         if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).onMouseButtonDown(button, mods, x, y);
+            return ((MouseAware) wrapped).mouseButtonDown(button, mods, x, y);
         }
         return false;
     }
 
     @Override
-    public boolean onMouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y) {
         if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).onMouseMove(x, y);
+            return ((MouseAware) wrapped).mouseMove(x, y);
         }
         return false;
     }
 
     @Override
-    public void onMouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y) {
         if (wrapped instanceof MouseAware) {
-            ((MouseAware) wrapped).onMouseButtonReleased(button, mods, x, y);
+            ((MouseAware) wrapped).mouseButtonReleased(button, mods, x, y);
         }
     }
     

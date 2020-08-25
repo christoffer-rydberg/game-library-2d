@@ -1,15 +1,12 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.FocusAware;
-import com.gamelibrary2d.markers.MouseWhenFocusedAware;
 import com.gamelibrary2d.widgets.events.*;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class AbstractObservableWidget<T
-        extends Renderable> extends InternalAbstractWidget<T> implements FocusAware, MouseWhenFocusedAware {
+public abstract class AbstractObservableWidget<T extends Renderable> extends AbstractWidget<T> {
     private final List<MouseButtonDown> mouseButtonDownListeners = new CopyOnWriteArrayList<>();
     private final List<MouseMoved> mouseHoverListeners = new CopyOnWriteArrayList<>();
     private final List<MouseMoved> mouseDragListeners = new CopyOnWriteArrayList<>();
@@ -106,28 +103,30 @@ public abstract class AbstractObservableWidget<T
     }
 
     @Override
-    protected void onHandleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+    protected void onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+        super.onMouseButtonDown(button, mods, projectedX, projectedY);
         for (var listener : mouseButtonDownListeners) {
             listener.onMouseButtonDown(button, mods, projectedX, projectedY);
         }
     }
 
     @Override
-    protected void handleMouseHover(float projectedX, float projectedY) {
+    protected void onMouseHover(float projectedX, float projectedY) {
         for (var listener : mouseHoverListeners) {
             listener.onMouseMoved(projectedX, projectedY, false);
         }
     }
 
     @Override
-    protected void handleMouseDrag(float projectedX, float projectedY) {
+    protected void onMouseDrag(float projectedX, float projectedY) {
         for (var listener : mouseDragListeners) {
             listener.onMouseMoved(projectedX, projectedY, true);
         }
     }
-    
+
     @Override
-    protected void onHandleMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        super.onMouseButtonReleased(button, mods, projectedX, projectedY);
         for (var listener : mouseButtonReleasedListeners) {
             listener.onMouseButtonReleased(button, mods, projectedX, projectedY);
         }
@@ -135,7 +134,7 @@ public abstract class AbstractObservableWidget<T
 
     @Override
     public void onCharInput(char charInput) {
-        super.onCharInput(charInput);
+        super.charInput(charInput);
         for (var listener : charInputListeners) {
             listener.onCharInput(charInput);
         }
@@ -143,7 +142,7 @@ public abstract class AbstractObservableWidget<T
 
     @Override
     public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        super.onKeyDown(key, scanCode, repeat, mods);
+        super.keyDown(key, scanCode, repeat, mods);
         for (var listener : keyDownListeners) {
             listener.onKeyDown(key, scanCode, repeat, mods);
         }
@@ -151,7 +150,7 @@ public abstract class AbstractObservableWidget<T
 
     @Override
     public void onKeyReleased(int key, int scanCode, int mods) {
-        super.onKeyReleased(key, scanCode, mods);
+        super.keyReleased(key, scanCode, mods);
         for (var listener : keyReleasedListeners) {
             listener.onKeyReleased(key, scanCode, mods);
         }

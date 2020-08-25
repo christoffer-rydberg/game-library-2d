@@ -18,7 +18,7 @@ public interface MouseAware {
      * @return True if the mouse event is handled and should not be routed to other
      * objects, false otherwise.
      */
-    boolean onMouseButtonDown(int button, int mods, float x, float y);
+    boolean mouseButtonDown(int button, int mods, float x, float y);
 
     /**
      * Handles mouse move events.
@@ -28,7 +28,7 @@ public interface MouseAware {
      * @return True if the mouse event is handled and should not be routed to other
      * objects, false otherwise.
      */
-    boolean onMouseMove(float x, float y);
+    boolean mouseMove(float x, float y);
 
     /**
      * Handles mouse button release events.
@@ -38,6 +38,6 @@ public interface MouseAware {
      * @param x      The x-coordinate of the mouse cursor projected to the parent of the object.
      * @param y      The y-coordinate of the mouse cursor projected to the parent of the object.
      */
-    void onMouseButtonReleased(int button, int mods, float x, float y);
+    void mouseButtonReleased(int button, int mods, float x, float y);
 
 }

@@ -4,8 +4,8 @@ import com.gamelibrary2d.layers.NavigationPanel;
 
 public interface NavigationAware {
 
-    void onNavigatedTo(NavigationPanel navigationPanel);
+    void navigatedTo(NavigationPanel navigationPanel);
 
-    void onNavigatedFrom(NavigationPanel navigationPanel);
+    void navigatedFrom(NavigationPanel navigationPanel);
 
 }

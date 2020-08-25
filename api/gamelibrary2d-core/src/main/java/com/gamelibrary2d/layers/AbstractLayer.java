@@ -122,15 +122,15 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public final boolean onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
-        return isEnabled() ? handleMouseButtonDown(button, mods, projectedX, projectedY) : false;
+    public final boolean mouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+        return isEnabled() ? onMouseButtonDown(button, mods, projectedX, projectedY) : false;
     }
 
-    protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+    protected boolean onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
             MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.onMouseButtonDown(button, mods, projectedX, projectedY)) {
+            if (obj.mouseButtonDown(button, mods, projectedX, projectedY)) {
                 mouseAwareIterationList.clear();
                 return true;
             }
@@ -142,15 +142,15 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public final boolean onMouseMove(float projectedX, float projectedY) {
-        return isEnabled() ? handleMouseMove(projectedX, projectedY) : false;
+    public final boolean mouseMove(float projectedX, float projectedY) {
+        return isEnabled() ? onMouseMove(projectedX, projectedY) : false;
     }
 
-    protected boolean handleMouseMove(float projectedX, float projectedY) {
+    protected boolean onMouseMove(float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
             MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.onMouseMove(projectedX, projectedY)) {
+            if (obj.mouseMove(projectedX, projectedY)) {
                 mouseAwareIterationList.clear();
                 return true;
             }
@@ -162,16 +162,16 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public final void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+    public final void mouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         if (isEnabled()) {
-            handleMouseButtonReleased(button, mods, projectedX, projectedY);
+            onMouseButtonReleased(button, mods, projectedX, projectedY);
         }
     }
 
-    protected void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
         mouseAwareIterationList.addAll(mouseAwareObjects);
         for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            mouseAwareIterationList.get(i).onMouseButtonReleased(button, mods, projectedX, projectedY);
+            mouseAwareIterationList.get(i).mouseButtonReleased(button, mods, projectedX, projectedY);
         }
 
         mouseAwareIterationList.clear();

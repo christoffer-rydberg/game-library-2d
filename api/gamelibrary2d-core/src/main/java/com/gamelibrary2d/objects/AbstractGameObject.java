@@ -6,9 +6,8 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.markers.Bounded;
-import com.gamelibrary2d.markers.KeyAware;
 
-public abstract class AbstractGameObject<T extends Renderable> implements KeyAware, GameObject {
+public abstract class AbstractGameObject<T extends Renderable> implements GameObject {
     private final Point position = new Point();
     private final Point scale = new Point(1, 1);
     private final Point scaleAndRotationCenter = new Point();
@@ -41,30 +40,6 @@ public abstract class AbstractGameObject<T extends Renderable> implements KeyAwa
             return ((Bounded) content).getBounds();
         else
             return Rectangle.EMPTY;
-    }
-
-    @Override
-    public void onCharInput(char charInput) {
-        var content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).onCharInput(charInput);
-        }
-    }
-
-    @Override
-    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        var content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).onKeyDown(key, scanCode, repeat, mods);
-        }
-    }
-
-    @Override
-    public void onKeyReleased(int key, int scanCode, int mods) {
-        var content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).onKeyReleased(key, scanCode, mods);
-        }
     }
 
     @Override

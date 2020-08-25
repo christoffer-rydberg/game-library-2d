@@ -49,33 +49,33 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     }
 
     @Override
-    public boolean onMouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y) {
         var content = getContent();
         if (content instanceof MouseAware) {
             var projected = Projection.projectTo(this, x, y);
-            return ((MouseAware) content).onMouseButtonDown(button, mods, projected.getX(), projected.getY());
+            return ((MouseAware) content).mouseButtonDown(button, mods, projected.getX(), projected.getY());
         }
 
         return false;
     }
 
     @Override
-    public boolean onMouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y) {
         var content = getContent();
         if (content instanceof MouseAware) {
             var projected = Projection.projectTo(this, x, y);
-            return ((MouseAware) content).onMouseMove(projected.getX(), projected.getY());
+            return ((MouseAware) content).mouseMove(projected.getX(), projected.getY());
         }
 
         return false;
     }
 
     @Override
-    public void onMouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y) {
         var content = getContent();
         if (content instanceof MouseAware) {
             var projected = Projection.projectTo(this, x, y);
-            ((MouseAware) content).onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
+            ((MouseAware) content).mouseButtonReleased(button, mods, projected.getX(), projected.getY());
         }
     }
 
@@ -87,14 +87,14 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     private void navigatedFrom(GameObject obj) {
         var navigationAware = asNavigationAware(obj);
         if (navigationAware != null) {
-            navigationAware.onNavigatedFrom(this);
+            navigationAware.navigatedFrom(this);
         }
     }
 
     private void navigatedTo(GameObject obj) {
         var navigationAware = asNavigationAware(obj);
         if (navigationAware != null) {
-            navigationAware.onNavigatedTo(this);
+            navigationAware.navigatedTo(this);
         }
     }
 

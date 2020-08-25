@@ -41,7 +41,7 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean onMouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y) {
         if (!isDrawing()) {
             drawButton = button;
             line.getStart().set(x, y);
@@ -54,7 +54,7 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean onMouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y) {
         if (isDrawing()) {
             line.getEnd().set(x, y);
             line.refresh();
@@ -65,7 +65,7 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void onMouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y) {
         if (drawButton == button) {
             drawButton = -1;
             var direction = line.getStart().getDirectionDegrees(line.getEnd());

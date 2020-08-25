@@ -109,7 +109,7 @@ public class DemoFrame extends AbstractFrame {
     }
 
     @Override
-    protected boolean handleMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
+    protected boolean onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
         explosionSystem.emitAll(projectedX, projectedY);
         createFire(projectedX, projectedY, 1f);
         return true;

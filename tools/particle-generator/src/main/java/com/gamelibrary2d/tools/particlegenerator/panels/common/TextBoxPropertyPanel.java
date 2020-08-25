@@ -60,7 +60,7 @@ public abstract class TextBoxPropertyPanel<T> extends StackPanel {
             textBoxContext.setFontColor(Color.WHITE);
 
             var textBox = new DefaultWidget<>(textBoxContext);
-            textBox.setFocusChangedAction(focused -> {
+            textBox.addFocusChangedListener(focused -> {
                 this.focused = focused;
                 textBox.getContent().setFontColor(getStatusColor());
             });

@@ -20,20 +20,20 @@ public abstract class AbstractCursor<T extends Renderable> extends AbstractGameO
     }
 
     @Override
-    public boolean onMouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y) {
         onInteracted();
         return false;
     }
 
     @Override
-    public boolean onMouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y) {
         setPosition(x, y);
         onInteracted();
         return false;
     }
 
     @Override
-    public void onMouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y) {
         onInteracted();
     }
 

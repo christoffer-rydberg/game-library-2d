@@ -360,15 +360,15 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         var frame = getFrame();
         if (action == Keyboard.instance().actionPressed()) {
             if (frame instanceof KeyAware)
-                ((KeyAware) frame).onKeyDown(key, scancode, false, mods);
+                ((KeyAware) frame).keyDown(key, scancode, false, mods);
             FocusManager.keyDownEvent(key, scancode, false, mods);
         } else if (action == Keyboard.instance().actionRepeat()) {
             if (frame instanceof KeyAware)
-                ((KeyAware) frame).onKeyDown(key, scancode, true, mods);
+                ((KeyAware) frame).keyDown(key, scancode, true, mods);
             FocusManager.keyDownEvent(key, scancode, true, mods);
         } else {
             if (frame instanceof KeyAware)
-                ((KeyAware) frame).onKeyReleased(key, scancode, mods);
+                ((KeyAware) frame).keyReleased(key, scancode, mods);
             FocusManager.keyReleaseEvent(key, scancode, mods);
         }
     }
@@ -376,7 +376,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onCharCallback(char charInput) {
         if (frame instanceof KeyAware)
-            ((KeyAware) frame).onCharInput(charInput);
+            ((KeyAware) frame).charInput(charInput);
         FocusManager.charInputEvent(charInput);
     }
 
@@ -386,7 +386,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         cursorPosY = (float) ypos;
         var frame = getFrame();
         if (frame != null) {
-            frame.onMouseMove(cursorPosX, cursorPosY);
+            frame.mouseMove(cursorPosX, cursorPosY);
         }
     }
 
@@ -398,10 +398,10 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onMouseButtonCallback(int button, int action, int mods) {
         if (action == Mouse.instance().actionPressed()) {
-            getFrame().onMouseButtonDown(button, mods, cursorPosX, cursorPosY);
+            getFrame().mouseButtonDown(button, mods, cursorPosX, cursorPosY);
             FocusManager.mouseButtonEventFinished(button, ButtonAction.PRESSED, mods);
         } else if (action == Mouse.instance().actionReleased()) {
-            getFrame().onMouseButtonReleased(button, mods, cursorPosX, cursorPosY);
+            getFrame().mouseButtonReleased(button, mods, cursorPosX, cursorPosY);
             FocusManager.mouseButtonEventFinished(button, ButtonAction.RELEASED, mods);
         }
     }

@@ -14,7 +14,7 @@ import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.util.io.FileChooser;
-import com.gamelibrary2d.widgets.DefaultObservableWidget;
+import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class DemoFrame extends AbstractFrame {
         loadButtonContext.setText("Click here to load GIF");
         var textBounds = font.textSize(loadButtonContext.getText(), loadButtonContext.getHorizontalAlignment(), loadButtonContext.getVerticalAlignment());
 
-        var loadButton = new DefaultObservableWidget<>();
+        var loadButton = new DefaultWidget<>();
         loadButton.setContent(loadButtonContext);
         loadButton.setBounds(textBounds);
         loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);

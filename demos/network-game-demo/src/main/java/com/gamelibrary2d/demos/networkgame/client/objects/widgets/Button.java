@@ -13,7 +13,11 @@ import com.gamelibrary2d.widgets.Label;
 
 public class Button extends AbstractWidget<Label> {
 
+    private final Action onClick;
+
     public Button(String text, Action onClick) {
+        this.onClick = onClick;
+
         var background = new SurfaceRenderer(
                 Surfaces.button(),
                 Textures.button());
@@ -24,7 +28,12 @@ public class Button extends AbstractWidget<Label> {
         var content = new Label(text, new TextRenderer(Fonts.button()));
         content.setBackground(background);
         setContent(content);
-
-        setMouseButtonReleasedAction((b, m, x, y) -> onClick.invoke());
     }
+
+    @Override
+    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        super.onMouseButtonReleased(button, mods, projectedX, projectedY);
+        onClick.invoke();
+    }
+
 }

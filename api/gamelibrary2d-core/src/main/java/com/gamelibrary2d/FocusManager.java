@@ -67,7 +67,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).onKeyDown(key, scanCode, repeat, mods);
+                iterationList.get(i).keyDown(key, scanCode, repeat, mods);
             }
         } finally {
             iterationList.clear();
@@ -78,7 +78,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).onKeyReleased(key, scanCode, mods);
+                iterationList.get(i).keyReleased(key, scanCode, mods);
             }
         } finally {
             iterationList.clear();
@@ -89,7 +89,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).onCharInput(charInput);
+                iterationList.get(i).charInput(charInput);
             }
         } finally {
             iterationList.clear();
@@ -102,7 +102,7 @@ public class FocusManager {
             for (int i = 0; i < iterationList.size(); ++i) {
                 var obj = iterationList.get(i);
                 if (obj instanceof MouseWhenFocusedAware) {
-                    ((MouseWhenFocusedAware) obj).onMouseButtonWhenFocused(button, action, mods);
+                    ((MouseWhenFocusedAware) obj).mouseButtonWhenFocused(button, action, mods);
                 }
             }
         } finally {

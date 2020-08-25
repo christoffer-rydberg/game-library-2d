@@ -96,7 +96,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     }
 
     private GameObject createHandle(Renderable renderable) {
-        var handleObj = new DefaultObservableWidget<>(renderable);
+        var handleObj = new DefaultWidget<>(renderable);
         handleObj.addMouseButtonDownListener(this::onHandleClicked);
         handleObj.addMouseDragListener(this::onHandleDragged);
         handleObj.addMouseButtonReleasedListener(this::onHandleReleased);

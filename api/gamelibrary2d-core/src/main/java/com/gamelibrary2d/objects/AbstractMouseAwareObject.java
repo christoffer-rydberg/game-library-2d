@@ -9,6 +9,7 @@ import com.gamelibrary2d.renderers.BitmapRenderer;
 import com.gamelibrary2d.util.Projection;
 
 public abstract class AbstractMouseAwareObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
+
     private final MouseButtonStates mouseButtonStates = new MouseButtonStates(5);
     private Rectangle bounds;
     private BitmapRenderer bitmapRenderer;
@@ -76,11 +77,12 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final boolean onMouseButtonDown(int button, int mods, float x, float y) {
+    public final boolean mouseButtonDown(int button, int mods, float x, float y) {
         if (isEnabled()) {
             var projected = Projection.projectTo(this, x, y);
             if (isPixelVisible(projected.getX(), projected.getY())) {
-                handleMouseButtonDown(button, mods, projected.getX(), projected.getY());
+                onMouseButtonEventStarted();
+                onMouseButtonDown(button, mods, projected.getX(), projected.getY());
                 mouseButtonStates.setActive(button, true);
                 return true;
             }
@@ -92,16 +94,16 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final boolean onMouseMove(float x, float y) {
+    public final boolean mouseMove(float x, float y) {
         if (isEnabled()) {
             if (mouseButtonStates.hasActiveButtons() && isListeningToMouseDragEvents()) {
                 var projected = Projection.projectTo(this, x, y);
-                handleMouseDrag(projected.getX(), projected.getY());
+                onMouseDrag(projected.getX(), projected.getY());
                 return true;
             } else if (isListeningToMouseHoverEvents()) {
                 var projected = Projection.projectTo(this, x, y);
                 if (isPixelVisible(projected.getX(), projected.getY())) {
-                    handleMouseHover(projected.getX(), projected.getY());
+                    onMouseHover(projected.getX(), projected.getY());
                     return true;
                 }
             }
@@ -111,28 +113,36 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final void onMouseButtonReleased(int button, int mods, float x, float y) {
+    public final void mouseButtonReleased(int button, int mods, float x, float y) {
         if (isEnabled() && mouseButtonStates.isActive(button)) {
             mouseButtonStates.setActive(button, false);
             var projected = Projection.projectTo(this, x, y);
-            handleMouseButtonReleased(button, mods, projected.getX(), projected.getY());
+            onMouseButtonEventStarted();
+            onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
         }
+    }
+
+    /**
+     * Invoked before {@link #mouseButtonDown} or {@link #mouseButtonReleased}
+     * in order to alert that a mouse button event is about to be handled.
+     */
+    protected void onMouseButtonEventStarted() {
+
     }
 
     protected abstract boolean isListeningToMouseHoverEvents();
 
     protected abstract boolean isListeningToMouseDragEvents();
 
-    protected abstract void handleMouseButtonDown(int button, int mods, float projectedX, float projectedY);
+    protected abstract void onMouseButtonDown(int button, int mods, float projectedX, float projectedY);
 
-    protected abstract void handleMouseButtonReleased(int button, int mods, float projectedX, float projectedY);
+    protected abstract void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY);
 
-    protected abstract void handleMouseHover(float projectedX, float projectedY);
+    protected abstract void onMouseHover(float projectedX, float projectedY);
 
-    protected abstract void handleMouseDrag(float projectedX, float projectedY);
+    protected abstract void onMouseDrag(float projectedX, float projectedY);
 
     private static class MouseButtonStates {
-
         private int activeButtons;
 
         private boolean[] buttons;

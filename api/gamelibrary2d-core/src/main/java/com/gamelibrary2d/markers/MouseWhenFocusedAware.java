@@ -12,5 +12,5 @@ public interface MouseWhenFocusedAware {
      * @param action The key action (press or release).
      * @param mods   Describes which modifier keys were held down.
      */
-    void onMouseButtonWhenFocused(int button, ButtonAction action, int mods);
+    void mouseButtonWhenFocused(int button, ButtonAction action, int mods);
 }
