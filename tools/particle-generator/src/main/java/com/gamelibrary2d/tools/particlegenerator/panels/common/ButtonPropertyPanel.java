@@ -58,10 +58,10 @@ public abstract class ButtonPropertyPanel<T> extends StackPanel {
             button.setBounds(font.textSize(buttonContext.getText(),
                     buttonContext.getHorizontalAlignment(), buttonContext.getVerticalAlignment()));
             buttonContext.addTextChangedListener((before, after) -> onTextChanged(button, before, after));
-            button.addMouseButtonReleasedListener((button1, mods, projectedX, projectedY) ->
+            button.addMouseButtonReleasedListener((button1, mods, x, y, projectedX, projectedY) ->
                     onMouseButtonReleased(button, button1, mods, projectedX, projectedY)
             );
-            button.addMouseButtonReleasedListener((button1, mods, projectedX, projectedY) -> update(button));
+            button.addMouseButtonReleasedListener((button1, mods, x, y, projectedX, projectedY) -> update(button));
 
             buttons.add(button);
             add(button, i == 0 ? 175 : MARGIN);

@@ -103,18 +103,18 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         return handleObj;
     }
 
-    private void onHandleClicked(int button, int mods, float x, float y) {
+    private void onHandleClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (dragButton < 0) {
             dragButton = button;
-            dragOriginX = x;
-            dragOriginY = y;
+            dragOriginX = projectedX;
+            dragOriginY = projectedY;
             for (var listener : dragBeginListeners) {
                 listener.onDragBegin(getValue());
             }
         }
     }
 
-    private void onHandleReleased(int button, int mods, float v, float v1) {
+    private void onHandleReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (dragButton == button) {
             dragButton = -1;
             for (var listener : dragStopListeners) {
@@ -123,9 +123,9 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         }
     }
 
-    private void onHandleDragged(float x, float y, boolean drag) {
+    private void onHandleDragged(float x, float y, float projectedX, float projectedY, boolean drag) {
         if (dragButton >= 0) {
-            setValue(getValueFromPosition(x, y));
+            setValue(getValueFromPosition(projectedX, projectedY));
         }
     }
 

@@ -105,16 +105,16 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void handleUpdate(float deltaTime) {
-        super.handleUpdate(deltaTime);
+    protected void onUpdate(float deltaTime) {
+        super.onUpdate(deltaTime);
         if (emitterPanel.isLaunchingSequential()) {
             particleEmitterTime = particleSystem.emitSequential(PosX, PosY, particleEmitterTime, deltaTime);
         }
     }
 
     @Override
-    protected boolean onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
-        if (!super.onMouseButtonDown(button, mods, projectedX, projectedY)) {
+    protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        if (!super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY)) {
             if (dragging == -1) {
                 dragging = button;
                 PosX = projectedX;
@@ -129,8 +129,8 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected boolean onMouseMove(float projectedX, float projectedY) {
-        if (!super.onMouseMove(projectedX, projectedY)) {
+    protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
+        if (!super.onMouseMove(x, y, projectedX, projectedY)) {
             if (dragging != -1) {
                 PosX = projectedX;
                 PosY = projectedY;
@@ -144,11 +144,11 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (button == dragging) {
             dragging = -1;
         }
-        super.onMouseButtonReleased(button, mods, projectedX, projectedY);
+        super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
     }
 
     @Override

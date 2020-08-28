@@ -84,28 +84,28 @@ public class AbstractObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).mouseButtonDown(button, mods, x, y);
+            return ((MouseAware) wrapped).mouseButtonDown(button, mods, x, y, projectedX, projectedY);
         }
         return false;
     }
 
     @Override
-    public boolean mouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
         if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).mouseMove(x, y);
+            return ((MouseAware) wrapped).mouseMove(x, y, projectedX, projectedY);
         }
         return false;
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (wrapped instanceof MouseAware) {
-            ((MouseAware) wrapped).mouseButtonReleased(button, mods, x, y);
+            ((MouseAware) wrapped).mouseButtonReleased(button, mods, x, y, projectedX, projectedY);
         }
     }
-    
+
     @Override
     public void update(float deltaTime) {
         if (wrapped instanceof Updatable) {

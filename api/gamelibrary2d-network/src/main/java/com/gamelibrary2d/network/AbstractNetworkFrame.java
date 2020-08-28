@@ -52,11 +52,11 @@ public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFra
     }
 
     @Override
-    protected final void handleUpdate(float deltaTime) {
-        client.update(deltaTime, this::onUpdate);
+    protected final void onUpdate(float deltaTime) {
+        client.update(deltaTime, this::onClientUpdate);
     }
 
-    protected void onUpdate(float deltaTime) {
-        super.handleUpdate(deltaTime);
+    protected void onClientUpdate(float deltaTime) {
+        super.onUpdate(deltaTime);
     }
 }

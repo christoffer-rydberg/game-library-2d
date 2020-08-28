@@ -40,7 +40,7 @@ public class BounceHandler<T1 extends Obstacle, T2 extends Obstacle> implements 
     }
 
     @Override
-    public CollisionResult onCollision(CollidableInfo<T2> collided) {
+    public CollisionResult collision(CollidableInfo<T2> collided) {
         var distX = collided.getX() - updated.getX();
         var distY = collided.getY() - updated.getY();
         var dist = Math.sqrt(distX * distX + distY * distY);

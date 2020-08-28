@@ -23,7 +23,7 @@ public interface CollisionHandler<T1 extends Collidable, T2 extends Collidable> 
      *
      * @param collided Last previous update parameters for the collided {@link Collidable}.
      */
-    CollisionResult onCollision(CollidableInfo<T2> collided);
+    CollisionResult collision(CollidableInfo<T2> collided);
 
     /**
      * Invoked when all collisions has been detected for the updated {@link Collidable}.

@@ -103,32 +103,32 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
-        super.onMouseButtonDown(button, mods, projectedX, projectedY);
+    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
         for (var listener : mouseButtonDownListeners) {
-            listener.onMouseButtonDown(button, mods, projectedX, projectedY);
+            listener.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
         }
     }
 
     @Override
-    protected void onMouseHover(float projectedX, float projectedY) {
+    protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
         for (var listener : mouseHoverListeners) {
-            listener.onMouseMoved(projectedX, projectedY, false);
+            listener.onMouseMoved(x, y, projectedX, projectedY, false);
         }
     }
 
     @Override
-    protected void onMouseDrag(float projectedX, float projectedY) {
+    protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
         for (var listener : mouseDragListeners) {
-            listener.onMouseMoved(projectedX, projectedY, true);
+            listener.onMouseMoved(x, y, projectedX, projectedY, true);
         }
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
-        super.onMouseButtonReleased(button, mods, projectedX, projectedY);
+    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
         for (var listener : mouseButtonReleasedListeners) {
-            listener.onMouseButtonReleased(button, mods, projectedX, projectedY);
+            listener.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
         }
     }
 

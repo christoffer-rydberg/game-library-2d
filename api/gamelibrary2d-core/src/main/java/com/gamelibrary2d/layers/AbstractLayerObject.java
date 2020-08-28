@@ -72,35 +72,35 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     @Override
-    public final boolean mouseButtonDown(int button, int mods, float x, float y) {
-        return isEnabled() ? onMouseButtonDown(button, mods, x, y) : false;
+    public final boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onMouseButtonDown(button, mods, x, y, projectedX, projectedY) : false;
     }
 
-    protected boolean onMouseButtonDown(int button, int mods, float x, float y) {
-        var projected = Projection.projectTo(this, x, y);
-        return getContent().mouseButtonDown(button, mods, projected.getX(), projected.getY());
-    }
-
-    @Override
-    public final boolean mouseMove(float x, float y) {
-        return isEnabled() ? onMouseMove(x, y) : false;
-    }
-
-    protected boolean onMouseMove(float x, float y) {
-        var projected = Projection.projectTo(this, x, y);
-        return getContent().mouseMove(projected.getX(), projected.getY());
+    protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        var projected = Projection.projectTo(this, projectedX, projectedY);
+        return getContent().mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
     }
 
     @Override
-    public final void mouseButtonReleased(int button, int mods, float x, float y) {
+    public final boolean mouseMove(float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onMouseMove(x, y, projectedX, projectedY) : false;
+    }
+
+    protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
+        var projected = Projection.projectTo(this, projectedX, projectedY);
+        return getContent().mouseMove(x, y, projected.getX(), projected.getY());
+    }
+
+    @Override
+    public final void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            onMouseButtonReleased(button, mods, x, y);
+            onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
         }
     }
 
-    protected void onMouseButtonReleased(int button, int mods, float x, float y) {
-        var projected = Projection.projectTo(this, x, y);
-        getContent().mouseButtonReleased(button, mods, projected.getX(), projected.getY());
+    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        var projected = Projection.projectTo(this, projectedX, projectedY);
+        getContent().mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
     }
 
     @Override

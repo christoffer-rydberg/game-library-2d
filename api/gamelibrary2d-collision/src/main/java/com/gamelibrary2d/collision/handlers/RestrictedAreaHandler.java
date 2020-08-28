@@ -14,7 +14,7 @@ public class RestrictedAreaHandler<T extends Collidable> implements UpdatedHandl
     }
 
     @Override
-    public void onUpdated(CollidableInfo<T> info) {
+    public void updated(CollidableInfo<T> info) {
         var obj = info.getCollidable();
 
         var bounds = obj.getBounds();

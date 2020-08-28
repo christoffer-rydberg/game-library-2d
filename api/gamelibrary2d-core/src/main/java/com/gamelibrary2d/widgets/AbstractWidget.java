@@ -2,7 +2,6 @@ package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.FocusManager;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.input.ButtonAction;
 import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
@@ -11,6 +10,7 @@ import com.gamelibrary2d.objects.AbstractMouseAwareObject;
 public abstract class AbstractWidget<T extends Renderable>
         extends AbstractMouseAwareObject<T> implements FocusAware, KeyAware, MouseWhenFocusedAware {
 
+    private boolean focused;
     private boolean awareOfMouseEvent;
 
     protected AbstractWidget() {
@@ -63,60 +63,92 @@ public abstract class AbstractWidget<T extends Renderable>
         }
     }
 
-    @Override
-    protected void onMouseButtonEventStarted() {
-        super.onMouseButtonEventStarted();
-        awareOfMouseEvent = true;
+    protected final void mouseEventStarted(float x, float y) {
+        super.mouseEventStarted(x, y);
+        onMouseEventStarted(x, y);
+    }
+
+    protected final void mouseEventFinished(float x, float y) {
+        super.mouseEventFinished(x, y);
+        onMouseEventFinished(x, y);
+        awareOfMouseEvent = focused;
+    }
+
+    /**
+     * Invoked before a mouse event is handled.
+     *
+     * @param x The x-coordinate of the mouse cursor projected to the parent container.
+     * @param y The y-coordinate of the mouse cursor projected to the parent container.
+     */
+    protected void onMouseEventStarted(float x, float y) {
+
+    }
+
+    /**
+     * Invoked after after a mouse event is handled.
+     *
+     * @param x The x-coordinate of the mouse cursor projected to the parent container.
+     * @param y The y-coordinate of the mouse cursor projected to the parent container.
+     */
+    protected void onMouseEventFinished(float x, float y) {
+
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float projectedX, float projectedY) {
-        if (focusOnMouseButtonAction(ButtonAction.PRESSED, button, mods, projectedX, projectedY)) {
-            FocusManager.focus(this, false);
-        }
+    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        FocusManager.focus(this, false);
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
-        if (focusOnMouseButtonAction(ButtonAction.RELEASED, button, mods, projectedX, projectedY)) {
-            FocusManager.focus(this, false);
-        }
+    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        FocusManager.focus(this, false);
     }
 
     @Override
-    public final void mouseButtonWhenFocused(int button, ButtonAction action, int mods) {
+    public final void mouseButtonDownWhenFocused(int button, int mods) {
         if (!awareOfMouseEvent) {
-            onMissedMouseButtonEvent(button, action, mods);
+            onMouseButtonDownWhenFocused(button, mods);
         }
         awareOfMouseEvent = false;
     }
 
-    /**
-     * Override in order to change which buttons and actions are used to focus this object.
-     */
-    protected boolean focusOnMouseButtonAction(
-            ButtonAction buttonAction, int button, int mods, float projectedX, float projectedY) {
-        return buttonAction == ButtonAction.RELEASED;
+    @Override
+    public final void mouseButtonReleasedWhenFocused(int button, int mods) {
+        if (!awareOfMouseEvent) {
+            onMouseButtonReleasedWhenFocused(button, mods);
+        }
+        awareOfMouseEvent = false;
     }
 
-    /**
-     * Invoked if this object is focused and a mouse button event is detected outside the object.
-     *
-     * @param button The mouse button that was pressed/released.
-     * @param action The key action (press or release).
-     * @param mods   Describes which modifier keys were held down.
-     */
-    protected void onMissedMouseButtonEvent(int button, ButtonAction action, int mods) {
+    protected void onMouseButtonDownWhenFocused(int button, int mods) {
+        FocusManager.unfocus(this, false);
+    }
+
+    protected void onMouseButtonReleasedWhenFocused(int button, int mods) {
         FocusManager.unfocus(this, false);
     }
 
     @Override
-    public void onFocused() {
-
+    public final void focused() {
+        focused = true;
+        onFocused();
     }
 
     @Override
-    public void onUnfocused() {
+    public final void unfocused() {
+        focused = false;
+        onUnfocused();
+    }
+
+    public boolean isFocused() {
+        return focused;
+    }
+
+    protected void onFocused() {
+
+    }
+
+    protected void onUnfocused() {
 
     }
 
@@ -131,12 +163,12 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     @Override
-    protected void onMouseHover(float projectedX, float projectedY) {
+    protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
 
     }
 
     @Override
-    protected void onMouseDrag(float projectedX, float projectedY) {
+    protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
 
     }
 }

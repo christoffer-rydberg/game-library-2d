@@ -17,8 +17,8 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     }
 
     @Override
-    protected void handleUpdate(float deltaTime) {
-        super.handleUpdate(deltaTime);
+    protected void onUpdate(float deltaTime) {
+        super.onUpdate(deltaTime);
         if (workerThread != null && !workerThread.isAlive()) {
             var loadResult = this.loadResult;
             workerThread = null;

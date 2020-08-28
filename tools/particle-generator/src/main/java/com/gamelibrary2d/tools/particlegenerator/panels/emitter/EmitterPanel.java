@@ -79,7 +79,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
     private class LaunchEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emit(ParticleFrame.PosX, ParticleFrame.PosY);
             }
@@ -89,7 +89,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
     private class LaunchSequentialEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 launchSequentialButton.setToggled(!launchSequentialButton.isToggled());
             }
@@ -99,7 +99,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
     private class LaunchAllEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.emitAll(ParticleFrame.PosX, ParticleFrame.PosY);
             }

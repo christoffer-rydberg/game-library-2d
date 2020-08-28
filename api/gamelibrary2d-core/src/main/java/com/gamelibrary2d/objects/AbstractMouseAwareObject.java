@@ -77,12 +77,13 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final boolean mouseButtonDown(int button, int mods, float x, float y) {
+    public final boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            var projected = Projection.projectTo(this, x, y);
+            var projected = Projection.projectTo(this, projectedX, projectedY);
             if (isPixelVisible(projected.getX(), projected.getY())) {
-                onMouseButtonEventStarted();
-                onMouseButtonDown(button, mods, projected.getX(), projected.getY());
+                mouseEventStarted(projectedX, projectedY);
+                onMouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
+                mouseEventFinished(projectedX, projectedY);
                 mouseButtonStates.setActive(button, true);
                 return true;
             }
@@ -94,16 +95,20 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final boolean mouseMove(float x, float y) {
+    public final boolean mouseMove(float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
             if (mouseButtonStates.hasActiveButtons() && isListeningToMouseDragEvents()) {
-                var projected = Projection.projectTo(this, x, y);
-                onMouseDrag(projected.getX(), projected.getY());
+                var projected = Projection.projectTo(this, projectedX, projectedY);
+                mouseEventStarted(projectedX, projectedY);
+                onMouseDrag(x, y, projected.getX(), projected.getY());
+                mouseEventFinished(projectedX, projectedY);
                 return true;
             } else if (isListeningToMouseHoverEvents()) {
-                var projected = Projection.projectTo(this, x, y);
+                var projected = Projection.projectTo(this, projectedX, projectedY);
                 if (isPixelVisible(projected.getX(), projected.getY())) {
-                    onMouseHover(projected.getX(), projected.getY());
+                    mouseEventStarted(projectedX, projectedY);
+                    onMouseHover(x, y, projected.getX(), projected.getY());
+                    mouseEventFinished(projectedX, projectedY);
                     return true;
                 }
             }
@@ -113,20 +118,33 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     @Override
-    public final void mouseButtonReleased(int button, int mods, float x, float y) {
+    public final void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled() && mouseButtonStates.isActive(button)) {
             mouseButtonStates.setActive(button, false);
-            var projected = Projection.projectTo(this, x, y);
-            onMouseButtonEventStarted();
-            onMouseButtonReleased(button, mods, projected.getX(), projected.getY());
+            var projected = Projection.projectTo(this, projectedX, projectedY);
+            mouseEventStarted(projectedX, projectedY);
+            onMouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
+            mouseEventFinished(projectedX, projectedY);
         }
     }
 
     /**
-     * Invoked before {@link #mouseButtonDown} or {@link #mouseButtonReleased}
-     * in order to alert that a mouse button event is about to be handled.
+     * Invoked before a mouse event is handled.
+     *
+     * @param x The x-coordinate of the mouse cursor projected to the parent container.
+     * @param y The y-coordinate of the mouse cursor projected to the parent container.
      */
-    protected void onMouseButtonEventStarted() {
+    protected void mouseEventStarted(float x, float y) {
+
+    }
+
+    /**
+     * Invoked after after a mouse event is handled.
+     *
+     * @param x The x-coordinate of the mouse cursor projected to the parent container.
+     * @param y The y-coordinate of the mouse cursor projected to the parent container.
+     */
+    protected void mouseEventFinished(float x, float y) {
 
     }
 
@@ -134,13 +152,50 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     protected abstract boolean isListeningToMouseDragEvents();
 
-    protected abstract void onMouseButtonDown(int button, int mods, float projectedX, float projectedY);
+    /**
+     * Invoked when a  mouse button down event is handled.
+     *
+     * @param button     The mouse button that was pressed.
+     * @param mods       Describes which modifier keys were held down.
+     * @param x          The x-coordinate of the mouse cursor.
+     * @param y          The y-coordinate of the mouse cursor.
+     * @param projectedX The x-coordinate of the mouse cursor projected to this object.
+     * @param projectedY The y-coordinate of the mouse cursor projected to this object.
+     */
+    protected abstract void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY);
 
-    protected abstract void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY);
+    /**
+     * Invoked when a  mouse button release event is handled.
+     *
+     * @param button     The mouse button that was released.
+     * @param mods       Describes which modifier keys were held down.
+     * @param x          The x-coordinate of the mouse cursor.
+     * @param y          The y-coordinate of the mouse cursor.
+     * @param projectedX The x-coordinate of the mouse cursor projected to this object.
+     * @param projectedY The y-coordinate of the mouse cursor projected to this object.
+     */
+    protected abstract void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY);
 
-    protected abstract void onMouseHover(float projectedX, float projectedY);
+    /**
+     * Invoked when the mouse hovers over this object.
+     *
+     * @param x          The x-coordinate of the mouse cursor.
+     * @param y          The y-coordinate of the mouse cursor.
+     * @param projectedX The x-coordinate of the mouse cursor projected to this object.
+     * @param projectedY The y-coordinate of the mouse cursor projected to this object.
+     */
+    protected abstract void onMouseHover(float x, float y, float projectedX, float projectedY);
 
-    protected abstract void onMouseDrag(float projectedX, float projectedY);
+    /**
+     * Invoked when one or more mouse button-down events has been handled by this object,
+     * but not yet been released, and the mouse moves.
+     *
+     * @param x          The x-coordinate of the mouse cursor.
+     * @param y          The y-coordinate of the mouse cursor.
+     * @param projectedX The x-coordinate of the mouse cursor projected to this object.
+     * @param projectedY The y-coordinate of the mouse cursor projected to this object.
+     */
+    protected abstract void onMouseDrag(float x, float y, float projectedX, float projectedY);
 
     private static class MouseButtonStates {
         private int activeButtons;

@@ -379,7 +379,7 @@ public class RenderSettingsPanel extends StackPanel {
     }
 
     private MouseButtonReleased getTextureMouseListener(Button obj) {
-        return (button, mods, projectedX, projectedY) -> {
+        return (button, mods, x, y, projectedX, projectedY) -> {
             if (button == Mouse.instance().mouseButton1()) {
                 loadTexture(obj, quad);
             }

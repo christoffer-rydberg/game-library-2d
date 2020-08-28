@@ -7,5 +7,5 @@ import com.gamelibrary2d.collision.CollidableInfo;
  * Invoked after an object has been updated, right before its new position is checked for collisions.
  */
 public interface UpdatedHandler<T extends Collidable> {
-    void onUpdated(CollidableInfo<T> info);
+    void updated(CollidableInfo<T> info);
 }

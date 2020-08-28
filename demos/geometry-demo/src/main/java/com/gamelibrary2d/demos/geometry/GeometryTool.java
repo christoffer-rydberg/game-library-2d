@@ -35,7 +35,7 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y) {
+    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == -1) {
             drawButton = button;
             drawnGeometry = geometryFactory.create();
@@ -46,11 +46,11 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseMove(float x, float y) {
+    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
         if (drawButton != -1) {
-            if (prevNode.getDistance(x, y) > minNodeInterval) {
-                drawnGeometry.nodes().add(x, y);
-                prevNode.set(x, y);
+            if (prevNode.getDistance(projectedX, projectedY) > minNodeInterval) {
+                drawnGeometry.nodes().add(projectedX, projectedY);
+                prevNode.set(projectedX, projectedY);
             }
 
             return true;
@@ -60,7 +60,7 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y) {
+    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == button) {
             drawButton = -1;
             lineCreated.publish(drawnGeometry);

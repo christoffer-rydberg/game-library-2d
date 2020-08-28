@@ -83,7 +83,7 @@ class InternalCollidableWrapper<T1 extends Collidable> {
                 boundsBeforeUpdate);
 
         if (updatedHandler != null) {
-            updatedHandler.onUpdated(info);
+            updatedHandler.updated(info);
         }
     }
 
@@ -92,7 +92,7 @@ class InternalCollidableWrapper<T1 extends Collidable> {
             CollisionHandler collisionHandler, CollidableInfo other) {
         Class<?> type = collisionHandler.getCollidableClass();
         return type.isAssignableFrom(other.getCollidable().getClass())
-                ? collisionHandler.onCollision(other)
+                ? collisionHandler.collision(other)
                 : CollisionResult.CONTINUE;
     }
 

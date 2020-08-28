@@ -91,7 +91,7 @@ public class DemoFrame extends AbstractFrame {
         }
     }
 
-    private void onLoadButtonClicked(int button, int mods, float projectedX, float projectedY) {
+    private void onLoadButtonClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
         try {
             selectGif();
         } catch (IOException e) {

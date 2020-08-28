@@ -12,7 +12,6 @@ import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.input.ButtonAction;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.resources.Shader;
 
@@ -386,7 +385,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         cursorPosY = (float) ypos;
         var frame = getFrame();
         if (frame != null) {
-            frame.mouseMove(cursorPosX, cursorPosY);
+            frame.mouseMove(cursorPosX, cursorPosY, cursorPosX, cursorPosY);
         }
     }
 
@@ -398,11 +397,11 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     @Override
     public void onMouseButtonCallback(int button, int action, int mods) {
         if (action == Mouse.instance().actionPressed()) {
-            getFrame().mouseButtonDown(button, mods, cursorPosX, cursorPosY);
-            FocusManager.mouseButtonEventFinished(button, ButtonAction.PRESSED, mods);
+            getFrame().mouseButtonDown(button, mods, cursorPosX, cursorPosY, cursorPosX, cursorPosY);
+            FocusManager.mouseButtonDownFinished(button, mods);
         } else if (action == Mouse.instance().actionReleased()) {
-            getFrame().mouseButtonReleased(button, mods, cursorPosX, cursorPosY);
-            FocusManager.mouseButtonEventFinished(button, ButtonAction.RELEASED, mods);
+            getFrame().mouseButtonReleased(button, mods, cursorPosX, cursorPosY, cursorPosX, cursorPosY);
+            FocusManager.mouseButtonReleasedFinished(button, mods);
         }
     }
 

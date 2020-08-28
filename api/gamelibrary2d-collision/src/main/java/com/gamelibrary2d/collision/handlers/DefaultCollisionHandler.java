@@ -25,7 +25,7 @@ public class DefaultCollisionHandler<T1 extends Collidable, T2 extends Collidabl
     }
 
     @Override
-    public CollisionResult onCollision(CollidableInfo<T2> collided) {
+    public CollisionResult collision(CollidableInfo<T2> collided) {
         return collisionListener.onCollision(updated, collided.getCollidable());
     }
 

@@ -254,7 +254,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private class SaveEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 saveParticleSystem();
             }
@@ -264,7 +264,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private class LoadEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 loadParticleSystem();
             }
@@ -274,7 +274,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private class ResetEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 particleSystem.setSettings(new ParticleSystemSettings(new ParticlePositioner(), new ParticleParameters()));
             }
@@ -284,7 +284,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private class RandomizeEventHandler implements MouseButtonReleased {
 
         @Override
-        public void onMouseButtonReleased(int button, int mods, float projectedX, float projectedY) {
+        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
             if (button == Mouse.instance().mouseButton1()) {
                 randomizeParticleSystem();
             }

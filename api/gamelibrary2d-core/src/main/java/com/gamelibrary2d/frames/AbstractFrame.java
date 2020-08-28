@@ -144,9 +144,9 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
     }
 
     @Override
-    protected void handleUpdate(float deltaTime) {
+    protected void onUpdate(float deltaTime) {
         if (!isPaused()) {
-            super.handleUpdate(deltaTime);
+            super.onUpdate(deltaTime);
 
             for (int i = 0; i < updaters.size(); ++i) {
                 Updater updater = updaters.pollFirst();

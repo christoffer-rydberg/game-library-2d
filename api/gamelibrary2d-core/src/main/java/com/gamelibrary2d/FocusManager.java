@@ -1,6 +1,5 @@
 package com.gamelibrary2d;
 
-import com.gamelibrary2d.input.ButtonAction;
 import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
@@ -23,14 +22,14 @@ public class FocusManager {
         if (!focusedObjects.contains(obj)) {
             focusedObjects.add(obj);
             if (obj instanceof FocusAware) {
-                ((FocusAware) obj).onFocused();
+                ((FocusAware) obj).focused();
             }
         }
     }
 
     public static void unfocus(Object obj, boolean recursive) {
         if (focusedObjects.remove(obj) && obj instanceof FocusAware) {
-            ((FocusAware) obj).onUnfocused();
+            ((FocusAware) obj).unfocused();
         }
 
         if (recursive && obj instanceof Parent) {
@@ -96,17 +95,29 @@ public class FocusManager {
         }
     }
 
-    static void mouseButtonEventFinished(int button, ButtonAction action, int mods) {
+    private static void onMouseButtonEventFinished(int button, int mods, boolean released) {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
                 var obj = iterationList.get(i);
                 if (obj instanceof MouseWhenFocusedAware) {
-                    ((MouseWhenFocusedAware) obj).mouseButtonWhenFocused(button, action, mods);
+                    if (released) {
+                        ((MouseWhenFocusedAware) obj).mouseButtonReleasedWhenFocused(button, mods);
+                    } else {
+                        ((MouseWhenFocusedAware) obj).mouseButtonDownWhenFocused(button, mods);
+                    }
                 }
             }
         } finally {
             iterationList.clear();
         }
+    }
+
+    static void mouseButtonDownFinished(int button, int mods) {
+        onMouseButtonEventFinished(button, mods, false);
+    }
+
+    static void mouseButtonReleasedFinished(int button, int mods) {
+        onMouseButtonEventFinished(button, mods, true);
     }
 }
