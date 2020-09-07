@@ -2,7 +2,6 @@ package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
@@ -10,6 +9,10 @@ abstract class AbstractSurfaceRenderer extends AbstractShaderRenderer implements
 
     private Surface surface;
     private Texture texture;
+
+    protected AbstractSurfaceRenderer(RenderingParameters parameters) {
+        super(parameters);
+    }
 
     protected AbstractSurfaceRenderer() {
         this(null, null);
@@ -39,12 +42,17 @@ abstract class AbstractSurfaceRenderer extends AbstractShaderRenderer implements
 
     void setTexture(Texture texture) {
         this.texture = texture;
-        updateSettings(RenderSettings.TEXTURED, texture != null ? 1 : 0);
     }
 
     @Override
     public Rectangle getBounds() {
         return surface == null ? Rectangle.EMPTY : surface.getBounds();
+    }
+
+    @Override
+    protected void applyParameters(float alpha) {
+        getParameters().set(RenderingParameters.IS_TEXTURED, texture != null ? 1 : 0);
+        super.applyParameters(alpha);
     }
 
     @Override

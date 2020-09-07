@@ -10,7 +10,7 @@ import com.gamelibrary2d.tools.particlegenerator.ParticleFrame;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
 import com.gamelibrary2d.tools.particlegenerator.objects.ToggleButton;
-import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.widgets.events.MouseButtonReleased;

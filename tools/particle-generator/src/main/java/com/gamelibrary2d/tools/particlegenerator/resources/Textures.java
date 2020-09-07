@@ -1,10 +1,8 @@
-package com.gamelibrary2d.demos.networkgame.client.resources;
+package com.gamelibrary2d.tools.particlegenerator.resources;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.demos.networkgame.client.Settings;
-import com.gamelibrary2d.demos.networkgame.client.urls.Images;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
@@ -13,39 +11,19 @@ import com.gamelibrary2d.resources.Texture;
 import java.io.IOException;
 
 public class Textures {
-    private static Texture button;
-    private static Texture inputField;
-    private static Texture boulder;
-    private static Texture spacecraft;
+    private static Texture propertyBaseLine;
 
     public static void create(Disposer disposer) throws IOException {
-        button = createQuadStackTexture(
-                Settings.BUTTON_SIZE,
-                Color.WHITE.divide(10),
+        propertyBaseLine = createQuadStackTexture(
+                Bounds.PROPERTY_TEXT_BOX,
+                Color.WHITE.divide(2),
                 Color.WHITE,
-                10,
+                2,
                 disposer);
-
-        inputField = button;
-
-        boulder = Texture.create(Images.BOULDER, disposer);
-        spacecraft = Texture.create(Images.SPACECRAFT, disposer);
     }
 
-    public static Texture button() {
-        return button;
-    }
-
-    public static Texture inputField() {
-        return inputField;
-    }
-
-    public static Texture boulder() {
-        return boulder;
-    }
-
-    public static Texture spacecraft() {
-        return spacecraft;
+    public static Texture propertyBaseLine() {
+        return propertyBaseLine;
     }
 
     public static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {
@@ -53,9 +31,9 @@ public class Textures {
 
         var layers = new Renderable[depth];
         for (int i = 0; i < depth; ++i) {
-            var interpolation = i / (float) depth;
+            var interpolation = (i + 1) / (float) depth;
             layers[i] = createQuadRenderer(
-                    bounds.pad(i * -1),
+                    bounds.pad(0, -i),
                     bottom.add(deltaColor.multiply(interpolation)),
                     disposer);
         }

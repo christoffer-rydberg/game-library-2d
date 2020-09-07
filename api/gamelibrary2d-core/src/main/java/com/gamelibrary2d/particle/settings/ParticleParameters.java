@@ -6,7 +6,7 @@ import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.particle.systems.Particle;
 
 public class ParticleParameters implements Serializable {
-    private final static int STRIDE = 48;
+    private final static int STRIDE = 52;
 
     private final static int LIFE = 0;
     private final static int LIFE_VAR = 1;
@@ -26,7 +26,7 @@ public class ParticleParameters implements Serializable {
     private final static int UPDATE_SCALE = 12;
     private final static int DIRECTION = 13;
     private final static int DIRECTION_VAR = 14;
-    private final static int MOVE_AWAY_FROM_CENTER = 15;
+    private final static int MOVE_FROM_CENTER = 15;
 
     private final static int HORIZONTAL_ACCELERATION = 16;
     private final static int HORIZONTAL_ACCELERATION_VAR = 17;
@@ -67,6 +67,8 @@ public class ParticleParameters implements Serializable {
     private final static int ALPHA_VAR = 45;
     private final static int END_ALPHA = 46;
     private final static int END_ALPHA_VAR = 47;
+
+    private final static int UPDATE_ALPHA = 48;
 
     private final float[] internalState = new float[STRIDE];
     private int updateCounter;
@@ -234,12 +236,12 @@ public class ParticleParameters implements Serializable {
         setInternalState(DIRECTION_VAR, directionVar);
     }
 
-    public boolean isMovingAwayFromCenter() {
-        return internalState[MOVE_AWAY_FROM_CENTER] == 1f;
+    public boolean isMovingFromCenter() {
+        return internalState[MOVE_FROM_CENTER] == 1f;
     }
 
-    public void setMoveAwayFromCenter(boolean moveAwayFromCenter) {
-        setInternalState(MOVE_AWAY_FROM_CENTER, moveAwayFromCenter ? 1f : 0f);
+    public void setMoveFromCenter(boolean moveFromCenter) {
+        setInternalState(MOVE_FROM_CENTER, moveFromCenter ? 1f : 0f);
     }
 
     public float getScale() {
@@ -334,11 +336,11 @@ public class ParticleParameters implements Serializable {
         setInternalState(TANGENTIAL_ACCELERATION, tangentalAcc);
     }
 
-    public float getTangentalAccVar() {
+    public float getTangentalAccelerationVar() {
         return internalState[TANGENTIAL_ACCELERATION_VAR];
     }
 
-    public void setTangentalAccVar(float tangentalAccVar) {
+    public void setTangentalAccelerationVar(float tangentalAccVar) {
         setInternalState(TANGENTIAL_ACCELERATION_VAR, tangentalAccVar);
     }
 
@@ -486,6 +488,14 @@ public class ParticleParameters implements Serializable {
         setInternalState(END_ALPHA_VAR, endAlphaVar);
     }
 
+    public void setUpdateAlpha(boolean updateAlpha) {
+        setInternalState(UPDATE_ALPHA, updateAlpha ? 1f : 0f);
+    }
+
+    public boolean isUpdatingAlpha() {
+        return internalState[UPDATE_ALPHA] == 1f;
+    }
+
     public float getRotation() {
         return internalState[ROTATION];
     }
@@ -526,11 +536,11 @@ public class ParticleParameters implements Serializable {
         setInternalState(ROTATION_ACCELERATION, rotationAcceleration);
     }
 
-    public float getRotationAccVar() {
+    public float getRotationAccelerationVar() {
         return internalState[ROTATION_ACCELERATION_VAR];
     }
 
-    public void setRotationAccVar(float rotationAccelerationVar) {
+    public void setRotationAccelerationVar(float rotationAccelerationVar) {
         setInternalState(ROTATION_ACCELERATION_VAR, rotationAccelerationVar);
     }
 
@@ -546,7 +556,7 @@ public class ParticleParameters implements Serializable {
         setCentripetalAcceleration(getCentripetalAcceleration() * factor);
         setCentripetalAccelerationVar(getCentripetalAccelerationVar() * factor);
         setTangentalAcceleration(getTangentalAcceleration() * factor);
-        setTangentalAccVar(getTangentalAccVar() * factor);
+        setTangentalAccelerationVar(getTangentalAccelerationVar() * factor);
     }
 
     public void apply(Particle particle) {
@@ -568,7 +578,7 @@ public class ParticleParameters implements Serializable {
 
         float velocityX = 0, velocityY = 0;
         if (emittedSpeed != 0) {
-            if (isMovingAwayFromCenter()) {
+            if (isMovingFromCenter()) {
                 float dirX = particle.getPosX() - particle.getCenterX();
                 float dirY = particle.getPosY() - particle.getCenterY();
                 if (dirX != 0 || dirY != 0) {
@@ -612,13 +622,14 @@ public class ParticleParameters implements Serializable {
 
         particle.setCentripetalAccelerationeleration(centripetalAcc);
 
-        particle.setTangentialAcceleration(getTangentalAcceleration() + getTangentalAccVar() * RandomInstance.random11());
+        particle.setTangentialAcceleration(getTangentalAcceleration() + getTangentalAccelerationVar() * RandomInstance.random11());
 
         if (isRotatedForward()) {
             particle.setRotatedForward(true);
         } else {
+            particle.setRotatedForward(false);
             particle.setRotationSpeed(getRotationSpeed() + getRotationSpeedVar() * RandomInstance.random11());
-            particle.setRotationAcceleration(getRotationAcceleration() + getRotationAccVar() * RandomInstance.random11());
+            particle.setRotationAcceleration(getRotationAcceleration() + getRotationAccelerationVar() * RandomInstance.random11());
         }
 
         if (isUpdatingScale()) {
@@ -628,6 +639,10 @@ public class ParticleParameters implements Serializable {
             particle.setDeltaScale(0);
         }
 
+        var deltaAlpha = isUpdatingAlpha()
+                ? ((getEndAlpha() + getEndAlphaVar() * RandomInstance.random11()) - emittedAlpha) / emittedLife
+                : 0;
+
         if (isUpdatingColor()) {
             particle.setDeltaColor(
                     ((getEndColorR() + getEndColorRVar() * RandomInstance.random11()) - emittedColor0)
@@ -636,10 +651,9 @@ public class ParticleParameters implements Serializable {
                             / (255f * emittedLife),
                     ((getEndColorB() + getEndColorBVar() * RandomInstance.random11()) - emittedColor2)
                             / (255f * emittedLife),
-                    ((getEndAlpha() + getEndAlphaVar() * RandomInstance.random11()) - emittedAlpha) / emittedLife);
+                    deltaAlpha);
         } else {
-            particle.setDeltaColor(0, 0, 0,
-                    ((getEndAlpha() + getEndAlphaVar() * RandomInstance.random11()) - emittedAlpha) / emittedLife);
+            particle.setDeltaColor(0, 0, 0, deltaAlpha);
         }
 
         particle.setTime(0f);

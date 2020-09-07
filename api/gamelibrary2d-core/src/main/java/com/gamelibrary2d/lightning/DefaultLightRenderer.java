@@ -9,11 +9,11 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
+import com.gamelibrary2d.renderers.RenderingParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.util.RenderSettings;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -22,6 +22,10 @@ import java.util.List;
 public class DefaultLightRenderer implements LightRenderer {
 
     private static final int MAXIMUM_LIGHT = 127;
+
+    private static final int PARAMETER_ALPHA_MAP_COLS = RenderingParameters.MIN_LENGTH;
+
+    private static final int PARAMETER_ALPHA_MAP_ROWS = RenderingParameters.MIN_LENGTH + 1;
 
     private final Point position = new Point();
 
@@ -78,8 +82,9 @@ public class DefaultLightRenderer implements LightRenderer {
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_NEAREST);
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_NEAREST);
 
-        renderer = new SurfaceRenderer();
-        renderer.updateSettings(RenderSettings.COLOR_R, 0, 0, 0);
+        var parameters = new RenderingParameters(new float[RenderingParameters.MIN_LENGTH + 2]);
+        parameters.setRgba(0, 0, 0, 1f);
+        renderer = new SurfaceRenderer(parameters);
         renderer.setShaderProgram(shaderProgram);
     }
 
@@ -200,7 +205,8 @@ public class DefaultLightRenderer implements LightRenderer {
 
         // Render
         ModelMatrix.instance().translatef(position.getX(), position.getY(), 0);
-        renderer.updateSettings(RenderSettings.DEFAULT_SETTINGS_SIZE, alphaMapCols, alphaMapRows);
+        renderer.getParameters().set(PARAMETER_ALPHA_MAP_COLS, alphaMapCols);
+        renderer.getParameters().set(PARAMETER_ALPHA_MAP_ROWS, alphaMapRows);
         renderer.render(alpha);
     }
 

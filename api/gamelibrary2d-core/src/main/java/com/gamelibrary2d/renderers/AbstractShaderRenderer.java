@@ -4,7 +4,6 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.RenderSettings;
 
 public abstract class AbstractShaderRenderer extends AbstractRenderer {
 
@@ -12,6 +11,12 @@ public abstract class AbstractShaderRenderer extends AbstractRenderer {
     private ShaderProgram shaderProgram;
 
     protected AbstractShaderRenderer() {
+        blendMode = BlendMode.TRANSPARENCY;
+        shaderProgram = ShaderProgram.getDefaultShaderProgram();
+    }
+
+    protected AbstractShaderRenderer(RenderingParameters parameters) {
+        super(parameters);
         blendMode = BlendMode.TRANSPARENCY;
         shaderProgram = ShaderProgram.getDefaultShaderProgram();
     }
@@ -33,21 +38,26 @@ public abstract class AbstractShaderRenderer extends AbstractRenderer {
     }
 
     @Override
-    protected void onRender(float alpha, float[] settings, int settingsSize) {
+    public void render(float alpha) {
         ShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.bind();
         shaderProgram.updateModelMatrix(ModelMatrix.instance());
         OpenGLUtils.applyBlendMode(blendMode);
-        applySettings(alpha, settings, settingsSize);
+        applyParameters(alpha);
         onRender(shaderProgram);
     }
 
-    protected void applySettings(float alpha, float settings[], int settingsSize) {
-        float alphaSetting = settings[RenderSettings.ALPHA];
-        settings[RenderSettings.ALPHA] = alphaSetting * alpha;
-        shaderProgram.updateSettings(settings, 0, settingsSize);
-        shaderProgram.applySettings();
-        settings[RenderSettings.ALPHA] = alphaSetting;
+    protected void applyParameters(float alpha) {
+        var parameters = getParameters();
+        float alphaSetting = parameters.get(RenderingParameters.ALPHA);
+
+        try {
+            parameters.set(RenderingParameters.ALPHA, alphaSetting * alpha);
+            shaderProgram.setParameters(parameters.getArray(), 0, parameters.getLength());
+            shaderProgram.applyParameters();
+        } finally {
+            parameters.set(RenderingParameters.ALPHA, alphaSetting);
+        }
     }
 
     protected abstract void onRender(ShaderProgram shaderProgram);

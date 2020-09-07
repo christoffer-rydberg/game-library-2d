@@ -1,14 +1,16 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.FocusManager;
+import com.gamelibrary2d.MouseEventState;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.FocusAware;
+import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
 import com.gamelibrary2d.objects.AbstractMouseAwareObject;
 
 public abstract class AbstractWidget<T extends Renderable>
-        extends AbstractMouseAwareObject<T> implements FocusAware, KeyAware, MouseWhenFocusedAware {
+        extends AbstractMouseAwareObject<T> implements FocusAware, KeyAware, InputAware, MouseWhenFocusedAware {
 
     private boolean focused;
     private boolean awareOfMouseEvent;
@@ -30,8 +32,8 @@ public abstract class AbstractWidget<T extends Renderable>
 
     protected void onCharInput(char charInput) {
         var content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).charInput(charInput);
+        if (content instanceof InputAware) {
+            ((InputAware) (content)).charInput(charInput);
         }
     }
 
@@ -117,6 +119,7 @@ public abstract class AbstractWidget<T extends Renderable>
         if (!awareOfMouseEvent) {
             onMouseButtonReleasedWhenFocused(button, mods);
         }
+
         awareOfMouseEvent = false;
     }
 
@@ -130,6 +133,7 @@ public abstract class AbstractWidget<T extends Renderable>
 
     @Override
     public final void focused() {
+        awareOfMouseEvent = MouseEventState.isHandlingEvent();
         focused = true;
         onFocused();
     }

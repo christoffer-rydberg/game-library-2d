@@ -44,7 +44,6 @@ import com.gamelibrary2d.updates.EmptyUpdate;
 import com.gamelibrary2d.updates.ScaleUpdate;
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.QuadShape;
-import com.gamelibrary2d.util.RenderSettings;
 
 import java.io.IOException;
 import java.net.URL;
@@ -223,7 +222,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
     private Renderable createBackground(Rectangle bounds, float posX, float posY) {
         var background = new SurfaceRenderer(Quad.create(bounds, this));
-        background.updateSettings(RenderSettings.COLOR_R, 0f, 0f, 0f);
+        background.getParameters().setRgb(0f, 0f, 0f);
         var stars = createStars(Math.round(bounds.area() * 0.0005f), bounds);
 
         var space = new DefaultGameObject<>(a -> {

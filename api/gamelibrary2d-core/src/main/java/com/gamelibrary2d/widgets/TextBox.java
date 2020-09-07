@@ -3,10 +3,11 @@ package com.gamelibrary2d.widgets;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.renderers.TextRenderer;
 
-public class TextBox extends Label implements Bounded, Renderable, KeyAware {
+public class TextBox extends Label implements Bounded, Renderable, KeyAware, InputAware {
 
     public TextBox() {
 

@@ -2,11 +2,9 @@ package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Font;
 
 public class TextRenderer extends AbstractShaderRenderer {
-
     private Font font;
     private String text = "";
     private int start;
@@ -14,7 +12,6 @@ public class TextRenderer extends AbstractShaderRenderer {
 
     public TextRenderer(Font font) {
         setFont(font);
-        updateSettings(RenderSettings.TEXTURED, 1);
     }
 
     public Font getFont() {
@@ -44,6 +41,12 @@ public class TextRenderer extends AbstractShaderRenderer {
     @Override
     public Rectangle getBounds() {
         return Rectangle.EMPTY;
+    }
+
+    @Override
+    protected void applyParameters(float alpha) {
+        getParameters().set(RenderingParameters.IS_TEXTURED, 1);
+        super.applyParameters(alpha);
     }
 
     @Override

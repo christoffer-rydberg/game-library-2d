@@ -7,7 +7,6 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
 
@@ -22,8 +21,7 @@ public class Button extends AbstractWidget<Label> {
                 Surfaces.button(),
                 Textures.button());
 
-        var color = Settings.BUTTON_COLOR;
-        background.updateSettings(RenderSettings.COLOR_R, color.getR(), color.getG(), color.getB(), color.getA());
+        background.getParameters().setRgba(Settings.BUTTON_COLOR);
 
         var content = new Label(text, new TextRenderer(Fonts.button()));
         content.setBackground(background);

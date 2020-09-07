@@ -20,7 +20,6 @@ import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.splitscreen.*;
 import com.gamelibrary2d.util.QuadShape;
-import com.gamelibrary2d.util.RenderSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private SpaceCraft createSpaceCraft(Quad quad, Texture texture) {
         var random = RandomInstance.get();
         var renderer = new SurfaceRenderer(quad, texture);
-        renderer.updateSettings(RenderSettings.COLOR_R,
+        renderer.getParameters().setRgb(
                 random.nextFloat() * 0.5f + 0.5f,
                 random.nextFloat() * 0.5f + 0.5f,
                 random.nextFloat() * 0.5f + 0.5f);
@@ -120,8 +119,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private DefaultGameObject createBackgroundColor() {
         var quad = Quad.create(GAME_BOUNDS, this);
         var renderer = new SurfaceRenderer(quad);
-        renderer.updateSettings(
-                RenderSettings.COLOR_R,
+        renderer.getParameters().setRgba(
                 BACKGROUND_COLOR.getR(),
                 BACKGROUND_COLOR.getG(),
                 BACKGROUND_COLOR.getB(),
@@ -207,11 +205,6 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
     @Override
     protected void onEnd() {
-
-    }
-
-    @Override
-    public void charInput(char charInput) {
 
     }
 

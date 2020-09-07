@@ -4,14 +4,14 @@ import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
+import com.gamelibrary2d.renderers.RenderingParameters;
 import com.gamelibrary2d.resources.Shader;
-import com.gamelibrary2d.util.RenderSettings;
 
 import java.nio.FloatBuffer;
 
 public class ShaderProgram implements Disposable {
 
-    private final static String SETTINGS_ATTRIBUTE = "settings";
+    private final static String PARAMETERS_ATTRIBUTE = "parameters";
 
     private static int activeProgram;
 
@@ -21,11 +21,11 @@ public class ShaderProgram implements Disposable {
     private static ShaderProgram quadParticleShaderProgram;
     private static ShaderProgram pointShaderProgram;
     private static ShaderProgram quadShaderProgram;
-    private final FloatBuffer settings = BufferUtils.createFloatBuffer(RenderSettings.MAXIMUM_SETTINGS_SIZE);
+    private final FloatBuffer parameters = BufferUtils.createFloatBuffer(RenderingParameters.MAX_LENGTH);
     private boolean initialized;
     private int programId;
     private int uniModel;
-    private int settingsLocation;
+    private int parametersLocation;
 
     private ShaderProgram(Disposer disposer) {
         programId = OpenGL.instance().glCreateProgram();
@@ -145,7 +145,7 @@ public class ShaderProgram implements Disposable {
         int uniProjection = OpenGL.instance().glGetUniformLocation(programId, "projection");
         OpenGL.instance().glUniformMatrix4fv(uniProjection, false, projection.getFloatBuffer());
 
-        settingsLocation = OpenGL.instance().glGetUniformLocation(programId, SETTINGS_ATTRIBUTE);
+        parametersLocation = OpenGL.instance().glGetUniformLocation(programId, PARAMETERS_ATTRIBUTE);
 
         bind(boundProgram);
     }
@@ -185,25 +185,25 @@ public class ShaderProgram implements Disposable {
         return OpenGL.instance().glGetUniformLocation(programId, name);
     }
 
-    public float getSetting(int index) {
-        return settings.get(index);
+    public float getParameter(int index) {
+        return parameters.get(index);
     }
 
-    public boolean updateSetting(int index, float value) {
-        if (value == getSetting(index))
+    public boolean setParameter(int index, float value) {
+        if (value == getParameter(index))
             return false;
-        settings.put(index, value);
+        parameters.put(index, value);
         return true;
     }
 
-    public void updateSettings(float[] settings, int offset, int length) {
-        this.settings.clear();
-        this.settings.put(settings, offset, length);
-        this.settings.flip();
+    public void setParameters(float[] parameters, int offset, int length) {
+        this.parameters.clear();
+        this.parameters.put(parameters, offset, length);
+        this.parameters.flip();
     }
 
-    public void applySettings() {
-        OpenGL.instance().glUniform1fv(settingsLocation, this.settings);
+    public void applyParameters() {
+        OpenGL.instance().glUniform1fv(parametersLocation, this.parameters);
     }
 
     public void updateModelMatrix(ModelMatrix modelMatrix) {

@@ -14,7 +14,7 @@ import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.objects.Button;
-import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
@@ -104,7 +104,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         particleParameters.setLife(life);
         particleParameters.setLifeVar(round(random.nextFloat() * life, 1));
 
-        particleParameters.setMoveAwayFromCenter(random.nextInt(2) == 1);
+        particleParameters.setMoveFromCenter(random.nextInt(2) == 1);
         particleParameters.setSpeed(random.nextInt(10));
         particleParameters.setSpeedVar(random.nextInt(10));
 
@@ -141,7 +141,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         particleParameters.setCentripetalAccelerationVar(round(random.nextFloat() * 100, 1));
 
         particleParameters.setTangentalAcceleration(round(random.nextFloat() * 100, 1));
-        particleParameters.setTangentalAccVar(round(random.nextFloat() * 100, 1));
+        particleParameters.setTangentalAccelerationVar(round(random.nextFloat() * 100, 1));
 
         particleParameters.setColor(random.nextInt(255), random.nextInt(255), random.nextInt(255));
         particleParameters.setUpdateColor(random.nextInt(2) == 1);
@@ -163,6 +163,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         particleParameters.setAlphaVar(round(random.nextFloat(), 2));
         particleParameters.setEndAlpha(round(random.nextFloat(), 2));
         particleParameters.setEndAlphaVar(round(random.nextFloat(), 2));
+        particleParameters.setUpdateAlpha(random.nextInt(2) == 1);
 
         boolean randomizeRotation = random.nextInt(2) == 1;
         if (randomizeRotation) {
@@ -174,7 +175,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
                 particleParameters.setRotationSpeed(0);
                 particleParameters.setRotationSpeedVar(0);
                 particleParameters.setRotationAcceleration(0);
-                particleParameters.setRotationAccVar(0);
+                particleParameters.setRotationAccelerationVar(0);
             } else {
                 particleParameters.setRotatedForward(false);
                 particleParameters.setRotation(round(random.nextFloat() * 360 - 180, 2));
@@ -182,7 +183,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
                 particleParameters.setRotationSpeed(round(random.nextFloat() * 100, 2));
                 particleParameters.setRotationSpeedVar(round(random.nextFloat() * 100, 2));
                 particleParameters.setRotationAcceleration(round(random.nextFloat() * 100, 2));
-                particleParameters.setRotationAccVar(round(random.nextFloat() * 100, 2));
+                particleParameters.setRotationAccelerationVar(round(random.nextFloat() * 100, 2));
             }
         } else {
             particleParameters.setRotation(0);
@@ -190,7 +191,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
             particleParameters.setRotationSpeed(0);
             particleParameters.setRotationSpeedVar(0);
             particleParameters.setRotationAcceleration(0);
-            particleParameters.setRotationAccVar(0);
+            particleParameters.setRotationAccelerationVar(0);
         }
 
         int origin = random.nextInt(ParticlePositioner.SpawnArea.values().length);

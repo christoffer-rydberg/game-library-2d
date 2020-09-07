@@ -9,8 +9,7 @@ import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
-import com.gamelibrary2d.util.RenderSettings;
-import com.gamelibrary2d.widgets.Slider;
+import com.gamelibrary2d.tools.particlegenerator.widgets.Slider;
 
 class ResizeSlider extends Slider {
     private ParticlePositioner originalParticlePositioner;
@@ -42,7 +41,7 @@ class ResizeSlider extends Slider {
     static ResizeSlider create(ParticleSystemModel particleSystem, Disposer disposer) {
         var quad = Quad.create(Rectangle.centered(16, 32), disposer);
         var handle = new SurfaceRenderer(quad);
-        handle.updateSettings(RenderSettings.COLOR_R, 0.75f, 0.75f, 0);
+        handle.getParameters().setRgb(0.75f, 0.75f, 0);
         return new ResizeSlider(handle, particleSystem);
     }
 }

@@ -1,20 +1,17 @@
 package com.gamelibrary2d;
 
-import com.gamelibrary2d.markers.FocusAware;
-import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.markers.MouseWhenFocusedAware;
-import com.gamelibrary2d.markers.Parent;
+import com.gamelibrary2d.markers.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FocusManager {
 
-    private static final List<KeyAware> focusedObjects = new ArrayList<>();
+    private static final List<Object> focusedObjects = new ArrayList<>();
 
-    private static final List<KeyAware> iterationList = new ArrayList<>();
+    private static final List<Object> iterationList = new ArrayList<>();
 
-    public static void focus(KeyAware obj, boolean replace) {
+    public static void focus(Object obj, boolean replace) {
         if (replace) {
             replaceFocus(obj);
         }
@@ -44,15 +41,15 @@ public class FocusManager {
     }
 
     public static void clearFocus() {
-        List<KeyAware> focused = new ArrayList<>(focusedObjects.size());
+        List<Object> focused = new ArrayList<>(focusedObjects.size());
         focused.addAll(focusedObjects);
         for (int i = 0; i < focused.size(); ++i) {
             unfocus(focused.get(i), false);
         }
     }
 
-    private static void replaceFocus(KeyAware obj) {
-        List<KeyAware> focused = new ArrayList<>(focusedObjects.size());
+    private static void replaceFocus(Object obj) {
+        List<Object> focused = new ArrayList<>(focusedObjects.size());
         focused.addAll(focusedObjects);
         for (int i = 0; i < focused.size(); ++i) {
             var focusedObject = focused.get(i);
@@ -66,7 +63,10 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).keyDown(key, scanCode, repeat, mods);
+                var obj = iterationList.get(i);
+                if (obj instanceof KeyAware) {
+                    ((KeyAware) obj).keyDown(key, scanCode, repeat, mods);
+                }
             }
         } finally {
             iterationList.clear();
@@ -77,7 +77,10 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).keyReleased(key, scanCode, mods);
+                var obj = iterationList.get(i);
+                if (obj instanceof KeyAware) {
+                    ((KeyAware) obj).keyReleased(key, scanCode, mods);
+                }
             }
         } finally {
             iterationList.clear();
@@ -88,7 +91,10 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                iterationList.get(i).charInput(charInput);
+                var obj = iterationList.get(i);
+                if (obj instanceof InputAware) {
+                    ((InputAware) obj).charInput(charInput);
+                }
             }
         } finally {
             iterationList.clear();

@@ -53,6 +53,7 @@ public class DemoFrame extends AbstractFrame {
         updateSettings.setEndColor(127.5f, 127.5f, 127.5f);
         updateSettings.setAlpha(0.75f);
         updateSettings.setAlphaVar(0.25f);
+        updateSettings.setUpdateAlpha(true);
         return updateSettings;
     }
 

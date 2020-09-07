@@ -7,9 +7,6 @@ import com.gamelibrary2d.util.StackOrientation;
 import java.util.List;
 
 public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerObject<T> implements Panel<T> {
-
-    private Rectangle bounds = Rectangle.EMPTY;
-
     private boolean autoResizing = true;
 
     protected AbstractPanel() {
@@ -112,20 +109,6 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
             float yMax = Math.max(bounds.yMax(), panelBounds.yMax());
             setBounds(new Rectangle(xMin, yMin, xMax, yMax));
         }
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
-    @Override
-    public void setBounds(Rectangle bounds) {
-        if (bounds == null) {
-            throw new IllegalArgumentException("Bounds cannot be null, consider using Rectangle.Empty instead.");
-        }
-
-        this.bounds = bounds;
     }
 
     @Override

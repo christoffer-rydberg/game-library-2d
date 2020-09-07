@@ -4,7 +4,6 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.particle.systems.ParticleRenderBuffer;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.util.RenderSettings;
 
 public class IterativeParticleRenderer implements ParticleRenderer {
 
@@ -46,8 +45,7 @@ public class IterativeParticleRenderer implements ParticleRenderer {
                         renderBuffer.getScale(renderOffset),
                         1.0f);
 
-                renderer.updateSettings(
-                        RenderSettings.COLOR_R,
+                renderer.getParameters().setRgba(
                         renderBuffer.getColorR(renderOffset),
                         renderBuffer.getColorG(renderOffset),
                         renderBuffer.getColorB(renderOffset),

@@ -6,7 +6,7 @@ import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.objects.StackPanel;
-import com.gamelibrary2d.tools.particlegenerator.util.Fonts;
+import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.widgets.DefaultWidget;

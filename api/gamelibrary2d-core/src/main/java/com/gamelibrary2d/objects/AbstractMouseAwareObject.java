@@ -1,6 +1,5 @@
 package com.gamelibrary2d.objects;
 
-import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
@@ -11,7 +10,6 @@ import com.gamelibrary2d.util.Projection;
 public abstract class AbstractMouseAwareObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
 
     private final MouseButtonStates mouseButtonStates = new MouseButtonStates(5);
-    private Rectangle bounds;
     private BitmapRenderer bitmapRenderer;
     private DefaultDisposer disposer;
 
@@ -28,15 +26,6 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
             super.setEnabled(enabled);
             mouseButtonStates.clear();
         }
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return bounds != null ? bounds : super.getBounds();
-    }
-
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
     }
 
     public void disablePixelDetection() {

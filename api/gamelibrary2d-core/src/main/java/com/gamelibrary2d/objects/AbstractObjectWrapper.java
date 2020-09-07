@@ -2,12 +2,13 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.markers.Updatable;
 
 public class AbstractObjectWrapper<T extends GameObject>
-        implements GameObject, MouseAware, KeyAware, Updatable {
+        implements GameObject, MouseAware, KeyAware, InputAware, Updatable {
 
     private T wrapped;
 
@@ -39,8 +40,8 @@ public class AbstractObjectWrapper<T extends GameObject>
 
     @Override
     public void charInput(char charInput) {
-        if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).charInput(charInput);
+        if (wrapped instanceof InputAware) {
+            ((InputAware) wrapped).charInput(charInput);
         }
     }
 

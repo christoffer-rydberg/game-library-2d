@@ -31,7 +31,7 @@ public abstract class AbstractGameObject<T extends Renderable> implements GameOb
         return bounds != null ? bounds : getContentBounds();
     }
 
-    protected void setBounds(Rectangle bounds) {
+    public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
     }
 

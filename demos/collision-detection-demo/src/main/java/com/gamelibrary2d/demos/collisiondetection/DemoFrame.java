@@ -17,7 +17,6 @@ import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.updaters.InfiniteUpdater;
-import com.gamelibrary2d.util.RenderSettings;
 
 import java.io.IOException;
 
@@ -42,7 +41,7 @@ public class DemoFrame extends AbstractFrame {
         Texture ballTexture = Texture.create(Ball.class.getClassLoader().getResource("ball.png"), this);
         ballSurface = Quad.create(Rectangle.centered(32, 32), this);
         ballRenderer = new SurfaceRenderer(ballSurface, ballTexture);
-        ballRenderer.updateSettings(RenderSettings.COLOR_R, 152f / 255f, 251f / 255f, 152f / 255f);
+        ballRenderer.getParameters().setRgb(152f / 255f, 251f / 255f, 152f / 255f);
         tool = BallTool.create(this, ballRenderer, this::addBall);
     }
 

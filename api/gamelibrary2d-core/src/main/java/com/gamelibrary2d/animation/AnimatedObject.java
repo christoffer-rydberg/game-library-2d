@@ -5,11 +5,10 @@ import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.util.RenderSettings;
+import com.gamelibrary2d.renderers.RenderingParameters;
 
 public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableObject<T>, Updatable {
     private float animationTime;
-    private Rectangle bounds;
 
     public AnimatedObject() {
 
@@ -40,7 +39,7 @@ public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> im
         this.animationTime = time;
         var renderer = getContent();
         if (renderer != null) {
-            renderer.updateSettings(RenderSettings.TIME, time);
+            renderer.getParameters().set(RenderingParameters.TIME, time);
         }
     }
 
@@ -53,15 +52,6 @@ public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> im
 
     protected void onUpdate(float deltaTime) {
         setAnimationTime(animationTime + deltaTime);
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return bounds != null ? bounds : super.getBounds();
-    }
-
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
     }
 
     @Override

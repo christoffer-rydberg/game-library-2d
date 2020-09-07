@@ -9,7 +9,6 @@ import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.widgets.events.TextChanged;
 
@@ -189,7 +188,7 @@ public class Label implements Bounded, Renderable {
 
     private void onRender(TextRenderer textRenderer, Color color, float alpha) {
         if (color != null) {
-            textRenderer.updateSettings(RenderSettings.COLOR_R, color.getR(), color.getG(), color.getB(), color.getA());
+            textRenderer.getParameters().setRgba(color);
         }
 
         float usedRowWidth = rowWidth > 0 ? rowWidth : Integer.MAX_VALUE;

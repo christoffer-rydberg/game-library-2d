@@ -3,12 +3,11 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.animation.Animation;
 import com.gamelibrary2d.animation.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 
@@ -22,13 +21,11 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     public AnimationRenderer(Animation animation, boolean loop) {
         disposer = null;
         setAnimation(animation, loop);
-        updateSettings(RenderSettings.TEXTURED, 1);
     }
 
     public AnimationRenderer(Animation animation, boolean loop, Disposer disposer) {
         this.disposer = disposer;
         setAnimation(animation, loop);
-        updateSettings(RenderSettings.TEXTURED, 1);
     }
 
     public Animation getAnimation() {
@@ -108,14 +105,19 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     }
 
     private int getIndex() {
-        float[] settings = getSettings();
-        float time = settings == null ? 0 : settings[RenderSettings.TIME];
+        var time = getParameters().get(RenderingParameters.TIME);
         return (int) (time / frameDuration);
     }
 
     @Override
     public Rectangle getBounds() {
         return animation.getBounds();
+    }
+
+    @Override
+    protected void applyParameters(float alpha) {
+        getParameters().set(RenderingParameters.IS_TEXTURED, 1);
+        super.applyParameters(alpha);
     }
 
     @Override
@@ -197,7 +199,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             modelMatrix.popMatrix();
 
             // Render frame buffer texture to the default frame buffer
-            float alpha = shaderProgram.getSetting(RenderSettings.ALPHA);
+            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
             frameBufferRenderer.render(alpha);
         }
 
@@ -209,7 +211,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
                 previousFrame = 0;
             }
 
-            float alpha = shaderProgram.getSetting(RenderSettings.ALPHA);
+            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
             for (int i = previousFrame; i <= activeIndex; ++i) {
                 var frame = animation.getFrame(i);
 
@@ -219,8 +221,8 @@ public class AnimationRenderer extends AbstractShaderRenderer {
 
                 if (frame.getRenderToBackgroundHint()) {
                     // Make opaque. Alpha will be applied when rendered to default frame buffer.
-                    if (shaderProgram.updateSetting(RenderSettings.ALPHA, 1f)) {
-                        shaderProgram.applySettings();
+                    if (shaderProgram.setParameter(RenderingParameters.ALPHA, 1f)) {
+                        shaderProgram.applyParameters();
                     }
                     frame.getTexture().bind();
                     backgroundQuads[i].render(shaderProgram);
@@ -229,8 +231,8 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             previousFrame = activeIndex;
 
             // Restore alpha setting
-            if (shaderProgram.updateSetting(RenderSettings.ALPHA, alpha)) {
-                shaderProgram.applySettings();
+            if (shaderProgram.setParameter(RenderingParameters.ALPHA, alpha)) {
+                shaderProgram.applyParameters();
             }
 
             frameBuffer.unbind(true);

@@ -9,17 +9,16 @@ out vec2 textureCoordinate;
 flat out int alphaMapCols;
 flat out int alphaMapRows;
 
-uniform float settings[];
+uniform float parameters[];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
 	textureCoordinate = texcoord;
-	float alpha = settings[0];
-    color = vec4(settings[2], settings[3], settings[4], settings[5] * alpha);
-    alphaMapCols = int(settings[7]);
-    alphaMapRows = int(settings[8]);
+    color = vec4(parameters[0], parameters[1], parameters[2], parameters[3]);
+    alphaMapCols = int(parameters[6]);
+    alphaMapRows = int(parameters[7]);
     mat4 mvp = projection * view * model;
     gl_Position = mvp * vec4(position, 0.0, 1.0);
 }

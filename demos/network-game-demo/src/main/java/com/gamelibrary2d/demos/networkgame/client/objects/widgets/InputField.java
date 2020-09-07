@@ -6,7 +6,6 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.RenderSettings;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.TextBox;
 
@@ -17,8 +16,7 @@ public class InputField extends AbstractWidget<TextBox> {
                 Surfaces.inputField(),
                 Textures.inputField());
 
-        var color = Settings.INPUT_FIELD_COLOR;
-        background.updateSettings(RenderSettings.COLOR_R, color.getR(), color.getG(), color.getB(), color.getA());
+        background.getParameters().setRgba(Settings.INPUT_FIELD_COLOR);
 
         var content = new TextBox(text, new TextRenderer(Fonts.inputField()));
         content.setBackground(background);

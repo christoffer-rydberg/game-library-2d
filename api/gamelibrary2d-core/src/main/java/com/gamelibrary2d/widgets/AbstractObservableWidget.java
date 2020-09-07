@@ -134,7 +134,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
 
     @Override
     public void onCharInput(char charInput) {
-        super.charInput(charInput);
+        super.onCharInput(charInput);
         for (var listener : charInputListeners) {
             listener.onCharInput(charInput);
         }
@@ -142,7 +142,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
 
     @Override
     public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        super.keyDown(key, scanCode, repeat, mods);
+        super.onKeyDown(key, scanCode, repeat, mods);
         for (var listener : keyDownListeners) {
             listener.onKeyDown(key, scanCode, repeat, mods);
         }
@@ -150,7 +150,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
 
     @Override
     public void onKeyReleased(int key, int scanCode, int mods) {
-        super.keyReleased(key, scanCode, mods);
+        super.onKeyReleased(key, scanCode, mods);
         for (var listener : keyReleasedListeners) {
             listener.onKeyReleased(key, scanCode, mods);
         }

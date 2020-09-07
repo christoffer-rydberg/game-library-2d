@@ -1,7 +1,7 @@
 package com.gamelibrary2d.tools.particlegenerator.objects;
 
-import com.gamelibrary2d.widgets.AbstractObservableWidget;
 import com.gamelibrary2d.objects.ComposableObject;
+import com.gamelibrary2d.widgets.AbstractObservableWidget;
 import com.gamelibrary2d.widgets.Label;
 
 public class Button extends AbstractObservableWidget<Label> implements ComposableObject<Label> {

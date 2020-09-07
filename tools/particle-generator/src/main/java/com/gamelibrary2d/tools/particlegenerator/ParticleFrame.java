@@ -9,7 +9,7 @@ import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.tools.particlegenerator.panels.emitter.EmitterPanel;
-import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.ParticleSettingsPanel;
+import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.ParticleParametersPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SaveLoadResetPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.particlesettings.SpawnSettingsPanel;
 import com.gamelibrary2d.tools.particlegenerator.panels.renderSettings.RenderSettingsPanel;
@@ -29,7 +29,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
 
     private EmitterPanel emitterPanel;
 
-    private ParticleSettingsPanel particleSettingsPanel;
+    private ParticleParametersPanel particleParametersPanel;
 
     private SpawnSettingsPanel spawnSettingsPanel;
 
@@ -55,12 +55,12 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         particleLayer.add(particleSystem.getShaderParticleSystem());
         backgroundLayer = new BasicLayer<>();
 
-        particleSettingsPanel = new ParticleSettingsPanel(particleSystem);
-        particleSettingsPanel.setPosition(WINDOW_MARGIN, game.getWindow().height() - WINDOW_MARGIN);
+        particleParametersPanel = new ParticleParametersPanel(particleSystem);
+        particleParametersPanel.setPosition(160f, game.getWindow().height() - 20f);
 
         spawnSettingsPanel = new SpawnSettingsPanel(this, particleSystem);
         spawnSettingsPanel.setPosition(WINDOW_MARGIN,
-                game.getWindow().height() - WINDOW_MARGIN - particleSettingsPanel.getBounds().height());
+                game.getWindow().height() - WINDOW_MARGIN - particleParametersPanel.getBounds().height());
 
         renderSettingsPanel = new RenderSettingsPanel(particleSystem, game, this);
         renderSettingsPanel.setPosition(
@@ -82,7 +82,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         add(backgroundLayer);
         add(particleLayer);
         add(screenLayer);
-        screenLayer.add(particleSettingsPanel);
+        screenLayer.add(particleParametersPanel);
         screenLayer.add(spawnSettingsPanel);
         screenLayer.add(renderSettingsPanel);
         screenLayer.add(emitterPanel);
@@ -149,11 +149,6 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
             dragging = -1;
         }
         super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
-    }
-
-    @Override
-    public void charInput(char charInput) {
-
     }
 
     @Override

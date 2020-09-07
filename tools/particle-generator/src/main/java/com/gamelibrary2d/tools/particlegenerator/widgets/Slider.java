@@ -1,9 +1,11 @@
-package com.gamelibrary2d.widgets;
+package com.gamelibrary2d.tools.particlegenerator.widgets;
 
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.widgets.AbstractAggregatingWidget;
+import com.gamelibrary2d.widgets.DefaultWidget;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
