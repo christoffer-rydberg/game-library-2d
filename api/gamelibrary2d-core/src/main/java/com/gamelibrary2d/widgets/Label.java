@@ -74,6 +74,11 @@ public class Label implements Bounded, Renderable {
         return textPositionOffset;
     }
 
+    public void setAlignment(HorizontalAlignment horizontal, VerticalAlignment vertical) {
+        setHorizontalAlignment(horizontal);
+        setVerticalAlignment(vertical);
+    }
+
     public HorizontalAlignment getHorizontalAlignment() {
         return horizontalAlignment;
     }

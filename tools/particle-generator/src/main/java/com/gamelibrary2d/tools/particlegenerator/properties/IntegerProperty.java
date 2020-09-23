@@ -1,27 +1,27 @@
-package com.gamelibrary2d.tools.particlegenerator.util;
+package com.gamelibrary2d.tools.particlegenerator.properties;
 
-public class BooleanProperty {
+public class IntegerProperty {
     private final Getter getter;
     private final Setter setter;
 
-    public BooleanProperty(Getter getter, Setter setter) {
+    public IntegerProperty(Getter getter, Setter setter) {
         this.getter = getter;
         this.setter = setter;
     }
 
-    public boolean get() {
+    public float get() {
         return getter.get();
     }
 
-    public void set(boolean value) {
+    public void set(int value) {
         setter.set(value);
     }
 
     public interface Getter {
-        boolean get();
+        int get();
     }
 
     public interface Setter {
-        void set(boolean value);
+        void set(int value);
     }
 }

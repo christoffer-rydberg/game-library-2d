@@ -2,7 +2,7 @@ package com.gamelibrary2d.util;
 
 public enum BlendMode {
     NONE,
-    TRANSPARENCY,
+    TRANSPARENT,
     ADDITIVE,
-    MASK
+    MASKED
 }

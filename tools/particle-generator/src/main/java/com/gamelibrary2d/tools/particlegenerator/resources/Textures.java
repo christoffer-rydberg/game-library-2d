@@ -12,21 +12,31 @@ import java.io.IOException;
 
 public class Textures {
     private static Texture propertyBaseLine;
+    private static Texture sliderHandle;
 
     public static void create(Disposer disposer) throws IOException {
         propertyBaseLine = createQuadStackTexture(
-                Bounds.PROPERTY_TEXT_BOX,
+                Bounds.PROPERTY_BASE_LINE,
                 Color.WHITE.divide(2),
                 Color.WHITE,
                 2,
                 disposer);
+
+        sliderHandle = Texture.create(
+                Textures.class.getResource("/Images/sliderHandle.png"),
+                disposer
+        );
     }
 
     public static Texture propertyBaseLine() {
         return propertyBaseLine;
     }
 
-    public static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {
+    public static Texture sliderHandle() {
+        return sliderHandle;
+    }
+
+    private static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {
         var deltaColor = top.subtract(bottom);
 
         var layers = new Renderable[depth];
@@ -47,7 +57,7 @@ public class Textures {
         return Texture.create(r, 1f, bounds, disposer);
     }
 
-    public static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {
+    private static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {
         var renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
         renderer.getParameters().setRgba(color);
         return renderer;

@@ -6,20 +6,17 @@ import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.particle.systems.Particle;
 
 public class ParticlePositioner implements Serializable {
-    private static final int STRIDE = 10;
+    private static final int STRIDE = 8;
 
-    private static final int SPAWN_AREA_OFFSET_X = 0;
-    private static final int SPAWN_AREA_OFFSET_Y = 1;
-    private static final int SPAWN_ANGLE = 2;
-    private static final int SPAWN_ANGLE_VAR = 3;
+    private static final int LOCAL_CENTER = 0;
+    private static final int SPAWN_ANGLE = 1;
+    private static final int SPAWN_ANGLE_VAR = 2;
+    private static final int SPAWN_AREA = 3;
 
     private static final int SPAWN_AREA_WIDTH = 4;
     private static final int SPAWN_AREA_WIDTH_VAR = 5;
     private static final int SPAWN_AREA_HEIGHT = 6;
     private static final int SPAWN_AREA_HEIGHT_VAR = 7;
-
-    private static final int SPAWN_AREA = 8;
-    private static final int LOCAL_CENTER = 9;
 
     private float[] internalState = new float[STRIDE];
     private int updateCounter;
@@ -65,14 +62,6 @@ public class ParticlePositioner implements Serializable {
         }
     }
 
-    public float getSpawnAreaOffsetX() {
-        return internalState[SPAWN_AREA_OFFSET_X];
-    }
-
-    public void setSpawnAreaOffsetX(float spawnAreaOffsetX) {
-        setInternalState(SPAWN_AREA_OFFSET_X, spawnAreaOffsetX);
-    }
-
     private void setInternalState(int index, float value) {
         if (internalState[index] != value) {
             internalState[index] = value;
@@ -87,14 +76,6 @@ public class ParticlePositioner implements Serializable {
         return updateCounter;
     }
 
-    public float getSpawnAreaOffsetY() {
-        return internalState[SPAWN_AREA_OFFSET_Y];
-    }
-
-    public void setSpawnAreaOffsetY(float spawnAreaOffsetY) {
-        setInternalState(SPAWN_AREA_OFFSET_Y, spawnAreaOffsetY);
-    }
-
     public boolean isLocalCenter() {
         return internalState[LOCAL_CENTER] != 0;
     }
@@ -104,9 +85,6 @@ public class ParticlePositioner implements Serializable {
     }
 
     public void initialize(Particle particle, float x, float y) {
-        x += getSpawnAreaOffsetX();
-        y += getSpawnAreaOffsetY();
-
         double angle = getSpawnAngle() - getSpawnAngleVar() * RandomInstance.random11() - 90;
         double angleRadians = angle * Math.PI / 180d;
 
@@ -175,8 +153,6 @@ public class ParticlePositioner implements Serializable {
     }
 
     public void scale(float factor) {
-        setSpawnAreaOffsetX(getSpawnAreaOffsetX() * factor);
-        setSpawnAreaOffsetY(getSpawnAreaOffsetY() * factor);
         setSpawnAreaWidth(getSpawnAreaWidth() * factor);
         setSpawnAreaHeight(getSpawnAreaHeight() * factor);
         setSpawnAreaWidthVar(getSpawnAreaWidthVar() * factor);

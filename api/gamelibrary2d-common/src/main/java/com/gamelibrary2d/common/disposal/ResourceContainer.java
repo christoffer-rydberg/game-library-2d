@@ -40,7 +40,7 @@ public class ResourceContainer<T> {
      */
     public void createResource(Func<Disposer, T> resourceFactory, boolean lazy, Disposer disposer) {
         dispose();
-        if (resourceDisposer == null || disposer != resourceDisposer.getParentDisposer()) {
+        if (resourceDisposer == null || disposer != resourceDisposer.getParent()) {
             resourceDisposer = new DefaultDisposer(disposer);
         }
         if (lazy) {

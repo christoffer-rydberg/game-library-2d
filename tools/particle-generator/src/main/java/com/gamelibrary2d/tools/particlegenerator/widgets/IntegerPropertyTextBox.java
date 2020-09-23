@@ -2,18 +2,18 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.tools.particlegenerator.properties.FloatProperty;
+import com.gamelibrary2d.tools.particlegenerator.properties.IntegerProperty;
 import com.gamelibrary2d.widgets.TextBox;
 
-public class FloatPropertyTextBox extends TextBox {
+public class IntegerPropertyTextBox extends TextBox {
     private static final Color VALID = Color.WHITE;
     private static final Color INVALID = Color.RED;
 
-    private final FloatProperty property;
+    private final IntegerProperty property;
 
     private float cachedValue;
 
-    public FloatPropertyTextBox(TextRenderer textRenderer, FloatProperty property) {
+    public IntegerPropertyTextBox(TextRenderer textRenderer, IntegerProperty property) {
         super(textRenderer);
         this.property = property;
         cachedValue = property.get();
@@ -38,7 +38,7 @@ public class FloatPropertyTextBox extends TextBox {
 
     private void onTextChanged(String before, String after) {
         try {
-            property.set(Float.parseFloat(after));
+            property.set(Integer.parseInt(after));
             setFontColor(VALID);
         } catch (Exception e) {
             setFontColor(INVALID);

@@ -17,12 +17,13 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     private final float[] externalAcceleration = new float[2];
     private final Particle particle;
 
+    private Point positionTransform;
+
     private int particleCount;
     private boolean gpuOutdated = true;
     private ParticleSystemSettings settings;
     private ParticleRenderBuffer vertexBuffer;
     private ParticleUpdateBuffer updateBuffer;
-    private Point positionTransform;
     private ParticleUpdateListener updateListener;
 
     private DefaultParticleSystem(int capacity, ParticleSystemSettings settings,
@@ -40,6 +41,10 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
                 settings,
                 ParticleRenderBuffer.create(capacity, disposer),
                 ParticleUpdateBuffer.create(capacity, disposer));
+    }
+
+    public float getParticleTime(int index) {
+        return updateBuffer.getTime(index * updateBuffer.stride());
     }
 
     public void setExternalSpeed(float x, float y) {
@@ -131,8 +136,10 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
             count = remaining;
         }
 
+        x += settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
+        y += settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
         for (int i = 0; i < count; ++i) {
-            emit(x, y);
+            emitHelper(x, y);
         }
     }
 
@@ -170,12 +177,14 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
         if (interval > 0) {
             time += deltaTime;
             int iterations = (int) (time / interval);
-            float remainingTime = time - (iterations * interval);
-            int count = settings.isPulsating()
-                    ? (settings.getDefaultCount() + settings.getDefaultCountVar()) * iterations
-                    : iterations;
-            emitAll(x, y, count);
-            time = remainingTime;
+            for (int i = 0; i < iterations; ++i) {
+                int count = settings.isPulsating()
+                        ? Math.round(settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11())
+                        : 1;
+                emitAll(x, y, count);
+            }
+
+            time -= iterations * interval;
         }
 
         return time;
@@ -186,16 +195,26 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
      */
     public void emit(float x, float y) {
         if (particleCount < getCapacity()) {
-            particle.setIndex(particleCount++);
-
-            particle.setInitialized(false);
-            settings.getParticlePositioner().initialize(particle, x, y);
-            settings.getParticleParameters().apply(particle);
-
-            particle.setExternalSpeedX(externalSpeed[0]);
-            particle.setExternalSpeedY(externalSpeed[1]);
-            particle.setCustom(0);
+            x += settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
+            y += settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
+            emitHelper(x, y);
         }
+    }
+
+    private void emitHelper(float x, float y) {
+        particle.setIndex(particleCount++);
+
+        particle.setInitialized(false);
+        settings.getParticlePositioner().initialize(particle, x, y);
+        settings.getParticleParameters().apply(particle);
+
+        particle.setExternalSpeedX(externalSpeed[0]);
+        particle.setExternalSpeedY(externalSpeed[1]);
+        particle.setCustom(0);
+    }
+
+    private boolean isTransformingPosition() {
+        return positionTransform != null && (positionTransform.getX() != 0f || positionTransform.getY() != 0f);
     }
 
     public void update(float deltaTime) {
@@ -211,7 +230,7 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
                 }
 
                 if (updateListener != null) {
-                    final boolean compensateForPosTransform = positionTransform != null;
+                    final boolean compensateForPosTransform = isTransformingPosition();
                     if (compensateForPosTransform) {
                         particle.setPosition(particle.getPosX() + positionTransform.getX(),
                                 particle.getPosY() + positionTransform.getY());
@@ -237,7 +256,7 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
 
     public void render(float alpha) {
         if (particleCount > 0) {
-            if (positionTransform != null) {
+            if (isTransformingPosition()) {
                 ModelMatrix.instance().pushMatrix();
                 ModelMatrix.instance().translatef(positionTransform.getX(), positionTransform.getY(), 0);
                 settings.getRenderer().render(vertexBuffer, gpuOutdated, 0, particleCount, alpha);

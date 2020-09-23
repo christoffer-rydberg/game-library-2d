@@ -17,12 +17,12 @@ public class AnimationFactory {
         return create(readAllBytes(url), format, bounds, disposer);
     }
 
-    public static Animation create(URL url, String format, Rectangle scale, Point sizeConstraints, Disposer disposer) throws IOException {
-        return create(readAllBytes(url), format, scale, sizeConstraints, disposer);
-    }
-
     public static Animation create(byte[] bytes, String format, Rectangle bounds, Disposer disposer) throws IOException {
         return create(bytes, format, bounds, InternalResizeMode.ABSOLUTE, NO_CONSTRAINTS, disposer);
+    }
+
+    public static Animation create(URL url, String format, Rectangle scale, Point sizeConstraints, Disposer disposer) throws IOException {
+        return create(readAllBytes(url), format, scale, sizeConstraints, disposer);
     }
 
     public static Animation create(byte[] bytes, String format, Rectangle scale, Point sizeConstraints, Disposer disposer) throws IOException {

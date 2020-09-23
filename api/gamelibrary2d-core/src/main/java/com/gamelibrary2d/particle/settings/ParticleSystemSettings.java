@@ -14,6 +14,10 @@ public final class ParticleSystemSettings implements Serializable {
     private int defaultCountVar = 0;
     private float defaultInterval = 1;
     private boolean pulsating;
+    private float offsetX;
+    private float offsetXVar;
+    private float offsetY;
+    private float offsetYVar;
 
     public ParticleSystemSettings(ParticlePositioner particlePositioner, ParticleParameters particleParameters,
                                   ParticleRenderer renderer) {
@@ -37,7 +41,43 @@ public final class ParticleSystemSettings implements Serializable {
         defaultCountVar = buffer.getInt();
         defaultInterval = buffer.getFloat();
         pulsating = buffer.getBool();
+        offsetX = buffer.getFloat();
+        offsetXVar = buffer.getFloat();
+        offsetY = buffer.getFloat();
+        offsetYVar = buffer.getFloat();
         this.renderer = renderer;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public float getOffsetXVar() {
+        return offsetXVar;
+    }
+
+    public void setOffsetXVar(float offsetXVar) {
+        this.offsetXVar = offsetXVar;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(float offsetY) {
+        this.offsetY = offsetY;
+    }
+
+    public float getOffsetYVar() {
+        return offsetYVar;
+    }
+
+    public void setOffsetYVar(float offsetYVar) {
+        this.offsetYVar = offsetYVar;
     }
 
     public int getDefaultCount() {
@@ -120,5 +160,9 @@ public final class ParticleSystemSettings implements Serializable {
         buffer.putInt(defaultCountVar);
         buffer.putFloat(defaultInterval);
         buffer.putBool(pulsating);
+        buffer.putFloat(offsetX);
+        buffer.putFloat(offsetXVar);
+        buffer.putFloat(offsetY);
+        buffer.putFloat(offsetYVar);
     }
 }

@@ -1,30 +1,29 @@
-package com.gamelibrary2d.tools.particlegenerator.panels.particlesettings;
+package com.gamelibrary2d.tools.particlegenerator.panels;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Color;
+import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.io.SaveLoadManager;
 import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.settings.ParticleParameters;
 import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.tools.particlegenerator.ParticleSystemModel;
-import com.gamelibrary2d.tools.particlegenerator.objects.Button;
+import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
+import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
-import com.gamelibrary2d.widgets.events.MouseButtonReleased;
+import com.gamelibrary2d.widgets.Label;
 
 import java.io.File;
 import java.io.IOException;
 
 public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
-
     private final ParticleSystemModel particleSystem;
 
     private final SaveLoadManager saveLoadManager = new SaveLoadManager();
@@ -38,26 +37,21 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/particle_path.txt");
 
-        addButton("Save", 0, 0, new SaveEventHandler());
-        addButton("Load", 100, 0, new LoadEventHandler());
-        addButton("Reset", 200, 0, new ResetEventHandler());
-        addButton("Randomize", 300, 0, new RandomizeEventHandler());
+        addButton("Save", 0, 0, this::saveParticleSystem);
+        addButton("Load", 100, 0, this::loadParticleSystem);
+        addButton("Reset", 200, 0, particleSystem::reset);
+        addButton("Randomize", 300, 0, this::randomizeParticleSystem);
     }
 
-    private void addButton(String text, float posX, float posY, MouseButtonReleased mouseEventHandler) {
-        Button button = new Button();
+    private void addButton(String text, float posX, float posY, Action onClick) {
+        var content = new Label(text, new TextRenderer(Fonts.getDefaultFont()));
+        content.setFontColor(Color.SOFT_BLUE);
+        content.setAlignment(HorizontalAlignment.LEFT, VerticalAlignment.BOTTOM);
 
-        var buttonContext = button.getContent();
-        buttonContext.setText(text);
-        buttonContext.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
-        buttonContext.setFontColor(Color.WHITE);
-        buttonContext.setVerticalAlignment(VerticalAlignment.BOTTOM);
-        buttonContext.setHorizontalAlignment(HorizontalAlignment.LEFT);
-
+        var button = new Button<>(content, onClick);
         button.setPosition(posX, posY);
-        button.setBounds(Fonts.getDefaultFont().textSize(buttonContext.getText(), buttonContext.getHorizontalAlignment(),
-                buttonContext.getVerticalAlignment()));
-        button.addMouseButtonReleasedListener(mouseEventHandler);
+        button.setBounds(Fonts.getDefaultFont().textSize(content.getText(), content.getHorizontalAlignment(),
+                content.getVerticalAlignment()));
         add(button);
     }
 
@@ -98,7 +92,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private void randomizeParticleSystem() {
         RandomGenerator random = RandomInstance.get();
 
-        ParticleParameters particleParameters = particleSystem.getUpdateSettings();
+        ParticleParameters particleParameters = particleSystem.getParameters();
 
         float life = round(random.nextFloat() * 5, 1);
         particleParameters.setLife(life);
@@ -157,7 +151,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
                 varEndColor ? random.nextInt(255) : 0);
 
         boolean varEndSpeed = random.nextInt(2) == 1;
-        particleParameters.setEndSpeedFactor(varEndSpeed ? random.nextFloat() : 1);
+        particleParameters.setEndSpeedFactor(varEndSpeed ? round(random.nextFloat(), 2) : 1);
 
         particleParameters.setAlpha(round(random.nextFloat(), 2));
         particleParameters.setAlphaVar(round(random.nextFloat(), 2));
@@ -196,7 +190,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
         int origin = random.nextInt(ParticlePositioner.SpawnArea.values().length);
         var spawnArea = ParticlePositioner.SpawnArea.values()[origin];
-        particleSystem.getSpawnSettings().setSpawnArea(spawnArea);
+        particleSystem.getPositioner().setSpawnArea(spawnArea);
 
         float count = round(random.nextFloat() * 750, 1);
         float countVar = round(random.nextFloat() * (count / 2f), 1);
@@ -205,90 +199,49 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         particleSystem.getSettings().setDefaultInterval(1.f / count);
         particleSystem.getSettings().setPulsating(false);
         boolean localCenter = random.nextInt(2) == 1;
-        particleSystem.getSpawnSettings().setLocalCenter(localCenter);
+        particleSystem.getPositioner().setLocalCenter(localCenter);
 
         var areaRandomizer = random.nextInt(3);
         if (areaRandomizer == 0) {
-            particleSystem.getSpawnSettings().setSpawnAreaWidth(0);
-            particleSystem.getSpawnSettings().setSpawnAreaHeight(0);
+            particleSystem.getPositioner().setSpawnAreaWidth(0);
+            particleSystem.getPositioner().setSpawnAreaHeight(0);
 
-            particleSystem.getSpawnSettings().setSpawnAreaWidthVar(
+            particleSystem.getPositioner().setSpawnAreaWidthVar(
                     round(random.nextFloat() * game.getWindow().width() / 4, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaHeightVar(
+            particleSystem.getPositioner().setSpawnAreaHeightVar(
                     round(random.nextFloat() * game.getWindow().height() / 4, 0));
         } else if (areaRandomizer == 1) {
-            particleSystem.getSpawnSettings().setSpawnAreaWidth(
+            particleSystem.getPositioner().setSpawnAreaWidth(
                     round(random.nextFloat() * game.getWindow().width() / 4, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaHeight(
+            particleSystem.getPositioner().setSpawnAreaHeight(
                     round(random.nextFloat() * game.getWindow().height() / 4, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaWidthVar(0);
-            particleSystem.getSpawnSettings().setSpawnAreaHeightVar(0);
+            particleSystem.getPositioner().setSpawnAreaWidthVar(0);
+            particleSystem.getPositioner().setSpawnAreaHeightVar(0);
         } else if (areaRandomizer == 2) {
-            particleSystem.getSpawnSettings().setSpawnAreaWidthVar(
+            particleSystem.getPositioner().setSpawnAreaWidthVar(
                     round(random.nextFloat() * game.getWindow().width() / 8, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaHeightVar(
+            particleSystem.getPositioner().setSpawnAreaHeightVar(
                     round(random.nextFloat() * game.getWindow().height() / 8, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaWidth(
+            particleSystem.getPositioner().setSpawnAreaWidth(
                     round(random.nextFloat() * game.getWindow().width() / 8, 0));
 
-            particleSystem.getSpawnSettings().setSpawnAreaHeight(
+            particleSystem.getPositioner().setSpawnAreaHeight(
                     round(random.nextFloat() * game.getWindow().height() / 8, 0));
         }
 
-        particleSystem.getSpawnSettings()
+        particleSystem.getPositioner()
                 .setSpawnAngle(round(random.nextFloat() * 360 - 180, 1));
-        particleSystem.getSpawnSettings()
+        particleSystem.getPositioner()
                 .setSpawnAngleVar(round(random.nextFloat() * 180, 1));
-
     }
 
     private float round(float value, int decimals) {
         int tmp = (int) Math.pow(10, decimals);
         return (int) (value * tmp) / (float) tmp;
-    }
-
-    private class SaveEventHandler implements MouseButtonReleased {
-
-        @Override
-        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-            if (button == Mouse.instance().mouseButton1()) {
-                saveParticleSystem();
-            }
-        }
-    }
-
-    private class LoadEventHandler implements MouseButtonReleased {
-
-        @Override
-        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-            if (button == Mouse.instance().mouseButton1()) {
-                loadParticleSystem();
-            }
-        }
-    }
-
-    private class ResetEventHandler implements MouseButtonReleased {
-
-        @Override
-        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-            if (button == Mouse.instance().mouseButton1()) {
-                particleSystem.setSettings(new ParticleSystemSettings(new ParticlePositioner(), new ParticleParameters()));
-            }
-        }
-    }
-
-    private class RandomizeEventHandler implements MouseButtonReleased {
-
-        @Override
-        public void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-            if (button == Mouse.instance().mouseButton1()) {
-                randomizeParticleSystem();
-            }
-        }
     }
 }

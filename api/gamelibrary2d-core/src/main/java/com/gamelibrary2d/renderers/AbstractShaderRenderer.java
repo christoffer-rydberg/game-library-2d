@@ -6,18 +6,17 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.util.BlendMode;
 
 public abstract class AbstractShaderRenderer extends AbstractRenderer {
-
     private BlendMode blendMode;
     private ShaderProgram shaderProgram;
 
     protected AbstractShaderRenderer() {
-        blendMode = BlendMode.TRANSPARENCY;
+        blendMode = BlendMode.TRANSPARENT;
         shaderProgram = ShaderProgram.getDefaultShaderProgram();
     }
 
     protected AbstractShaderRenderer(RenderingParameters parameters) {
         super(parameters);
-        blendMode = BlendMode.TRANSPARENCY;
+        blendMode = BlendMode.TRANSPARENT;
         shaderProgram = ShaderProgram.getDefaultShaderProgram();
     }
 

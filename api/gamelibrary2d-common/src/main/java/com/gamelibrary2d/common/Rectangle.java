@@ -230,7 +230,15 @@ public class Rectangle {
     }
 
     public Point center() {
-        return new Point(xMin + width() / 2, yMin + height() / 2);
+        return new Point(centerX(), centerY());
+    }
+
+    public float centerX() {
+        return xMin + width() / 2;
+    }
+
+    public float centerY() {
+        return xMin + height() / 2;
     }
 
     public void wrap(Point p) {

@@ -5,9 +5,8 @@
 layout( local_size_x = 512, local_size_y = 1, local_size_z = 1) in;
 
 struct PositionParameters {
-    vec4 Part0; // SpawnAreaOffsetX, SpawnAreaOffsetY, SpawnAngle, SpawnAngleVar
+    vec4 Part0; // LocalCenter, SpawnAngle, SpawnAngleVar, SpawnArea
     vec4 Part1; // SpawnAreaWidth, SpawnAreaWidthVar, SpawnAreaHeight, SpawnAreaHeightVar
-    vec4 Part2; // SpawnAngle, LocalCenter, PADDING, PADDING
 };
 
 struct Parameters {
@@ -136,19 +135,19 @@ void positionInEllipseArea(inout Render r, inout uint seed, float centerX, float
 }
 
 void applyPositionParameters(inout Render r, inout Update u, inout uint seed) {
-    float x = position.x + positionParameters.Part0[0];
-    float y = position.y + positionParameters.Part0[1];
-    float angle = positionParameters.Part0[2] - positionParameters.Part0[3] * random11(++seed) - 90;
+    float x = position.x;
+    float y = position.y;
+    float angle = positionParameters.Part0[1] - positionParameters.Part0[2] * random11(++seed) - 90;
     float angleRadians = angle * M_PI / 180.0;
 
-    float spawnArea = positionParameters.Part2[0];
+    float spawnArea = positionParameters.Part0[3];
     if(spawnArea == 0) {
         positionInRectangleArea(r, seed, x, y, angleRadians);
     } else {
         positionInEllipseArea(r, seed, x, y, angleRadians);
     }
 
-    if (positionParameters.Part2[1] != 0) {
+    if (positionParameters.Part0[0] != 0) {
         u.Part0[1] = r.Part0[0];
         u.Part0[2] = r.Part0[1];
     } else {

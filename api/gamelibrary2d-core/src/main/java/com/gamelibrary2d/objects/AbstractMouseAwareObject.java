@@ -37,7 +37,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
     }
 
     public void enablePixelDetection(Disposer disposer) {
-        if (this.disposer == null || this.disposer.getParentDisposer() != disposer) {
+        if (this.disposer == null || this.disposer.getParent() != disposer) {
             disablePixelDetection();
             this.disposer = new DefaultDisposer(disposer);
         }

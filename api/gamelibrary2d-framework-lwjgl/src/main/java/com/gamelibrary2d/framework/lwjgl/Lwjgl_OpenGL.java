@@ -205,6 +205,11 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
+    public void glUniform2f(int location, float v1, float v2) {
+        GL20.glUniform2f(location, v1, v2);
+    }
+
+    @Override
     public void glUniform3fv(int location, float[] value) {
         GL20.glUniform3fv(location, value);
     }

@@ -28,7 +28,7 @@ public class OpenGLUtils {
                 openGL.glDisable(OpenGL.GL_BLEND);
                 break;
 
-            case TRANSPARENCY:
+            case TRANSPARENT:
                 if (!blendEnabled)
                     openGL.glEnable(OpenGL.GL_BLEND);
                 openGL.glBlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
@@ -40,7 +40,7 @@ public class OpenGLUtils {
                 openGL.glBlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE);
                 break;
 
-            case MASK:
+            case MASKED:
                 if (!blendEnabled)
                     openGL.glEnable(OpenGL.GL_BLEND);
                 openGL.glBlendFunc(OpenGL.GL_ZERO, OpenGL.GL_ONE_MINUS_SRC_ALPHA);

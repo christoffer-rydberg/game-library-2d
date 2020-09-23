@@ -4,16 +4,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class DefaultDisposer implements Disposable, Disposer {
-    private final Disposer parentDisposer;
+    private final Disposer parent;
     private final Deque<Disposable> registeredResources = new ArrayDeque<>();
 
     public DefaultDisposer() {
-        parentDisposer = null;
+        this.parent = null;
     }
 
-    public DefaultDisposer(Disposer disposer) {
-        parentDisposer = disposer;
-        disposer.registerDisposal(this);
+    public DefaultDisposer(Disposer parent) {
+        this.parent = parent;
+        parent.registerDisposal(this);
     }
 
     public int size() {
@@ -56,11 +56,7 @@ public class DefaultDisposer implements Disposable, Disposer {
         registeredResources.clear();
     }
 
-    public boolean hasParentDisposer() {
-        return parentDisposer != null;
-    }
-
-    public Disposer getParentDisposer() {
-        return parentDisposer;
+    public Disposer getParent() {
+        return parent;
     }
 }

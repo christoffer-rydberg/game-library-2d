@@ -1,12 +1,15 @@
 package com.gamelibrary2d.tools.particlegenerator.widgets;
 
+import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.renderers.LineRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
-import com.gamelibrary2d.tools.particlegenerator.util.BooleanProperty;
+import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;
 import com.gamelibrary2d.util.HorizontalAlignment;
 import com.gamelibrary2d.util.VerticalAlignment;
 import com.gamelibrary2d.widgets.AbstractWidget;
@@ -19,17 +22,17 @@ public class Checkbox extends AbstractWidget {
     private final CheckboxRenderer renderer;
     private boolean cachedValue;
 
-    public Checkbox(Box box, Font font, BooleanProperty checked) {
+    public Checkbox(Box box, LineRenderer lineRenderer, Font font, BooleanProperty checked) {
         this.checked = checked;
-        this.renderer = new CheckboxRenderer(box, font);
+        this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = null;
         this.onUnchecked = null;
         setContent(renderer);
     }
 
-    public Checkbox(Box box, Font font, BooleanProperty checked, Action onChecked, Action onUnchecked) {
+    public Checkbox(Box box, LineRenderer lineRenderer, Font font, BooleanProperty checked, Action onChecked, Action onUnchecked) {
         this.checked = checked;
-        this.renderer = new CheckboxRenderer(box, font);
+        this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = onChecked;
         this.onUnchecked = onUnchecked;
         setContent(renderer);
@@ -65,10 +68,6 @@ public class Checkbox extends AbstractWidget {
         toggle();
     }
 
-    public boolean isChecked() {
-        return cachedValue;
-    }
-
     public void toggle() {
         checked.set(!checked.get());
         updateCheckbox();
@@ -76,17 +75,19 @@ public class Checkbox extends AbstractWidget {
 
     private class CheckboxRenderer implements Renderable, Bounded {
         private final Box box;
+        private final LineRenderer renderer;
         private final Label label;
 
-        CheckboxRenderer(Box box, Font font) {
+        CheckboxRenderer(Box box, LineRenderer renderer, Font font) {
             this.box = box;
+            this.renderer = renderer;
             label = new Label(new TextRenderer(font));
-            label.setHorizontalAlignment(HorizontalAlignment.CENTER);
-            label.setVerticalAlignment(VerticalAlignment.CENTER);
+            label.setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         }
 
         public void check() {
             label.setText("V");
+            label.setFontColor(Color.GREEN);
         }
 
         public void uncheck() {
@@ -95,8 +96,13 @@ public class Checkbox extends AbstractWidget {
 
         @Override
         public void render(float alpha) {
-            box.render(alpha);
+            box.render(renderer, alpha);
+            var centerX = box.getBounds().centerX();
+            var centerY = box.getBounds().centerY();
+            ModelMatrix.instance().pushMatrix();
+            ModelMatrix.instance().translatef(centerX, centerY, 0f);
             label.render(alpha);
+            ModelMatrix.instance().popMatrix();
         }
 
         @Override

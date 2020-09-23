@@ -162,6 +162,8 @@ public interface OpenGL {
 
     void glUniform1fv(int location, float[] buffer);
 
+    void glUniform2f(int location, float v1, float v2);
+
     void glUniform2fv(int location, float[] buffer);
 
     void glUniform3fv(int location, float[] buffer);

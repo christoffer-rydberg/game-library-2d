@@ -10,6 +10,7 @@ public class Color {
     public static final Color GREEN = new Color(0, 1, 0);
     public static final Color BLUE = new Color(0, 0, 1);
     public static final Color LIGHT_BLUE = new Color(173f / 255f, 216f / 255f, 230f / 255f);
+    public static final Color SOFT_BLUE = new Color(171f / 255f, 215f / 255f, 235f / 255f);
     public static final Color SILVER = new Color(192f / 255f, 192f / 255f, 192f / 255f);
     public static final Color SAND = new Color(194f / 255f, 178f / 255f, 128f / 255f);
     public static final Color GOLD = new Color(255f / 255f, 215f / 255f, 0f);
@@ -19,7 +20,7 @@ public class Color {
     public static final Color ORANGE = new Color(255f / 255f, 165f / 255f, 0);
     public static final Color BROWN = new Color(139f / 255f, 69f / 255f, 19f / 255f);
     public static final Color TRANSPARENT = new Color(0, 0, 0, 0);
-    public static final Color LAVENDER = new Color(230f/255f, 230f/255f, 250f/255f);
+    public static final Color LAVENDER = new Color(230f / 255f, 230f / 255f, 250f / 255f);
 
     private final float r;
     private final float g;

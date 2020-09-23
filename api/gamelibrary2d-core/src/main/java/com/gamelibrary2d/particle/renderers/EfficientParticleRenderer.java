@@ -15,7 +15,7 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
     private final static String texturedUniformName = "textured";
     private final float[] boundsArray = new float[4];
     private float pointSize = 1f;
-    private ParticleShape particleShape = ParticleShape.RECTANGLE;
+    private ParticleShape particleShape = ParticleShape.QUAD;
     private PointSmoothing pointSmoothing = PointSmoothing.FASTEST;
     private Texture texture;
     private Rectangle bounds;
@@ -84,14 +84,14 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
         super.render(alpha, buffer, offset, len);
 
         OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
-        if (particleShape == ParticleShape.RECTANGLE && texture != null) {
+        if (particleShape == ParticleShape.QUAD && texture != null) {
             texture.unbind();
         }
     }
 
     @Override
     protected void renderPrepare(ShaderProgram shaderProgram) {
-        if (particleShape == ParticleShape.RECTANGLE) {
+        if (particleShape == ParticleShape.QUAD) {
             var glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
             OpenGL.instance().glUniform4fv(glBoundsUniform, boundsArray);
 
@@ -135,7 +135,7 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
         switch (particleShape) {
             case POINT:
                 return ShaderProgram.getPointParticleShaderProgram();
-            case RECTANGLE:
+            case QUAD:
                 return ShaderProgram.getQuadParticleShaderProgram();
             default:
                 throw new IllegalStateException("Unexpected value: " + particleShape);

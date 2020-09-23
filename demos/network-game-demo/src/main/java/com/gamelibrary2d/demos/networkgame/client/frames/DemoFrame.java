@@ -138,7 +138,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         var shockwavePS = loadParticleSystem(context, Particles.SHOCK_WAVE, 1000);
 
         var renderer = new EfficientParticleRenderer();
-        renderer.setBlendMode(BlendMode.TRANSPARENCY);
+        renderer.setBlendMode(BlendMode.TRANSPARENT);
         renderer.setTexture(Textures.boulder());
         var boulderExplosionPS = loadParticleSystem(
                 context, Particles.BOULDER_EXPLOSION, renderer, 1000);

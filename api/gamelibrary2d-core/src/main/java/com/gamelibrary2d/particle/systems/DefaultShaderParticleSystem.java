@@ -26,14 +26,12 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem im
     private final ParticleRenderBuffer[] renderBuffer;
     private final ParticleUpdateBuffer[] updateBuffer;
 
+    private Point positionTransform;
     private int parameterUpdateCounter;
     private int positionUpdateCounter;
-
     private int capacity;
     private int particleCount;
     private int activeBuffer = 0;
-
-    private Point positionTransform;
     private ParticleSystemSettings settings;
     private ParticleUpdateListener updateListener;
 
@@ -253,7 +251,10 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem im
 
         openGL.glUniform1i(glUniformRandomSeed, RandomInstance.get().nextInt());
         openGL.glUniform1i(glUniformParticlesInGpu, particlesInGpuBuffer);
-        openGL.glUniform2fv(glUniformPosition, position);
+        openGL.glUniform2f(
+                glUniformPosition,
+                position[0] + settings.getOffsetX(),
+                position[1] + settings.getOffsetY());
         openGL.glUniform2fv(glUniformExternalAcceleration, externalAcceleration);
 
         var particlePositioner = settings.getParticlePositioner();
@@ -283,12 +284,16 @@ public class DefaultShaderParticleSystem extends AbstractShaderParticleSystem im
                 updateBuffer[activeBuffer == 1 ? 0 : 1].bufferId());
     }
 
+    private boolean isTransformingPosition() {
+        return positionTransform != null && (positionTransform.getX() != 0f || positionTransform.getY() != 0f);
+    }
+
     @Override
     public void render(float alpha) {
         if (particlesInGpuBuffer == 0)
             return;
 
-        if (positionTransform != null) {
+        if (isTransformingPosition()) {
             ModelMatrix.instance().pushMatrix();
             ModelMatrix.instance().translatef(positionTransform.getX(), positionTransform.getY(), 0);
             settings.getRenderer().render(renderBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
