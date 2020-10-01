@@ -10,8 +10,8 @@ import com.gamelibrary2d.renderers.LineRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
 
@@ -82,7 +82,7 @@ public class Checkbox extends AbstractWidget {
             this.box = box;
             this.renderer = renderer;
             label = new Label(new TextRenderer(font));
-            label.setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+            label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         }
 
         public void check() {

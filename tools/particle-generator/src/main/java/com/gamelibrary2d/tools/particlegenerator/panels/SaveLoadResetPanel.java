@@ -15,8 +15,8 @@ import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
 import com.gamelibrary2d.widgets.Label;
 
@@ -46,12 +46,11 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private void addButton(String text, float posX, float posY, Action onClick) {
         var content = new Label(text, new TextRenderer(Fonts.getDefaultFont()));
         content.setFontColor(Color.SOFT_BLUE);
-        content.setAlignment(HorizontalAlignment.LEFT, VerticalAlignment.BOTTOM);
+        content.setAlignment(HorizontalTextAlignment.LEFT, VerticalTextAlignment.BASE_LINE);
 
         var button = new Button<>(content, onClick);
         button.setPosition(posX, posY);
-        button.setBounds(Fonts.getDefaultFont().textSize(content.getText(), content.getHorizontalAlignment(),
-                content.getVerticalAlignment()));
+        button.setBounds(content.getTextBounds());
         add(button);
     }
 

@@ -240,7 +240,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
 
     private void stackExpandBounds(StackOrientation orientation, Rectangle bounds, float padding) {
         if (getBounds().equals(Rectangle.EMPTY)) {
-            bounds = bounds.expandToPoint(0, 0);
+            bounds = bounds.expand(0, 0);
         }
 
         if (padding != 0) {
@@ -269,6 +269,6 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
                 break;
         }
 
-        setBounds(getBounds().expandToPoint(posX, posY));
+        setBounds(getBounds().expand(posX, posY));
     }
 }

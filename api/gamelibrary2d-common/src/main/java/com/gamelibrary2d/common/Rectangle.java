@@ -83,13 +83,36 @@ public class Rectangle {
         return Math.max(-INFINITE_VALUE, Math.min(INFINITE_VALUE, value));
     }
 
-    public Rectangle expandToPoint(Point p) {
-        return expandToPoint(p.getX(), p.getY());
+    public Rectangle expand(float x, float y) {
+        if (isInside(x, y)) {
+            return this;
+        } else {
+            return new Rectangle(
+                    Math.min(this.xMin, x),
+                    Math.min(this.yMin, y),
+                    Math.max(this.xMax, x),
+                    Math.max(this.yMax, y));
+        }
     }
 
-    public Rectangle expandToPoint(float x, float y) {
-        return isInside(x, y) ? this
-                : new Rectangle(Math.min(xMin, x), Math.min(yMin, y), Math.max(xMax, x), Math.max(yMax, y));
+    public Rectangle expand(Point p) {
+        return expand(p.getX(), p.getY());
+    }
+
+    public Rectangle expand(float xMin, float yMin, float xMax, float yMax) {
+        if (isInside(xMin, yMin) && isInside(xMax, yMax)) {
+            return this;
+        } else {
+            return new Rectangle(
+                    Math.min(this.xMin, xMin),
+                    Math.min(this.yMin, yMin),
+                    Math.max(this.xMax, xMax),
+                    Math.max(this.yMax, yMax));
+        }
+    }
+
+    public Rectangle expand(Rectangle other) {
+        return expand(other.xMin, other.yMin, other.xMax, other.yMax);
     }
 
     public boolean isInside(Point p) {
@@ -139,7 +162,6 @@ public class Rectangle {
     }
 
     public Rectangle resize(float scaleX, float scaleY, float hotSpotX, float hotSpotY) {
-
         // Current Center point
         float centerX = xMin + width() / 2;
         float centerY = yMin + height() / 2;
@@ -238,7 +260,7 @@ public class Rectangle {
     }
 
     public float centerY() {
-        return xMin + height() / 2;
+        return yMin + height() / 2;
     }
 
     public void wrap(Point p) {
@@ -266,4 +288,5 @@ public class Rectangle {
     public int hashCode() {
         return Objects.hash(xMin, yMin, xMax, yMax);
     }
+
 }

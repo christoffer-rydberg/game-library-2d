@@ -8,8 +8,9 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.resources.Surface;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.events.TextChanged;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public class Label implements Bounded, Renderable {
     private String text = "";
     private TextRenderer textRenderer;
 
-    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.CENTER;
-    private VerticalAlignment verticalAlignment = VerticalAlignment.CENTER;
+    private HorizontalTextAlignment horizontalAlignment = HorizontalTextAlignment.LEFT;
+    private VerticalTextAlignment verticalAlignment = VerticalTextAlignment.BASE_LINE;
 
     private Color fontColor;
 
@@ -44,6 +45,31 @@ public class Label implements Bounded, Renderable {
     public Label(String text, TextRenderer textRenderer) {
         setText(text);
         setTextRenderer(textRenderer);
+    }
+
+    /**
+     * Determines if the specified index of the specified text holds a 'new line'
+     * separator.
+     *
+     * @param text  The text.
+     * @param index The index.
+     * @return True if a 'new line' separator is found, false otherwise.
+     */
+    public static boolean isNewLine(String text, int index) {
+        return getNewLineSize(text, index) > 0;
+    }
+
+    /**
+     * Gets the character size of the 'new line' separator in the specified text at
+     * the specified index.
+     *
+     * @param text  The text.
+     * @param index The index.
+     * @return The size, in number of characters, of the 'new line' separator or 0
+     * if the specified index is not a 'new line' separator.
+     */
+    public static int getNewLineSize(String text, int index) {
+        return text.charAt(index) == '\n' ? 1 : 0;
     }
 
     public void addTextChangedListener(TextChanged listener) {
@@ -74,16 +100,16 @@ public class Label implements Bounded, Renderable {
         return textPositionOffset;
     }
 
-    public void setAlignment(HorizontalAlignment horizontal, VerticalAlignment vertical) {
+    public void setAlignment(HorizontalTextAlignment horizontal, VerticalTextAlignment vertical) {
         setHorizontalAlignment(horizontal);
         setVerticalAlignment(vertical);
     }
 
-    public HorizontalAlignment getHorizontalAlignment() {
+    public HorizontalTextAlignment getHorizontalAlignment() {
         return horizontalAlignment;
     }
 
-    public void setHorizontalAlignment(HorizontalAlignment horizontalAlignment) {
+    public void setHorizontalAlignment(HorizontalTextAlignment horizontalAlignment) {
         this.horizontalAlignment = horizontalAlignment;
     }
 
@@ -95,11 +121,11 @@ public class Label implements Bounded, Renderable {
         this.background = background;
     }
 
-    public VerticalAlignment getVerticalAlignment() {
+    public VerticalTextAlignment getVerticalAlignment() {
         return verticalAlignment;
     }
 
-    public void setVerticalAlignment(VerticalAlignment verticalAlignment) {
+    public void setVerticalAlignment(VerticalTextAlignment verticalAlignment) {
         this.verticalAlignment = verticalAlignment;
     }
 
@@ -187,41 +213,49 @@ public class Label implements Bounded, Renderable {
             background.render(alpha);
         }
         if (textRenderer != null) {
-            onRender(textRenderer, fontColor, alpha);
+            onRender(alpha);
         }
     }
 
-    private void onRender(TextRenderer textRenderer, Color color, float alpha) {
-        if (color != null) {
-            textRenderer.getParameters().setRgba(color);
+    private void onRender(float alpha) {
+        if (fontColor != null) {
+            textRenderer.getParameters().setRgba(fontColor);
         }
 
-        float usedRowWidth = rowWidth > 0 ? rowWidth : Integer.MAX_VALUE;
-        float usedRowHeight = rowHeight > 0 ? rowHeight : textRenderer.getFont().textHeight();
-        renderRows(textRenderer, usedRowWidth, usedRowHeight, alpha, true);
+        iterateRows(true, alpha, null);
     }
 
-    public int determineRequiredRows(TextRenderer renderer) {
-        return renderRows(renderer, getRowWidth(), getRowHeight(), 1f, false);
+    private Rectangle getTextBounds(Font font, int offset, int len) {
+        var textWidth = font.getTextWidth(text, offset, len);
+        float offsetX = offsetFromHorizontalAlignment(textWidth);
+        float offsetY = offsetFromVerticalAlignment(font);
+        return new Rectangle(
+                offsetX,
+                offsetY - font.getDescent(),
+                textWidth + offsetX,
+                offsetY + font.getAscent());
     }
 
-    private int renderRows(TextRenderer textRenderer, float rowWidth, float rowHeight, float alpha, boolean render) {
+    public Rectangle getTextBounds() {
+        var output = new TextBoundsOutput();
+        iterateRows(false, 1f, output);
+        return output.bounds;
+    }
 
+    private void iterateRows(boolean render, float alpha, TextBoundsOutput output) {
+        final float rowWidth = this.rowWidth > 0 ? this.rowWidth : Integer.MAX_VALUE;
+        final float rowHeight = this.rowHeight > 0 ? this.rowHeight : textRenderer.getFont().getHeight();
+        final var textRenderer = this.getTextRenderer();
         final Font font = textRenderer.getFont();
-
         final int rowCount = getRowCount() > 0 ? getRowCount() : Integer.MAX_VALUE;
 
         int currentRow = 0;
-
         int rowStart = getTextOffset();
-
         while (rowStart < text.length() && currentRow < rowCount) {
+            int rowEnd = getRowEnd(text, rowStart, rowWidth, true);
 
-            // Get the end of the row
-            int rowEnd = font.getRowEnd(text, rowStart, rowWidth, true);
-
-            boolean endOfText = rowEnd == text.length();
-            int newLineSize = endOfText ? 0 : Font.getNewLineSize(text, rowEnd);
+            var endOfText = rowEnd == text.length();
+            int newLineSize = endOfText ? 0 : getNewLineSize(text, rowEnd);
             boolean newLineSeparatorFound = newLineSize > 0;
             if (!endOfText && !newLineSeparatorFound) {
                 // Back up to avoid cutting words
@@ -234,8 +268,15 @@ public class Label implements Bounded, Renderable {
 
             boolean renderBreak = isBreakString(text, rowStart, len);
 
-            if (render && !renderBreak)
-                renderRow(textRenderer, alpha, font.textWidth(text, rowStart, len), rowHeight, rowStart, len);
+            if (!renderBreak) {
+                if (output != null) {
+                    output.expandBounds(getTextBounds(font, rowStart, len).move(0, -currentRow * rowHeight));
+                }
+
+                if (render) {
+                    renderRow(textRenderer, alpha, font.getTextWidth(text, rowStart, len), rowHeight, rowStart, len);
+                }
+            }
 
             rowStart = newLineSeparatorFound ? rowEnd + newLineSize : consumeSeparators(text, rowEnd);
 
@@ -249,10 +290,9 @@ public class Label implements Bounded, Renderable {
             }
         }
 
-        if (render)
+        if (render) {
             charactersRendered = rowStart;
-
-        return currentRow;
+        }
     }
 
     private int consumeSeparators(String text, int index) {
@@ -261,11 +301,10 @@ public class Label implements Bounded, Renderable {
         return index;
     }
 
-    private void renderRow(TextRenderer textRenderer, float alpha, float rowWidth, float rowHeight, int offset,
-                           int len) {
-
+    private void renderRow(TextRenderer textRenderer, float alpha,
+                           float rowWidth, float rowHeight, int offset, int len) {
         final float xOffset = offsetFromHorizontalAlignment(rowWidth) + textPositionOffset.getX();
-        final float yOffset = offsetFromVerticalAlignment(textRenderer.getFont().textHeight())
+        final float yOffset = offsetFromVerticalAlignment(textRenderer.getFont())
                 + textPositionOffset.getY();
 
         if (xOffset != 0 || yOffset != 0) {
@@ -295,15 +334,43 @@ public class Label implements Bounded, Renderable {
         }
     }
 
-    private float offsetFromVerticalAlignment(float size) {
+    private float offsetFromVerticalAlignment(Font font) {
         switch (verticalAlignment) {
             case TOP:
-                return -size;
+                return -font.getAscent();
             case CENTER:
-                return -size / 2;
+                return (font.getAscent() + font.getDescent()) / 2 - font.getAscent();
+            case BOTTOM:
+                return font.getDescent();
+            case BASE_LINE:
             default:
                 return 0;
         }
+    }
+
+    /**
+     * Gets the end index of a row from the specified text, given the specified
+     * start index and row pixel width.
+     *
+     * @param text           The text.
+     * @param startIndex     The (inclusive) start index of the row.
+     * @param pixelWidth     The pixel width of the row.
+     * @param breakOnNewLine Determines if a 'new line'-separator should end the
+     *                       row.
+     * @return The (exclusive) end index of the row.
+     */
+    public int getRowEnd(String text, int startIndex, float pixelWidth, boolean breakOnNewLine) {
+        final int length = text.length();
+        while (startIndex < length && pixelWidth > 0) {
+            if (breakOnNewLine && isNewLine(text, startIndex))
+                break;
+            Surface quad = getTextRenderer().getFont().getQuads().get(text.charAt(startIndex));
+            if (quad != null)
+                pixelWidth -= quad.getBounds().width();
+            if (pixelWidth > 0)
+                ++startIndex;
+        }
+        return startIndex;
     }
 
     @Override
@@ -311,5 +378,15 @@ public class Label implements Bounded, Renderable {
         return background instanceof Bounded
                 ? ((Bounded) background).getBounds()
                 : Rectangle.EMPTY;
+    }
+
+    private static class TextBoundsOutput {
+        private Rectangle bounds;
+
+        void expandBounds(Rectangle bounds) {
+            this.bounds = this.bounds == null
+                    ? bounds
+                    : this.bounds.expand(bounds);
+        }
     }
 }

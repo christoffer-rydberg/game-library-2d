@@ -13,9 +13,9 @@ import com.gamelibrary2d.tools.particlegenerator.properties.GenericProperty;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
 import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.HorizontalAlignment;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.PointSmoothing;
-import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
 import com.gamelibrary2d.widgets.Label;
 
@@ -40,7 +40,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         fileChooser = new FileChooser(TEMP_PATH);
 
         textureLabel = new Label();
-        textureLabel.setAlignment(HorizontalAlignment.LEFT, VerticalAlignment.BOTTOM);
+        textureLabel.setAlignment(HorizontalTextAlignment.LEFT, VerticalTextAlignment.BASE_LINE);
         textureLabel.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
         textureLabel.setFontColor(Color.SOFT_BLUE);
         textureLabel.setText("None");
@@ -158,10 +158,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
             textureLabel.setText(fileName == null ? "None" : fileName);
         });
 
-        textureButton.setBounds(Fonts.getDefaultFont().textSize(textureLabel.getText(),
-                textureLabel.getHorizontalAlignment(), textureLabel.getVerticalAlignment()));
-
-        textureButton.setPosition(0, -2);
+        textureButton.setBounds(textureLabel.getTextBounds());
 
         var textureElement = new PanelElement.CustomElement("Texture", textureButton);
 

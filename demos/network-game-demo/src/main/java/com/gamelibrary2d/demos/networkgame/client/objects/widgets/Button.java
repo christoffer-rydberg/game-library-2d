@@ -7,6 +7,8 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
 
@@ -24,6 +26,7 @@ public class Button extends AbstractWidget<Label> {
         background.getParameters().setRgba(Settings.BUTTON_COLOR);
 
         var content = new Label(text, new TextRenderer(Fonts.button()));
+        content.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         content.setBackground(background);
         setContent(content);
     }

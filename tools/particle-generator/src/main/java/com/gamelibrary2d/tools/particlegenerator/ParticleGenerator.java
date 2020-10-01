@@ -50,6 +50,6 @@ public class ParticleGenerator extends AbstractGame {
 
     @Override
     protected void onExit() {
-        
+
     }
 }

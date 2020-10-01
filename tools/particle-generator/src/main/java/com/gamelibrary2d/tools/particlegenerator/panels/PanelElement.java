@@ -20,8 +20,8 @@ import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.resources.Surfaces;
 import com.gamelibrary2d.tools.particlegenerator.resources.Textures;
 import com.gamelibrary2d.tools.particlegenerator.widgets.*;
-import com.gamelibrary2d.util.HorizontalAlignment;
-import com.gamelibrary2d.util.VerticalAlignment;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
 
@@ -34,8 +34,8 @@ public class PanelElement {
             String text,
             Font font,
             Color color,
-            HorizontalAlignment horizontalAlignment,
-            VerticalAlignment verticalAlignment) {
+            HorizontalTextAlignment horizontalAlignment,
+            VerticalTextAlignment verticalAlignment) {
         var textRenderer = new TextRenderer(font);
         var label = new Label(text, textRenderer);
         label.setAlignment(horizontalAlignment, verticalAlignment);
@@ -47,8 +47,8 @@ public class PanelElement {
             String text,
             Font font,
             Color color,
-            HorizontalAlignment horizontalAlignment,
-            VerticalAlignment verticalAlignment) {
+            HorizontalTextAlignment horizontalAlignment,
+            VerticalTextAlignment verticalAlignment) {
         return new DefaultGameObject<>(createLabel(
                 text, font, color, horizontalAlignment, verticalAlignment
         ));
@@ -59,18 +59,12 @@ public class PanelElement {
                 parameterName + ":",
                 Fonts.getDefaultFont(),
                 Color.SAND,
-                HorizontalAlignment.RIGHT,
-                VerticalAlignment.BOTTOM
+                HorizontalTextAlignment.RIGHT,
+                VerticalTextAlignment.BASE_LINE
         );
 
-        var labelOffsetX = -10;
-        var labelOffsetY = -2;
-        label.setPosition(labelOffsetX, labelOffsetY);
-        label.setBounds(new Rectangle(
-                -labelOffsetX,
-                -labelOffsetY,
-                -labelOffsetX,
-                -labelOffsetY + 18));
+        label.setPosition(-10, 0);
+        label.setBounds(new Rectangle(0, 0, 0, 12));
         return label;
     }
 
@@ -89,7 +83,7 @@ public class PanelElement {
 
             checkBox.setPosition(
                     Surfaces.propertyBaseLine().getBounds().width() / 2f - checkBox.getBounds().centerX(),
-                    -Surfaces.defaultCheckbox().getBounds().yMin());
+                    -Surfaces.defaultCheckbox().getBounds().yMin() - 2f);
 
             add(label);
             add(checkBox);
@@ -106,37 +100,36 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
-            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 0f);
+            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 1f);
 
             add(label);
             add(parameterWidget);
 
             if (variance != null) {
                 var varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
-                varianceWidget.setPosition(120, 0f);
+                varianceWidget.setPosition(120, 1f);
 
                 var plusLabel = createLabelObject(
                         "+",
                         Fonts.getDefaultFont(),
                         Color.SAND,
-                        HorizontalAlignment.CENTER,
-                        VerticalAlignment.BOTTOM);
+                        HorizontalTextAlignment.CENTER,
+                        VerticalTextAlignment.CENTER);
 
                 plusLabel.setPosition(
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
-                        varianceWidget.getPosition().getY() + varianceWidget.getBounds().yMin() - 1);
+                        varianceWidget.getPosition().getY() + 3);
 
                 var minusLabel = createLabelObject(
                         "-",
                         Fonts.getDefaultFont(),
                         Color.SAND,
-                        HorizontalAlignment.CENTER,
-                        VerticalAlignment.BOTTOM
-                );
+                        HorizontalTextAlignment.CENTER,
+                        VerticalTextAlignment.CENTER);
+
                 minusLabel.setPosition(
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
-                        varianceWidget.getPosition().getY() + varianceWidget.getBounds().yMin() - 6);
-
+                        varianceWidget.getPosition().getY() - 3);
 
                 add(plusLabel);
                 add(minusLabel);
@@ -145,9 +138,6 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(FloatProperty property, Color backgroundColor) {
-            var textBox = new FloatPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
-            textBox.setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM);
-
             var background = new SurfaceRenderer(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
@@ -156,6 +146,8 @@ public class PanelElement {
             background.getParameters().setRgb(backgroundColor);
             background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
 
+            var textBox = new FloatPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
+            textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
             textBox.setBackground(background);
 
             var propertyWidget = new DefaultWidget<>(textBox);
@@ -176,36 +168,36 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
-            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 0f);
+            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 1f);
 
             add(label);
             add(parameterWidget);
 
             if (variance != null) {
                 var varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
-                varianceWidget.setPosition(120, 0f);
+                varianceWidget.setPosition(120, 1f);
 
                 var plusLabel = createLabelObject(
                         "+",
                         Fonts.getDefaultFont(),
                         Color.SAND,
-                        HorizontalAlignment.CENTER,
-                        VerticalAlignment.BOTTOM);
+                        HorizontalTextAlignment.CENTER,
+                        VerticalTextAlignment.BASE_LINE);
 
                 plusLabel.setPosition(
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
-                        varianceWidget.getPosition().getY() + varianceWidget.getBounds().yMin() - 1);
+                        varianceWidget.getPosition().getY() + 3);
 
                 var minusLabel = createLabelObject(
                         "-",
                         Fonts.getDefaultFont(),
                         Color.SAND,
-                        HorizontalAlignment.CENTER,
-                        VerticalAlignment.BOTTOM
-                );
+                        HorizontalTextAlignment.CENTER,
+                        VerticalTextAlignment.BASE_LINE);
+
                 minusLabel.setPosition(
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
-                        varianceWidget.getPosition().getY() + varianceWidget.getBounds().yMin() - 6);
+                        varianceWidget.getPosition().getY() - 3);
 
                 add(plusLabel);
                 add(minusLabel);
@@ -214,9 +206,6 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(IntegerProperty property, Color backgroundColor) {
-            var textBox = new IntegerPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
-            textBox.setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM);
-
             var background = new SurfaceRenderer(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
@@ -225,6 +214,8 @@ public class PanelElement {
             background.getParameters().setRgb(backgroundColor);
             background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
 
+            var textBox = new IntegerPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
+            textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
             textBox.setBackground(background);
 
             var propertyWidget = new DefaultWidget<>(textBox);
@@ -301,14 +292,13 @@ public class PanelElement {
             backgroundObj.setPosition(-backgroundObj.getBounds().xMin(), 0f);
             backgroundObj.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
 
-            var enumLabel =
-                    createLabel(
-                            property.get().toString(),
-                            Fonts.getSmallFont(),
-                            ENUM_FONT_COLOR,
-                            HorizontalAlignment.CENTER,
-                            VerticalAlignment.BOTTOM
-                    );
+            var enumLabel = createLabel(
+                    property.get().toString(),
+                    Fonts.getSmallFont(),
+                    ENUM_FONT_COLOR,
+                    HorizontalTextAlignment.CENTER,
+                    VerticalTextAlignment.BASE_LINE
+            );
 
             var backgroundWidth = backgroundObj.getBounds().width();
 

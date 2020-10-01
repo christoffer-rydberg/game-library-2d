@@ -13,6 +13,8 @@ import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
@@ -30,15 +32,15 @@ public class DemoFrame extends AbstractFrame {
     private GameObject createLoadButton() {
         var font = Font.create(new java.awt.Font("Gabriola", java.awt.Font.BOLD, 48), this);
 
-        var loadButtonContext = new Label();
-        loadButtonContext.setTextRenderer(new TextRenderer(font));
-        loadButtonContext.setFontColor(Color.WHITE);
-        loadButtonContext.setText("Click here to load GIF");
-        var textBounds = font.textSize(loadButtonContext.getText(), loadButtonContext.getHorizontalAlignment(), loadButtonContext.getVerticalAlignment());
+        var label = new Label();
+        label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
+        label.setTextRenderer(new TextRenderer(font));
+        label.setFontColor(Color.WHITE);
+        label.setText("Click here to load GIF");
 
         var loadButton = new DefaultWidget<>();
-        loadButton.setContent(loadButtonContext);
-        loadButton.setBounds(textBounds);
+        loadButton.setContent(label);
+        loadButton.setBounds(label.getTextBounds());
         loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);
 
         return loadButton;

@@ -6,6 +6,8 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
+import com.gamelibrary2d.util.HorizontalTextAlignment;
+import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.TextBox;
 
@@ -19,6 +21,7 @@ public class InputField extends AbstractWidget<TextBox> {
         background.getParameters().setRgba(Settings.INPUT_FIELD_COLOR);
 
         var content = new TextBox(text, new TextRenderer(Fonts.inputField()));
+        content.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         content.setBackground(background);
         setContent(content);
     }

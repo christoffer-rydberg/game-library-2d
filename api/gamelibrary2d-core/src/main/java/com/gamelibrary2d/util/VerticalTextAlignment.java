@@ -1,7 +1,8 @@
 package com.gamelibrary2d.util;
 
-public enum VerticalAlignment {
+public enum VerticalTextAlignment {
     TOP,
     CENTER,
+    BASE_LINE,
     BOTTOM
 }
