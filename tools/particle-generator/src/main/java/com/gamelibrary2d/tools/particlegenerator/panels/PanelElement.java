@@ -37,9 +37,8 @@ public class PanelElement {
             HorizontalTextAlignment horizontalAlignment,
             VerticalTextAlignment verticalAlignment) {
         var textRenderer = new TextRenderer(font);
-        var label = new Label(text, textRenderer);
+        var label = new Label(text, textRenderer, color);
         label.setAlignment(horizontalAlignment, verticalAlignment);
-        label.setFontColor(color);
         return label;
     }
 
@@ -146,11 +145,11 @@ public class PanelElement {
             background.getParameters().setRgb(backgroundColor);
             background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
 
-            var textBox = new FloatPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
+            var textBox = new FloatPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
-            textBox.setBackground(background);
 
             var propertyWidget = new DefaultWidget<>(textBox);
+            propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
                     background.getParameters().setRgb(focused ? Color.GOLD : backgroundColor));
             propertyWidget.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
@@ -214,11 +213,11 @@ public class PanelElement {
             background.getParameters().setRgb(backgroundColor);
             background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
 
-            var textBox = new IntegerPropertyTextBox(new TextRenderer(Fonts.getDefaultFont()), property);
+            var textBox = new IntegerPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
-            textBox.setBackground(background);
 
             var propertyWidget = new DefaultWidget<>(textBox);
+            propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
                     background.getParameters().setRgb(focused ? Color.GOLD : backgroundColor));
             propertyWidget.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));

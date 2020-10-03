@@ -2,22 +2,22 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.tools.particlegenerator.properties.IntegerProperty;
-import com.gamelibrary2d.widgets.TextBox;
+import com.gamelibrary2d.tools.particlegenerator.properties.FloatProperty;
+import com.gamelibrary2d.widgets.TextField;
 
-public class IntegerPropertyTextBox extends TextBox {
+public class FloatPropertyTextField extends TextField {
     private static final Color VALID = Color.WHITE;
     private static final Color INVALID = Color.RED;
 
-    private final IntegerProperty property;
+    private final FloatProperty property;
 
     private float cachedValue;
 
-    public IntegerPropertyTextBox(TextRenderer textRenderer, IntegerProperty property) {
+    public FloatPropertyTextField(TextRenderer textRenderer, FloatProperty property) {
         super(textRenderer);
         this.property = property;
         cachedValue = property.get();
-        setFontColor(VALID);
+        textRenderer.getParameters().setRgba(VALID);
         setText(toString(cachedValue));
         addTextChangedListener(this::onTextChanged);
     }
@@ -38,10 +38,10 @@ public class IntegerPropertyTextBox extends TextBox {
 
     private void onTextChanged(String before, String after) {
         try {
-            property.set(Integer.parseInt(after));
-            setFontColor(VALID);
+            property.set(Float.parseFloat(after));
+            getTextRenderer().getParameters().setRgba(VALID);
         } catch (Exception e) {
-            setFontColor(INVALID);
+            getTextRenderer().getParameters().setRgba(INVALID);
         }
     }
 

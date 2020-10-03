@@ -22,31 +22,31 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         var emitButtonConent = new Label();
         emitButtonConent.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP);
         emitButtonConent.setTextRenderer(new TextRenderer(font));
-        emitButtonConent.setFontColor(Color.SOFT_BLUE);
+        emitButtonConent.setColor(Color.SOFT_BLUE);
         emitButtonConent.setText("Emit");
 
         var emitButton = new Button<>(emitButtonConent, particleSystem::emit);
-        emitButton.setBounds(emitButtonConent.getTextBounds());
+        emitButton.setBounds(emitButtonConent.calculateBounds());
         emitButton.setPosition(0, 0);
 
         emitSequentialButton = new ToggleButton();
         var emitSequentialContent = emitSequentialButton.getContent();
         emitSequentialContent.setText("Emit Sequential");
         emitSequentialContent.setTextRenderer(new TextRenderer(font));
-        emitSequentialContent.setFontColor(Color.SOFT_BLUE);
+        emitSequentialContent.setColor(Color.SOFT_BLUE);
         emitSequentialContent.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP);
 
-        emitSequentialButton.setBounds(emitSequentialContent.getTextBounds());
+        emitSequentialButton.setBounds(emitSequentialContent.calculateBounds());
         emitSequentialButton.setPosition(0, -50);
 
         var emitAllContext = new Label();
         emitAllContext.setText("Emit All");
         emitAllContext.setTextRenderer(new TextRenderer(font));
-        emitAllContext.setFontColor(Color.SOFT_BLUE);
+        emitAllContext.setColor(Color.SOFT_BLUE);
         emitAllContext.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP);
 
         var emitAllButton = new Button<>(emitAllContext, particleSystem::emitAll);
-        emitAllButton.setBounds(emitAllContext.getTextBounds());
+        emitAllButton.setBounds(emitAllContext.calculateBounds());
         emitAllButton.setPosition(0, -100);
 
         add(emitButton);

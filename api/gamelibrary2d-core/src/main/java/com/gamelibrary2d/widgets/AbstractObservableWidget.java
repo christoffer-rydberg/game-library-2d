@@ -1,20 +1,20 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.widgets.events.*;
+import com.gamelibrary2d.widgets.listeners.*;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractObservableWidget<T extends Renderable> extends AbstractWidget<T> {
-    private final List<MouseButtonDown> mouseButtonDownListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseMoved> mouseHoverListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseMoved> mouseDragListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseButtonReleased> mouseButtonReleasedListeners = new CopyOnWriteArrayList<>();
-    private final List<KeyDown> keyDownListeners = new CopyOnWriteArrayList<>();
-    private final List<KeyReleased> keyReleasedListeners = new CopyOnWriteArrayList<>();
-    private final List<CharInput> charInputListeners = new CopyOnWriteArrayList<>();
-    private final List<FocusChanged> focusChangedListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseButtonDownListener> mouseButtonDownListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseHoverListener> mouseHoverListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseDragListener> mouseDragListeners = new CopyOnWriteArrayList<>();
+    private final List<MouseButtonReleasedListener> mouseButtonReleasedListeners = new CopyOnWriteArrayList<>();
+    private final List<KeyDownListener> keyDownListeners = new CopyOnWriteArrayList<>();
+    private final List<KeyReleasedListener> keyReleasedListeners = new CopyOnWriteArrayList<>();
+    private final List<CharInputListener> charInputListeners = new CopyOnWriteArrayList<>();
+    private final List<FocusChangedListener> focusChangedListeners = new CopyOnWriteArrayList<>();
 
     protected AbstractObservableWidget() {
 
@@ -24,71 +24,71 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
         super(content);
     }
 
-    public void removeMouseListener(MouseButtonDown listener) {
+    public void removeMouseListener(MouseButtonDownListener listener) {
         mouseButtonDownListeners.remove(listener);
     }
 
-    public void addMouseButtonDownListener(MouseButtonDown listener) {
+    public void addMouseButtonDownListener(MouseButtonDownListener listener) {
         mouseButtonDownListeners.add(listener);
     }
 
-    public void removeMouseButtonDownListener(MouseButtonDown listener) {
+    public void removeMouseButtonDownListener(MouseButtonDownListener listener) {
         mouseButtonDownListeners.remove(listener);
     }
 
-    public void addMouseHoverListener(MouseMoved listener) {
+    public void addMouseHoverListener(MouseHoverListener listener) {
         mouseHoverListeners.add(listener);
     }
 
-    public void removeMouseHoverListener(MouseMoved listener) {
+    public void removeMouseHoverListener(MouseHoverListener listener) {
         mouseHoverListeners.remove(listener);
     }
 
-    public void addMouseDragListener(MouseMoved listener) {
+    public void addMouseDragListener(MouseDragListener listener) {
         mouseDragListeners.add(listener);
     }
 
-    public void removeMouseDragListener(MouseMoved listener) {
+    public void removeMouseDragListener(MouseDragListener listener) {
         mouseDragListeners.remove(listener);
     }
 
-    public void addMouseButtonReleasedListener(MouseButtonReleased listener) {
+    public void addMouseButtonReleasedListener(MouseButtonReleasedListener listener) {
         mouseButtonReleasedListeners.add(listener);
     }
 
-    public void removeMouseButtonReleasedListener(MouseButtonReleased listener) {
+    public void removeMouseButtonReleasedListener(MouseButtonReleasedListener listener) {
         mouseButtonReleasedListeners.remove(listener);
     }
 
-    public void addKeyDownListener(KeyDown listener) {
+    public void addKeyDownListener(KeyDownListener listener) {
         keyDownListeners.add(listener);
     }
 
-    public void removeKeyDownListener(KeyDown listener) {
+    public void removeKeyDownListener(KeyDownListener listener) {
         keyDownListeners.remove(listener);
     }
 
-    public void addKeyReleasedListener(KeyReleased listener) {
+    public void addKeyReleasedListener(KeyReleasedListener listener) {
         keyReleasedListeners.add(listener);
     }
 
-    public void removeKeyReleasedListener(KeyReleased listener) {
+    public void removeKeyReleasedListener(KeyReleasedListener listener) {
         keyReleasedListeners.remove(listener);
     }
 
-    public void addCharInputListener(CharInput listener) {
+    public void addCharInputListener(CharInputListener listener) {
         charInputListeners.add(listener);
     }
 
-    public void removeCharInputListener(CharInput listener) {
+    public void removeCharInputListener(CharInputListener listener) {
         charInputListeners.remove(listener);
     }
 
-    public void addFocusChangedListener(FocusChanged listener) {
+    public void addFocusChangedListener(FocusChangedListener listener) {
         focusChangedListeners.add(listener);
     }
 
-    public void removeFocusChangedListener(FocusChanged listener) {
+    public void removeFocusChangedListener(FocusChangedListener listener) {
         focusChangedListeners.remove(listener);
     }
 
@@ -113,14 +113,14 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
         for (var listener : mouseHoverListeners) {
-            listener.onMouseMoved(x, y, projectedX, projectedY, false);
+            listener.onMouseHover(x, y, projectedX, projectedY);
         }
     }
 
     @Override
     protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
         for (var listener : mouseDragListeners) {
-            listener.onMouseMoved(x, y, projectedX, projectedY, true);
+            listener.onMouseDrag(x, y, projectedX, projectedY);
         }
     }
 

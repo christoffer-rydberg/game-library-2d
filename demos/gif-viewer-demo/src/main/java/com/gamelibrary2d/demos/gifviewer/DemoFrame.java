@@ -35,12 +35,12 @@ public class DemoFrame extends AbstractFrame {
         var label = new Label();
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         label.setTextRenderer(new TextRenderer(font));
-        label.setFontColor(Color.WHITE);
+        label.setColor(Color.WHITE);
         label.setText("Click here to load GIF");
 
         var loadButton = new DefaultWidget<>();
         loadButton.setContent(label);
-        loadButton.setBounds(label.getTextBounds());
+        loadButton.setBounds(label.calculateBounds());
         loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);
 
         return loadButton;

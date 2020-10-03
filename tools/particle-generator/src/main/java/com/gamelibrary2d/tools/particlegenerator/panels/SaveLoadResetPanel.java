@@ -44,13 +44,12 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     }
 
     private void addButton(String text, float posX, float posY, Action onClick) {
-        var content = new Label(text, new TextRenderer(Fonts.getDefaultFont()));
-        content.setFontColor(Color.SOFT_BLUE);
+        var content = new Label(text, new TextRenderer(Fonts.getDefaultFont()), Color.SOFT_BLUE);
         content.setAlignment(HorizontalTextAlignment.LEFT, VerticalTextAlignment.BASE_LINE);
 
         var button = new Button<>(content, onClick);
         button.setPosition(posX, posY);
-        button.setBounds(content.getTextBounds());
+        button.setBounds(content.calculateBounds());
         add(button);
     }
 

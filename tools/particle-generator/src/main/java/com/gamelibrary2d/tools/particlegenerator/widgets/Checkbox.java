@@ -87,7 +87,7 @@ public class Checkbox extends AbstractWidget {
 
         public void check() {
             label.setText("V");
-            label.setFontColor(Color.GREEN);
+            label.getTextRenderer().getParameters().setRgba(Color.GREEN);
         }
 
         public void uncheck() {

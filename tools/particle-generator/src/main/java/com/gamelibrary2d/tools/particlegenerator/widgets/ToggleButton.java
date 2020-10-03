@@ -20,10 +20,10 @@ public class ToggleButton extends AbstractWidget<Label> implements ComposableObj
     public void setToggled(boolean toggled) {
         this.toggled = toggled;
         if (toggled) {
-            defaultColor = getContent().getFontColor();
-            getContent().setFontColor(Color.GREEN);
+            defaultColor = getContent().getColor();
+            getContent().setColor(Color.GREEN);
         } else {
-            getContent().setFontColor(defaultColor);
+            getContent().setColor(defaultColor);
         }
     }
 

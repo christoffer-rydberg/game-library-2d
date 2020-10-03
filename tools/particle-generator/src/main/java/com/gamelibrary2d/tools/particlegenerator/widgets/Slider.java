@@ -125,7 +125,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         }
     }
 
-    private void onHandleDragged(float x, float y, float projectedX, float projectedY, boolean drag) {
+    private void onHandleDragged(float x, float y, float projectedX, float projectedY) {
         if (dragButton >= 0) {
             setValue(getValueFromPosition(projectedX, projectedY));
         }

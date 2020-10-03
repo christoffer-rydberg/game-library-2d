@@ -42,7 +42,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         textureLabel = new Label();
         textureLabel.setAlignment(HorizontalTextAlignment.LEFT, VerticalTextAlignment.BASE_LINE);
         textureLabel.setTextRenderer(new TextRenderer(Fonts.getDefaultFont()));
-        textureLabel.setFontColor(Color.SOFT_BLUE);
+        textureLabel.setColor(Color.SOFT_BLUE);
         textureLabel.setText("None");
 
         this.particleSystem = particleSystem;
@@ -158,7 +158,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
             textureLabel.setText(fileName == null ? "None" : fileName);
         });
 
-        textureButton.setBounds(textureLabel.getTextBounds());
+        textureButton.setBounds(textureLabel.calculateBounds());
 
         var textureElement = new PanelElement.CustomElement("Texture", textureButton);
 

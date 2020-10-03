@@ -55,7 +55,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
                     disposer.dispose();
                     bitmapRenderer = BitmapRenderer.create(bounds, disposer);
                 }
-                bitmapRenderer.render(() -> super.onRenderProjected(1f));
+                bitmapRenderer.render(() -> onRenderProjected(1f));
                 return bitmapRenderer.isVisible(x, y);
             } else {
                 return true;

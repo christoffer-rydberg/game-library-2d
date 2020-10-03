@@ -46,7 +46,7 @@ public class Font {
 
         var ascent = fontMetrics.getAscent();
         var descent = fontMetrics.getDescent();
-        var height = fontMetrics.getHeight();
+        var height = ascent + descent;
 
         int currentTextureWidth = 0;
         Map<Character, Surface> quads = new HashMap<>();

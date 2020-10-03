@@ -97,21 +97,15 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        FocusManager.focus(this, false);
-    }
-
-    @Override
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        FocusManager.focus(this, false);
-    }
-
-    @Override
     public final void mouseButtonDownWhenFocused(int button, int mods) {
         if (!awareOfMouseEvent) {
             onMouseButtonDownWhenFocused(button, mods);
         }
         awareOfMouseEvent = false;
+    }
+
+    protected void onMouseButtonDownWhenFocused(int button, int mods) {
+        FocusManager.unfocus(this, false);
     }
 
     @Override
@@ -121,10 +115,6 @@ public abstract class AbstractWidget<T extends Renderable>
         }
 
         awareOfMouseEvent = false;
-    }
-
-    protected void onMouseButtonDownWhenFocused(int button, int mods) {
-        FocusManager.unfocus(this, false);
     }
 
     protected void onMouseButtonReleasedWhenFocused(int button, int mods) {
@@ -154,6 +144,16 @@ public abstract class AbstractWidget<T extends Renderable>
 
     protected void onUnfocused() {
 
+    }
+
+    @Override
+    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        FocusManager.focus(this, false);
+    }
+
+    @Override
+    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+        FocusManager.focus(this, false);
     }
 
     @Override
