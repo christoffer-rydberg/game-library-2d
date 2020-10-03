@@ -5,17 +5,20 @@ import com.gamelibrary2d.util.BlendMode;
 
 public class OpenGLUtils {
 
-    private static BlendMode currentBlendMode;
+    private static BlendMode blendMode;
 
-    public static void applyBlendMode(BlendMode blendMode) {
+    public static BlendMode getBlendMode() {
+        return blendMode;
+    }
 
-        if (blendMode == currentBlendMode) {
+    public static void setBlendMode(BlendMode blendMode) {
+        if (blendMode == OpenGLUtils.blendMode) {
             return;
         }
 
-        boolean blendEnabled = currentBlendMode != null && currentBlendMode != BlendMode.NONE;
+        boolean blendEnabled = OpenGLUtils.blendMode != null && OpenGLUtils.blendMode != BlendMode.NONE;
 
-        currentBlendMode = blendMode;
+        OpenGLUtils.blendMode = blendMode;
 
         if (blendMode == null)
             return;

@@ -41,7 +41,7 @@ public abstract class AbstractShaderRenderer extends AbstractRenderer {
         ShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.bind();
         shaderProgram.updateModelMatrix(ModelMatrix.instance());
-        OpenGLUtils.applyBlendMode(blendMode);
+        OpenGLUtils.setBlendMode(blendMode);
         applyParameters(alpha);
         onRender(shaderProgram);
     }

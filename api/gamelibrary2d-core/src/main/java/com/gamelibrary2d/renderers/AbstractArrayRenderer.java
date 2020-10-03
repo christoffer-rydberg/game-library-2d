@@ -87,17 +87,17 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
 
         var drawMode = getOpenGlDrawMode();
         if (blendMode != BlendMode.NONE && isMaskingOutBackground()) {
-            OpenGLUtils.applyBlendMode(BlendMode.MASKED);
+            OpenGLUtils.setBlendMode(BlendMode.MASKED);
             OpenGL.instance().glDrawArrays(drawMode, offset, len);
         }
 
-        OpenGLUtils.applyBlendMode(blendMode);
+        OpenGLUtils.setBlendMode(blendMode);
         OpenGL.instance().glDrawArrays(drawMode, offset, len);
 
         // Cleanup
         renderCleanup();
         array.unbind();
-        OpenGLUtils.applyBlendMode(BlendMode.NONE);
+        OpenGLUtils.setBlendMode(BlendMode.NONE);
     }
 
     protected abstract ShaderProgram getShaderProgram();

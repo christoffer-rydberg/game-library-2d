@@ -7,9 +7,11 @@ import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractShaderRenderer {
     private final Disposer disposer;
@@ -131,7 +133,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             backgroundBuffer.render(shaderProgram, animation, activeIndex);
 
             if (!activeFrame.getRenderToBackgroundHint()) {
-                // TODO: Alpha will blend incorrectly. Use another frame buffer as intermediate buffer before rendering?
                 render(shaderProgram, activeFrame);
             }
         } else {
@@ -147,7 +148,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     private static class BackgroundBuffer {
         private final DefaultDisposer resourceDisposer;
         private FrameBuffer frameBuffer;
-        private Renderer frameBufferRenderer;
+        private SurfaceRenderer frameBufferRenderer;
         private Quad[] backgroundQuads;
         private int previousFrame;
 
@@ -177,7 +178,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
         }
 
         private void render(ShaderProgram shaderProgram, Animation animation, int activeIndex) {
-            // Allocate resources when rendered for the first time
             if (frameBuffer == null) {
                 var texture = Texture.create(animation.getOriginalWidth(), animation.getOriginalHeight(), resourceDisposer);
                 var quad = Quad.create(animation.getBounds(), resourceDisposer);
@@ -191,6 +191,12 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             modelMatrix.pushMatrix();
             modelMatrix.clearMatrix();
 
+            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
+            var blendMode = OpenGLUtils.getBlendMode();
+
+            // Disable blend mode
+            OpenGLUtils.setBlendMode(BlendMode.TRANSPARENT);
+
             // Render to background buffer
             shaderProgram.updateModelMatrix(ModelMatrix.instance());
             renderToFrameBuffer(shaderProgram, animation, activeIndex);
@@ -199,7 +205,8 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             modelMatrix.popMatrix();
 
             // Render frame buffer texture to the default frame buffer
-            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
+            frameBufferRenderer.setShaderProgram(shaderProgram);
+            frameBufferRenderer.setBlendMode(blendMode);
             frameBufferRenderer.render(alpha);
         }
 
@@ -211,7 +218,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
                 previousFrame = 0;
             }
 
-            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
             for (int i = previousFrame; i <= activeIndex; ++i) {
                 var frame = animation.getFrame(i);
 
@@ -229,11 +235,6 @@ public class AnimationRenderer extends AbstractShaderRenderer {
                 }
             }
             previousFrame = activeIndex;
-
-            // Restore alpha setting
-            if (shaderProgram.setParameter(RenderingParameters.ALPHA, alpha)) {
-                shaderProgram.applyParameters();
-            }
 
             frameBuffer.unbind(true);
         }
