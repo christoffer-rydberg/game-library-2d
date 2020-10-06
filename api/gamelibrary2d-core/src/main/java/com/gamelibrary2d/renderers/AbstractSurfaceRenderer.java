@@ -5,12 +5,12 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
-abstract class AbstractSurfaceRenderer extends AbstractShaderRenderer implements TexturedRenderer {
+abstract class AbstractSurfaceRenderer extends AbstractRenderer implements TexturedRenderer {
 
     private Surface surface;
     private Texture texture;
 
-    protected AbstractSurfaceRenderer(RenderingParameters parameters) {
+    protected AbstractSurfaceRenderer(ShaderParameters parameters) {
         super(parameters);
     }
 
@@ -51,7 +51,7 @@ abstract class AbstractSurfaceRenderer extends AbstractShaderRenderer implements
 
     @Override
     protected void applyParameters(float alpha) {
-        getParameters().set(RenderingParameters.IS_TEXTURED, texture != null ? 1 : 0);
+        getParameters().set(ShaderParameters.IS_TEXTURED, texture != null ? 1 : 0);
         super.applyParameters(alpha);
     }
 

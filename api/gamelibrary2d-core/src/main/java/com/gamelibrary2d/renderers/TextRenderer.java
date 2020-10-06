@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Font;
 
-public class TextRenderer extends AbstractShaderRenderer {
+public class TextRenderer extends AbstractRenderer {
     private Font font;
     private String text = "";
     private int start;
@@ -45,7 +45,7 @@ public class TextRenderer extends AbstractShaderRenderer {
 
     @Override
     protected void applyParameters(float alpha) {
-        getParameters().set(RenderingParameters.IS_TEXTURED, 1);
+        getParameters().set(ShaderParameters.IS_TEXTURED, 1);
         super.applyParameters(alpha);
     }
 

@@ -6,7 +6,7 @@ import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.LineRenderer;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
@@ -72,7 +72,7 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var lineRenderer = new LineRenderer();
-            lineRenderer.setColor(Color.SILVER);
+            lineRenderer.getParameters().setRgba(Color.SILVER);
 
             var checkBox = new Checkbox(
                     Surfaces.defaultCheckbox(),
@@ -143,7 +143,7 @@ public class PanelElement {
             );
 
             background.getParameters().setRgb(backgroundColor);
-            background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
+            background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var textBox = new FloatPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
@@ -211,7 +211,7 @@ public class PanelElement {
             );
 
             background.getParameters().setRgb(backgroundColor);
-            background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
+            background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var textBox = new IntegerPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
@@ -240,7 +240,7 @@ public class PanelElement {
             boundingBox.setBounds(bounds);
 
             var checkBoxRenderer = new LineRenderer();
-            checkBoxRenderer.setColor(Color.SILVER);
+            checkBoxRenderer.getParameters().setRgba(Color.SILVER);
 
             var checkBox = new Checkbox(
                     Surfaces.cornerCheckbox(),
@@ -285,7 +285,7 @@ public class PanelElement {
             );
 
             background.getParameters().setRgb(ENUM_BASE_LINE_COLOR);
-            background.getParameters().set(RenderingParameters.ALPHA, 0.5f);
+            background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var backgroundObj = new DefaultGameObject<>(background);
             backgroundObj.setPosition(-backgroundObj.getBounds().xMin(), 0f);

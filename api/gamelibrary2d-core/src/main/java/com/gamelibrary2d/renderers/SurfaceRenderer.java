@@ -8,7 +8,7 @@ public class SurfaceRenderer extends AbstractSurfaceRenderer {
     public SurfaceRenderer() {
     }
 
-    public SurfaceRenderer(RenderingParameters parameters) {
+    public SurfaceRenderer(ShaderParameters parameters) {
         super(parameters);
     }
 

@@ -2,7 +2,7 @@ package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Color;
 
-public class RenderingParameters {
+public class ShaderParameters {
     public final static int MIN_LENGTH = 6;
     public final static int MAX_LENGTH = 100;
     public final static int COLOR_R = 0;
@@ -14,7 +14,7 @@ public class RenderingParameters {
 
     private final float[] parameters;
 
-    public RenderingParameters() {
+    public ShaderParameters() {
         parameters = new float[MIN_LENGTH];
         parameters[COLOR_R] = 1;
         parameters[COLOR_G] = 1;
@@ -22,7 +22,7 @@ public class RenderingParameters {
         parameters[ALPHA] = 1;
     }
 
-    public RenderingParameters(float[] parameters) {
+    public ShaderParameters(float[] parameters) {
         if (parameters == null) {
             throw new IllegalStateException("Parameters cannot be null");
         } else if (parameters.length < MIN_LENGTH) {

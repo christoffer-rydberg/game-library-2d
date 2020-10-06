@@ -74,7 +74,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         var starPositions = PositionBuffer.create(positions, this);
         var starsRenderer = new QuadsRenderer(Rectangle.centered(8f, 8f));
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
-        starsRenderer.setColor(Color.LIGHT_YELLOW);
+        starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
 
         return a -> starsRenderer.render(a, starPositions, 0, starPositions.capacity());
     }

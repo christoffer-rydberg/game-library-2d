@@ -5,7 +5,7 @@ import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 
 public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableObject<T>, Updatable {
     private float animationTime;
@@ -39,7 +39,7 @@ public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> im
         this.animationTime = time;
         var renderer = getContent();
         if (renderer != null) {
-            renderer.getParameters().set(RenderingParameters.TIME, time);
+            renderer.getParameters().set(ShaderParameters.TIME, time);
         }
     }
 

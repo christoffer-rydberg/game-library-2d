@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.resources.Surface;
@@ -162,19 +162,19 @@ public class Label implements Renderable {
         }
 
         var params = textRenderer.getParameters();
-        var r = params.get(RenderingParameters.COLOR_R);
-        var g = params.get(RenderingParameters.COLOR_G);
-        var b = params.get(RenderingParameters.COLOR_B);
-        var a = params.get(RenderingParameters.ALPHA);
+        var r = params.get(ShaderParameters.COLOR_R);
+        var g = params.get(ShaderParameters.COLOR_G);
+        var b = params.get(ShaderParameters.COLOR_B);
+        var a = params.get(ShaderParameters.ALPHA);
 
         params.setRgba(color);
 
         var index = onRender(alpha, offset, len);
 
-        params.set(RenderingParameters.COLOR_R, r);
-        params.set(RenderingParameters.COLOR_G, g);
-        params.set(RenderingParameters.COLOR_B, b);
-        params.set(RenderingParameters.ALPHA, a);
+        params.set(ShaderParameters.COLOR_R, r);
+        params.set(ShaderParameters.COLOR_G, g);
+        params.set(ShaderParameters.COLOR_B, b);
+        params.set(ShaderParameters.ALPHA, a);
 
         return index;
     }

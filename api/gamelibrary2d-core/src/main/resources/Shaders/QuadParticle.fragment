@@ -4,15 +4,15 @@ in vData
 {
     vec4 color;
 	vec2 vertexCoordinate;
+	float textured;
 } inputData;
 
 out vec4 fragColor;
 
 uniform sampler2D texImage;
-uniform float textured;
 
 void main() {
-	if(textured > 0.5) {
+	if(inputData.textured > 0.5) {
 		vec4 textureColor = texture(texImage, inputData.vertexCoordinate);
 		fragColor = inputData.color * textureColor;    	 
 	} else {

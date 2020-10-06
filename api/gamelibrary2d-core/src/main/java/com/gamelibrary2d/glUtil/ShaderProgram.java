@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.resources.Shader;
 
 import java.nio.FloatBuffer;
@@ -21,7 +21,7 @@ public class ShaderProgram implements Disposable {
     private static ShaderProgram quadParticleShaderProgram;
     private static ShaderProgram pointShaderProgram;
     private static ShaderProgram quadShaderProgram;
-    private final FloatBuffer parameters = BufferUtils.createFloatBuffer(RenderingParameters.MAX_LENGTH);
+    private final FloatBuffer parameters = BufferUtils.createFloatBuffer(ShaderParameters.MAX_LENGTH);
     private boolean initialized;
     private int programId;
     private int uniModel;

@@ -8,5 +8,5 @@ public interface Renderer extends Bounded, Renderable {
     @Override
     void render(float alpha);
 
-    RenderingParameters getParameters();
+    ShaderParameters getParameters();
 }

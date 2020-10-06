@@ -1,38 +1,25 @@
 package com.gamelibrary2d.renderers;
 
-import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.util.BlendMode;
 
 public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements ArrayRenderer<T> {
-    private final static String alphaUniformName = "alpha";
-    private final static String colorUniformName = "colorFactor";
-    private final float[] colorArray = new float[4];
     private final DrawMode drawMode;
-
-    private Color color;
+    private final ShaderParameters parameters;
     private boolean maskingOutBackground = false;
     private BlendMode blendMode = BlendMode.ADDITIVE;
 
     protected AbstractArrayRenderer(DrawMode drawMode) {
         this.drawMode = drawMode;
-        setColor(Color.WHITE);
+        parameters = new ShaderParameters();
     }
 
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-        colorArray[0] = color.getR();
-        colorArray[1] = color.getG();
-        colorArray[2] = color.getB();
-        colorArray[3] = color.getA();
+    public ShaderParameters getParameters() {
+        return parameters;
     }
 
     public BlendMode getBlendMode() {
@@ -75,15 +62,11 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
         shaderProgram.bind();
         shaderProgram.updateModelMatrix(ModelMatrix.instance());
 
-        int glUniformAlpha = shaderProgram.getUniformLocation(alphaUniformName);
-        OpenGL.instance().glUniform1f(glUniformAlpha, alpha);
-
-        int glUniformColor = shaderProgram.getUniformLocation(colorUniformName);
-        OpenGL.instance().glUniform4fv(glUniformColor, colorArray);
-
         renderPrepare(shaderProgram);
 
         array.bind();
+
+        applyParameters(alpha);
 
         var drawMode = getOpenGlDrawMode();
         if (blendMode != BlendMode.NONE && isMaskingOutBackground()) {
@@ -92,12 +75,26 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
         }
 
         OpenGLUtils.setBlendMode(blendMode);
+
         OpenGL.instance().glDrawArrays(drawMode, offset, len);
 
         // Cleanup
         renderCleanup();
         array.unbind();
         OpenGLUtils.setBlendMode(BlendMode.NONE);
+    }
+
+    protected void applyParameters(float alpha) {
+        float alphaSetting = parameters.get(ShaderParameters.ALPHA);
+
+        try {
+            var shaderProgram = getShaderProgram();
+            parameters.set(ShaderParameters.ALPHA, alphaSetting * alpha);
+            shaderProgram.setParameters(parameters.getArray(), 0, parameters.getLength());
+            shaderProgram.applyParameters();
+        } finally {
+            parameters.set(ShaderParameters.ALPHA, alphaSetting);
+        }
     }
 
     protected abstract ShaderProgram getShaderProgram();

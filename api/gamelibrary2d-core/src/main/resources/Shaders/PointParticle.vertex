@@ -1,23 +1,21 @@
 #version 420
 
+uniform float parameters[];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform float alpha;
-uniform vec4 colorFactor;
-
-in layout (location = 0) vec4 orientation; // position, scale and rotation
+in layout (location = 0) vec2 position;
 in layout (location = 1) vec4 color; // rgba
 
 out vec4 particleColor;
 
 void main() {
 	mat4 mvp = projection * view * model;
-    gl_Position = mvp * vec4(orientation.x, orientation.y, 0.0, 1.0);
+    gl_Position = mvp * vec4(position.x, position.y, 0.0, 1.0);
     particleColor = vec4(
-        color[0] * colorFactor[0],
-        color[1] * colorFactor[1],
-        color[2] * colorFactor[2],
-        color[3] * colorFactor[3] * alpha);
+        color[0] * parameters[0],
+        color[1] * parameters[1],
+        color[2] * parameters[2],
+        color[3] * parameters[3]);
 }

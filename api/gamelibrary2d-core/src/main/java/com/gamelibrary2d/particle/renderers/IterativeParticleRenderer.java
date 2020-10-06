@@ -5,7 +5,7 @@ import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleRenderBuffer;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 
 public class IterativeParticleRenderer implements ParticleRenderer {
 
@@ -50,7 +50,7 @@ public class IterativeParticleRenderer implements ParticleRenderer {
                         1.0f);
 
                 renderer.getParameters().set(
-                        RenderingParameters.TIME,
+                        ShaderParameters.TIME,
                         particleSystem.getParticleTime(i));
 
                 renderer.getParameters().setRgba(

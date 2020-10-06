@@ -9,7 +9,7 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
-import com.gamelibrary2d.renderers.RenderingParameters;
+import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Shader;
@@ -23,9 +23,9 @@ public class DefaultLightRenderer implements LightRenderer {
 
     private static final int MAXIMUM_LIGHT = 127;
 
-    private static final int PARAMETER_ALPHA_MAP_COLS = RenderingParameters.MIN_LENGTH;
+    private static final int PARAMETER_ALPHA_MAP_COLS = ShaderParameters.MIN_LENGTH;
 
-    private static final int PARAMETER_ALPHA_MAP_ROWS = RenderingParameters.MIN_LENGTH + 1;
+    private static final int PARAMETER_ALPHA_MAP_ROWS = ShaderParameters.MIN_LENGTH + 1;
 
     private final Point position = new Point();
 
@@ -82,7 +82,7 @@ public class DefaultLightRenderer implements LightRenderer {
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_NEAREST);
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_NEAREST);
 
-        var parameters = new RenderingParameters(new float[RenderingParameters.MIN_LENGTH + 2]);
+        var parameters = new ShaderParameters(new float[ShaderParameters.MIN_LENGTH + 2]);
         parameters.setRgba(0, 0, 0, 1f);
         renderer = new SurfaceRenderer(parameters);
         renderer.setShaderProgram(shaderProgram);

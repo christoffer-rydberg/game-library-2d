@@ -16,12 +16,14 @@ in vData
 	vec4 color;
     float scale;
     float rotation;
+    float textured;
 } inputData[];
 
 out vData
 {
     vec4 color;
 	vec2 vertexCoordinate;
+	float textured;
 } outputData;
 
 void main(void)
@@ -31,8 +33,9 @@ void main(void)
     
     mat4 mvp = projection * view * model;
 
-    for ( i = 0; i < gl_in.length(); i++)
-    {
+    for ( i = 0; i < gl_in.length(); i++) {
+    	outputData.textured = inputData[i].textured;
+
     	float scaledXMin = bounds[0] * inputData[i].scale;
     	float scaledYMin = bounds[1] * inputData[i].scale;
     	float scaledXMax = bounds[2] * inputData[i].scale;

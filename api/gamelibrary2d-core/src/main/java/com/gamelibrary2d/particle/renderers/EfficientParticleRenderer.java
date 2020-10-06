@@ -5,6 +5,7 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
+import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.PointSmoothing;
 
@@ -12,7 +13,6 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
 
     private final static String boundsUniformName = "bounds";
 
-    private final static String texturedUniformName = "textured";
     private final float[] boundsArray = new float[4];
     private float pointSize = 1f;
     private ParticleShape particleShape = ParticleShape.QUAD;
@@ -23,11 +23,6 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
     public EfficientParticleRenderer() {
         super(DrawMode.POINTS);
         setBounds(Rectangle.centered(16f, 16f));
-    }
-
-    public EfficientParticleRenderer(Texture texture) {
-        this();
-        setTexture(texture);
     }
 
     public Rectangle getBounds() {
@@ -95,14 +90,12 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
             var glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
             OpenGL.instance().glUniform4fv(glBoundsUniform, boundsArray);
 
-            var glTexturedUniform = shaderProgram.getUniformLocation(texturedUniformName);
-
             var texture = getTexture();
             if (texture != null) {
                 texture.bind();
-                OpenGL.instance().glUniform1f(glTexturedUniform, 1);
+                getParameters().set(ShaderParameters.IS_TEXTURED, 1);
             } else {
-                OpenGL.instance().glUniform1f(glTexturedUniform, 0);
+                getParameters().set(ShaderParameters.IS_TEXTURED, 0);
             }
         } else {
             OpenGL.instance().glPointSize(pointSize);

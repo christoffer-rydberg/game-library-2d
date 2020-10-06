@@ -1,11 +1,9 @@
 #version 420
 
+uniform float parameters[];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-
-uniform float alpha;
-uniform vec4 colorFactor;
 
 in layout (location = 0) vec4 orientation; // position, scale and rotation
 in layout (location = 1) vec4 color; // rgba
@@ -14,7 +12,8 @@ out vData
 {
     vec4 color;
     float scale;
-    float rotation;    
+    float rotation;
+    float textured;
 } outputData;
 
 void main() 
@@ -22,10 +21,11 @@ void main()
 	mat4 mvp = projection * view * model;
 	gl_Position = mvp * vec4(orientation.x, orientation.y, 0.0, 1.0);
     outputData.color = vec4(
-        color[0] * colorFactor[0],
-        color[1] * colorFactor[1],
-        color[2] * colorFactor[2],
-        color[3] * colorFactor[3] * alpha);
+        parameters[0] * color[0],
+        parameters[1] * color[1],
+        parameters[2] * color[2],
+        parameters[3] * color[3]);
     outputData.scale = orientation[2];
     outputData.rotation = orientation[3];
+    outputData.textured = parameters[5];
 }

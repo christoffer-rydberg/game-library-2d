@@ -13,7 +13,7 @@ import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.BlendMode;
 
-public class AnimationRenderer extends AbstractShaderRenderer {
+public class AnimationRenderer extends AbstractRenderer {
     private final Disposer disposer;
     private Animation animation;
     private boolean looping;
@@ -107,7 +107,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
     }
 
     private int getIndex() {
-        var time = getParameters().get(RenderingParameters.TIME);
+        var time = getParameters().get(ShaderParameters.TIME);
         return (int) (time / frameDuration);
     }
 
@@ -118,7 +118,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
 
     @Override
     protected void applyParameters(float alpha) {
-        getParameters().set(RenderingParameters.IS_TEXTURED, 1);
+        getParameters().set(ShaderParameters.IS_TEXTURED, 1);
         super.applyParameters(alpha);
     }
 
@@ -191,7 +191,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
             modelMatrix.pushMatrix();
             modelMatrix.clearMatrix();
 
-            float alpha = shaderProgram.getParameter(RenderingParameters.ALPHA);
+            float alpha = shaderProgram.getParameter(ShaderParameters.ALPHA);
             var blendMode = OpenGLUtils.getBlendMode();
 
             // Disable blend mode
@@ -227,7 +227,7 @@ public class AnimationRenderer extends AbstractShaderRenderer {
 
                 if (frame.getRenderToBackgroundHint()) {
                     // Make opaque. Alpha will be applied when rendered to default frame buffer.
-                    if (shaderProgram.setParameter(RenderingParameters.ALPHA, 1f)) {
+                    if (shaderProgram.setParameter(ShaderParameters.ALPHA, 1f)) {
                         shaderProgram.applyParameters();
                     }
                     frame.getTexture().bind();
