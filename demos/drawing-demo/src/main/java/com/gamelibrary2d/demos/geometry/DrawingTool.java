@@ -8,23 +8,23 @@ import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
 
-public class GeometryTool implements Renderable, MouseAware {
+public class DrawingTool implements Renderable, MouseAware {
     private final Factory<Geometry> geometryFactory;
     private final Point prevNode;
     private final float minNodeInterval;
-    private final EventPublisher<Geometry> lineCreated = new DefaultEventPublisher<>();
+    private final EventPublisher<Geometry> geometryCreated = new DefaultEventPublisher<>();
 
     private Geometry drawnGeometry;
     private int drawButton = -1;
 
-    public GeometryTool(Factory<Geometry> geometryFactory, float minNodeInterval) {
+    public DrawingTool(Factory<Geometry> geometryFactory, float minNodeInterval) {
         this.geometryFactory = geometryFactory;
         this.minNodeInterval = minNodeInterval;
         this.prevNode = new Point(-minNodeInterval, -minNodeInterval);
     }
 
     public void addGeometryCreatedListener(EventListener<Geometry> listener) {
-        lineCreated.addListener(listener);
+        geometryCreated.addListener(listener);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class GeometryTool implements Renderable, MouseAware {
     public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == button) {
             drawButton = -1;
-            lineCreated.publish(drawnGeometry);
+            geometryCreated.publish(drawnGeometry);
             drawnGeometry = null;
         }
     }

@@ -5,7 +5,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
 public class ParticleSystemDemo {
-    private static final String title = "Particle System";
+    private static final String title = "Particle System Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

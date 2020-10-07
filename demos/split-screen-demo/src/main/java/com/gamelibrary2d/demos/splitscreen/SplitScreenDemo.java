@@ -5,7 +5,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
 public class SplitScreenDemo {
-    private static final String title = "Split Screen";
+    private static final String title = "Split Screen Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

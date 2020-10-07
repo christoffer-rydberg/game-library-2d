@@ -6,7 +6,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
 public class NetworkGameDemo {
-    private static final String title = "Network Game";
+    private static final String title = "Network Game Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

@@ -10,18 +10,18 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize(InitializationContext context) {
-        var lineLayer = new BasicLayer<Geometry>();
+        var lineLayer = new BasicLayer<>();
 
         var lineRenderer = new LineRenderer(4f);
 
-        var lineTool = new GeometryTool(
+        var drawingTool = new DrawingTool(
                 () -> new Geometry(PositionBuffer.create(this), lineRenderer),
                 10f);
 
-        lineTool.addGeometryCreatedListener(lineLayer::add);
+        drawingTool.addGeometryCreatedListener(lineLayer::add);
 
         add(lineLayer);
-        add(lineTool);
+        add(drawingTool);
     }
 
     @Override

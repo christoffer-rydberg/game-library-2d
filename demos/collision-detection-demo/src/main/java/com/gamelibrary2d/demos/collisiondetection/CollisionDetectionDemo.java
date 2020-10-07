@@ -5,7 +5,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
 public class CollisionDetectionDemo {
-    private static final String title = "Collision Detection";
+    private static final String title = "Collision Detection Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

@@ -4,8 +4,8 @@ import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
-public class GeometryDemo {
-    private static final String title = "Geometry";
+public class DrawingDemo {
+    private static final String title = "Drawing Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

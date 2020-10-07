@@ -5,7 +5,7 @@ import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
 public class TransparentWindowDemo {
-    private static final String title = "Transparent Window";
+    private static final String title = "Transparent Window Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");

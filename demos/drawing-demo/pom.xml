@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.gamelibrary2d.demos</groupId>
-    <artifactId>geometry-demo</artifactId>
+    <artifactId>drawing-demo</artifactId>
     <version>0.5.0</version>
     <packaging>jar</packaging>
 
@@ -40,7 +40,7 @@
                     <outputDirectory>${project.basedir}/../../jar/demos</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.gamelibrary2d.demos.geometry.GeometryDemo</mainClass>
+                            <mainClass>com.gamelibrary2d.demos.geometry.DrawingDemo</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
