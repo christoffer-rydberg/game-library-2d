@@ -18,6 +18,7 @@ import com.gamelibrary2d.renderers.QuadsRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.splitscreen.*;
 import com.gamelibrary2d.util.QuadShape;
 
@@ -173,7 +174,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
             spaceCraftQuad = Quad.create(Rectangle.centered(64, 64), this);
 
-            spaceCraftTexture = Texture.create(
+            spaceCraftTexture = DefaultTexture.create(
                     getClass().getClassLoader().getResource("spacecraft.png"),
                     this);
 

@@ -7,7 +7,6 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
-import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.listeners.TextChangedListener;
@@ -304,10 +303,8 @@ public class Label implements Renderable {
                 break;
             }
 
-            Surface quad = getTextRenderer().getFont().getQuads().get(text.charAt(startIndex));
-            if (quad != null) {
-                pixelWidth -= quad.getBounds().width();
-            }
+            var font = getTextRenderer().getFont();
+            pixelWidth -= font.getTextWidth(text, startIndex, 1);
             if (pixelWidth > 0) {
                 ++startIndex;
             }

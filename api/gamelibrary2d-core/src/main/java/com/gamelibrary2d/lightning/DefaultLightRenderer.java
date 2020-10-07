@@ -11,9 +11,9 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.DefaultShader;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.Shader;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.TextureUtil;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -62,8 +62,8 @@ public class DefaultLightRenderer implements LightRenderer {
         resolutionChangedDisposer = new DefaultDisposer(disposer);
 
         ShaderProgram shaderProgram = ShaderProgram.create(disposer);
-        shaderProgram.attachShader(Shader.fromFile("Shaders/LightMap.vertex", ShaderType.VERTEX, disposer));
-        shaderProgram.attachShader(Shader.fromFile("Shaders/LightMap.fragment", ShaderType.FRAGMENT, disposer));
+        shaderProgram.attachShader(DefaultShader.fromFile("Shaders/LightMap.vertex", ShaderType.VERTEX, disposer));
+        shaderProgram.attachShader(DefaultShader.fromFile("Shaders/LightMap.fragment", ShaderType.FRAGMENT, disposer));
         shaderProgram.bindFragDataLocation(0, "fragColor"); // Optional since the fragment shader only have one "out"
         // variable
         shaderProgram.initialize();
@@ -72,7 +72,7 @@ public class DefaultLightRenderer implements LightRenderer {
 
         // Generate and bind a texture id for the alpha map
         textureId = OpenGL.instance().glGenTextures();
-        Texture.bind(textureId);
+        TextureUtil.bind(textureId);
 
         // Setup the ST coordinate system
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_CLAMP_TO_EDGE);
@@ -193,9 +193,8 @@ public class DefaultLightRenderer implements LightRenderer {
     }
 
     private void render(Point position, float alpha) {
-
         // Bind alpha map texture
-        Texture.bind(textureId);
+        TextureUtil.bind(textureId);
 
         // Upload texture data
         transparencyTexture.position(transparencyTexture.limit());

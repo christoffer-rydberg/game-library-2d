@@ -41,8 +41,8 @@ public class AnimationSheet {
 
         var spriteSheet = new AnimationSheet(cols, rows);
 
-        float width = texture.getImageWidth();
-        float height = texture.getImageHeight();
+        float width = texture.getWidth();
+        float height = texture.getHeight();
 
         float frameWidth = width / cols;
         float frameHeight = height / rows;

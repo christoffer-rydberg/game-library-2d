@@ -33,7 +33,7 @@ import com.gamelibrary2d.renderers.QuadsRenderer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.resources.Font;
+import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.updaters.DurationUpdater;
@@ -144,7 +144,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
                 context, Particles.BOULDER_EXPLOSION, renderer, 1000);
 
         var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
-        timeLabel = new TimeLabel(new TextRenderer(Font.create(font, this)));
+        timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
         timeLabel.setPosition(game.getWindow().width() / 2f, 9 * game.getWindow().height() / 10f);
 
         destroyActions.put(ObjectIdentifiers.BOULDER, obj -> {

@@ -10,7 +10,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
@@ -166,8 +166,8 @@ public class AnimationRenderer extends AbstractRenderer {
                 var scaledWidth = bounds.width();
                 var scaledHeight = bounds.height();
 
-                var width = frame.getTexture().getImageWidth();
-                var height = frame.getTexture().getImageHeight();
+                var width = frame.getTexture().getWidth();
+                var height = frame.getTexture().getHeight();
                 var offsetX = Math.round((width / scaledWidth) * (bounds.xMin() - animation.getBounds().xMin()));
                 var offsetY = Math.round((height / scaledHeight) * (bounds.yMin() - animation.getBounds().yMin()));
 
@@ -179,7 +179,7 @@ public class AnimationRenderer extends AbstractRenderer {
 
         private void render(ShaderProgram shaderProgram, Animation animation, int activeIndex) {
             if (frameBuffer == null) {
-                var texture = Texture.create(animation.getOriginalWidth(), animation.getOriginalHeight(), resourceDisposer);
+                var texture = DefaultTexture.create(animation.getOriginalWidth(), animation.getOriginalHeight(), resourceDisposer);
                 var quad = Quad.create(animation.getBounds(), resourceDisposer);
                 frameBuffer = FrameBuffer.create(texture, resourceDisposer);
                 frameBufferRenderer = new SurfaceRenderer(quad, texture);

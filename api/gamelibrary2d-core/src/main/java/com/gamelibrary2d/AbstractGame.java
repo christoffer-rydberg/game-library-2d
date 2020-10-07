@@ -14,7 +14,7 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.resources.Shader;
+import com.gamelibrary2d.resources.DefaultShader;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -125,8 +125,8 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     private void createDefaultShaderProgram() {
         ShaderProgram defaultShaderProgram = ShaderProgram.create(this);
-        defaultShaderProgram.attachShader(Shader.fromFile("Shaders/Default.vertex", ShaderType.VERTEX, this));
-        defaultShaderProgram.attachShader(Shader.fromFile("Shaders/Default.fragment", ShaderType.FRAGMENT, this));
+        defaultShaderProgram.attachShader(DefaultShader.fromFile("Shaders/Default.vertex", ShaderType.VERTEX, this));
+        defaultShaderProgram.attachShader(DefaultShader.fromFile("Shaders/Default.fragment", ShaderType.FRAGMENT, this));
         defaultShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional, the shader only has one "out" variable
         defaultShaderProgram.initialize();
         defaultShaderProgram.initializeMvp(window.width(), window.height());
@@ -134,46 +134,46 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
         ShaderProgram particleUpdaterProgram = ShaderProgram.create(this);
         particleUpdaterProgram
-                .attachShader(Shader.fromFile("Shaders/ParticleUpdater.compute", ShaderType.COMPUTE, this));
+                .attachShader(DefaultShader.fromFile("Shaders/ParticleUpdater.compute", ShaderType.COMPUTE, this));
         particleUpdaterProgram.initialize();
         ShaderProgram.setDefaultParticleUpdaterProgram(particleUpdaterProgram);
 
         ShaderProgram pointParticleShaderProgram = ShaderProgram.create(this);
         pointParticleShaderProgram
-                .attachShader(Shader.fromFile("Shaders/PointParticle.vertex", ShaderType.VERTEX, this));
+                .attachShader(DefaultShader.fromFile("Shaders/PointParticle.vertex", ShaderType.VERTEX, this));
         pointParticleShaderProgram
-                .attachShader(Shader.fromFile("Shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
+                .attachShader(DefaultShader.fromFile("Shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
         pointParticleShaderProgram.initialize();
         pointParticleShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setPointParticleShaderProgram(pointParticleShaderProgram);
 
         ShaderProgram quadParticleShaderProgram = ShaderProgram.create(this);
         quadParticleShaderProgram
-                .attachShader(Shader.fromFile("Shaders/QuadParticle.geometry", ShaderType.GEOMETRY, this));
+                .attachShader(DefaultShader.fromFile("Shaders/QuadParticle.geometry", ShaderType.GEOMETRY, this));
         quadParticleShaderProgram
-                .attachShader(Shader.fromFile("Shaders/QuadParticle.vertex", ShaderType.VERTEX, this));
+                .attachShader(DefaultShader.fromFile("Shaders/QuadParticle.vertex", ShaderType.VERTEX, this));
         quadParticleShaderProgram
-                .attachShader(Shader.fromFile("Shaders/QuadParticle.fragment", ShaderType.FRAGMENT, this));
+                .attachShader(DefaultShader.fromFile("Shaders/QuadParticle.fragment", ShaderType.FRAGMENT, this));
         quadParticleShaderProgram.initialize();
         quadParticleShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setQuadParticleShaderProgram(quadParticleShaderProgram);
 
         ShaderProgram pointShaderProgram = ShaderProgram.create(this);
         pointShaderProgram
-                .attachShader(Shader.fromFile("Shaders/Point.vertex", ShaderType.VERTEX, this));
+                .attachShader(DefaultShader.fromFile("Shaders/Point.vertex", ShaderType.VERTEX, this));
         pointShaderProgram
-                .attachShader(Shader.fromFile("Shaders/Point.fragment", ShaderType.FRAGMENT, this));
+                .attachShader(DefaultShader.fromFile("Shaders/Point.fragment", ShaderType.FRAGMENT, this));
         pointShaderProgram.initialize();
         pointShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setPointShaderProgram(pointShaderProgram);
 
         ShaderProgram quadShaderProgram = ShaderProgram.create(this);
         quadShaderProgram
-                .attachShader(Shader.fromFile("Shaders/Quad.geometry", ShaderType.GEOMETRY, this));
+                .attachShader(DefaultShader.fromFile("Shaders/Quad.geometry", ShaderType.GEOMETRY, this));
         quadShaderProgram
-                .attachShader(Shader.fromFile("Shaders/Quad.vertex", ShaderType.VERTEX, this));
+                .attachShader(DefaultShader.fromFile("Shaders/Quad.vertex", ShaderType.VERTEX, this));
         quadShaderProgram
-                .attachShader(Shader.fromFile("Shaders/Quad.fragment", ShaderType.FRAGMENT, this));
+                .attachShader(DefaultShader.fromFile("Shaders/Quad.fragment", ShaderType.FRAGMENT, this));
         quadShaderProgram.initialize();
         quadShaderProgram.initializeMvp(window.width(), window.height());
         ShaderProgram.setQuadShaderProgram(quadShaderProgram);

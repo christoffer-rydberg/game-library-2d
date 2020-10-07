@@ -13,7 +13,7 @@ import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,7 +32,7 @@ class DemoFrame extends AbstractFrame {
 
     private SurfaceRenderer createRenderer(Rectangle bounds, String image) throws IOException {
         var backgroundUrl = getUrl(image);
-        var backgroundTexture = Texture.create(backgroundUrl, this);
+        var backgroundTexture = DefaultTexture.create(backgroundUrl, this);
         var backgroundQuad = Quad.create(bounds, this);
         return new SurfaceRenderer(backgroundQuad, backgroundTexture);
     }

@@ -9,9 +9,9 @@ import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
 import com.gamelibrary2d.particle.systems.CustomShaderParticleSystem;
+import com.gamelibrary2d.resources.DefaultShader;
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.PointSmoothing;
-import com.gamelibrary2d.resources.Shader;
 
 import java.awt.image.BufferedImage;
 
@@ -42,7 +42,7 @@ class ParticleSystemFactory {
                 goalColors);
 
         ShaderProgram updateProgram = ShaderProgram.create(disposer);
-        updateProgram.attachShader(Shader.fromFile("Shaders/ParticleUpdater.compute", ShaderType.COMPUTE, disposer));
+        updateProgram.attachShader(DefaultShader.fromFile("Shaders/ParticleUpdater.compute", ShaderType.COMPUTE, disposer));
         updateProgram.initialize();
         setUniforms(updateProgram);
 

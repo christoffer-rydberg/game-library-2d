@@ -7,6 +7,7 @@ import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class Textures {
                 2,
                 disposer);
 
-        sliderHandle = Texture.create(
+        sliderHandle = DefaultTexture.create(
                 Textures.class.getResource("/Images/sliderHandle.png"),
                 disposer
         );
@@ -54,7 +55,7 @@ public class Textures {
             }
         };
 
-        return Texture.create(r, 1f, bounds, disposer);
+        return DefaultTexture.create(r, 1f, bounds, disposer);
     }
 
     private static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {

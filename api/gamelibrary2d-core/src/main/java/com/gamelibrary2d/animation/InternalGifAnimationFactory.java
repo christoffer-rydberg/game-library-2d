@@ -6,6 +6,7 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.gif.DisposalMethod;
@@ -50,9 +51,9 @@ class InternalGifAnimationFactory {
             BufferedImage frameImage = images.get(i);
             var metadataItem = metadata.getItems().get(i);
 
-            Texture frameTexture = Texture.create(frameImage, disposer);
-            float frameWidth = frameTexture.getImageWidth();
-            float frameHeight = frameTexture.getImageHeight();
+            Texture frameTexture = DefaultTexture.create(frameImage, disposer);
+            float frameWidth = frameTexture.getWidth();
+            float frameHeight = frameTexture.getHeight();
 
             var xOffset = metadataItem.getLeftPosition();
             var yOffset = imageHeight - frameHeight - metadataItem.getTopPosition();

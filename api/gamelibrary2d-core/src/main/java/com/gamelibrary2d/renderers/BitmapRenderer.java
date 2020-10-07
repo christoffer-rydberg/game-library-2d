@@ -10,6 +10,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 
 import java.nio.ByteBuffer;
 
@@ -30,7 +31,7 @@ public class BitmapRenderer {
     private final Texture texture;
 
     private BitmapRenderer(Rectangle area, Disposer disposer) {
-        this.texture = Texture.create((int) area.width(), (int) area.height(), disposer);
+        this.texture = DefaultTexture.create((int) area.width(), (int) area.height(), disposer);
         this.area = area;
         this.frameBuffer = FrameBuffer.create(texture, disposer);
         this.frameBufferRenderer = new SurfaceRenderer(Quad.create(area, disposer), frameBuffer.getTexture());

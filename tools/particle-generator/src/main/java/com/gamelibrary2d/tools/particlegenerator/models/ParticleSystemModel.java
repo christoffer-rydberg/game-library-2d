@@ -12,7 +12,7 @@ import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.DefaultShaderParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.util.BlendMode;
 
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class ParticleSystemModel {
                     animation.getFrame(0).getTexture()
             );
         } else {
-            var texture = Texture.create(url, textureDisposer);
+            var texture = DefaultTexture.create(url, textureDisposer);
             iterativeRenderer.setTexture(texture);
             efficientRenderer.setTexture(texture);
         }

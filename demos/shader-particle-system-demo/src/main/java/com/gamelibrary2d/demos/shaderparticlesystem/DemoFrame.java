@@ -5,7 +5,7 @@ import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultLayerObject;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,8 +24,8 @@ public class DemoFrame extends AbstractFrame {
             Window window = game.getWindow();
             float windowWidth = window.width();
             float windowHeight = window.height();
-            BufferedImage init = Texture.load(DemoFrame.class.getResource("/Images/before.jpg"));
-            BufferedImage goal = Texture.load(DemoFrame.class.getResource("/Images/after.jpg"));
+            BufferedImage init = DefaultTexture.load(DemoFrame.class.getResource("/Images/before.jpg"));
+            BufferedImage goal = DefaultTexture.load(DemoFrame.class.getResource("/Images/after.jpg"));
 
             var particleSystem = ParticleSystemFactory.create(init, goal, windowWidth / 2f,
                     windowHeight / 2f, this);

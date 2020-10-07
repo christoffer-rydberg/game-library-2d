@@ -9,6 +9,7 @@ import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.DefaultTexture;
 
 import java.io.IOException;
 
@@ -28,8 +29,8 @@ public class Textures {
 
         inputField = button;
 
-        boulder = Texture.create(Images.BOULDER, disposer);
-        spacecraft = Texture.create(Images.SPACECRAFT, disposer);
+        boulder = DefaultTexture.create(Images.BOULDER, disposer);
+        spacecraft = DefaultTexture.create(Images.SPACECRAFT, disposer);
     }
 
     public static Texture button() {
@@ -66,7 +67,7 @@ public class Textures {
             }
         };
 
-        return Texture.create(r, 1f, bounds, disposer);
+        return DefaultTexture.create(r, 1f, bounds, disposer);
     }
 
     public static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {
