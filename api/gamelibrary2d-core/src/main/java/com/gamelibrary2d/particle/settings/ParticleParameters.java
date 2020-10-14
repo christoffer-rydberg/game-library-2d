@@ -620,7 +620,7 @@ public class ParticleParameters implements Serializable {
         particle.setVerticalAcceleration(
                 getVerticalAcceleration() + getVerticalAccelerationVar() * RandomInstance.random11());
 
-        particle.setCentripetalAccelerationeleration(centripetalAcc);
+        particle.setCentripetalAcceleration(centripetalAcc);
 
         particle.setTangentialAcceleration(getTangentalAcceleration() + getTangentalAccelerationVar() * RandomInstance.random11());
 

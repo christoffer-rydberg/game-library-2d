@@ -3,11 +3,13 @@ package com.gamelibrary2d.glUtil;
 import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.framework.OpenGL;
 
-public abstract class AbstractVertexArrayBuffer extends AbstractInterleavedBuffer<OpenGLFloatBuffer> implements Disposable {
+public abstract class AbstractVertexArrayBuffer<T extends OpenGLBuffer> extends AbstractInterleavedBuffer<T>
+        implements OpenGLBuffer, Disposable {
     private final int glVao;
 
-    protected AbstractVertexArrayBuffer(OpenGLFloatBuffer buffer, int stride, int elementSize) {
+    protected AbstractVertexArrayBuffer(T buffer, int stride, int elementSize) {
         super(buffer, stride);
+
         OpenGL openGL = OpenGL.instance();
         this.glVao = openGL.glGenVertexArrays();
 
@@ -16,7 +18,13 @@ public abstract class AbstractVertexArrayBuffer extends AbstractInterleavedBuffe
         int byteStride = stride * Float.BYTES;
         for (int i = 0; i < elements; ++i) {
             openGL.glEnableVertexAttribArray(i);
-            openGL.glVertexAttribPointer(i, elementSize, OpenGL.GL_FLOAT, false, byteStride, i * elementSize * Float.BYTES);
+            openGL.glVertexAttribPointer(
+                    i,
+                    elementSize,
+                    OpenGL.GL_FLOAT,
+                    false,
+                    byteStride,
+                    i * elementSize * Float.BYTES);
         }
         unbind();
     }

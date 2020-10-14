@@ -3,11 +3,14 @@ package com.gamelibrary2d.particle.systems;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.AbstractInterleavedBuffer;
-import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
+import com.gamelibrary2d.glUtil.MirroredBuffer;
+import com.gamelibrary2d.glUtil.MirroredFloatBuffer;
 
-public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatBuffer> {
+import java.util.Arrays;
 
-    private final static int STRIDE = 24;
+public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<MirroredFloatBuffer> implements MirroredBuffer {
+
+    public final static int STRIDE = 24;
 
     private final static int INITIALIZED = 0;
     private final static int CENTER_X = 1;
@@ -39,10 +42,10 @@ public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatB
     private final static int EXTERNAL_SPEED_Y = 22;
     private final static int CUSTOM = 23;
 
-    private final float[] internalState;
+    private float[] internalState;
 
     private ParticleUpdateBuffer(float[] internalState, Disposer disposer) {
-        super(OpenGLFloatBuffer.create(internalState, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer), STRIDE);
+        super(MirroredFloatBuffer.create(internalState, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer), STRIDE);
         this.internalState = internalState;
     }
 
@@ -51,13 +54,34 @@ public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatB
         return new ParticleUpdateBuffer(data, disposer);
     }
 
-    public static ParticleUpdateBuffer[] createWithSharedData(int capacity, int count, Disposer disposer) {
-        var result = new ParticleUpdateBuffer[count];
-        var data = new float[capacity * STRIDE];
-        for (int i = 0; i < count; ++i) {
-            result[i] = new ParticleUpdateBuffer(data, disposer);
+    @Override
+    public void updateGPU(int offset, int len) {
+        var stride = getStride();
+        getBuffer().updateGPU(offset * stride, len * stride);
+    }
+
+    @Override
+    public void updateCPU(int offset, int len) {
+        var stride = getStride();
+        getBuffer().updateCPU(offset * stride, len * stride);
+    }
+
+    @Override
+    public void copy(int offset, int destination, int len) {
+        var stride = getStride();
+        getBuffer().copy(offset * stride, destination * stride, len * stride);
+    }
+
+    public void ensureCapacity(int minCapacity) {
+        int oldCapacity = internalState.length;
+        if (oldCapacity < minCapacity) {
+            int newCapacity = oldCapacity * 2;
+            if (newCapacity < minCapacity) {
+                newCapacity = minCapacity;
+            }
+            internalState = Arrays.copyOf(internalState, newCapacity);
+            getBuffer().allocate(internalState);
         }
-        return result;
     }
 
     float getExternalSpeedX(int offset) {
@@ -104,7 +128,7 @@ public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatB
         return internalState[offset + ACCELERATION_Y];
     }
 
-    float getCentripetalAccelerationeleration(int offset) {
+    float getCentripetalAcceleration(int offset) {
         return internalState[offset + CENTRIPETAL_ACCELERATION];
     }
 
@@ -200,7 +224,7 @@ public class ParticleUpdateBuffer extends AbstractInterleavedBuffer<OpenGLFloatB
         internalState[offset + ACCELERATION_Y] = value;
     }
 
-    void setCentripetalAccelerationeleration(int offset, float value) {
+    void setCentripetalAcceleration(int offset, float value) {
         internalState[offset + CENTRIPETAL_ACCELERATION] = value;
     }
 

@@ -78,12 +78,12 @@ public class Particle {
         updateBuffer.setVerticalAcceleration(updateOffset, verticalAcceleration);
     }
 
-    public float getCentripetalAccelerationeleration() {
-        return updateBuffer.getCentripetalAccelerationeleration(updateOffset);
+    public float getCentripetalAcceleration() {
+        return updateBuffer.getCentripetalAcceleration(updateOffset);
     }
 
-    public void setCentripetalAccelerationeleration(float centripetalAcc) {
-        updateBuffer.setCentripetalAccelerationeleration(updateOffset, centripetalAcc);
+    public void setCentripetalAcceleration(float centripetalAcc) {
+        updateBuffer.setCentripetalAcceleration(updateOffset, centripetalAcc);
     }
 
     public float getTangentialAcceleration() {
@@ -189,8 +189,8 @@ public class Particle {
     void setIndex(int index) {
         if (this.index != index) {
             this.index = index;
-            renderOffset = index * renderBuffer.stride();
-            updateOffset = index * updateBuffer.stride();
+            renderOffset = index * renderBuffer.getStride();
+            updateOffset = index * updateBuffer.getStride();
         }
     }
 
@@ -327,7 +327,7 @@ public class Particle {
         float tangentialDirY = centripetalDirX;
 
         // Get acceleration sums of centripetal and tangential accelerations
-        float centripetalAcc = getCentripetalAccelerationeleration();
+        float centripetalAcc = getCentripetalAcceleration();
         float tangentialAcc = getTangentialAcceleration();
         float accSumX = centripetalDirX * centripetalAcc + tangentialDirX * tangentialAcc;
         float accSumY = centripetalDirY * centripetalAcc + tangentialDirY * tangentialAcc;

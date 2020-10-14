@@ -6,7 +6,6 @@ import com.gamelibrary2d.framework.OpenGL;
 public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements OpenGLBuffer {
     private final int target;
 
-    private int capacity;
     private boolean bound;
     private int glBuffer = -1;
 
@@ -14,27 +13,27 @@ public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements
         this.target = target;
     }
 
-    protected void allocate(int capacity) {
-        this.capacity = capacity;
-
+    protected void allocate() {
         boolean isBound = bound;
 
-        if (!isBound)
+        if (!isBound) {
             bind();
+        }
 
         onAllocate(target);
 
-        if (!isBound)
+        if (!isBound) {
             unbind();
+        }
     }
 
-    public int capacity() {
-        return capacity;
+    public boolean isBound() {
+        return bound;
     }
 
     public void bind() {
         OpenGL openGL = OpenGL.instance();
-        openGL.glBindBuffer(target, bufferId());
+        openGL.glBindBuffer(target, getBufferId());
         bound = true;
     }
 
@@ -45,31 +44,7 @@ public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements
         bound = false;
     }
 
-    public void updateCPU(int offset, int len) {
-        boolean isBound = bound;
-
-        if (!isBound)
-            bind();
-
-        onUpdateCPU(target, offset, len);
-
-        if (!isBound)
-            unbind();
-    }
-
-    public void updateGPU(int offset, int len) {
-        boolean isBound = bound;
-
-        if (!isBound)
-            bind();
-
-        onUpdateGPU(target, offset, len);
-
-        if (!isBound)
-            unbind();
-    }
-
-    public int bufferId() {
+    public int getBufferId() {
         if (glBuffer == -1) {
             OpenGL openGL = OpenGL.instance();
             glBuffer = openGL.glGenBuffers();
@@ -84,9 +59,8 @@ public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements
         openGL.glDeleteBuffers(glBuffer);
     }
 
+    @Override
+    public abstract int getCapacity();
+
     protected abstract void onAllocate(int target);
-
-    protected abstract void onUpdateGPU(int target, int offset, int len);
-
-    protected abstract void onUpdateCPU(int target, int offset, int len);
 }

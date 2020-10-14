@@ -30,7 +30,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
     private final ParticleSystemModel particleSystem;
     private final Panel<GameObject> iterativePanel;
     private final Panel<GameObject> efficientPanel;
-    private final Panel<GameObject> efficientGpuPanel;
+    private final Panel<GameObject> acceleratedPanel;
     private final ShapePanel shapePanel;
     private final Label textureLabel;
 
@@ -49,7 +49,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         this.shapePanel = new ShapePanel(particleSystem);
         this.iterativePanel = createIterativePanel();
         this.efficientPanel = createEfficientPanel();
-        this.efficientGpuPanel = createEfficientGpuPanel();
+        this.acceleratedPanel = createAcceleratedPanel();
 
         PanelUtil.stack(this, particleSystemType(), 0f);
         PanelUtil.stack(this, blendMode());
@@ -64,8 +64,8 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
             case EFFICIENT:
                 setActivePanel(efficientPanel);
                 break;
-            case EFFICIENT_GPU:
-                setActivePanel(efficientGpuPanel);
+            case ACCELERATED:
+                setActivePanel(acceleratedPanel);
                 break;
         }
     }
@@ -130,7 +130,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         return panel;
     }
 
-    private Panel<GameObject> createEfficientGpuPanel() {
+    private Panel<GameObject> createAcceleratedPanel() {
         var panel = new DefaultPanel<>();
         PanelUtil.stack(panel, shapePanel, 0f);
         return panel;

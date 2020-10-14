@@ -2,12 +2,14 @@ package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.AbstractVertexArrayBuffer;
-import com.gamelibrary2d.glUtil.OpenGLFloatBuffer;
+import com.gamelibrary2d.glUtil.AbstractMirroredVertexArrayBuffer;
+import com.gamelibrary2d.glUtil.MirroredFloatBuffer;
 
-public class ParticleRenderBuffer extends AbstractVertexArrayBuffer {
+import java.util.Arrays;
 
-    private final static int STRIDE = 8;
+public class ParticleRenderBuffer extends AbstractMirroredVertexArrayBuffer<MirroredFloatBuffer> {
+
+    public final static int STRIDE = 8;
 
     private final static int POS_X = 0;
     private final static int POS_Y = 1;
@@ -19,9 +21,9 @@ public class ParticleRenderBuffer extends AbstractVertexArrayBuffer {
     private final static int COLOR_B = 6;
     private final static int COLOR_A = 7;
 
-    private final float[] internalState;
+    private float[] internalState;
 
-    private ParticleRenderBuffer(OpenGLFloatBuffer internalState) {
+    private ParticleRenderBuffer(MirroredFloatBuffer internalState) {
         super(internalState, STRIDE, 4);
         this.internalState = internalState.data();
     }
@@ -29,25 +31,25 @@ public class ParticleRenderBuffer extends AbstractVertexArrayBuffer {
     static ParticleRenderBuffer create(int capacity, Disposer disposer) {
         var data = new float[capacity * STRIDE];
         var buffer = new ParticleRenderBuffer(
-                OpenGLFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
+                MirroredFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
         disposer.registerDisposal(buffer);
         return buffer;
     }
 
-    static ParticleRenderBuffer[] createWithSharedData(int capacity, int count, Disposer disposer) {
-        var updateBuffer = new ParticleRenderBuffer[count];
-        var data = new float[capacity * STRIDE];
-        for (int i = 0; i < count; ++i) {
-            var buffer = new ParticleRenderBuffer(
-                    OpenGLFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
-            disposer.registerDisposal(buffer);
-            updateBuffer[i] = buffer;
-        }
-        return updateBuffer;
-    }
-
     public float getPosX(int offset) {
         return internalState[offset + POS_X];
+    }
+
+    public void ensureCapacity(int minCapacity) {
+        int oldCapacity = internalState.length;
+        if (oldCapacity < minCapacity) {
+            int newCapacity = oldCapacity * 2;
+            if (newCapacity < minCapacity) {
+                newCapacity = minCapacity;
+            }
+            internalState = Arrays.copyOf(internalState, newCapacity);
+            getBuffer().allocate(internalState);
+        }
     }
 
     public void setPosX(int offset, float value) {

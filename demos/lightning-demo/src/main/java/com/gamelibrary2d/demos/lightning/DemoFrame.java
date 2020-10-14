@@ -12,8 +12,8 @@ import com.gamelibrary2d.lightning.*;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.DefaultTexture;
+import com.gamelibrary2d.resources.Quad;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,7 +57,7 @@ class DemoFrame extends AbstractFrame {
 
     private DefaultParticleSystem createParticleSystem() throws IOException {
         var settings = new SaveLoadManager().load(getUrl("fire.particle"), ParticleSystemSettings::new);
-        return DefaultParticleSystem.create(1000, settings, this);
+        return DefaultParticleSystem.create(settings, this);
     }
 
     @Override

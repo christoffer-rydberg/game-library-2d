@@ -1,15 +1,15 @@
 package com.gamelibrary2d.glUtil;
 
 public abstract class AbstractInterleavedBuffer<T extends OpenGLBuffer> implements OpenGLBuffer {
-    private final int stride;
     private final T buffer;
+    private final int stride;
 
     protected AbstractInterleavedBuffer(T buffer, int stride) {
         this.buffer = buffer;
         this.stride = stride;
     }
 
-    protected T buffer() {
+    protected T getBuffer() {
         return buffer;
     }
 
@@ -24,31 +24,16 @@ public abstract class AbstractInterleavedBuffer<T extends OpenGLBuffer> implemen
     }
 
     @Override
-    public int bufferId() {
-        return buffer.bufferId();
+    public int getBufferId() {
+        return buffer.getBufferId();
     }
 
-    @Override
-    public void updateGPU(int offset, int len) {
-        buffer.updateGPU(offset * stride, len * stride);
-    }
-
-    @Override
-    public void updateCPU(int offset, int len) {
-        buffer.updateCPU(offset * stride, len * stride);
-    }
-
-    public int stride() {
+    public int getStride() {
         return stride;
     }
 
     @Override
-    public int capacity() {
-        return buffer.capacity() / stride;
-    }
-
-    @Override
-    public void copy(int offset, int destination, int len) {
-        buffer.copy(offset * stride, destination * stride, len * stride);
+    public int getCapacity() {
+        return buffer.getCapacity() / stride;
     }
 }

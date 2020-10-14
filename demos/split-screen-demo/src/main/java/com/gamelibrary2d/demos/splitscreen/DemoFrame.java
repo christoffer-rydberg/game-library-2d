@@ -77,7 +77,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
         starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
 
-        return a -> starsRenderer.render(a, starPositions, 0, starPositions.capacity());
+        return a -> starsRenderer.render(a, starPositions, 0, starPositions.getCapacity());
     }
 
     private void prepareView(SpaceCraft spaceCraft, Rectangle viewArea) {

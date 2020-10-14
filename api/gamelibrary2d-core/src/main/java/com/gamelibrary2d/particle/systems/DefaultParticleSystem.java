@@ -12,7 +12,6 @@ import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 
 public class DefaultParticleSystem implements ParticleSystem, Clearable {
-    private final int capacity;
     private final float[] externalSpeed = new float[2];
     private final float[] externalAcceleration = new float[2];
     private final Particle particle;
@@ -26,25 +25,30 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     private ParticleUpdateBuffer updateBuffer;
     private ParticleUpdateListener updateListener;
 
-    private DefaultParticleSystem(int capacity, ParticleSystemSettings settings,
-                                  ParticleRenderBuffer vertexBuffer, ParticleUpdateBuffer updateBuffer) {
+    private DefaultParticleSystem(
+            ParticleSystemSettings settings,
+            ParticleRenderBuffer vertexBuffer,
+            ParticleUpdateBuffer updateBuffer) {
+
         this.settings = settings;
         this.vertexBuffer = vertexBuffer;
         this.updateBuffer = updateBuffer;
         this.particle = new Particle(vertexBuffer, updateBuffer, 0);
-        this.capacity = capacity;
     }
 
-    public static DefaultParticleSystem create(int capacity, ParticleSystemSettings settings, Disposer disposer) {
+    public static DefaultParticleSystem create(ParticleSystemSettings settings, Disposer disposer) {
+        return create(settings, ParticleSystemSettings.estimateCapacity(settings), disposer);
+    }
+
+    public static DefaultParticleSystem create(ParticleSystemSettings settings, int initialCapacity, Disposer disposer) {
         return new DefaultParticleSystem(
-                capacity,
                 settings,
-                ParticleRenderBuffer.create(capacity, disposer),
-                ParticleUpdateBuffer.create(capacity, disposer));
+                ParticleRenderBuffer.create(initialCapacity, disposer),
+                ParticleUpdateBuffer.create(initialCapacity, disposer));
     }
 
     public float getParticleTime(int index) {
-        return updateBuffer.getTime(index * updateBuffer.stride());
+        return updateBuffer.getTime(index * updateBuffer.getStride());
     }
 
     public void setExternalSpeed(float x, float y) {
@@ -112,34 +116,32 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Emits all particles at once at the specified coordinates. The particles count
+     * Emits all particles at the specified coordinates. The particles count
      * is specified by {@link ParticleSystemSettings#getDefaultCount()}.
      *
      * @param x The X-coordinate of the emitted particles.
      * @param y The Y-coordinate of the emitted particles.
      */
     public void emitAll(float x, float y) {
-        emitAll(x, y, Math.round(
+        emit(x, y, Math.round(
                 settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11()));
     }
 
     /**
-     * Emits all particles at once at the specified coordinates.
+     * Emits particles at the specified coordinates.
      *
      * @param x     The X-coordinate of the emitted particles.
      * @param y     The Y-coordinate of the emitted particles.
      * @param count The number of emitted particles.
      */
-    public void emitAll(float x, float y, int count) {
-        int remaining = getCapacity() - particleCount;
-        if (remaining < count) {
-            count = remaining;
-        }
-
+    public void emit(float x, float y, int count) {
+        var updateParticleCount = particleCount + count;
+        vertexBuffer.ensureCapacity(updateParticleCount * vertexBuffer.getStride());
+        updateBuffer.ensureCapacity(updateParticleCount * updateBuffer.getStride());
         x += settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
         y += settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
         for (int i = 0; i < count; ++i) {
-            emitHelper(x, y);
+            onEmit(x, y);
         }
     }
 
@@ -177,11 +179,20 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
         if (interval > 0) {
             time += deltaTime;
             int iterations = (int) (time / interval);
+
+            int count = settings.isPulsating()
+                    ? Math.round(settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11())
+                    : 1;
+
+            var updateParticleCount = particleCount + iterations * count;
+            vertexBuffer.ensureCapacity(updateParticleCount * vertexBuffer.getStride());
+            updateBuffer.ensureCapacity(updateParticleCount * updateBuffer.getStride());
             for (int i = 0; i < iterations; ++i) {
-                int count = settings.isPulsating()
-                        ? Math.round(settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11())
-                        : 1;
-                emitAll(x, y, count);
+                var emittedX = x + settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
+                var emittedY = y + settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
+                for (int j = 0; j < count; ++j) {
+                    onEmit(emittedX, emittedY);
+                }
             }
 
             time -= iterations * interval;
@@ -194,14 +205,14 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
      * Emits a single particle at the specified coordinates.
      */
     public void emit(float x, float y) {
-        if (particleCount < getCapacity()) {
-            x += settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
-            y += settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
-            emitHelper(x, y);
-        }
+        x += settings.getOffsetX() + settings.getOffsetXVar() * RandomInstance.random11();
+        y += settings.getOffsetY() + settings.getOffsetYVar() * RandomInstance.random11();
+        vertexBuffer.ensureCapacity((particleCount + 1) * vertexBuffer.getStride());
+        updateBuffer.ensureCapacity((particleCount + 1) * updateBuffer.getStride());
+        onEmit(x, y);
     }
 
-    private void emitHelper(float x, float y) {
+    private void onEmit(float x, float y) {
         particle.setIndex(particleCount++);
 
         particle.setInitialized(false);
@@ -281,10 +292,6 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
 
     public int getParticleCount() {
         return particleCount;
-    }
-
-    public int getCapacity() {
-        return capacity;
     }
 
     private void destroyParticle(int index) {

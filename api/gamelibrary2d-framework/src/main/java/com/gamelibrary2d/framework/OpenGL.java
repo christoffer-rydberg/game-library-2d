@@ -108,6 +108,8 @@ public interface OpenGL {
 
     void glBindBuffer(int target, int buffer);
 
+    void glBufferData(int target, long size, int usage);
+
     void glBufferData(int target, int[] data, int usage);
 
     void glBufferData(int target, IntBuffer data, int usage);

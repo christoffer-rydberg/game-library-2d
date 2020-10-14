@@ -64,14 +64,14 @@ public class DemoFrame extends AbstractFrame {
             var fireSystemSettings = new ParticleSystemSettings(createSpawnSettings(), createUpdateSettings());
             fireSystemSettings.setDefaultInterval(1f / 350f);
 
-            fireSystem = DefaultParticleSystem.create(10000, fireSystemSettings, this);
+            fireSystem = DefaultParticleSystem.create(fireSystemSettings, this);
 
             // Example of particle system settings loaded from file:
             var explosionSystemSettings = new SaveLoadManager().load(
                     getClass().getClassLoader().getResource("explosion.particle"),
                     ParticleSystemSettings::new);
 
-            explosionSystem = DefaultParticleSystem.create(300, explosionSystemSettings, this);
+            explosionSystem = DefaultParticleSystem.create(explosionSystemSettings, this);
 
             add(fireSystem);
             add(explosionSystem);

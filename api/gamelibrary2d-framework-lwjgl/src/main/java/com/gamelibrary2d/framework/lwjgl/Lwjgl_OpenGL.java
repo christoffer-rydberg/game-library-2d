@@ -65,6 +65,11 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
+    public void glBufferData(int target, long size, int usage) {
+        GL15.glBufferData(target, size, usage);
+    }
+
+    @Override
     public void glBufferData(int target, int[] data, int usage) {
         GL15.glBufferData(target, data, usage);
     }

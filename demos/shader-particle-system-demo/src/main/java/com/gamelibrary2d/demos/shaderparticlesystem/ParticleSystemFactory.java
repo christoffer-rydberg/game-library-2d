@@ -8,7 +8,7 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.ShaderType;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
-import com.gamelibrary2d.particle.systems.CustomShaderParticleSystem;
+import com.gamelibrary2d.particle.systems.CustomParticleSystem;
 import com.gamelibrary2d.resources.DefaultShader;
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.PointSmoothing;
@@ -22,8 +22,8 @@ class ParticleSystemFactory {
     private final static float DELAY_BETWEEN_CYCLES = 1f;
     private final static float CYCLE_TIME = PARTICLE_DURATION + PARTICLE_DURATION_VAR + DELAY_BETWEEN_CYCLES;
 
-    static CustomShaderParticleSystem create(BufferedImage img, BufferedImage goal,
-                                             float posX, float posY, Disposer disposer) {
+    static CustomParticleSystem create(BufferedImage img, BufferedImage goal,
+                                       float posX, float posY, Disposer disposer) {
         float[] pos = createPositionArray(
                 posX - img.getWidth() / 2f,
                 posY - img.getHeight() / 2f,
@@ -52,7 +52,7 @@ class ParticleSystemFactory {
         renderer.setPointSmoothing(PointSmoothing.NONE);
         renderer.setBounds(new Rectangle(0, 0, 1f, 1f));
 
-        return CustomShaderParticleSystem.create(state, update, 8, updateProgram, renderer, disposer);
+        return CustomParticleSystem.create(state, update, 8, updateProgram, renderer, disposer);
     }
 
     private static void setUniforms(ShaderProgram computeProgram) {

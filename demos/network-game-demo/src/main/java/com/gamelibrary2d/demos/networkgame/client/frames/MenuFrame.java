@@ -51,7 +51,7 @@ public class MenuFrame extends AbstractFrame {
         joinPanel = createJoinPanel();
 
         var settings = new SaveLoadManager().load(Particles.MENU, ParticleSystemSettings::new);
-        var particleSystem = DefaultParticleSystem.create(10000, settings, this);
+        var particleSystem = DefaultParticleSystem.create(settings,this);
         var particleEmitter = new SequentialParticleEmitter(particleSystem);
         particleEmitter.getPosition().set(game.getWindow().width() / 2f, game.getWindow().height() / 2f);
         context.register(particleEmitter);

@@ -73,17 +73,17 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     }
 
     private DefaultParticleSystem loadParticleSystem(
-            InitializationContext context, URL url, ParticleRenderer renderer, int capacity)
+            InitializationContext context, URL url, ParticleRenderer renderer)
             throws IOException {
         var settings = new SaveLoadManager().load(url, b -> new ParticleSystemSettings(b, renderer));
-        var particleSystem = DefaultParticleSystem.create(capacity, settings, this);
+        var particleSystem = DefaultParticleSystem.create(settings, this);
         context.register(url, particleSystem);
         return particleSystem;
     }
 
-    private DefaultParticleSystem loadParticleSystem(InitializationContext context, URL url, int capacity)
+    private DefaultParticleSystem loadParticleSystem(InitializationContext context, URL url)
             throws IOException {
-        return loadParticleSystem(context, url, new EfficientParticleRenderer(), capacity);
+        return loadParticleSystem(context, url, new EfficientParticleRenderer());
     }
 
     private void initializeUpdateParticles(byte objectIdentifier, DefaultParticleSystem particleSystem) {
@@ -121,27 +121,26 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
         starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
 
-        return a -> starsRenderer.render(a, starPositions, 0, starPositions.capacity());
+        return a -> starsRenderer.render(a, starPositions, 0, starPositions.getCapacity());
     }
 
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
-        var portalPS = loadParticleSystem(context, Particles.PORTAL, 1000);
+        var portalPS = loadParticleSystem(context, Particles.PORTAL);
         initializeUpdateParticles(ObjectIdentifiers.PORTAL, portalPS);
 
-        var boulderPS = loadParticleSystem(context, Particles.BOULDER, 10000);
+        var boulderPS = loadParticleSystem(context, Particles.BOULDER);
         initializeUpdateParticles(ObjectIdentifiers.BOULDER, boulderPS);
 
-        var enginePS = loadParticleSystem(context, Particles.ENGINE, 1000);
+        var enginePS = loadParticleSystem(context, Particles.ENGINE);
         initializeUpdateParticles(ObjectIdentifiers.PLAYER, enginePS);
 
-        var shockwavePS = loadParticleSystem(context, Particles.SHOCK_WAVE, 1000);
+        var shockwavePS = loadParticleSystem(context, Particles.SHOCK_WAVE);
 
         var renderer = new EfficientParticleRenderer();
         renderer.setBlendMode(BlendMode.TRANSPARENT);
         renderer.setTexture(Textures.boulder());
-        var boulderExplosionPS = loadParticleSystem(
-                context, Particles.BOULDER_EXPLOSION, renderer, 1000);
+        var boulderExplosionPS = loadParticleSystem(context, Particles.BOULDER_EXPLOSION, renderer);
 
         var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
         timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
@@ -153,7 +152,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
             boulderExplosionPS.emitAll(pos.getX(), pos.getY());
         });
 
-        var explosionPS = loadParticleSystem(context, Particles.EXPLOSION, 1000);
+        var explosionPS = loadParticleSystem(context, Particles.EXPLOSION);
         initializeDestructionParticles(ObjectIdentifiers.PLAYER, explosionPS);
     }
 

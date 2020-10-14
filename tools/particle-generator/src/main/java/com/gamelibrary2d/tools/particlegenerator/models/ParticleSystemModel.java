@@ -9,8 +9,8 @@ import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.settings.ParticleParameters;
 import com.gamelibrary2d.particle.settings.ParticlePositioner;
 import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
+import com.gamelibrary2d.particle.systems.AcceleratedParticleSystem;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
-import com.gamelibrary2d.particle.systems.DefaultShaderParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.util.BlendMode;
@@ -20,7 +20,7 @@ import java.net.URL;
 
 public class ParticleSystemModel {
     private final DefaultParticleSystem defaultParticleSystem;
-    private final DefaultShaderParticleSystem shaderParticleSystem;
+    private final AcceleratedParticleSystem acceleratedParticleSystem;
 
     private final EfficientParticleRenderer efficientRenderer;
     private final IterativeRendererModel iterativeRenderer;
@@ -44,8 +44,8 @@ public class ParticleSystemModel {
                 new ParticleParameters(),
                 efficientRenderer);
 
-        defaultParticleSystem = DefaultParticleSystem.create(1000000, settings, disposer);
-        shaderParticleSystem = DefaultShaderParticleSystem.create(1000000, settings, disposer);
+        defaultParticleSystem = DefaultParticleSystem.create(settings, disposer);
+        acceleratedParticleSystem = AcceleratedParticleSystem.create(settings, 10000000, disposer);
 
         iterativeRenderer = new IterativeRendererModel(
                 disposer,
@@ -136,9 +136,9 @@ public class ParticleSystemModel {
 
     public float emitSequential(float time, float deltaTime) {
         switch (particleSystemType) {
-            case EFFICIENT_GPU:
-                shaderParticleSystem.setPosition(posX, posY);
-                return shaderParticleSystem.emitSequential(time, deltaTime);
+            case ACCELERATED:
+                acceleratedParticleSystem.setPosition(posX, posY);
+                return acceleratedParticleSystem.emitSequential(time, deltaTime);
             case EFFICIENT:
             case ITERATIVE:
                 return defaultParticleSystem.emitSequential(posX, posY, time, deltaTime);
@@ -149,9 +149,9 @@ public class ParticleSystemModel {
 
     public void emit() {
         switch (particleSystemType) {
-            case EFFICIENT_GPU:
-                shaderParticleSystem.setPosition(posX, posY);
-                shaderParticleSystem.emit();
+            case ACCELERATED:
+                acceleratedParticleSystem.setPosition(posX, posY);
+                acceleratedParticleSystem.emit();
                 break;
             case EFFICIENT:
             case ITERATIVE:
@@ -164,9 +164,9 @@ public class ParticleSystemModel {
 
     public void emitAll() {
         switch (particleSystemType) {
-            case EFFICIENT_GPU:
-                shaderParticleSystem.setPosition(posX, posY);
-                shaderParticleSystem.emitAll();
+            case ACCELERATED:
+                acceleratedParticleSystem.setPosition(posX, posY);
+                acceleratedParticleSystem.emitAll();
                 break;
             case EFFICIENT:
             case ITERATIVE:
@@ -184,12 +184,12 @@ public class ParticleSystemModel {
     public void setSettings(ParticleSystemSettings settings) {
         this.settings = settings;
         defaultParticleSystem.setSettings(settings);
-        shaderParticleSystem.setSettings(settings);
+        acceleratedParticleSystem.setSettings(settings);
     }
 
     public void addToLayer(Layer<ParticleSystem> layer) {
         layer.add(defaultParticleSystem);
-        layer.add(shaderParticleSystem);
+        layer.add(acceleratedParticleSystem);
     }
 
     public float getWidth() {
@@ -233,6 +233,6 @@ public class ParticleSystemModel {
     public enum ParticleSystemType {
         ITERATIVE,
         EFFICIENT,
-        EFFICIENT_GPU
+        ACCELERATED
     }
 }

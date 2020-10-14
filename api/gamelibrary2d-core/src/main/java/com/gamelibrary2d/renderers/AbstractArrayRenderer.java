@@ -57,7 +57,7 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
     }
 
     @Override
-    public void render(float alpha, T array, int offset, int len) {
+    public void render(float alpha, OpenGLBuffer array, int offset, int len) {
         ShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.bind();
         shaderProgram.updateModelMatrix(ModelMatrix.instance());

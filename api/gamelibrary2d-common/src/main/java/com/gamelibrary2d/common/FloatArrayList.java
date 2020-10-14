@@ -36,7 +36,7 @@ public class FloatArrayList {
      * Note that the array is not a copy. Changes to the array will affect the list,
      * unless the internal array has been replaced due to a resize of the list.
      */
-    public float[] internalArray() {
+    public float[] getInternalArray() {
         return data;
     }
 
@@ -101,9 +101,10 @@ public class FloatArrayList {
     public void ensureCapacity(int minCapacity) {
         int oldCapacity = data.length;
         if (oldCapacity < minCapacity) {
-            int newCapacity = oldCapacity + (oldCapacity >> 1);
-            if (newCapacity < minCapacity)
+            int newCapacity = oldCapacity * 2;
+            if (newCapacity < minCapacity) {
                 newCapacity = minCapacity;
+            }
             data = Arrays.copyOf(data, newCapacity);
         }
     }

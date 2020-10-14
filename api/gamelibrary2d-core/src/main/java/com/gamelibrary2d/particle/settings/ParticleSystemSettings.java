@@ -48,6 +48,26 @@ public final class ParticleSystemSettings implements Serializable {
         this.renderer = renderer;
     }
 
+    private static int estimateCapacityFromCount(ParticleSystemSettings settings) {
+        return settings.getDefaultCount() + settings.getDefaultCountVar();
+    }
+
+    private static int estimateCapacityFromInterval(ParticleSystemSettings settings) {
+        var maxLife = settings.getParticleParameters().getLife() + settings.getParticleParameters().getLifeVar();
+
+        var particleCount = settings.isPulsating()
+                ? settings.getDefaultCount() + settings.getDefaultCountVar()
+                : 1;
+
+        return (int) Math.ceil(1.2f * maxLife * particleCount / settings.getDefaultInterval());
+    }
+
+    public static int estimateCapacity(ParticleSystemSettings settings) {
+        return Math.max(
+                estimateCapacityFromCount(settings),
+                estimateCapacityFromInterval(settings));
+    }
+
     public float getOffsetX() {
         return offsetX;
     }

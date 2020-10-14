@@ -3,7 +3,7 @@ package com.gamelibrary2d.particle.systems;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 
-public abstract class AbstractShaderParticleSystem implements ParticleSystem {
+public abstract class AbstractGpuBasedParticleSystem implements ParticleSystem {
 
     private final static int WORK_GROUP_SIZE = 512;
 
@@ -13,7 +13,7 @@ public abstract class AbstractShaderParticleSystem implements ParticleSystem {
 
     private int glUniformParticleCount;
 
-    protected AbstractShaderParticleSystem(ShaderProgram updaterProgram) {
+    protected AbstractGpuBasedParticleSystem(ShaderProgram updaterProgram) {
         this.updaterProgram = updaterProgram;
 
         boolean updateProgramInUse = updaterProgram.inUse();

@@ -6,19 +6,19 @@ import com.gamelibrary2d.framework.OpenGL;
 
 import java.nio.IntBuffer;
 
-public class OpenGLIntBuffer extends AbstractOpenGLBuffer {
+public class MirroredIntBuffer extends AbstractMirroredBuffer {
     private final int usage;
 
     private int[] data;
     private IntBuffer ioBuffer;
 
-    private OpenGLIntBuffer(int target, int usage) {
+    private MirroredIntBuffer(int target, int usage) {
         super(target);
         this.usage = usage;
     }
 
-    public static OpenGLIntBuffer create(int[] data, int target, int usage, Disposer disposer) {
-        var buffer = new OpenGLIntBuffer(target, usage);
+    public static MirroredIntBuffer create(int[] data, int target, int usage, Disposer disposer) {
+        var buffer = new MirroredIntBuffer(target, usage);
         buffer.allocate(data);
         disposer.registerDisposal(buffer);
         return buffer;
@@ -31,7 +31,7 @@ public class OpenGLIntBuffer extends AbstractOpenGLBuffer {
     public boolean allocate(int[] data) {
         if (this.data != data) {
             this.data = data;
-            allocate(data.length);
+            allocate();
             return true;
         }
 
@@ -41,6 +41,11 @@ public class OpenGLIntBuffer extends AbstractOpenGLBuffer {
     @Override
     public void copy(int offset, int destination, int len) {
         System.arraycopy(data, offset, data, destination, len);
+    }
+
+    @Override
+    public int getCapacity() {
+        return data.length;
     }
 
     @Override

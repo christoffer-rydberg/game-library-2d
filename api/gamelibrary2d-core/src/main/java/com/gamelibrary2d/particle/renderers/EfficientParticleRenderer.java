@@ -2,6 +2,7 @@ package com.gamelibrary2d.particle.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.OpenGL;
+import com.gamelibrary2d.glUtil.MirroredBuffer;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
@@ -71,9 +72,9 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
 
     @Override
     public void render(OpenGLBuffer buffer, boolean gpuOutdated, int offset, int len, float alpha) {
-        if (gpuOutdated) {
+        if (gpuOutdated && buffer instanceof MirroredBuffer) {
             buffer.bind();
-            buffer.updateGPU(offset, len);
+            ((MirroredBuffer) buffer).updateGPU(offset, len);
         }
 
         super.render(alpha, buffer, offset, len);

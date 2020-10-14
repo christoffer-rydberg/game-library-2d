@@ -33,7 +33,7 @@ public class IterativeParticleRenderer implements ParticleRenderer {
 
             int end = offset + len;
             for (int i = offset; i < end; ++i) {
-                var renderOffset = i * renderBuffer.stride();
+                var renderOffset = i * renderBuffer.getStride();
 
                 modelMatrix.pushMatrix();
 

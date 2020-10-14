@@ -4,12 +4,12 @@ import com.gamelibrary2d.common.FloatArrayList;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.OpenGL;
 
-public class PositionBuffer extends AbstractVertexArrayBuffer {
+public class PositionBuffer extends AbstractMirroredVertexArrayBuffer<MirroredFloatBuffer> {
     private final static int STRIDE = 2;
     private final static int ELEMENT_SIZE = 2;
     private final FloatArrayList data;
 
-    private PositionBuffer(FloatArrayList data, OpenGLFloatBuffer buffer) {
+    private PositionBuffer(FloatArrayList data, MirroredFloatBuffer buffer) {
         super(buffer, STRIDE, ELEMENT_SIZE);
         this.data = data;
     }
@@ -23,8 +23,8 @@ public class PositionBuffer extends AbstractVertexArrayBuffer {
     }
 
     public static PositionBuffer create(FloatArrayList data, Disposer disposer) {
-        var buffer = OpenGLFloatBuffer.create(
-                data.internalArray(), OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
+        var buffer = MirroredFloatBuffer.create(
+                data.getInternalArray(), OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
         var positionBuffer = new PositionBuffer(data, buffer);
         disposer.registerDisposal(positionBuffer);
         return positionBuffer;
@@ -74,21 +74,21 @@ public class PositionBuffer extends AbstractVertexArrayBuffer {
             throw new IndexOutOfBoundsException("Index: " + (requiredSize - 1) + ", Size: " + size);
         }
 
-        var buffer = buffer();
+        var buffer = getBuffer();
         var bufferData = buffer.data();
         if (requiredSize <= bufferData.length / STRIDE) {
             super.updateGPU(offset, len);
         } else {
             // Assuming update after array growth. Reallocate entire OpenGL buffer:
-            buffer().allocate(data.internalArray());
+            getBuffer().allocate(data.getInternalArray());
         }
     }
 
     @Override
     public void updateCPU(int offset, int len) {
         super.updateCPU(offset, len);
-        var bufferData = buffer().data();
-        var internalData = data.internalArray();
+        var bufferData = getBuffer().data();
+        var internalData = data.getInternalArray();
         if (bufferData != internalData) {
             int bufferOffset = offset * STRIDE;
             var bufferLength = len * STRIDE;
