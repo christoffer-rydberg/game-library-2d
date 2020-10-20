@@ -24,7 +24,7 @@ public class MirroredIntBuffer extends AbstractMirroredBuffer {
         return buffer;
     }
 
-    public int[] data() {
+    public int[] getData() {
         return data;
     }
 

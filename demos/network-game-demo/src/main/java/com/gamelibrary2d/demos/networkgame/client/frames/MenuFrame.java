@@ -13,7 +13,7 @@ import com.gamelibrary2d.layers.NavigationPanel;
 import com.gamelibrary2d.layers.Panel;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.updaters.InfiniteUpdater;
 import com.gamelibrary2d.util.StackOrientation;
@@ -50,7 +50,7 @@ public class MenuFrame extends AbstractFrame {
         hostPanel = createHostPanel();
         joinPanel = createJoinPanel();
 
-        var settings = new SaveLoadManager().load(Particles.MENU, ParticleSystemSettings::new);
+        var settings = new SaveLoadManager().load(Particles.MENU, ParticleSystemParameters::new);
         var particleSystem = DefaultParticleSystem.create(settings,this);
         var particleEmitter = new SequentialParticleEmitter(particleSystem);
         particleEmitter.getPosition().set(game.getWindow().width() / 2f, game.getWindow().height() / 2f);

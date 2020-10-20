@@ -28,7 +28,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
 
     private final FileChooser fileChooser;
     private final ParticleSystemModel particleSystem;
-    private final Panel<GameObject> iterativePanel;
+    private final Panel<GameObject> sequentialPanel;
     private final Panel<GameObject> efficientPanel;
     private final Panel<GameObject> acceleratedPanel;
     private final ShapePanel shapePanel;
@@ -47,7 +47,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
 
         this.particleSystem = particleSystem;
         this.shapePanel = new ShapePanel(particleSystem);
-        this.iterativePanel = createIterativePanel();
+        this.sequentialPanel = createSequentialPanel();
         this.efficientPanel = createEfficientPanel();
         this.acceleratedPanel = createAcceleratedPanel();
 
@@ -58,8 +58,8 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
 
     private void updateActivePanel() {
         switch (particleSystem.getParticleSystemType()) {
-            case ITERATIVE:
-                setActivePanel(iterativePanel);
+            case SEQUENTIAL:
+                setActivePanel(sequentialPanel);
                 break;
             case EFFICIENT:
                 setActivePanel(efficientPanel);
@@ -118,7 +118,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         );
     }
 
-    private Panel<GameObject> createIterativePanel() {
+    private Panel<GameObject> createSequentialPanel() {
         var panel = new DefaultPanel<>();
         PanelUtil.stack(panel, createQuadPanel(), 0f);
         return panel;

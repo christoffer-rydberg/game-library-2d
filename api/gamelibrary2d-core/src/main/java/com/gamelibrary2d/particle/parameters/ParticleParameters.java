@@ -1,10 +1,13 @@
-package com.gamelibrary2d.particle.settings;
+package com.gamelibrary2d.particle.parameters;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Serializable;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.particle.systems.Particle;
 
+/**
+ * Parameters for setting the initial state and behaviour of emitted particles.
+ */
 public class ParticleParameters implements Serializable {
     private final static int STRIDE = 52;
 

@@ -3,17 +3,17 @@ package com.gamelibrary2d.tools.particlegenerator.panels;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.markers.Parent;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.particle.settings.ParticlePositioner;
+import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;
 import com.gamelibrary2d.tools.particlegenerator.properties.FloatProperty;
 import com.gamelibrary2d.tools.particlegenerator.properties.GenericProperty;
 
-public class ParticlePositionerPanel extends AbstractPanel<GameObject> implements Parent<GameObject> {
+public class PositionParametersPanel extends AbstractPanel<GameObject> implements Parent<GameObject> {
 
     private final ParticleSystemModel particleSystem;
 
-    public ParticlePositionerPanel(ParticleSystemModel particleSystem) {
+    public PositionParametersPanel(ParticleSystemModel particleSystem) {
         this.particleSystem = particleSystem;
         PanelUtil.stack(this, spawnArea(), 0f);
         PanelUtil.stack(this, spawnAreaWidth());
@@ -22,8 +22,8 @@ public class ParticlePositionerPanel extends AbstractPanel<GameObject> implement
         PanelUtil.stack(this, localCenter());
     }
 
-    private ParticlePositioner params() {
-        return particleSystem.getSettings().getParticlePositioner();
+    private PositionParameters params() {
+        return particleSystem.getSettings().getPositionParameters();
     }
 
     private GameObject localCenter() {
@@ -36,7 +36,7 @@ public class ParticlePositionerPanel extends AbstractPanel<GameObject> implement
     private GameObject spawnArea() {
         return new PanelElement.Enum<>(
                 "Spawn Area",
-                ParticlePositioner.SpawnArea.class,
+                PositionParameters.SpawnArea.class,
                 new GenericProperty<>(
                         () -> params().getSpawnArea(),
                         v -> params().setSpawnArea(v))

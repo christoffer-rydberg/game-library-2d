@@ -8,9 +8,10 @@ import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.particle.settings.ParticleParameters;
-import com.gamelibrary2d.particle.settings.ParticlePositioner;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
+import com.gamelibrary2d.particle.parameters.EmitterParameters;
+import com.gamelibrary2d.particle.parameters.ParticleParameters;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
+import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
@@ -65,23 +66,23 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     }
 
     private void loadParticleSystem() {
-        ParticleSystemSettings settings;
+        ParticleSystemParameters settings;
         try {
             File file = fileChooser.browse();
 
             if (file != null) {
-                settings = saveLoadManager.load(file, b -> new ParticleSystemSettings(b, particleSystem.getRenderer()));
+                settings = saveLoadManager.load(file, ParticleSystemParameters::new);
             } else {
-                settings = new ParticleSystemSettings(
-                        new ParticlePositioner(),
-                        new ParticleParameters(),
-                        particleSystem.getRenderer());
+                settings = new ParticleSystemParameters(
+                        new EmitterParameters(),
+                        new PositionParameters(),
+                        new ParticleParameters());
             }
         } catch (IOException e) {
-            settings = new ParticleSystemSettings(
-                    new ParticlePositioner(),
-                    new ParticleParameters(),
-                    particleSystem.getRenderer());
+            settings = new ParticleSystemParameters(
+                    new EmitterParameters(),
+                    new PositionParameters(),
+                    new ParticleParameters());
         }
 
         particleSystem.setSettings(settings);
@@ -186,16 +187,19 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
             particleParameters.setRotationAccelerationVar(0);
         }
 
-        int origin = random.nextInt(ParticlePositioner.SpawnArea.values().length);
-        var spawnArea = ParticlePositioner.SpawnArea.values()[origin];
+        int origin = random.nextInt(PositionParameters.SpawnArea.values().length);
+        var spawnArea = PositionParameters.SpawnArea.values()[origin];
         particleSystem.getPositioner().setSpawnArea(spawnArea);
 
         float count = round(random.nextFloat() * 750, 1);
         float countVar = round(random.nextFloat() * (count / 2f), 1);
-        particleSystem.getSettings().setDefaultCount((int) count);
-        particleSystem.getSettings().setDefaultCountVar((int) countVar);
-        particleSystem.getSettings().setDefaultInterval(1.f / count);
-        particleSystem.getSettings().setPulsating(false);
+
+        var emitterParameters = particleSystem.getSettings().getEmitterParameters();
+
+        emitterParameters.setDefaultCount((int) count);
+        emitterParameters.setDefaultCountVar((int) countVar);
+        emitterParameters.setDefaultInterval(1.f / count);
+        emitterParameters.setPulsating(false);
         boolean localCenter = random.nextInt(2) == 1;
         particleSystem.getPositioner().setLocalCenter(localCenter);
 

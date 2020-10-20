@@ -6,7 +6,7 @@ import com.gamelibrary2d.animation.AnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.particle.renderers.IterativeParticleRenderer;
+import com.gamelibrary2d.particle.renderers.SequentialParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
@@ -18,19 +18,19 @@ import com.gamelibrary2d.util.QuadShape;
 import java.io.IOException;
 import java.net.URL;
 
-public class IterativeRendererModel {
+public class SequentialRendererModel {
     private final SurfaceRenderer surfaceRenderer;
-    private final IterativeParticleRenderer renderer;
+    private final SequentialParticleRenderer renderer;
     private final Disposer resourceDisposer;
 
     private Rectangle bounds;
     private AnimationRenderer animationRenderer;
     private byte[] animationData;
 
-    public IterativeRendererModel(Disposer disposer, DefaultParticleSystem defaultParticleSystem, Rectangle bounds) {
+    public SequentialRendererModel(Disposer disposer, DefaultParticleSystem defaultParticleSystem, Rectangle bounds) {
         this.resourceDisposer = new DefaultDisposer(disposer);
         this.surfaceRenderer = new SurfaceRenderer();
-        this.renderer = new IterativeParticleRenderer(defaultParticleSystem, surfaceRenderer);
+        this.renderer = new SequentialParticleRenderer(defaultParticleSystem, surfaceRenderer);
         setBounds(bounds);
     }
 
@@ -69,7 +69,7 @@ public class IterativeRendererModel {
         }
     }
 
-    public IterativeParticleRenderer getRenderer() {
+    public SequentialParticleRenderer getRenderer() {
         return renderer;
     }
 

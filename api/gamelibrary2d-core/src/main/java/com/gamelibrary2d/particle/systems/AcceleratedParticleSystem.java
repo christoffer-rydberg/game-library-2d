@@ -7,15 +7,13 @@ import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.*;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
+import com.gamelibrary2d.particle.parameters.EmitterParameters;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleParameters;
-import com.gamelibrary2d.particle.settings.ParticlePositioner;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 
 public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem implements Clearable {
     private final float[] position = new float[2];
     private final float[] externalAcceleration = new float[2];
-    private final int[] atomicArray = new int[1];
 
     private final MirroredIntBuffer atomicBuffer;
     private final MirroredFloatBuffer parametersBuffer;
@@ -26,12 +24,14 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
     private final int capacity;
 
-    private Point positionTransform;
+    private Point positionTransformation;
     private int parameterUpdateCounter;
     private int positionUpdateCounter;
     private int particleCount;
     private int activeBuffer = 0;
-    private ParticleSystemSettings settings;
+
+    private EfficientParticleRenderer renderer;
+    private ParticleSystemParameters parameters;
     private ParticleUpdateListener updateListener;
 
     private int glUniformPosition;
@@ -46,15 +46,17 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
                                       MirroredFloatBuffer parametersBuffer,
                                       DefaultOpenGLBuffer[] updateBuffer,
                                       DefaultVertexArrayBuffer<DefaultOpenGLBuffer>[] renderBuffer,
-                                      ParticleSystemSettings settings,
+                                      ParticleSystemParameters parameters,
+                                      EfficientParticleRenderer renderer,
                                       int capacity,
                                       Disposer disposer) {
         super(updaterProgram);
         this.updateBuffer = updateBuffer;
         this.renderBuffer = renderBuffer;
-        this.settings = settings;
+        this.parameters = parameters;
+        this.renderer = renderer;
         this.capacity = capacity;
-        atomicBuffer = MirroredIntBuffer.create(atomicArray, OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
+        atomicBuffer = MirroredIntBuffer.create(new int[1], OpenGL.GL_ATOMIC_COUNTER_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
         boolean updateProgramInUse = updaterProgram.inUse();
         if (!updateProgramInUse) {
@@ -62,10 +64,10 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
         }
 
         this.positionbuffer = positionBuffer;
-        positionUpdateCounter = settings.getParticlePositioner().getUpdateCounter();
+        positionUpdateCounter = parameters.getPositionParameters().getUpdateCounter();
 
         this.parametersBuffer = parametersBuffer;
-        parameterUpdateCounter = settings.getParticleParameters().getUpdateCounter();
+        parameterUpdateCounter = parameters.getParticleParameters().getUpdateCounter();
 
         glUniformPosition = updaterProgram.getUniformLocation("position");
         glUniformExternalAcceleration = updaterProgram.getUniformLocation("externalAcceleration");
@@ -77,15 +79,20 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
         }
     }
 
-    public static AcceleratedParticleSystem create(ParticleSystemSettings settings, int capacity, Disposer disposer) {
+    public static AcceleratedParticleSystem create(
+            ParticleSystemParameters parameters,
+            EfficientParticleRenderer renderer,
+            int capacity,
+            Disposer disposer) {
+
         var positionBuffer = MirroredFloatBuffer.create(
-                settings.getParticlePositioner().getInternalStateArray(),
+                parameters.getPositionParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
                 OpenGL.GL_DYNAMIC_DRAW,
                 disposer);
 
         var parametersBuffer = MirroredFloatBuffer.create(
-                settings.getParticleParameters().getInternalStateArray(),
+                parameters.getParticleParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
                 OpenGL.GL_DYNAMIC_DRAW,
                 disposer);
@@ -118,7 +125,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
         }
 
         return new AcceleratedParticleSystem(ShaderProgram.getDefaultParticleUpdaterProgram(),
-                positionBuffer, parametersBuffer, updateBuffer, renderBuffer, settings, capacity, disposer);
+                positionBuffer, parametersBuffer, updateBuffer, renderBuffer, parameters, renderer, capacity, disposer);
     }
 
     public void setPosition(float x, float y) {
@@ -129,22 +136,6 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
     public void setExternalAcceleration(float x, float y) {
         externalAcceleration[0] = x;
         externalAcceleration[1] = y;
-    }
-
-    public ParticlePositioner getParticlePositioner() {
-        return settings.getParticlePositioner();
-    }
-
-    public void setParticlePositioner(ParticlePositioner positioner) {
-        settings.setParticlePositioner(positioner);
-    }
-
-    public ParticleParameters getParticleParameters() {
-        return settings.getParticleParameters();
-    }
-
-    public void setParticleParameters(ParticleParameters parameters) {
-        settings.setParticleParameters(parameters);
     }
 
     /**
@@ -165,21 +156,21 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
         updateListener = listener;
     }
 
-    public Point getPositionTransform() {
-        return positionTransform;
+    public Point getPositionTransformation() {
+        return positionTransformation;
     }
 
-    public void setPositionTransform(Point positionTransform) {
-        this.positionTransform = positionTransform;
+    public void setPositionTransformation(Point positionTransformation) {
+        this.positionTransformation = positionTransformation;
     }
 
     /**
      * Emits all particles at the specified coordinates. The particles count
-     * is specified by {@link ParticleSystemSettings#getDefaultCount()}.
+     * is specified by {@link EmitterParameters#getDefaultCount()}.
      */
     public void emitAll() {
-        emit(Math.round(
-                settings.getDefaultCount() + settings.getDefaultCountVar() * RandomInstance.random11()));
+        var emitterParameters = parameters.getEmitterParameters();
+        emit(Math.round(emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar() * RandomInstance.random11()));
     }
 
     /**
@@ -198,7 +189,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
     /**
      * Sequentially emits particles at the specified coordinates. The interval is
-     * specified by {@link ParticleSystemSettings#getDefaultInterval()}.
+     * specified by {@link EmitterParameters#getDefaultInterval()}.
      *
      * @param time      The current emitter time, in seconds. The delta time will be
      *                  added to this value. Particles will be emitted while the
@@ -208,7 +199,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
      * was emitted.
      */
     public float emitSequential(float time, float deltaTime) {
-        return emitSequential(time, deltaTime, settings.getDefaultInterval());
+        return emitSequential(time, deltaTime, parameters.getEmitterParameters().getDefaultInterval());
     }
 
     /**
@@ -230,8 +221,9 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
             float remainingTime = time - (iterations * interval);
 
-            int count = settings.isPulsating()
-                    ? (settings.getDefaultCount() + settings.getDefaultCountVar()) * iterations
+            var emitterParameters = parameters.getEmitterParameters();
+            int count = emitterParameters.isPulsating()
+                    ? (emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar()) * iterations
                     : iterations;
 
             emit(count);
@@ -249,16 +241,15 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
     @Override
     public void update(float deltaTime) {
         if (particleCount > 0) {
-
             // Reset atomic counter
-            atomicArray[0] = 0;
+            atomicBuffer.getData()[0] = 0;
             atomicBuffer.updateGPU(0, 1);
 
             super.update(deltaTime);
 
             // Update particle count
             atomicBuffer.updateCPU(0, 1);
-            particlesInGpuBuffer = atomicArray[0];
+            particlesInGpuBuffer = atomicBuffer.getData()[0];
             particleCount = particlesInGpuBuffer;
 
             activeBuffer = activeBuffer == 1 ? 0 : 1;
@@ -273,21 +264,23 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
         openGL.glUniform1i(glUniformParticlesInGpu, particlesInGpuBuffer);
 
+        var emitterParameters = parameters.getEmitterParameters();
+
         openGL.glUniform2f(
                 glUniformPosition,
-                position[0] + settings.getOffsetX(),
-                position[1] + settings.getOffsetY());
+                position[0] + emitterParameters.getOffsetX(),
+                position[1] + emitterParameters.getOffsetY());
         openGL.glUniform2fv(glUniformExternalAcceleration, externalAcceleration);
 
-        var particlePositioner = settings.getParticlePositioner();
-        if (!positionbuffer.allocate(particlePositioner.getInternalStateArray())) {
-            if (positionUpdateCounter != particlePositioner.getUpdateCounter()) {
-                positionUpdateCounter = particlePositioner.getUpdateCounter();
+        var positionParameters = parameters.getPositionParameters();
+        if (!positionbuffer.allocate(positionParameters.getInternalStateArray())) {
+            if (positionUpdateCounter != positionParameters.getUpdateCounter()) {
+                positionUpdateCounter = positionParameters.getUpdateCounter();
                 positionbuffer.updateGPU(0, positionbuffer.getCapacity());
             }
         }
 
-        var particleParameters = settings.getParticleParameters();
+        var particleParameters = parameters.getParticleParameters();
         if (!parametersBuffer.allocate(particleParameters.getInternalStateArray())) {
             if (parameterUpdateCounter != particleParameters.getUpdateCounter()) {
                 parameterUpdateCounter = particleParameters.getUpdateCounter();
@@ -307,21 +300,20 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
     }
 
     private boolean isTransformingPosition() {
-        return positionTransform != null && (positionTransform.getX() != 0f || positionTransform.getY() != 0f);
+        return positionTransformation != null && (positionTransformation.getX() != 0f || positionTransformation.getY() != 0f);
     }
 
     @Override
     public void render(float alpha) {
-        if (particlesInGpuBuffer == 0)
-            return;
-
-        if (isTransformingPosition()) {
-            ModelMatrix.instance().pushMatrix();
-            ModelMatrix.instance().translatef(positionTransform.getX(), positionTransform.getY(), 0);
-            settings.getRenderer().render(renderBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
-            ModelMatrix.instance().popMatrix();
-        } else {
-            settings.getRenderer().render(renderBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
+        if (particlesInGpuBuffer > 0) {
+            if (isTransformingPosition()) {
+                ModelMatrix.instance().pushMatrix();
+                ModelMatrix.instance().translatef(positionTransformation.getX(), positionTransformation.getY(), 0);
+                renderer.render(renderBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
+                ModelMatrix.instance().popMatrix();
+            } else {
+                renderer.render(renderBuffer[activeBuffer], false, 0, particlesInGpuBuffer, alpha);
+            }
         }
     }
 
@@ -340,11 +332,19 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
         return particleCount;
     }
 
-    public void setRenderer(EfficientParticleRenderer renderer) {
-        settings.setRenderer(renderer);
+    public EfficientParticleRenderer getRenderer() {
+        return renderer;
     }
 
-    public void setSettings(ParticleSystemSettings settings) {
-        this.settings = settings;
+    public void setRenderer(EfficientParticleRenderer renderer) {
+        this.renderer = renderer;
+    }
+
+    public ParticleSystemParameters getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(ParticleSystemParameters parameters) {
+        this.parameters = parameters;
     }
 }

@@ -24,7 +24,7 @@ public class MirroredFloatBuffer extends AbstractMirroredBuffer {
         return buffer;
     }
 
-    public float[] data() {
+    public float[] getData() {
         return data;
     }
 

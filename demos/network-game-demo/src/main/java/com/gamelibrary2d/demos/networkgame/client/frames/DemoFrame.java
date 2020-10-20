@@ -26,7 +26,7 @@ import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 import com.gamelibrary2d.renderers.QuadsRenderer;
@@ -75,8 +75,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private DefaultParticleSystem loadParticleSystem(
             InitializationContext context, URL url, ParticleRenderer renderer)
             throws IOException {
-        var settings = new SaveLoadManager().load(url, b -> new ParticleSystemSettings(b, renderer));
-        var particleSystem = DefaultParticleSystem.create(settings, this);
+        var settings = new SaveLoadManager().load(url, ParticleSystemParameters::new);
+        var particleSystem = DefaultParticleSystem.create(settings, renderer, this);
         context.register(url, particleSystem);
         return particleSystem;
     }

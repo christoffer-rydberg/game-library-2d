@@ -25,7 +25,7 @@ public class ParticleRenderBuffer extends AbstractMirroredVertexArrayBuffer<Mirr
 
     private ParticleRenderBuffer(MirroredFloatBuffer internalState) {
         super(internalState, STRIDE, 4);
-        this.internalState = internalState.data();
+        this.internalState = internalState.getData();
     }
 
     static ParticleRenderBuffer create(int capacity, Disposer disposer) {

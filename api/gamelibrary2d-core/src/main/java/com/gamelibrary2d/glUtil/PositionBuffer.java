@@ -34,7 +34,7 @@ public class PositionBuffer extends AbstractMirroredVertexArrayBuffer<MirroredFl
         return data.size() / STRIDE;
     }
 
-    public FloatArrayList data() {
+    public FloatArrayList getData() {
         return data;
     }
 
@@ -75,7 +75,7 @@ public class PositionBuffer extends AbstractMirroredVertexArrayBuffer<MirroredFl
         }
 
         var buffer = getBuffer();
-        var bufferData = buffer.data();
+        var bufferData = buffer.getData();
         if (requiredSize <= bufferData.length / STRIDE) {
             super.updateGPU(offset, len);
         } else {
@@ -87,7 +87,7 @@ public class PositionBuffer extends AbstractMirroredVertexArrayBuffer<MirroredFl
     @Override
     public void updateCPU(int offset, int len) {
         super.updateCPU(offset, len);
-        var bufferData = getBuffer().data();
+        var bufferData = getBuffer().getData();
         var internalData = data.getInternalArray();
         if (bufferData != internalData) {
             int bufferOffset = offset * STRIDE;

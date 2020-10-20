@@ -63,7 +63,7 @@ public class PanelElement {
         );
 
         label.setPosition(-10, 0);
-        label.setBounds(new Rectangle(0, 0, 0, 12));
+        label.setBounds(new Rectangle(10, 10, 0, 12));
         return label;
     }
 

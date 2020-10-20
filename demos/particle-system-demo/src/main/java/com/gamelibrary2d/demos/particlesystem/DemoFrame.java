@@ -6,9 +6,10 @@ import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.settings.ParticleParameters;
-import com.gamelibrary2d.particle.settings.ParticlePositioner;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
+import com.gamelibrary2d.particle.parameters.EmitterParameters;
+import com.gamelibrary2d.particle.parameters.ParticleParameters;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
+import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
@@ -29,8 +30,8 @@ public class DemoFrame extends AbstractFrame {
         this.game = game;
     }
 
-    private ParticlePositioner createSpawnSettings() {
-        var spawnSettings = new ParticlePositioner();
+    private PositionParameters createSpawnSettings() {
+        var spawnSettings = new PositionParameters();
         spawnSettings.setSpawnAreaWidthVar(75f);
         spawnSettings.setSpawnAreaHeightVar(25f);
         return spawnSettings;
@@ -61,15 +62,20 @@ public class DemoFrame extends AbstractFrame {
     protected void onInitialize(InitializationContext context) {
         try {
             // Example of particle system settings created from code:
-            var fireSystemSettings = new ParticleSystemSettings(createSpawnSettings(), createUpdateSettings());
-            fireSystemSettings.setDefaultInterval(1f / 350f);
+            var emitterParameters = new EmitterParameters();
+            emitterParameters.setDefaultInterval(1f / 350f);
+
+            var fireSystemSettings = new ParticleSystemParameters(
+                    emitterParameters,
+                    createSpawnSettings(),
+                    createUpdateSettings());
 
             fireSystem = DefaultParticleSystem.create(fireSystemSettings, this);
 
             // Example of particle system settings loaded from file:
             var explosionSystemSettings = new SaveLoadManager().load(
                     getClass().getClassLoader().getResource("explosion.particle"),
-                    ParticleSystemSettings::new);
+                    ParticleSystemParameters::new);
 
             explosionSystem = DefaultParticleSystem.create(explosionSystemSettings, this);
 

@@ -1,11 +1,14 @@
-package com.gamelibrary2d.particle.settings;
+package com.gamelibrary2d.particle.parameters;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.Serializable;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.particle.systems.Particle;
 
-public class ParticlePositioner implements Serializable {
+/**
+ * Parameters for positioning emitted particles.
+ */
+public class PositionParameters implements Serializable {
     private static final int STRIDE = 8;
 
     private static final int LOCAL_CENTER = 0;
@@ -19,13 +22,14 @@ public class ParticlePositioner implements Serializable {
     private static final int SPAWN_AREA_HEIGHT_VAR = 7;
 
     private float[] internalState = new float[STRIDE];
+
     private int updateCounter;
 
-    public ParticlePositioner() {
+    public PositionParameters() {
 
     }
 
-    public ParticlePositioner(DataBuffer buffer) {
+    public PositionParameters(DataBuffer buffer) {
         for (int i = 0; i < STRIDE; ++i) {
             internalState[i] = buffer.getFloat();
         }
@@ -84,7 +88,7 @@ public class ParticlePositioner implements Serializable {
         setInternalState(LOCAL_CENTER, localCenter ? 1 : 0);
     }
 
-    public void initialize(Particle particle, float x, float y) {
+    public void apply(Particle particle, float x, float y) {
         double angle = getSpawnAngle() - getSpawnAngleVar() * RandomInstance.random11() - 90;
         double angleRadians = angle * Math.PI / 180d;
 

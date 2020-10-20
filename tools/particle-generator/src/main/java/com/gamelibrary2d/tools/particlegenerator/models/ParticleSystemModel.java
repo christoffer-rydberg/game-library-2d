@@ -3,12 +3,13 @@ package com.gamelibrary2d.tools.particlegenerator.models;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.layers.Layer;
+import com.gamelibrary2d.particle.parameters.EmitterParameters;
+import com.gamelibrary2d.particle.parameters.ParticleParameters;
+import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
+import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
-import com.gamelibrary2d.particle.renderers.ParticleRenderer;
-import com.gamelibrary2d.particle.settings.ParticleParameters;
-import com.gamelibrary2d.particle.settings.ParticlePositioner;
-import com.gamelibrary2d.particle.settings.ParticleSystemSettings;
 import com.gamelibrary2d.particle.systems.AcceleratedParticleSystem;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
@@ -19,36 +20,39 @@ import java.io.IOException;
 import java.net.URL;
 
 public class ParticleSystemModel {
+    private final Frame frame;
     private final DefaultParticleSystem defaultParticleSystem;
     private final AcceleratedParticleSystem acceleratedParticleSystem;
 
     private final EfficientParticleRenderer efficientRenderer;
-    private final IterativeRendererModel iterativeRenderer;
+    private final SequentialRendererModel sequentialRenderer;
 
     private final Disposer textureDisposer;
+
 
     private float posX;
     private float posY;
     private BlendMode blendMode;
-    private ParticleSystemSettings settings;
+    private ParticleSystemParameters settings;
     private ParticleSystemType particleSystemType = ParticleSystemType.EFFICIENT;
     private Rectangle bounds;
 
-    private ParticleSystemModel(Disposer disposer) {
-        textureDisposer = new DefaultDisposer(disposer);
+    private ParticleSystemModel(Frame frame) {
+        this.frame = frame;
+        textureDisposer = new DefaultDisposer(frame);
 
         efficientRenderer = new EfficientParticleRenderer();
 
-        settings = new ParticleSystemSettings(
-                new ParticlePositioner(),
-                new ParticleParameters(),
-                efficientRenderer);
+        settings = new ParticleSystemParameters(
+                new EmitterParameters(),
+                new PositionParameters(),
+                new ParticleParameters());
 
-        defaultParticleSystem = DefaultParticleSystem.create(settings, disposer);
-        acceleratedParticleSystem = AcceleratedParticleSystem.create(settings, 10000000, disposer);
+        defaultParticleSystem = DefaultParticleSystem.create(settings, efficientRenderer, frame);
+        acceleratedParticleSystem = AcceleratedParticleSystem.create(settings, efficientRenderer, 10000000, frame);
 
-        iterativeRenderer = new IterativeRendererModel(
-                disposer,
+        sequentialRenderer = new SequentialRendererModel(
+                frame,
                 defaultParticleSystem,
                 efficientRenderer.getBounds());
 
@@ -59,8 +63,8 @@ public class ParticleSystemModel {
         setBlendMode(BlendMode.ADDITIVE);
     }
 
-    public static ParticleSystemModel create(Disposer disposer) {
-        return new ParticleSystemModel(disposer);
+    public static ParticleSystemModel create(Frame frame) {
+        return new ParticleSystemModel(frame);
     }
 
     public void setPosition(float x, float y) {
@@ -69,27 +73,27 @@ public class ParticleSystemModel {
     }
 
     public void reset() {
-        setSettings(new ParticleSystemSettings(
-                new ParticlePositioner(),
-                new ParticleParameters(),
-                getRenderer()));
+        setSettings(new ParticleSystemParameters(
+                new EmitterParameters(),
+                new PositionParameters(),
+                new ParticleParameters()));
     }
 
     public void removeTexture() {
         efficientRenderer.setTexture(null);
-        iterativeRenderer.setTexture(null);
+        sequentialRenderer.setTexture(null);
     }
 
     public void loadTexture(URL url) throws IOException {
         textureDisposer.dispose();
         if (url.getPath().endsWith(".gif")) {
-            var animation = iterativeRenderer.setAnimation(url);
+            var animation = sequentialRenderer.setAnimation(url);
             efficientRenderer.setTexture(
                     animation.getFrame(0).getTexture()
             );
         } else {
             var texture = DefaultTexture.create(url, textureDisposer);
-            iterativeRenderer.setTexture(texture);
+            sequentialRenderer.setTexture(texture);
             efficientRenderer.setTexture(texture);
         }
     }
@@ -103,15 +107,17 @@ public class ParticleSystemModel {
     }
 
     public void setParticleSystemType(ParticleSystemType particleSystemType) {
-        this.particleSystemType = particleSystemType;
-        switch (particleSystemType) {
-            case ITERATIVE:
-                defaultParticleSystem.setRenderer(iterativeRenderer.getRenderer());
-                break;
-            case EFFICIENT:
-                defaultParticleSystem.setRenderer(efficientRenderer);
-                break;
-        }
+        frame.invokeLater(() -> {
+            this.particleSystemType = particleSystemType;
+            switch (particleSystemType) {
+                case SEQUENTIAL:
+                    defaultParticleSystem.setRenderer(sequentialRenderer.getRenderer());
+                    break;
+                case EFFICIENT:
+                    defaultParticleSystem.setRenderer(efficientRenderer);
+                    break;
+            }
+        });
     }
 
     public ParticleParameters getParameters() {
@@ -122,16 +128,12 @@ public class ParticleSystemModel {
         settings.setParticleParameters(updateSettings);
     }
 
-    public ParticlePositioner getPositioner() {
-        return settings.getParticlePositioner();
+    public PositionParameters getPositioner() {
+        return settings.getPositionParameters();
     }
 
-    public void setPositioner(ParticlePositioner positioner) {
-        settings.setParticlePositioner(positioner);
-    }
-
-    public ParticleRenderer getRenderer() {
-        return settings.getRenderer();
+    public void setPositionParameters(PositionParameters positionParameters) {
+        settings.setPositionParameters(positionParameters);
     }
 
     public float emitSequential(float time, float deltaTime) {
@@ -140,7 +142,7 @@ public class ParticleSystemModel {
                 acceleratedParticleSystem.setPosition(posX, posY);
                 return acceleratedParticleSystem.emitSequential(time, deltaTime);
             case EFFICIENT:
-            case ITERATIVE:
+            case SEQUENTIAL:
                 return defaultParticleSystem.emitSequential(posX, posY, time, deltaTime);
             default:
                 throw new IllegalStateException("Unexpected value: " + particleSystemType);
@@ -154,7 +156,7 @@ public class ParticleSystemModel {
                 acceleratedParticleSystem.emit();
                 break;
             case EFFICIENT:
-            case ITERATIVE:
+            case SEQUENTIAL:
                 defaultParticleSystem.emit(posX, posY);
                 break;
             default:
@@ -169,7 +171,7 @@ public class ParticleSystemModel {
                 acceleratedParticleSystem.emitAll();
                 break;
             case EFFICIENT:
-            case ITERATIVE:
+            case SEQUENTIAL:
                 defaultParticleSystem.emitAll(posX, posY);
                 break;
             default:
@@ -177,14 +179,14 @@ public class ParticleSystemModel {
         }
     }
 
-    public ParticleSystemSettings getSettings() {
+    public ParticleSystemParameters getSettings() {
         return settings;
     }
 
-    public void setSettings(ParticleSystemSettings settings) {
+    public void setSettings(ParticleSystemParameters settings) {
         this.settings = settings;
         defaultParticleSystem.setSettings(settings);
-        acceleratedParticleSystem.setSettings(settings);
+        acceleratedParticleSystem.setParameters(settings);
     }
 
     public void addToLayer(Layer<ParticleSystem> layer) {
@@ -220,18 +222,18 @@ public class ParticleSystemModel {
         if (this.blendMode != blendMode) {
             this.blendMode = blendMode;
             efficientRenderer.setBlendMode(blendMode);
-            iterativeRenderer.setBlendMode(blendMode);
+            sequentialRenderer.setBlendMode(blendMode);
         }
     }
 
     private void updateParticleSize(float width, float height) {
         bounds = Rectangle.centered(width, height);
         efficientRenderer.setBounds(bounds);
-        iterativeRenderer.setBounds(bounds);
+        sequentialRenderer.setBounds(bounds);
     }
 
     public enum ParticleSystemType {
-        ITERATIVE,
+        SEQUENTIAL,
         EFFICIENT,
         ACCELERATED
     }

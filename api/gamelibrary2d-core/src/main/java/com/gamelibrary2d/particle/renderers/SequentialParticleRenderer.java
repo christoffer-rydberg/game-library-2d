@@ -7,12 +7,12 @@ import com.gamelibrary2d.particle.systems.ParticleRenderBuffer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.ShaderParameters;
 
-public class IterativeParticleRenderer implements ParticleRenderer {
+public class SequentialParticleRenderer implements ParticleRenderer {
 
     private final DefaultParticleSystem particleSystem;
     private Renderer renderer;
 
-    public IterativeParticleRenderer(DefaultParticleSystem particleSystem, Renderer renderer) {
+    public SequentialParticleRenderer(DefaultParticleSystem particleSystem, Renderer renderer) {
         this.particleSystem = particleSystem;
         this.renderer = renderer;
     }
@@ -27,8 +27,13 @@ public class IterativeParticleRenderer implements ParticleRenderer {
 
     @Override
     public void render(OpenGLBuffer buffer, boolean gpuOutdated, int offset, int len, float alpha) {
-        var renderBuffer = (ParticleRenderBuffer) buffer;
+        if (!(buffer instanceof ParticleRenderBuffer)) {
+            throw new IllegalArgumentException("Buffer must be of type ParticleRenderBuffer");
+        }
+
         if (renderer != null) {
+            var renderBuffer = (ParticleRenderBuffer) buffer;
+
             ModelMatrix modelMatrix = ModelMatrix.instance();
 
             int end = offset + len;
