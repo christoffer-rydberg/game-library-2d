@@ -6,7 +6,7 @@
 
     <groupId>com.gamelibrary2d</groupId>
     <artifactId>gamelibrary2d-common</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <packaging>jar</packaging>
 
     <properties>

@@ -6,7 +6,7 @@
 
     <groupId>com.gamelibrary2d.demos</groupId>
     <artifactId>particle-system-demo</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,13 +20,13 @@
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-core</artifactId>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-framework-lwjgl</artifactId>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
