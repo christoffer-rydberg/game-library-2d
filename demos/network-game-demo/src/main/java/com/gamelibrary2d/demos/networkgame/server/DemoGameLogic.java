@@ -66,12 +66,13 @@ public class DemoGameLogic {
     }
 
     public void spawn(DemoServerObject obj) {
+        obj.setDestroyed(false);
         obj.addCollisionDetection(collisionDetection);
         server.spawn(obj);
     }
 
     public void destroy(DemoServerObject obj) {
-        obj.onDestroyed();
+        obj.setDestroyed(true);
         collisionDetection.remove(obj);
         server.destroy(obj);
     }

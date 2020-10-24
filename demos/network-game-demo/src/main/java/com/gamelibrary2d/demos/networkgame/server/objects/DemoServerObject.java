@@ -11,7 +11,7 @@ public interface DemoServerObject extends ServerObject {
 
     float getSpeed();
 
-    void onDestroyed();
+    void setDestroyed(boolean destroyed);
 
     boolean isDestroyed();
 

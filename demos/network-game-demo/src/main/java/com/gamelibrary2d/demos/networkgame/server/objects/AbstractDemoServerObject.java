@@ -32,8 +32,8 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
     }
 
     @Override
-    public void onDestroyed() {
-        destroyed = true;
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     @Override
