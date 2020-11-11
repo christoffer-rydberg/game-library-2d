@@ -1,37 +1,36 @@
 package com.gamelibrary2d.demos.networkgame.client;
 
 import com.gamelibrary2d.AbstractGame;
-import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrame;
-import com.gamelibrary2d.demos.networkgame.client.frames.LoadingFrame;
-import com.gamelibrary2d.demos.networkgame.client.frames.MenuFrame;
-import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.*;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
+import com.gamelibrary2d.demos.networkgame.client.urls.Music;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
+import com.gamelibrary2d.framework.Framework;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 import com.gamelibrary2d.sound.SoundManager;
+import com.gamelibrary2d.sound.decoders.AudioDecoder;
+import com.gamelibrary2d.sound.decoders.VorbisDecoder;
 import com.gamelibrary2d.util.sound.MusicPlayer;
 import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.io.IOException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 
 public class DemoGame extends AbstractGame {
-    private ServerManager serverManager;
+    private final ServerManager serverManager;
 
     private Frame menuFrame;
     private LoadingFrame loadingFrame;
     private DemoFrame demoFrame;
+    private CreditsFrame creditsFrame;
 
-    public DemoGame() {
-        super(new Lwjgl_Framework());
+    public DemoGame(Framework framework, ServerManager serverManager) {
+        super(framework);
+        this.serverManager = serverManager;
     }
 
     @Override
@@ -44,11 +43,7 @@ public class DemoGame extends AbstractGame {
         try {
             showSplashScreen();
 
-            serverManager = new ServerManager(createKeyPair("RSA", 2048));
-
-            var soundManager = SoundManager.create(this);
-            loadSoundBuffers(soundManager);
-
+            var soundManager = initializeAudio();
             var musicPlayer = MusicPlayer.create(soundManager, 10, this);
             var soundPlayer = SoundEffectPlayer.create(soundManager, 10);
 
@@ -62,14 +57,12 @@ public class DemoGame extends AbstractGame {
         }
     }
 
-    private KeyPair createKeyPair(String algorithm, int keySize) throws NoSuchAlgorithmException {
-        var keyGen = KeyPairGenerator.getInstance(algorithm);
-        keyGen.initialize(keySize);
-        return keyGen.generateKeyPair();
-    }
-
-    private void loadSoundBuffers(SoundManager soundManager) {
-
+    private SoundManager initializeAudio() throws IOException {
+        var soundManager = SoundManager.create(this);
+        AudioDecoder decoder = new VorbisDecoder();
+        soundManager.loadSoundBuffer(Music.MENU, decoder);
+        soundManager.loadSoundBuffer(Music.GAME, decoder);
+        return soundManager;
     }
 
     private void loadDemoFrame(CommunicatorFactory communicatorFactory) {
@@ -84,6 +77,15 @@ public class DemoGame extends AbstractGame {
     public void goToMenu() {
         try {
             setFrame(menuFrame, FrameDisposal.UNLOAD);
+            serverManager.stopHostedServer();
+        } catch (InitializationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void goToCredits() {
+        try {
+            setFrame(creditsFrame, FrameDisposal.UNLOAD);
             serverManager.stopHostedServer();
         } catch (InitializationException e) {
             e.printStackTrace();
@@ -109,7 +111,7 @@ public class DemoGame extends AbstractGame {
         renderFrame();
     }
 
-    private void createGlobalResources() throws IOException {
+    private void createGlobalResources() {
         Fonts.create(this);
         Surfaces.create(this);
         Textures.create(this);
@@ -119,15 +121,19 @@ public class DemoGame extends AbstractGame {
         loadingFrame = new LoadingFrame(this);
         loadingFrame.initialize(this);
 
-        menuFrame = new MenuFrame(musicPlayer, soundPlayer, this);
+        menuFrame = new MenuFrame(this, musicPlayer, soundPlayer);
         menuFrame.initialize(this);
 
-        demoFrame = new DemoFrame(this);
+        demoFrame = new DemoFrame(this, musicPlayer, soundPlayer);
         demoFrame.initialize(this);
+
+        creditsFrame = new CreditsFrame(this);
+        creditsFrame.initialize(this);
     }
 
     @Override
     protected void onExit() {
         serverManager.stopHostedServer();
+        demoFrame.disconnect();
     }
 }

@@ -148,7 +148,12 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void onDisconnected(Communicator communicator, boolean pending) {
         log(String.format("Connection lost: %s", communicator.getEndpoint()));
-        clientStateService.remove(communicator);
+        var clientState = clientStateService.remove(communicator);
+        if (clientState != null) {
+            for (var player : clientState.getPlayers()) {
+                gameLogic.destroy(player);
+            }
+        }
     }
 
     @Override

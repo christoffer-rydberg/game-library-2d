@@ -5,8 +5,8 @@ import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 
 public abstract class AbstractPlayer extends AbstractClientObject {
 
-    protected AbstractPlayer(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, true, buffer);
+    protected AbstractPlayer(byte primaryType, DemoFrameClient client, DataBuffer buffer) {
+        super(primaryType, client, true, buffer);
         getParticleHotspot().set(0, -30);
     }
 }

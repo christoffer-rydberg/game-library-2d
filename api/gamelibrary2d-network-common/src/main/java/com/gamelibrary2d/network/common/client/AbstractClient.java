@@ -83,12 +83,17 @@ public abstract class AbstractClient implements Client {
     public CommunicationContext initialize()
             throws NetworkConnectionException, NetworkAuthenticationException, NetworkInitializationException {
         var communicator = connectCommunicator();
-        reallocateOutgoingBuffer(communicator);
-        var context = new DefaultCommunicationContext();
-        authenticate(context, communicator);
-        initialize(context, communicator);
-        context.register(communicatorKey, communicator);
-        return context;
+        try {
+            reallocateOutgoingBuffer(communicator);
+            var context = new DefaultCommunicationContext();
+            authenticate(context, communicator);
+            initialize(context, communicator);
+            context.register(communicatorKey, communicator);
+            return context;
+        } catch (Exception e) {
+            communicator.disconnect(e);
+            throw e;
+        }
     }
 
     private Communicator connectCommunicator() throws NetworkConnectionException {

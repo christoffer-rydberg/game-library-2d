@@ -36,9 +36,11 @@ public class DemoGameLogic {
 
         var center = settings.getGameBounds().center();
 
-        for (var player : players) {
+        for (byte i = 0; i < players.size(); ++i) {
+            var player = players.get(i);
             player.setPosition(center);
             player.setDirection(RandomInstance.get().nextFloat() * 360f);
+            player.setSecondaryType(i);
             spawn(player);
         }
 
@@ -72,8 +74,10 @@ public class DemoGameLogic {
     }
 
     public void destroy(DemoServerObject obj) {
-        obj.setDestroyed(true);
-        collisionDetection.remove(obj);
-        server.destroy(obj);
+        if (!obj.isDestroyed()) {
+            obj.setDestroyed(true);
+            collisionDetection.remove(obj);
+            server.destroy(obj);
+        }
     }
 }

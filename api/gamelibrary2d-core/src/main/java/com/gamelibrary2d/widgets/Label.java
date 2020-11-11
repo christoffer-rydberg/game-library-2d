@@ -57,7 +57,14 @@ public class Label implements Renderable {
     }
 
     private static int getNewLineSize(String text, int index) {
-        return text.charAt(index) == '\n' ? 1 : 0;
+        if (text.charAt(index) == '\n') {
+            return 1;
+        } else if (text.charAt(index) == '\r') {
+            var next = index + 1;
+            return next < text.length() && text.charAt(next) == '\n' ? 2 : 1;
+        } else {
+            return 0;
+        }
     }
 
     public Color getColor() {

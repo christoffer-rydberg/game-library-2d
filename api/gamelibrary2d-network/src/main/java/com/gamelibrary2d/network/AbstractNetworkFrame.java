@@ -11,6 +11,7 @@ import com.gamelibrary2d.network.common.initialization.CommunicationContext;
 
 public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFrame {
     private final Object clientContextKey = new Object();
+
     private T client;
 
     protected AbstractNetworkFrame() {
@@ -27,6 +28,12 @@ public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFra
 
     protected void setClient(T client) {
         this.client = client;
+    }
+
+    public void disconnect() {
+        if (client != null) {
+            client.disconnect();
+        }
     }
 
     @Override

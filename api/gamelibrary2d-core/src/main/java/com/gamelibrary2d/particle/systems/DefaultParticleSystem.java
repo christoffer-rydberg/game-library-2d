@@ -47,7 +47,7 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
             ParticleSystemParameters parameters,
             ParticleRenderer renderer,
             Disposer disposer) {
-        return create(parameters, renderer, ParticleSystemParameters.estimateCapacity(parameters), disposer);
+        return create(parameters, renderer, parameters.estimateCapacity(), disposer);
     }
 
     public static DefaultParticleSystem create(

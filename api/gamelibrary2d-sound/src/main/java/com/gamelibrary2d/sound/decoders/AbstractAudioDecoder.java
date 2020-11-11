@@ -20,7 +20,6 @@ public abstract class AbstractAudioDecoder implements AudioDecoder {
      * @throws IOException If an I/O error occurs.
      */
     private static ByteBuffer load(URL src) throws IOException {
-
         var byteBuffer = new DynamicByteBuffer();
         Read.bytes(src.openStream(), true, byteBuffer);
         byteBuffer.flip();

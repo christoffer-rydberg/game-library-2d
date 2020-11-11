@@ -38,7 +38,10 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
                 try {
                     // Disable Nagle's algorithm
                     channel.socket().setTcpNoDelay(true);
-                    addConnectedCommunicator(new ServerSideCommunicator(networkService, channel, this::configureClientAuthentication));
+                    addConnectedCommunicator(new ServerSideCommunicator(
+                            networkService,
+                            channel,
+                            this::configureClientAuthentication));
                 } catch (IOException e) {
                     networkService.disconnect(channel);
                     onConnectionFailed(endpoint, e);

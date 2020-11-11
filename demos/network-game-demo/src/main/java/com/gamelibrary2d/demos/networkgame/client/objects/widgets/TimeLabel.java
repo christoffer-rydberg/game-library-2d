@@ -1,5 +1,6 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.widgets;
 
+import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
@@ -10,6 +11,7 @@ public class TimeLabel extends AbstractGameObject<Label> {
 
     public TimeLabel(TextRenderer textRenderer) {
         var label = new Label(textRenderer);
+        label.setColor(Color.LAVENDER);
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         setContent(label);
         setTime(0, 0);

@@ -1,16 +1,18 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.Point;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.GameObject;
 
 public interface ClientObject extends GameObject {
 
     int getId();
 
-    byte getObjectIdentifier();
+    byte getPrimaryType();
+
+    byte getSecondaryType();
 
     Point getParticleHotspot();
 
@@ -22,9 +24,9 @@ public interface ClientObject extends GameObject {
 
     void setContent(Renderable content);
 
-    void setUpdateAction(Updatable updateAction);
+    void setUpdateEffect(DurationEffect updateEffect);
 
-    void setDestroyAction(ParameterizedAction<ClientObject> destroyAction);
+    void setDestroyedEffect(InstantEffect destroyedEffect);
 
     void destroy();
 }

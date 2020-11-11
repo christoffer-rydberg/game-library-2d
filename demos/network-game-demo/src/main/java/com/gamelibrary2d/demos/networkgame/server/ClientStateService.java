@@ -24,8 +24,8 @@ public class ClientStateService {
         return new ArrayList<>(clientStates.values());
     }
 
-    public void remove(Communicator communicator) {
-        clientStates.remove(communicator);
+    public ClientState remove(Communicator communicator) {
+        return clientStates.remove(communicator);
     }
 
     public int size() {

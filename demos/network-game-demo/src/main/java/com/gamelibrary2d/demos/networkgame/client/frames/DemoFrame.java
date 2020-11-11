@@ -3,37 +3,27 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.functional.Func;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
-import com.gamelibrary2d.common.io.SaveLoadManager;
-import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.ContentMap;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.EffectMap;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.TextureMap;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.PictureFrame;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
-import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
-import com.gamelibrary2d.demos.networkgame.client.urls.Particles;
+import com.gamelibrary2d.demos.networkgame.client.urls.Images;
+import com.gamelibrary2d.demos.networkgame.client.urls.Music;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
-import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.network.AbstractNetworkFrame;
-import com.gamelibrary2d.objects.DefaultGameObject;
-import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
-import com.gamelibrary2d.particle.renderers.ParticleRenderer;
-import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
-import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
-import com.gamelibrary2d.particle.systems.ParticleSystem;
-import com.gamelibrary2d.renderers.QuadsRenderer;
-import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultFont;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.updaters.DurationUpdater;
@@ -42,118 +32,48 @@ import com.gamelibrary2d.updaters.ParallelUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
 import com.gamelibrary2d.updates.EmptyUpdate;
 import com.gamelibrary2d.updates.ScaleUpdate;
-import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.QuadShape;
+import com.gamelibrary2d.util.sound.MusicPlayer;
+import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private final DemoGame game;
 
-    private final Map<Byte, Renderable> contents = new HashMap<>();
-    private final Map<Byte, Func<ClientObject, Updatable>> updateActions = new HashMap<>();
-    private final Map<Byte, ParameterizedAction<ClientObject>> destroyActions = new HashMap<>();
-
-    private final Layer<Renderable> backgroundLayer = new BasicLayer<>();
     private final DefaultLayerObject<Renderable> gameLayer = new DefaultLayerObject<>();
+    private final Layer<Renderable> backgroundLayer = new BasicLayer<>();
     private final Layer<Renderable> backgroundEffects = new BasicLayer<>();
     private final Layer<ClientObject> objectLayer = new BasicLayer<>();
     private final Layer<Renderable> foregroundEffects = new BasicLayer<>();
 
-    private TimeLabel timeLabel;
+    private final EffectMap effects = new EffectMap();
+    private final TextureMap textures = new TextureMap();
+    private final ContentMap content = new ContentMap();
 
+    private final MusicPlayer musicPlayer;
+    private final SoundEffectPlayer soundPlayer;
+
+    private Texture background;
+    private TimeLabel timeLabel;
     private GameSettings gameSettings;
 
-    public DemoFrame(DemoGame game) {
+    public DemoFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
         this.game = game;
+        this.musicPlayer = musicPlayer;
+        this.soundPlayer = soundPlayer;
         setClient(new DemoFrameClient(this));
-    }
-
-    private DefaultParticleSystem loadParticleSystem(
-            InitializationContext context, URL url, ParticleRenderer renderer)
-            throws IOException {
-        var settings = new SaveLoadManager().load(url, ParticleSystemParameters::new);
-        var particleSystem = DefaultParticleSystem.create(settings, renderer, this);
-        context.register(url, particleSystem);
-        return particleSystem;
-    }
-
-    private DefaultParticleSystem loadParticleSystem(InitializationContext context, URL url)
-            throws IOException {
-        return loadParticleSystem(context, url, new EfficientParticleRenderer());
-    }
-
-    private void initializeUpdateParticles(byte objectIdentifier, DefaultParticleSystem particleSystem) {
-        updateActions.put(objectIdentifier, obj -> {
-            var particleEmitter = new SequentialParticleEmitter(particleSystem);
-            return deltaTime -> {
-                particleEmitter.getPosition().set(obj.getParticleHotspot());
-                particleEmitter.getPosition().rotate(obj.getDirection());
-                particleEmitter.getPosition().add(obj.getPosition());
-                particleEmitter.update(deltaTime);
-            };
-        });
-    }
-
-    private void initializeDestructionParticles(byte objectIdentifier, DefaultParticleSystem particleSystem) {
-        destroyActions.put(objectIdentifier, obj -> {
-            var pos = obj.getPosition();
-            particleSystem.emitAll(pos.getX(), pos.getY());
-        });
-    }
-
-    private Renderable createStars(int count, Rectangle bounds) {
-        var random = RandomInstance.get();
-        float[] positions = new float[count * 2];
-        for (int i = 0; i < count; ++i) {
-            var x = bounds.xMin() + random.nextFloat() * bounds.width();
-            var y = bounds.yMin() + random.nextFloat() * bounds.height();
-            var index = i * 2;
-            positions[index] = x;
-            positions[index + 1] = y;
-        }
-
-        var starPositions = PositionBuffer.create(positions, this);
-        var starsRenderer = new QuadsRenderer(Rectangle.centered(6f, 6f));
-        starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
-        starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
-
-        return a -> starsRenderer.render(a, starPositions, 0, starPositions.getCapacity());
     }
 
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
-        var portalPS = loadParticleSystem(context, Particles.PORTAL);
-        initializeUpdateParticles(ObjectIdentifiers.PORTAL, portalPS);
+        background = DefaultTexture.create(Images.BACKGROUND, this);
 
-        var boulderPS = loadParticleSystem(context, Particles.BOULDER);
-        initializeUpdateParticles(ObjectIdentifiers.BOULDER, boulderPS);
-
-        var enginePS = loadParticleSystem(context, Particles.ENGINE);
-        initializeUpdateParticles(ObjectIdentifiers.PLAYER, enginePS);
-
-        var shockwavePS = loadParticleSystem(context, Particles.SHOCK_WAVE);
-
-        var renderer = new EfficientParticleRenderer();
-        renderer.setBlendMode(BlendMode.TRANSPARENT);
-        renderer.setTexture(Textures.boulder());
-        var boulderExplosionPS = loadParticleSystem(context, Particles.BOULDER_EXPLOSION, renderer);
+        textures.initialize(this);
+        effects.initialize(textures, this);
 
         var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
         timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
         timeLabel.setPosition(game.getWindow().width() / 2f, 9 * game.getWindow().height() / 10f);
-
-        destroyActions.put(ObjectIdentifiers.BOULDER, obj -> {
-            var pos = obj.getPosition();
-            shockwavePS.emitAll(pos.getX(), pos.getY());
-            boulderExplosionPS.emitAll(pos.getX(), pos.getY());
-        });
-
-        var explosionPS = loadParticleSystem(context, Particles.EXPLOSION);
-        initializeDestructionParticles(ObjectIdentifiers.PLAYER, explosionPS);
     }
 
     @Override
@@ -163,12 +83,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
 
     @Override
     protected void onLoaded(InitializationContext context) {
-        backgroundEffects.add(context.get(ParticleSystem.class, Particles.PORTAL));
-        backgroundEffects.add(context.get(ParticleSystem.class, Particles.BOULDER));
-
-        foregroundEffects.add(context.get(ParticleSystem.class, Particles.ENGINE));
-        foregroundEffects.add(context.get(ParticleSystem.class, Particles.EXPLOSION));
-        foregroundEffects.add(context.get(ParticleSystem.class, Particles.SHOCK_WAVE));
+        effects.onLoaded(backgroundEffects, foregroundEffects);
 
         gameLayer.add(backgroundEffects);
         gameLayer.add(objectLayer);
@@ -188,53 +103,51 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         var scale = Math.min(windowWidth / gameBounds.width(), windowHeight / gameBounds.height());
         var scaledGameBounds = Rectangle.centered(gameBounds.width(), gameBounds.height()).resize(scale);
 
-        var background = createBackground(
-                scaledGameBounds,
-                windowWidth / 2f,
-                windowHeight / 2f);
-
         gameLayer.setScale(scale, scale);
         gameLayer.setPosition(
                 windowWidth / 2f + scaledGameBounds.xMin(),
                 windowHeight / 2f + scaledGameBounds.yMin());
 
-        contents.put(ObjectIdentifiers.PLAYER, createRenderer(
-                gameSettings.getSpaceCraftBounds().resize(2f),
-                Textures.spacecraft()));
+        content.initialize(gameSettings, textures, this);
 
-        contents.put(ObjectIdentifiers.BOULDER, createRenderer(
-                gameSettings.getBoulderBounds().resize(1.25f),
-                Textures.boulder()));
-
-        backgroundLayer.add(background);
+        backgroundLayer.add(createBackground(
+                new Rectangle(0, 0, windowWidth, windowHeight),
+                scaledGameBounds.move(windowWidth / 2f, windowHeight / 2f)));
     }
 
     @Override
     protected void onBegin() {
-        game.setBackgroundColor(Color.WHITE);
+        musicPlayer.play(Music.GAME, 0.5f, 1f, false);
     }
 
     @Override
     protected void onEnd() {
-        game.setBackgroundColor(Color.BLACK);
+        musicPlayer.stop(1f);
     }
 
-    private Renderable createBackground(Rectangle bounds, float posX, float posY) {
-        var background = new SurfaceRenderer(Quad.create(bounds, this));
-        background.getParameters().setRgb(0f, 0f, 0f);
-        var stars = createStars(Math.round(bounds.area() * 0.0005f), bounds);
+    private Renderable createBackground(Rectangle windowBounds, Rectangle gameBounds) {
+        var gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.SAND, this);
 
-        var space = new DefaultGameObject<>(a -> {
-            background.render(a);
-            stars.render(a);
-        });
-        space.setPosition(posX, posY);
+        var imageRatio = background.getWidth() / background.getHeight();
 
-        return space;
-    }
+        var gameBoundsWidth = gameBounds.width();
+        var gameBoundsHeight = gameBounds.height();
 
-    private Renderer createRenderer(Rectangle bounds, Texture texture) {
-        return new SurfaceRenderer(Quad.create(bounds, this), texture);
+        var width = Math.max(gameBounds.width(), gameBoundsHeight * imageRatio);
+        var height = Math.max(gameBounds.height(), gameBoundsWidth / imageRatio);
+
+        var paddedBackgroundBounds = gameBounds.pad(
+                (width - gameBoundsWidth) / 2f,
+                (height - gameBoundsHeight) / 2f);
+
+        var backgroundImage = new SurfaceRenderer(
+                Quad.create(paddedBackgroundBounds, this),
+                background);
+
+        return alpha -> {
+            backgroundImage.render(alpha);
+            gameFrame.render(alpha);
+        };
     }
 
     void destroy(ClientObject obj) {
@@ -246,14 +159,9 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         obj.setScale(0f);
         runUpdater(new DurationUpdater(1f, new ScaleUpdate(obj, 1f)));
 
-        obj.setContent(contents.get(obj.getObjectIdentifier()));
-
-        var updateActionFactory = updateActions.get(obj.getObjectIdentifier());
-        if (updateActionFactory != null) {
-            obj.setUpdateAction(updateActionFactory.invoke(obj));
-        }
-
-        obj.setDestroyAction(destroyActions.get(obj.getObjectIdentifier()));
+        obj.setContent(content.get(obj));
+        obj.setUpdateEffect(effects.getUpdate(obj));
+        obj.setDestroyedEffect(effects.getDestroyed(obj));
 
         objectLayer.add(obj);
     }
@@ -271,7 +179,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
                         2f,
                         true,
                         new SuckedIntoPortalUpdate(obj, portalPosition)))
-                .forEach(updater -> parallelUpdater.add(updater));
+                .forEach(parallelUpdater::add);
 
         var sequentialUpdater = new SequentialUpdater();
         sequentialUpdater.add(new DurationUpdater(1.5f, new EmptyUpdate()));
@@ -292,7 +200,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
         timeLabel.setTimeFromSeconds(seconds);
     }
 
-    private class SuckedIntoPortalUpdate implements Updatable {
+    private static class SuckedIntoPortalUpdate implements Updatable {
         private final ClientObject target;
         private final float originX;
         private final float originY;

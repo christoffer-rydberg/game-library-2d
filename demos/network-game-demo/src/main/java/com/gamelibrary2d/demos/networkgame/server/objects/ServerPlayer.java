@@ -7,7 +7,7 @@ import com.gamelibrary2d.collision.handlers.RestrictedAreaHandler;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
+import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
 import com.gamelibrary2d.demos.networkgame.common.RotationDirection;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 import com.gamelibrary2d.network.common.Communicator;
@@ -20,11 +20,16 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
     private RotationDirection rotationDirection = RotationDirection.NONE;
 
     public ServerPlayer(DemoGameLogic gameLogic, Communicator communicator, Rectangle bounds) {
-        super(ObjectIdentifiers.PLAYER);
+        super(ObjectTypes.PLAYER);
         this.gameLogic = gameLogic;
         this.communicator = communicator;
         this.setBounds(bounds);
         setSpeedAndDirection(100f, RandomInstance.get().nextFloat() * 360f);
+    }
+
+    @Override
+    public void setSecondaryType(byte secondaryType) {
+        super.setSecondaryType(secondaryType);
     }
 
     @Override
@@ -64,8 +69,8 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
 
     @Override
     public void onPushed(Obstacle pusher, float accelerationX, float accelerationY) {
-        if (pusher instanceof ServerBoulder) {
-            gameLogic.destroy((ServerBoulder) pusher);
+        if (pusher instanceof ServerObstacle) {
+            gameLogic.destroy((ServerObstacle) pusher);
             gameLogic.destroy(this);
         } else {
             accelerate(accelerationX, accelerationY);

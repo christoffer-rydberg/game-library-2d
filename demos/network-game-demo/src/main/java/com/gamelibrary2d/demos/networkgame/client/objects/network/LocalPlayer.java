@@ -11,8 +11,8 @@ public class LocalPlayer extends AbstractPlayer {
     private final InputController controller;
     private final PlayerRotation rotation;
 
-    public LocalPlayer(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, buffer);
+    public LocalPlayer(byte primaryType, DemoFrameClient client, DataBuffer buffer) {
+        super(primaryType, client, buffer);
 
         rotation = new PlayerRotation(client, getId());
 

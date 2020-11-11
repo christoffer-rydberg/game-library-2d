@@ -5,7 +5,8 @@ import com.gamelibrary2d.collision.CollisionResult;
 import com.gamelibrary2d.collision.Obstacle;
 import com.gamelibrary2d.collision.handlers.DefaultCollisionHandler;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.demos.networkgame.common.ObjectIdentifiers;
+import com.gamelibrary2d.common.random.RandomInstance;
+import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 
 public class ServerPortal extends AbstractDemoServerObject {
@@ -16,7 +17,7 @@ public class ServerPortal extends AbstractDemoServerObject {
     private boolean collided;
 
     public ServerPortal(DemoGameLogic gameLogic, Rectangle bounds) {
-        super(ObjectIdentifiers.PORTAL);
+        super(ObjectTypes.PORTAL);
         this.gameLogic = gameLogic;
         setBounds(bounds);
     }
@@ -27,7 +28,8 @@ public class ServerPortal extends AbstractDemoServerObject {
         super.update(deltaTime);
 
         if (!collided && spawnTimer > SPAWN_RATE) {
-            var boulder = new ServerBoulder(gameLogic.getGameSettings().getBoulderBounds());
+            var type = RandomInstance.get().nextInt(2);
+            var boulder = new ServerObstacle((byte) type, gameLogic.getGameSettings().getBoulderBounds());
             boulder.setPosition(getPosition());
             gameLogic.spawn(boulder);
             spawnTimer -= SPAWN_RATE;

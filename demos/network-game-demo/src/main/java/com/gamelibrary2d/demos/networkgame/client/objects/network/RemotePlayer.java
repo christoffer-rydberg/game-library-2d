@@ -5,8 +5,8 @@ import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 
 public class RemotePlayer extends AbstractPlayer {
 
-    public RemotePlayer(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, buffer);
+    public RemotePlayer(byte primaryType, DemoFrameClient client, DataBuffer buffer) {
+        super(primaryType, client, buffer);
     }
 
 }

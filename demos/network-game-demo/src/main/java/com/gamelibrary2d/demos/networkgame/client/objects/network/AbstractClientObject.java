@@ -1,9 +1,10 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.Point;
-import com.gamelibrary2d.common.functional.ParameterizedAction;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractGameObject;
@@ -15,7 +16,8 @@ public abstract class AbstractClientObject
         extends AbstractGameObject<Renderable> implements ClientObject, Updatable, DirectionAware {
 
     private final int id;
-    private final byte objectIdentifier;
+    private final byte primaryType;
+    private final byte secondaryType;
     private final DemoFrameClient client;
     private final boolean autoRotate;
     private final PositionInterpolator positionInterpolator = new PositionInterpolator(this);
@@ -23,13 +25,14 @@ public abstract class AbstractClientObject
     private final Point particleHotspot = new Point();
 
     private float direction;
-    private Updatable updateAction;
-    private ParameterizedAction<ClientObject> destroyAction;
+    private DurationEffect updateEffect;
+    private InstantEffect destroyedEffect;
 
-    protected AbstractClientObject(byte objectIdentifier, DemoFrameClient client, boolean autoRotate, DataBuffer buffer) {
+    protected AbstractClientObject(byte primaryType, DemoFrameClient client, boolean autoRotate, DataBuffer buffer) {
+        this.primaryType = primaryType;
         this.client = client;
-        this.objectIdentifier = objectIdentifier;
         this.autoRotate = autoRotate;
+        this.secondaryType = buffer.get();
         id = buffer.getInt();
         setPosition(buffer.getFloat(), buffer.getFloat());
     }
@@ -40,8 +43,13 @@ public abstract class AbstractClientObject
     }
 
     @Override
-    public byte getObjectIdentifier() {
-        return objectIdentifier;
+    public byte getPrimaryType() {
+        return primaryType;
+    }
+
+    @Override
+    public byte getSecondaryType() {
+        return secondaryType;
     }
 
     @Override
@@ -50,8 +58,8 @@ public abstract class AbstractClientObject
     }
 
     @Override
-    public void setUpdateAction(Updatable updateAction) {
-        this.updateAction = updateAction;
+    public void setUpdateEffect(DurationEffect updateEffect) {
+        this.updateEffect = updateEffect;
     }
 
     @Override
@@ -60,14 +68,14 @@ public abstract class AbstractClientObject
     }
 
     @Override
-    public void setDestroyAction(ParameterizedAction<ClientObject> destroyAction) {
-        this.destroyAction = destroyAction;
+    public void setDestroyedEffect(InstantEffect destroyedEffect) {
+        this.destroyedEffect = destroyedEffect;
     }
 
     @Override
     public void destroy() {
-        if (destroyAction != null) {
-            destroyAction.invoke(this);
+        if (destroyedEffect != null) {
+            destroyedEffect.onUpdate(this);
         }
     }
 
@@ -76,8 +84,8 @@ public abstract class AbstractClientObject
         positionInterpolator.update(deltaTime);
         directionInterpolation.update(deltaTime);
 
-        if (updateAction != null) {
-            updateAction.update(deltaTime);
+        if (updateEffect != null) {
+            updateEffect.onUpdate(this, deltaTime);
         }
 
         var content = getContent();

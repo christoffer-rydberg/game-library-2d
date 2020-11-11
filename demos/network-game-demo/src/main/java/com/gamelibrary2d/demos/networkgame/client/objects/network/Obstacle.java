@@ -4,12 +4,11 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
 
-public class Boulder extends AbstractClientObject {
-
+public class Obstacle extends AbstractClientObject {
     private float rotationSpeed;
 
-    public Boulder(byte objectIdentifier, DemoFrameClient client, DataBuffer buffer) {
-        super(objectIdentifier, client, false, buffer);
+    public Obstacle(byte primaryType, DemoFrameClient client, DataBuffer buffer) {
+        super(primaryType, client, false, buffer);
         randomizeRotationSpeed();
     }
 

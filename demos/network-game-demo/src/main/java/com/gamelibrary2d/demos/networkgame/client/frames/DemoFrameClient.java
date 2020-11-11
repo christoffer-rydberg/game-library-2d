@@ -96,21 +96,21 @@ public class DemoFrameClient extends AbstractClient {
         frame.gameEnded();
     }
 
-    private ClientObject readObject(byte id, DataBuffer buffer) {
-        switch (id) {
-            case ObjectIdentifiers.BOULDER:
-                return new Boulder(id, this, buffer);
-            case ObjectIdentifiers.PLAYER:
+    private ClientObject readObject(byte primaryType, DataBuffer buffer) {
+        switch (primaryType) {
+            case ObjectTypes.OBSTACLE:
+                return new Obstacle(primaryType, this, buffer);
+            case ObjectTypes.PLAYER:
                 var isLocal = buffer.getBool();
                 if (isLocal) {
-                    return new LocalPlayer(id, this, buffer);
+                    return new LocalPlayer(primaryType, this, buffer);
                 } else {
-                    return new RemotePlayer(id, this, buffer);
+                    return new RemotePlayer(primaryType, this, buffer);
                 }
-            case ObjectIdentifiers.PORTAL:
-                return new Portal(id, this, buffer);
+            case ObjectTypes.PORTAL:
+                return new Portal(primaryType, this, buffer);
             default:
-                throw new IllegalStateException("Unexpected value: " + id);
+                throw new IllegalStateException("Unexpected value: " + primaryType);
         }
     }
 
