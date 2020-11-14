@@ -39,7 +39,7 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
-        Texture ballTexture = DefaultTexture.create(Ball.class.getClassLoader().getResource("ball.png"), this);
+        Texture ballTexture = DefaultTexture.create(Ball.class.getResource("/ball.png"), this);
         ballSurface = Quad.create(Rectangle.centered(32, 32), this);
         ballRenderer = new SurfaceRenderer(ballSurface, ballTexture);
         ballRenderer.getParameters().setRgb(152f / 255f, 251f / 255f, 152f / 255f);

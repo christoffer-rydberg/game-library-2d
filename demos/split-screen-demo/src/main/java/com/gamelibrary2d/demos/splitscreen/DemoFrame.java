@@ -175,7 +175,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
             spaceCraftQuad = Quad.create(Rectangle.centered(64, 64), this);
 
             spaceCraftTexture = DefaultTexture.create(
-                    getClass().getClassLoader().getResource("spacecraft.png"),
+                    getClass().getResource("/spacecraft.png"),
                     this);
 
             spaceCrafts = new ArrayList<>();

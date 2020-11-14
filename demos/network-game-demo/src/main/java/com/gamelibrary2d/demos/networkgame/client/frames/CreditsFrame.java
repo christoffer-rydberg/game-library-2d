@@ -27,7 +27,7 @@ public class CreditsFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
-        var url = CreditsFrame.class.getClassLoader().getResource("credits.txt");
+        var url = CreditsFrame.class.getResource("/credits.txt");
         var text = Read.text(url, StandardCharsets.UTF_8);
         var label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
         credits = new DefaultGameObject<>(label);

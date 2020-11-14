@@ -42,7 +42,7 @@ class ParticleSystemFactory {
                 goalColors);
 
         ShaderProgram updateProgram = ShaderProgram.create(disposer);
-        updateProgram.attachShader(DefaultShader.fromFile("Shaders/ParticleUpdater.compute", ShaderType.COMPUTE, disposer));
+        updateProgram.attachShader(DefaultShader.fromFile("shaders/ParticleUpdater.compute", ShaderType.COMPUTE, disposer));
         updateProgram.initialize();
         setUniforms(updateProgram);
 

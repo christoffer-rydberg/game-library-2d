@@ -74,7 +74,7 @@ public class DemoFrame extends AbstractFrame {
 
             // Example of particle system settings loaded from file:
             var explosionSystemSettings = new SaveLoadManager().load(
-                    getClass().getClassLoader().getResource("explosion.particle"),
+                    getClass().getResource("/explosion.particle"),
                     ParticleSystemParameters::new);
 
             explosionSystem = DefaultParticleSystem.create(explosionSystemSettings, this);
