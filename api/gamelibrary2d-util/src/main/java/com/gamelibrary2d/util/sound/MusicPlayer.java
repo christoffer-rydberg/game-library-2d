@@ -13,7 +13,7 @@ import com.gamelibrary2d.updates.EmptyUpdate;
 import java.net.URL;
 
 public class MusicPlayer {
-    private final SoundManager manager;
+    private final SoundManager soundManager;
     private final SoundSource[] source;
     private final SequentialUpdater[] updaters;
     private final int channels;
@@ -23,7 +23,7 @@ public class MusicPlayer {
     private SoundBuffer activeBuffer;
 
     private MusicPlayer(Frame frame, SoundManager manager, int channels) {
-        this.manager = manager;
+        this.soundManager = manager;
         this.channels = channels;
         source = new SoundSource[channels];
         updaters = new SequentialUpdater[channels];
@@ -38,6 +38,10 @@ public class MusicPlayer {
         var musicManager = new MusicPlayer(game.getFrame(), manager, channels);
         game.addFrameChangedListener(musicManager::setFrame);
         return musicManager;
+    }
+
+    public SoundManager getSoundManager() {
+        return soundManager;
     }
 
     private void setFrame(Frame frame) {
@@ -61,7 +65,7 @@ public class MusicPlayer {
     }
 
     public boolean isPlaying(URL musicUrl) {
-        return isPlaying() && manager.getSoundBuffer(musicUrl) == activeBuffer;
+        return isPlaying() && soundManager.getSoundBuffer(musicUrl) == activeBuffer;
     }
 
     public boolean stop(float fadeOutTime) {
@@ -76,7 +80,7 @@ public class MusicPlayer {
 
         activeBuffer = null;
 
-        updater.add(SoundUpdaterFactory.createFadeOutUpdater(manager, source, fadeOutTime, false));
+        updater.add(SoundUpdaterFactory.createFadeOutUpdater(soundManager, source, fadeOutTime, false));
 
         frame.runUpdater(updater, false);
 
@@ -98,7 +102,7 @@ public class MusicPlayer {
 
         activeBuffer = null;
 
-        updater.add(SoundUpdaterFactory.createFadeOutUpdater(manager, source, fadeOutTime, true));
+        updater.add(SoundUpdaterFactory.createFadeOutUpdater(soundManager, source, fadeOutTime, true));
 
         frame.runUpdater(updater, false);
 
@@ -136,7 +140,7 @@ public class MusicPlayer {
             updater.add(new DurationUpdater(fadeInTime, new EmptyUpdate()));
         }
 
-        updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume, fadeInTime));
+        updater.add(SoundUpdaterFactory.createFadeInUpdater(soundManager, source, volume, fadeInTime));
 
         frame.runUpdater(updater, false);
 
@@ -146,7 +150,7 @@ public class MusicPlayer {
     public void play(URL url, float volume, float fadeInTime, boolean pausePrevious) {
         boolean stopped = pausePrevious ? pause(fadeInTime / 2) : stop(fadeInTime / 2);
 
-        activeBuffer = manager.getSoundBuffer(url);
+        activeBuffer = soundManager.getSoundBuffer(url);
 
         if (activeBuffer == null) {
             return;
@@ -155,7 +159,7 @@ public class MusicPlayer {
         SoundSource source = getSource();
         SequentialUpdater updater = getUpdater();
         updater.add(new InstantUpdater(dt -> source.setSoundBuffer(activeBuffer)));
-        updater.add(SoundUpdaterFactory.createFadeInUpdater(manager, source, volume,
+        updater.add(SoundUpdaterFactory.createFadeInUpdater(soundManager, source, volume,
                 stopped ? fadeInTime / 2 : fadeInTime));
         frame.runUpdater(updater, false);
     }
@@ -172,7 +176,7 @@ public class MusicPlayer {
         moveToPreviousChannel();
         SoundSource source = getSource();
         var buffer = source.getSoundBuffer();
-        var wantedBuffer = manager.getSoundBuffer(musicUrl);
+        var wantedBuffer = soundManager.getSoundBuffer(musicUrl);
         moveToNextChannel();
         return buffer != null && buffer == wantedBuffer;
     }

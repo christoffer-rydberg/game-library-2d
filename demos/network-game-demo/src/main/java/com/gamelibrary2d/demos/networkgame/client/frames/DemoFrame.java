@@ -7,6 +7,7 @@ import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.ContentMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.EffectMap;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.TextureMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.PictureFrame;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
@@ -46,12 +47,12 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     private final Layer<ClientObject> objectLayer = new BasicLayer<>();
     private final Layer<Renderable> foregroundEffects = new BasicLayer<>();
 
-    private final EffectMap effects = new EffectMap();
+    private final SoundMap sounds;
+    private final EffectMap effects;
     private final TextureMap textures = new TextureMap();
     private final ContentMap content = new ContentMap();
 
     private final MusicPlayer musicPlayer;
-    private final SoundEffectPlayer soundPlayer;
 
     private Texture background;
     private TimeLabel timeLabel;
@@ -60,7 +61,8 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     public DemoFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
         this.game = game;
         this.musicPlayer = musicPlayer;
-        this.soundPlayer = soundPlayer;
+        this.sounds = new SoundMap(soundPlayer.getSoundManager());
+        this.effects = new EffectMap(sounds, soundPlayer);
         setClient(new DemoFrameClient(this));
     }
 
@@ -68,6 +70,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     protected void onInitialize(InitializationContext context) throws IOException {
         background = DefaultTexture.create(Images.BACKGROUND, this);
 
+        sounds.initialize();
         textures.initialize(this);
         effects.initialize(textures, this);
 
@@ -126,7 +129,7 @@ public class DemoFrame extends AbstractNetworkFrame<DemoFrameClient> {
     }
 
     private Renderable createBackground(Rectangle windowBounds, Rectangle gameBounds) {
-        var gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.SAND, this);
+        var gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.BLACK, this);
 
         var imageRatio = background.getWidth() / background.getHeight();
 

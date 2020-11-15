@@ -11,6 +11,7 @@ import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 
 public class ServerPortal extends AbstractDemoServerObject {
     private static final float SPAWN_RATE = 1f;
+    private static final int NUMBER_OF_OBJECTS = 7;
 
     private final DemoGameLogic gameLogic;
     private float spawnTimer;
@@ -28,7 +29,7 @@ public class ServerPortal extends AbstractDemoServerObject {
         super.update(deltaTime);
 
         if (!collided && spawnTimer > SPAWN_RATE) {
-            var type = RandomInstance.get().nextInt(2);
+            var type = RandomInstance.get().nextInt(NUMBER_OF_OBJECTS);
             var boulder = new ServerObstacle((byte) type, gameLogic.getGameSettings().getBoulderBounds());
             boulder.setPosition(getPosition());
             gameLogic.spawn(boulder);

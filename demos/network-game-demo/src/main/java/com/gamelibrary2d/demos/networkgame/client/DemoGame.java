@@ -10,7 +10,6 @@ import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Framework;
-import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 import com.gamelibrary2d.sound.SoundManager;
 import com.gamelibrary2d.sound.decoders.AudioDecoder;
@@ -31,11 +30,6 @@ public class DemoGame extends AbstractGame {
     public DemoGame(Framework framework, ServerManager serverManager) {
         super(framework);
         this.serverManager = serverManager;
-    }
-
-    @Override
-    public void start(Window window) throws InitializationException {
-        super.start(window);
     }
 
     @Override

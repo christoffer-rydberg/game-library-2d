@@ -14,6 +14,7 @@ import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,11 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 public class EffectMap {
+    private final SoundMap sounds;
+    private final SoundEffectPlayer soundPlayer;
     private final SaveLoadManager saveLoadManager = new SaveLoadManager();
     private final List<ParticleSystemItem> particleSystems = new ArrayList<>();
     private final Map<Byte, Map<Byte, InstantEffect>> destroyedEffects = new HashMap<>();
     private final Map<Byte, Map<Byte, Factory<DurationEffect>>> updateEffects = new HashMap<>();
     private final EfficientParticleRenderer defaultRenderer = new EfficientParticleRenderer();
+
+    public EffectMap(SoundMap sounds, SoundEffectPlayer soundPlayer) {
+        this.sounds = sounds;
+        this.soundPlayer = soundPlayer;
+    }
 
     private ParticleSystemParameters loadParameters(URL url) throws IOException {
         return saveLoadManager.load(url, ParticleSystemParameters::new);
@@ -140,10 +148,15 @@ public class EffectMap {
                     Scene.FOREGROUND,
                     disposer);
 
+            var soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
+
             destroyedEffects.put(key, obj -> {
                 var pos = obj.getPosition();
                 shockwaveSystem.emitAll(pos.getX(), pos.getY());
                 explosionSystem.emitAll(pos.getX(), pos.getY());
+                if (soundEffect != null) {
+                    soundPlayer.play(soundEffect, 0.5f);
+                }
             });
         }
     }

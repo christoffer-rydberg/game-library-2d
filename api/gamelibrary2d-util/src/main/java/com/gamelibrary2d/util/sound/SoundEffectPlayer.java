@@ -24,6 +24,10 @@ public class SoundEffectPlayer {
         return new SoundEffectPlayer(soundManager, channels);
     }
 
+    public SoundManager getSoundManager() {
+        return soundManager;
+    }
+
     public void play(URL url, float volume) {
         for (int i = 0; i < soundEffects.length; ++i) {
             var soundEffect = soundEffects[i];
