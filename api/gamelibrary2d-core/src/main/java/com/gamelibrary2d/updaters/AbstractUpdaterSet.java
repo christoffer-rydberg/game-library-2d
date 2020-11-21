@@ -31,7 +31,6 @@ abstract class AbstractUpdaterSet implements UpdaterSet {
 
     @Override
     public void reset() {
-
         while (!active.isEmpty()) {
             finished.addLast(active.pollFirst());
         }

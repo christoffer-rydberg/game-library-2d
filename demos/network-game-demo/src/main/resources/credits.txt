@@ -1,7 +1,8 @@
-Special thanks to opengameart.org,
-and the following contributors:
+Special thanks to opengameart.org
 
--== GRAPHIC ==-
+
+
+GRAPHIC DESIGN
 
 Blue fighter spaceship, by MillionthVector
 (https://opengameart.org/content/blue-fighter-spaceship)
@@ -14,6 +15,9 @@ Rocks, by Écrivain
 
 Cow Run Cycle, by reivaxcorp
 (https://opengameart.org/content/cow-run-cycle)
+
+Solar System, by ShinyOgre
+(https://opengameart.org/content/solar-system)
 
 Starfields and couple of space backgrounds, by Rawdanitsu
 (https://opengameart.org/content/starfields-and-couple-of-space-backgrounds)
@@ -30,7 +34,9 @@ https://opengameart.org/content/asteroid-explosions-rocket-mine-and-laser
 Crow-Man, by Spring
 (https://opengameart.org/content/crow-man)
 
--== MUSIC ==-
+
+
+MUSIC
 
 Drifting Beyond the Stars, by Hitctrl
 (https://opengameart.org/content/drifting-beyond-the-stars-background-ambient)
@@ -38,10 +44,10 @@ Drifting Beyond the Stars, by Hitctrl
 Frozen Jamm, by Jordan Trudgett (tgfcoder)
 (https://opengameart.org/content/frozen-jam-seamless-loop)
 
-Afterburner, by copyc4t
-(https://opengameart.org/content/afterburner-music-track)
 
--== SOUND EFFECTS ==-
+
+
+SOUND EFFECTS
 
 Farm animals, by Secretlondon
 (https://opengameart.org/content/farm-animals)
@@ -58,6 +64,6 @@ Moving Boulder, by themightyglider
 
 
 
-Created by
+GAME CREATED BY
 
 Christoffer Rydberg

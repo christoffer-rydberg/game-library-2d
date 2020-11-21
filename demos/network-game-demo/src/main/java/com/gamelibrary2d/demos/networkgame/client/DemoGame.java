@@ -24,8 +24,7 @@ public class DemoGame extends AbstractGame {
 
     private Frame menuFrame;
     private LoadingFrame loadingFrame;
-    private DemoFrame demoFrame;
-    private CreditsFrame creditsFrame;
+    private GameFrame gameFrame;
 
     public DemoGame(Framework framework, ServerManager serverManager) {
         super(framework);
@@ -60,9 +59,9 @@ public class DemoGame extends AbstractGame {
     }
 
     private void loadDemoFrame(CommunicatorFactory communicatorFactory) {
-        demoFrame.getClient().setCommunicatorFactory(communicatorFactory);
+        gameFrame.getClient().setCommunicatorFactory(communicatorFactory);
         try {
-            loadFrame(demoFrame, FrameDisposal.NONE);
+            loadFrame(gameFrame, FrameDisposal.NONE);
         } catch (InitializationException e) {
             e.printStackTrace();
         }
@@ -71,15 +70,6 @@ public class DemoGame extends AbstractGame {
     public void goToMenu() {
         try {
             setFrame(menuFrame, FrameDisposal.UNLOAD);
-            serverManager.stopHostedServer();
-        } catch (InitializationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void goToCredits() {
-        try {
-            setFrame(creditsFrame, FrameDisposal.UNLOAD);
             serverManager.stopHostedServer();
         } catch (InitializationException e) {
             e.printStackTrace();
@@ -118,16 +108,13 @@ public class DemoGame extends AbstractGame {
         menuFrame = new MenuFrame(this, musicPlayer, soundPlayer);
         menuFrame.initialize(this);
 
-        demoFrame = new DemoFrame(this, musicPlayer, soundPlayer);
-        demoFrame.initialize(this);
-
-        creditsFrame = new CreditsFrame(this);
-        creditsFrame.initialize(this);
+        gameFrame = new GameFrame(this, musicPlayer, soundPlayer);
+        gameFrame.initialize(this);
     }
 
     @Override
     protected void onExit() {
         serverManager.stopHostedServer();
-        demoFrame.disconnect();
+        gameFrame.disconnect();
     }
 }

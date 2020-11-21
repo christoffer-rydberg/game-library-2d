@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
+import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
@@ -18,7 +18,7 @@ public abstract class AbstractClientObject
     private final int id;
     private final byte primaryType;
     private final byte secondaryType;
-    private final DemoFrameClient client;
+    private final GameFrameClient client;
     private final boolean autoRotate;
     private final PositionInterpolator positionInterpolator = new PositionInterpolator(this);
     private final DirectionInterpolation directionInterpolation = new DirectionInterpolation(this);
@@ -28,7 +28,7 @@ public abstract class AbstractClientObject
     private DurationEffect updateEffect;
     private InstantEffect destroyedEffect;
 
-    protected AbstractClientObject(byte primaryType, DemoFrameClient client, boolean autoRotate, DataBuffer buffer) {
+    protected AbstractClientObject(byte primaryType, GameFrameClient client, boolean autoRotate, DataBuffer buffer) {
         this.primaryType = primaryType;
         this.client = client;
         this.autoRotate = autoRotate;

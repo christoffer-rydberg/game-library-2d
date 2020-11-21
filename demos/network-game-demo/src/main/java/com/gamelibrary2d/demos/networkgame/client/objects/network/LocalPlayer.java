@@ -1,7 +1,7 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.client.frames.DemoFrameClient;
+import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 import com.gamelibrary2d.demos.networkgame.common.PlayerRotation;
 import com.gamelibrary2d.framework.Keyboard;
 import com.gamelibrary2d.input.InputBinding;
@@ -11,7 +11,7 @@ public class LocalPlayer extends AbstractPlayer {
     private final InputController controller;
     private final PlayerRotation rotation;
 
-    public LocalPlayer(byte primaryType, DemoFrameClient client, DataBuffer buffer) {
+    public LocalPlayer(byte primaryType, GameFrameClient client, DataBuffer buffer) {
         super(primaryType, client, buffer);
 
         rotation = new PlayerRotation(client, getId());

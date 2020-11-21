@@ -1,8 +1,9 @@
 package com.gamelibrary2d.demos.networkgame.client.frames;
 
+import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
-import com.gamelibrary2d.common.io.SaveLoadManager;
+import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.Settings;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.Button;
@@ -12,23 +13,25 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.demos.networkgame.client.urls.Images;
 import com.gamelibrary2d.demos.networkgame.client.urls.Music;
-import com.gamelibrary2d.demos.networkgame.client.urls.Particles;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.framework.Keyboard;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.layers.DefaultPanel;
-import com.gamelibrary2d.layers.NavigationPanel;
-import com.gamelibrary2d.layers.Panel;
+import com.gamelibrary2d.layers.*;
+import com.gamelibrary2d.markers.KeyAware;
+import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.particle.SequentialParticleEmitter;
-import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
-import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.updaters.InfiniteUpdater;
+import com.gamelibrary2d.updaters.DurationUpdater;
+import com.gamelibrary2d.updaters.InstantUpdater;
+import com.gamelibrary2d.updaters.SequentialUpdater;
+import com.gamelibrary2d.updates.OpacityUpdate;
+import com.gamelibrary2d.updates.PositionUpdate;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.StackOrientation;
 import com.gamelibrary2d.util.VerticalTextAlignment;
@@ -37,18 +40,22 @@ import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-public class MenuFrame extends AbstractFrame {
+public class MenuFrame extends AbstractFrame implements KeyAware {
     private final DemoGame game;
     private final MusicPlayer musicPlayer;
     private final SoundEffectPlayer soundPlayer;
-
+    private final SequentialUpdater introUpdater = new SequentialUpdater();
+    private LayerObject<Renderable> menu;
+    private Credits credits;
+    private LayerObject<Renderable> backgroundLayer;
+    private Renderable background;
     private NavigationPanel navigationPanel;
     private GameObject gameTitle;
     private GameObject mainPanel;
     private GameObject hostPanel;
     private GameObject joinPanel;
-
     private GameObject creditsButton;
 
     public MenuFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
@@ -69,8 +76,22 @@ public class MenuFrame extends AbstractFrame {
         return new DefaultGameObject<>(renderer);
     }
 
+    private Renderable createBackground() throws IOException {
+        var backgroundTexture = DefaultTexture.create(Images.MENU_BACKGROUND, this);
+
+        var backgroundSurface = Surfaces.coverArea(
+                Rectangle.fromBottomLeft(game.getWindow().width(), game.getWindow().height()),
+                backgroundTexture.getWidth(),
+                backgroundTexture.getHeight(),
+                this);
+
+        return new SurfaceRenderer(backgroundSurface, backgroundTexture);
+    }
+
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
+        background = createBackground();
+
         navigationPanel = new NavigationPanel();
         mainPanel = createMainPanel();
         hostPanel = createHostPanel();
@@ -83,15 +104,12 @@ public class MenuFrame extends AbstractFrame {
 
         gameTitle = createGameTitle();
         gameTitle.setPosition(
-                game.getWindow().width() / 2,
+                game.getWindow().width() / 2f,
                 game.getWindow().height() * 0.75f);
 
-        var settings = new SaveLoadManager().load(Particles.MENU, ParticleSystemParameters::new);
-        var particleSystem = DefaultParticleSystem.create(settings, this);
-        var particleEmitter = new SequentialParticleEmitter(particleSystem);
-        particleEmitter.getPosition().set(game.getWindow().width() / 2f, game.getWindow().height() / 2f);
-
-        context.register(particleEmitter);
+        backgroundLayer = new DefaultLayerObject<>();
+        menu = new DefaultLayerObject<>();
+        credits = new Credits(game.getWindow());
     }
 
     @Override
@@ -101,13 +119,38 @@ public class MenuFrame extends AbstractFrame {
 
     @Override
     protected void onLoaded(InitializationContext context) {
-        var particleEmitter = context.get(SequentialParticleEmitter.class);
-        runUpdater(new InfiniteUpdater(particleEmitter));
-        add(particleEmitter.getParticleSystem());
-        add(navigationPanel);
-        add(gameTitle);
-        add(creditsButton);
+        hideCredits();
+        add(backgroundLayer);
+        add(menu);
+        add(credits);
+        backgroundLayer.add(background);
+        menu.add(navigationPanel);
+        menu.add(gameTitle);
+        menu.add(creditsButton);
         navigationPanel.navigateTo(mainPanel, false);
+
+        runIntro();
+    }
+
+    private void runIntro() {
+        menu.setOpacity(0f);
+        backgroundLayer.setScale(10f);
+
+        introUpdater.clear();
+
+        introUpdater.add(new DurationUpdater(
+                19f,
+                true,
+                new IntroZoomUpdate(backgroundLayer)
+        ));
+
+        introUpdater.add(new DurationUpdater(
+                4f,
+                true,
+                new OpacityUpdate(menu, 1f)
+        ));
+
+        runUpdater(introUpdater);
     }
 
     @Override
@@ -117,17 +160,27 @@ public class MenuFrame extends AbstractFrame {
 
     @Override
     protected void onEnd() {
-        musicPlayer.stop(1f);
+        musicPlayer.stop(2f);
     }
 
     private <T extends GameObject> void stack(Panel<T> panel, T obj) {
         panel.stack(obj, StackOrientation.DOWN);
     }
 
+    private void showCredits() {
+        menu.setEnabled(false);
+        credits.show(this::hideCredits);
+    }
+
+    private void hideCredits() {
+        credits.hide();
+        menu.setEnabled(true);
+    }
+
     private Button createCreditsButton() {
         var label = new Label("Credits", new TextRenderer(Fonts.button()));
         label.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.BOTTOM);
-        return new Button(label, label.calculateBounds(), game::goToCredits);
+        return new Button(label, label.calculateBounds(), this::showCredits);
     }
 
     private Button createButton(String text, Action onClick) {
@@ -194,5 +247,94 @@ public class MenuFrame extends AbstractFrame {
         center(panel, game.getWindow());
 
         return panel;
+    }
+
+    @Override
+    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
+        if (credits.isEnabled()) {
+            if (key == Keyboard.instance().keyEscape()) {
+                hideCredits();
+            } else if (key == Keyboard.instance().keyEnter()) {
+                credits.setSpeedFactor(10f);
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(int key, int scanCode, int mods) {
+        if (credits.isEnabled()) {
+            if (key == Keyboard.instance().keyEnter()) {
+                credits.setSpeedFactor(1f);
+            }
+        }
+    }
+
+    private static class Credits extends AbstractLayer<GameObject> {
+        private final Window window;
+        private final SequentialUpdater updater = new SequentialUpdater();
+        private DefaultGameObject<Label> credits;
+        private float speedFactor;
+
+        Credits(Window window) throws IOException {
+            this.window = window;
+            var url = Credits.class.getResource("/credits.txt");
+            var text = Read.text(url, StandardCharsets.UTF_8);
+            var label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
+            credits = new DefaultGameObject<>(label);
+            add(credits);
+        }
+
+        void setSpeedFactor(float speedFactor) {
+            this.speedFactor = speedFactor;
+        }
+
+        @Override
+        protected void onUpdate(float deltaTime) {
+            super.onUpdate(deltaTime);
+            updater.update(deltaTime * speedFactor);
+        }
+
+        void hide() {
+            setEnabled(false);
+        }
+
+        void show(Action onFinished) {
+            setEnabled(true);
+            setSpeedFactor(1f);
+
+            credits.setPosition(window.width() / 2f, 0);
+            var height = credits.getContent().calculateBounds().height();
+            var windowHeight = window.height();
+
+            updater.clear();
+
+            updater.add(new DurationUpdater(
+                    60f,
+                    true,
+                    new PositionUpdate(credits, 0, height + windowHeight)));
+
+            updater.add(new InstantUpdater(dt -> onFinished.invoke()));
+        }
+    }
+
+    private static class IntroZoomUpdate implements Updatable {
+        private final GameObject obj;
+        private final float initialScale;
+
+        private float alpha;
+
+        IntroZoomUpdate(GameObject obj) {
+            this.obj = obj;
+            this.initialScale = obj.getScale().getX();
+        }
+
+        @Override
+        public void update(float deltaTime) {
+            alpha += deltaTime;
+            var radius = initialScale - 1;
+            var x = -radius * (1f - alpha) + 0 * alpha;
+            var y = Math.sqrt(radius * radius - x * x);
+            obj.setScale(initialScale - (float) y);
+        }
     }
 }
