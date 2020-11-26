@@ -6,18 +6,18 @@ import com.gamelibrary2d.network.common.Message;
 
 public class GameSettings implements Message {
     private final Rectangle gameBounds;
-    private final Rectangle boulderBounds;
+    private final Rectangle obstacleBounds;
     private final Rectangle spaceCraftBounds;
 
-    public GameSettings(Rectangle gameBounds, Rectangle boulderBounds, Rectangle spaceCraftBounds) {
+    public GameSettings(Rectangle gameBounds, Rectangle obstacleBounds, Rectangle spaceCraftBounds) {
         this.gameBounds = gameBounds;
-        this.boulderBounds = boulderBounds;
+        this.obstacleBounds = obstacleBounds;
         this.spaceCraftBounds = spaceCraftBounds;
     }
 
     public GameSettings(DataBuffer buffer) {
         gameBounds = SerializationUtil.deserializeRectangle(buffer);
-        boulderBounds = SerializationUtil.deserializeRectangle(buffer);
+        obstacleBounds = SerializationUtil.deserializeRectangle(buffer);
         spaceCraftBounds = SerializationUtil.deserializeRectangle(buffer);
     }
 
@@ -26,11 +26,11 @@ public class GameSettings implements Message {
     }
 
     public Rectangle getPortalBounds() {
-        return boulderBounds;
+        return obstacleBounds;
     }
 
-    public Rectangle getBoulderBounds() {
-        return boulderBounds;
+    public Rectangle getObstacleBounds() {
+        return obstacleBounds;
     }
 
     public Rectangle getSpaceCraftBounds() {
@@ -40,7 +40,7 @@ public class GameSettings implements Message {
     @Override
     public void serializeMessage(DataBuffer buffer) {
         SerializationUtil.serializeRectangle(gameBounds, buffer);
-        SerializationUtil.serializeRectangle(boulderBounds, buffer);
+        SerializationUtil.serializeRectangle(obstacleBounds, buffer);
         SerializationUtil.serializeRectangle(spaceCraftBounds, buffer);
     }
 }

@@ -4,27 +4,37 @@ import com.gamelibrary2d.collision.CollisionDetection;
 import com.gamelibrary2d.collision.Obstacle;
 import com.gamelibrary2d.collision.handlers.BounceHandler;
 import com.gamelibrary2d.collision.handlers.RestrictedAreaHandler;
+import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
-import com.gamelibrary2d.demos.networkgame.common.RotationDirection;
 import com.gamelibrary2d.demos.networkgame.server.DemoGameLogic;
 import com.gamelibrary2d.network.common.Communicator;
 
 public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
+    public final static float MAX_SPEED = 100f;
+    public final static float ACCELERATION = 200f;
+
     private final DemoGameLogic gameLogic;
 
     private final Communicator communicator;
 
-    private RotationDirection rotationDirection = RotationDirection.NONE;
+    private float acceleration;
+    private float rotationAcceleration;
+    private Point accelerationVector = new Point(0, ACCELERATION);
 
     public ServerPlayer(DemoGameLogic gameLogic, Communicator communicator, Rectangle bounds) {
         super(ObjectTypes.PLAYER);
         this.gameLogic = gameLogic;
         this.communicator = communicator;
         this.setBounds(bounds);
-        setSpeedAndDirection(100f, RandomInstance.get().nextFloat() * 360f);
+    }
+
+    @Override
+    public void setRotation(float rotation) {
+        super.setRotation(rotation);
+        accelerationVector.set(0f, ACCELERATION);
+        accelerationVector.rotate(rotation);
     }
 
     @Override
@@ -41,25 +51,35 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
 
     @Override
     public void update(float deltaTime) {
-        updateRotation(deltaTime);
+        if (isRotating()) {
+            var rotationAcceleration = isAccelerating()
+                    ? this.rotationAcceleration / 2f
+                    : this.rotationAcceleration;
+
+            setRotation(getRotation() + rotationAcceleration * deltaTime * 180);
+        }
+
+        if (isAccelerating()) {
+            var velocity = getVelocity();
+            velocity.add(
+                    accelerationVector.getX() * deltaTime,
+                    accelerationVector.getY() * deltaTime);
+
+            var speed = velocity.getLength();
+            if (speed > MAX_SPEED) {
+                velocity.multiply(MAX_SPEED / speed);
+            }
+
+            onVelocityChanged();
+        }
+
         super.update(deltaTime);
     }
 
-    private void updateRotation(float deltaTime) {
-        switch (rotationDirection) {
-            case NONE:
-                break;
-            case LEFT:
-                setDirection(getDirection() - deltaTime * 180);
-                break;
-            case RIGHT:
-                setDirection(getDirection() + deltaTime * 180);
-                break;
-        }
-    }
-
-    public void setDirection(float direction) {
-        super.setSpeedAndDirection(getSpeed(), direction);
+    public void setSpeedAndDirection(float speed, float direction) {
+        super.setSpeedAndDirection(
+                Math.min(MAX_SPEED, speed),
+                direction);
     }
 
     @Override
@@ -77,8 +97,12 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
         }
     }
 
-    public void setRotationDirection(RotationDirection rotationDirection) {
-        this.rotationDirection = rotationDirection;
+    public void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public void setRotationAcceleration(float rotationAcceleration) {
+        this.rotationAcceleration = rotationAcceleration;
     }
 
     @Override
@@ -88,5 +112,14 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
                 new RestrictedAreaHandler<>(collisionDetection.getBounds(), ServerPlayer::accelerate),
                 new BounceHandler<>(Obstacle.class)
         );
+    }
+
+    @Override
+    public boolean isAccelerating() {
+        return acceleration != 0f;
+    }
+
+    public boolean isRotating() {
+        return rotationAcceleration != 0f;
     }
 }

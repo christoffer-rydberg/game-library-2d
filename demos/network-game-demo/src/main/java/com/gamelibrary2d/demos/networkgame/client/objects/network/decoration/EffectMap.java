@@ -45,7 +45,7 @@ public class EffectMap {
         var emitter = new SequentialParticleEmitter(particleSystem);
         return (obj, deltaTime) -> {
             emitter.getPosition().set(obj.getParticleHotspot());
-            emitter.getPosition().rotate(obj.getDirection());
+            emitter.getPosition().rotate(obj.getRotation());
             emitter.getPosition().add(obj.getPosition());
             emitter.update(deltaTime);
         };

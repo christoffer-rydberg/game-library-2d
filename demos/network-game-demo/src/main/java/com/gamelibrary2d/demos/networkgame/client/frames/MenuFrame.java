@@ -58,6 +58,8 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     private GameObject joinPanel;
     private GameObject creditsButton;
 
+    private boolean menuIsHidden = true;
+
     public MenuFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
         this.game = game;
         this.musicPlayer = musicPlayer;
@@ -144,13 +146,21 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
                 new IntroZoomUpdate(backgroundLayer)
         ));
 
-        introUpdater.add(new DurationUpdater(
-                4f,
-                true,
-                new OpacityUpdate(menu, 1f)
-        ));
+        introUpdater.add(new InstantUpdater(dt -> ShowMenu()));
 
         runUpdater(introUpdater);
+    }
+
+    private void ShowMenu() {
+        if (menuIsHidden) {
+            runUpdater(new DurationUpdater(
+                    4f,
+                    true,
+                    new OpacityUpdate(menu, 1f)
+            ));
+
+            menuIsHidden = false;
+        }
     }
 
     @Override
@@ -251,10 +261,14 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
     @Override
     public void keyDown(int key, int scanCode, boolean repeat, int mods) {
-        if (credits.isEnabled()) {
-            if (key == Keyboard.instance().keyEscape()) {
+        if (key == Keyboard.instance().keyEscape()) {
+            if (credits.isEnabled()) {
                 hideCredits();
-            } else if (key == Keyboard.instance().keyEnter()) {
+            } else {
+                ShowMenu();
+            }
+        } else if (key == Keyboard.instance().keyEnter()) {
+            if (credits.isEnabled()) {
                 credits.setSpeedFactor(10f);
             }
         }
@@ -262,8 +276,8 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
     @Override
     public void keyReleased(int key, int scanCode, int mods) {
-        if (credits.isEnabled()) {
-            if (key == Keyboard.instance().keyEnter()) {
+        if (key == Keyboard.instance().keyEnter()) {
+            if (credits.isEnabled()) {
                 credits.setSpeedFactor(1f);
             }
         }

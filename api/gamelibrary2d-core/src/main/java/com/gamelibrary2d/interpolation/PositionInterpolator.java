@@ -1,4 +1,4 @@
-package com.gamelibrary2d.util;
+package com.gamelibrary2d.interpolation;
 
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.Transformable;

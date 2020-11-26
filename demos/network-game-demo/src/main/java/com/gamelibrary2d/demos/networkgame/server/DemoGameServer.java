@@ -6,7 +6,6 @@ import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.common.ClientMessages;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
-import com.gamelibrary2d.demos.networkgame.common.RotationDirection;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.demos.networkgame.server.objects.DemoServerObject;
 import com.gamelibrary2d.demos.networkgame.server.objects.ServerPlayer;
@@ -132,13 +131,13 @@ public class DemoGameServer implements ServerContext {
 
         var players = new ArrayList<ServerPlayer>(requestedPlayers);
         for (int i = 0; i < requestedPlayers; ++i) {
-            players.add(new ServerPlayer(gameLogic, communicator, settings.getBoulderBounds()));
+            players.add(new ServerPlayer(gameLogic, communicator, settings.getSpaceCraftBounds()));
         }
 
         var communicatorState = new ClientState(communicator, players);
         clientStateService.put(communicatorState);
 
-        if (!gameLogic.gameIsRunning()) {
+        if (gameLogic.gameOver()) {
             communicator.getOutgoing().put(ServerMessages.GAME_ENDED);
         } else {
             communicatorState.setReady(true);
@@ -160,10 +159,12 @@ public class DemoGameServer implements ServerContext {
     public void onMessage(Communicator communicator, DataBuffer buffer) {
         byte id = buffer.get();
         switch (id) {
-            case ClientMessages.PLAYER_ROTATION:
+            case ClientMessages.PLAYER_ACCELERATION:
                 var player = clientStateService.get(communicator).getPlayer(buffer.getInt());
-                var rotationDirection = buffer.getEnum(RotationDirection.class);
-                player.setRotationDirection(rotationDirection);
+                var acceleration = buffer.getFloat();
+                var rotationAcceleration = buffer.getFloat();
+                player.setAcceleration(acceleration);
+                player.setRotationAcceleration(rotationAcceleration);
                 break;
             case ClientMessages.PLAY_AGAIN:
                 clientStateService.get(communicator).setReady(true);
@@ -184,7 +185,7 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void update(float deltaTime) {
         if (clientStateService.size() > 0) {
-            if (!gameLogic.gameIsRunning()) {
+            if (gameLogic.gameOver()) {
                 startCountdown -= deltaTime;
                 if (startCountdown <= 0 || clientStateService.allReady()) {
                     startCountdown = 10f;
@@ -269,6 +270,16 @@ public class DemoGameServer implements ServerContext {
             bitParser.putInt(object.getId(), NetworkConstants.OBJECT_ID_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.POS_X_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getY()), NetworkConstants.POS_Y_BIT_SIZE);
+
+            bitParser.putInt(object.isAccelerating() ? 1 : 0, 1);
+
+            if (object instanceof ServerPlayer) {
+                bitParser.putInt(1, 1);
+                bitParser.putInt(Math.round(object.getRotation()), NetworkConstants.ROTATION_BIT_SIZE);
+            } else {
+                bitParser.putInt(0, 1);
+            }
+
             bitParser.putInt(Math.round(object.getDirection()), NetworkConstants.DIRECTION_BIT_SIZE);
         }
 

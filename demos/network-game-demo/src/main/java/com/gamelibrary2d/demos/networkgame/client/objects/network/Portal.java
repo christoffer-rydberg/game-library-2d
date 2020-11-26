@@ -6,7 +6,7 @@ import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 public class Portal extends AbstractClientObject {
 
     public Portal(byte primaryType, GameFrameClient client, DataBuffer buffer) {
-        super(primaryType, client, false, buffer);
+        super(primaryType, client, buffer);
     }
 
 }

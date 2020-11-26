@@ -6,32 +6,30 @@ import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.interpolation.InterpolatableAngle;
+import com.gamelibrary2d.interpolation.PositionInterpolator;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractGameObject;
-import com.gamelibrary2d.util.DirectionAware;
-import com.gamelibrary2d.util.DirectionInterpolation;
-import com.gamelibrary2d.util.PositionInterpolator;
 
 public abstract class AbstractClientObject
-        extends AbstractGameObject<Renderable> implements ClientObject, Updatable, DirectionAware {
+        extends AbstractGameObject<Renderable> implements ClientObject, Updatable {
 
     private final int id;
     private final byte primaryType;
     private final byte secondaryType;
     private final GameFrameClient client;
-    private final boolean autoRotate;
     private final PositionInterpolator positionInterpolator = new PositionInterpolator(this);
-    private final DirectionInterpolation directionInterpolation = new DirectionInterpolation(this);
+    private final InterpolatableAngle direction = new InterpolatableAngle();
+
     private final Point particleHotspot = new Point();
 
-    private float direction;
     private DurationEffect updateEffect;
     private InstantEffect destroyedEffect;
+    private boolean accelerating;
 
-    protected AbstractClientObject(byte primaryType, GameFrameClient client, boolean autoRotate, DataBuffer buffer) {
+    protected AbstractClientObject(byte primaryType, GameFrameClient client, DataBuffer buffer) {
         this.primaryType = primaryType;
         this.client = client;
-        this.autoRotate = autoRotate;
         this.secondaryType = buffer.get();
         id = buffer.getInt();
         setPosition(buffer.getFloat(), buffer.getFloat());
@@ -72,6 +70,15 @@ public abstract class AbstractClientObject
         this.destroyedEffect = destroyedEffect;
     }
 
+    public boolean isAccelerating() {
+        return accelerating;
+    }
+
+    @Override
+    public void setAccelerating(boolean accelerating) {
+        this.accelerating = accelerating;
+    }
+
     @Override
     public void destroy() {
         if (destroyedEffect != null) {
@@ -82,9 +89,9 @@ public abstract class AbstractClientObject
     @Override
     public void update(float deltaTime) {
         positionInterpolator.update(deltaTime);
-        directionInterpolation.update(deltaTime);
+        direction.update(deltaTime);
 
-        if (updateEffect != null) {
+        if (useUpdateEffect()) {
             updateEffect.onUpdate(this, deltaTime);
         }
 
@@ -94,17 +101,13 @@ public abstract class AbstractClientObject
         }
     }
 
-    @Override
-    public float getDirection() {
-        return direction;
+    protected boolean useUpdateEffect() {
+        return updateEffect != null;
     }
 
     @Override
-    public void setDirection(float direction) {
-        this.direction = direction;
-        if (autoRotate) {
-            setRotation(direction);
-        }
+    public float getDirection() {
+        return direction.getAngle();
     }
 
     @Override
@@ -114,6 +117,11 @@ public abstract class AbstractClientObject
 
     @Override
     public void setGoalDirection(float direction) {
-        directionInterpolation.setGoal(direction, 1f / client.getServerUpdatesPerSecond());
+        this.direction.interpolate(direction, 1f / client.getServerUpdatesPerSecond());
+    }
+
+    @Override
+    public void setGoalRotation(float rotation) {
+
     }
 }

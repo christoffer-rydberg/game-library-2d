@@ -6,9 +6,10 @@ import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 
 public class Obstacle extends AbstractClientObject {
     private float rotationSpeed;
+    private float goalDirection;
 
     public Obstacle(byte primaryType, GameFrameClient client, DataBuffer buffer) {
-        super(primaryType, client, false, buffer);
+        super(primaryType, client, buffer);
         randomizeRotationSpeed();
     }
 
@@ -19,9 +20,10 @@ public class Obstacle extends AbstractClientObject {
     }
 
     @Override
-    public void setDirection(float direction) {
-        if (getDirection() != direction) {
-            super.setDirection(direction);
+    public void setGoalDirection(float direction) {
+        if (goalDirection != direction) {
+            goalDirection = direction;
+            super.setGoalDirection(direction);
             randomizeRotationSpeed();
         }
     }

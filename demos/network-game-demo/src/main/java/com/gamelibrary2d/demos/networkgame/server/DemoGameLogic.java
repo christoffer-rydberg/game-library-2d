@@ -15,7 +15,7 @@ public class DemoGameLogic {
     private final GameSettings settings;
     private final CollisionDetection collisionDetection;
 
-    private boolean gameRunning;
+    private boolean gameOver = true;
 
     public DemoGameLogic(DemoGameServer server) {
         this.server = server;
@@ -27,19 +27,21 @@ public class DemoGameLogic {
 
         collisionDetection = new CollisionDetection(
                 settings.getGameBounds(),
-                getGameSettings().getBoulderBounds().width() * 4,
+                getGameSettings().getObstacleBounds().width() * 4,
                 10);
     }
 
     public void startGame(List<ServerPlayer> players) {
-        gameRunning = true;
+        gameOver = false;
 
         var center = settings.getGameBounds().center();
 
         for (byte i = 0; i < players.size(); ++i) {
             var player = players.get(i);
             player.setPosition(center);
-            player.setDirection(RandomInstance.get().nextFloat() * 360f);
+            var initialRotation = RandomInstance.get().nextFloat() * 360f;
+            player.setRotation(initialRotation);
+            player.setSpeedAndDirection(ServerPlayer.MAX_SPEED, initialRotation);
             player.setSecondaryType(i);
             spawn(player);
         }
@@ -50,13 +52,13 @@ public class DemoGameLogic {
     }
 
     public void endGame() {
-        gameRunning = false;
+        gameOver = true;
         server.endGame();
         collisionDetection.clear();
     }
 
-    public boolean gameIsRunning() {
-        return gameRunning;
+    public boolean gameOver() {
+        return gameOver;
     }
 
     public GameSettings getGameSettings() {

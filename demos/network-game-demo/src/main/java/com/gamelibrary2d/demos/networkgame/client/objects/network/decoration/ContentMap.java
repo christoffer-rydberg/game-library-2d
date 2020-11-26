@@ -31,7 +31,7 @@ public class ContentMap {
     }
 
     private void initializeObstacleRenderers(GameSettings settings, TextureMap textures, Disposer disposer) {
-        initializeRenderers(ObjectTypes.OBSTACLE, textures, settings.getBoulderBounds().resize(1.25f), disposer);
+        initializeRenderers(ObjectTypes.OBSTACLE, textures, settings.getObstacleBounds().resize(1.25f), disposer);
     }
 
     public void initialize(GameSettings settings, TextureMap textures, Disposer disposer) {

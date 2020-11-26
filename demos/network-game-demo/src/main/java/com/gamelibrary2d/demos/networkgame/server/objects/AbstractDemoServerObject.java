@@ -11,6 +11,7 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
 
     private byte secondaryType;
     private float speed;
+    private float rotation;
     private float direction;
     private boolean destroyed = true;
 
@@ -57,6 +58,15 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
         return direction;
     }
 
+    @Override
+    public float getRotation() {
+        return rotation;
+    }
+
+    protected void setRotation(float rotation) {
+        this.rotation = normalizeAngle(rotation);
+    }
+
     public void reposition(float x, float y) {
         getPosition().set(x, y);
     }
@@ -68,22 +78,30 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
 
     protected void setSpeedAndDirection(float speed, float direction) {
         this.speed = speed;
-        this.direction = normalizeDirection(direction);
+        this.direction = normalizeAngle(direction);
         velocity.set(0, speed);
         velocity.rotate(direction);
     }
 
+    protected Point getVelocity() {
+        return velocity;
+    }
+
     protected void setSpeed(float x, float y) {
         velocity.set(x, y);
+        onVelocityChanged();
+    }
+
+    protected void onVelocityChanged() {
         speed = velocity.getLength();
-        direction = normalizeDirection(velocity.getAngleDegrees());
+        direction = normalizeAngle(velocity.getAngleDegrees());
     }
 
     protected void accelerate(float x, float y) {
         setSpeed(velocity.getX() + x, velocity.getY() + y);
     }
 
-    private float normalizeDirection(float direction) {
+    private float normalizeAngle(float direction) {
         return (((direction % 360f) + 360f) % 360f);
     }
 
@@ -101,5 +119,10 @@ public abstract class AbstractDemoServerObject extends AbstractServerObject impl
     public void serializeMessage(DataBuffer buffer) {
         buffer.put(secondaryType);
         super.serializeMessage(buffer);
+    }
+
+    @Override
+    public boolean isAccelerating() {
+        return false;
     }
 }

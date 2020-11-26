@@ -9,11 +9,15 @@ public interface DemoServerObject extends ServerObject {
 
     float getDirection();
 
-    float getSpeed();
+    float getRotation();
 
-    void setDestroyed(boolean destroyed);
+    float getSpeed();
 
     boolean isDestroyed();
 
+    void setDestroyed(boolean destroyed);
+
     void addCollisionDetection(CollisionDetection collisionDetection);
+
+    boolean isAccelerating();
 }

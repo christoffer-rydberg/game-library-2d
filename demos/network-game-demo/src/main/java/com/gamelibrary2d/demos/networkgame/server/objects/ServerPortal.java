@@ -30,7 +30,7 @@ public class ServerPortal extends AbstractDemoServerObject {
 
         if (!collided && spawnTimer > SPAWN_RATE) {
             var type = RandomInstance.get().nextInt(NUMBER_OF_OBJECTS);
-            var boulder = new ServerObstacle((byte) type, gameLogic.getGameSettings().getBoulderBounds());
+            var boulder = new ServerObstacle((byte) type, gameLogic.getGameSettings().getObstacleBounds());
             boulder.setPosition(getPosition());
             gameLogic.spawn(boulder);
             spawnTimer -= SPAWN_RATE;

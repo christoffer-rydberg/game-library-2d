@@ -18,6 +18,8 @@ public interface ClientObject extends GameObject {
 
     void setGoalPosition(float x, float y);
 
+    void setGoalRotation(float rotation);
+
     void setGoalDirection(float direction);
 
     float getDirection();
@@ -29,6 +31,8 @@ public interface ClientObject extends GameObject {
     void setDestroyedEffect(InstantEffect destroyedEffect);
 
     void destroy();
+
+    void setAccelerating(boolean accelerating);
 }
 
 

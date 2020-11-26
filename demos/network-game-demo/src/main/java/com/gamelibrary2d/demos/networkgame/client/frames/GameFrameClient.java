@@ -150,10 +150,19 @@ public class GameFrameClient extends AbstractClient {
             int id = bitParser.getInt(NetworkConstants.OBJECT_ID_BIT_SIZE);
             float x = bitParser.getInt(NetworkConstants.POS_X_BIT_SIZE);
             float y = bitParser.getInt(NetworkConstants.POS_Y_BIT_SIZE);
+
+            var isAccelerating = bitParser.getInt(1) == 1;
+
+            float rotation = bitParser.getInt(1) == 1
+                    ? bitParser.getInt(NetworkConstants.ROTATION_BIT_SIZE)
+                    : 0f;
+
             float direction = bitParser.getInt(NetworkConstants.DIRECTION_BIT_SIZE);
             var obj = objects.get(id);
             if (obj != null) {
+                obj.setAccelerating(isAccelerating);
                 obj.setGoalPosition(x, y);
+                obj.setGoalRotation(rotation);
                 obj.setGoalDirection(direction);
             }
         }
