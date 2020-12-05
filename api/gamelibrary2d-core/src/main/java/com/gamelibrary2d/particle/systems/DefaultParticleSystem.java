@@ -127,11 +127,11 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Emits all particles at the specified coordinates. The particles count
+     * Emits all particles at the specified position. The particles count
      * is specified by {@link EmitterParameters#getDefaultCount()}.
      *
-     * @param x The X-coordinate of the emitted particles.
-     * @param y The Y-coordinate of the emitted particles.
+     * @param x The X-position of the emitted particles.
+     * @param y The Y-position of the emitted particles.
      */
     public void emitAll(float x, float y) {
         var emitterParameters = parameters.getEmitterParameters();
@@ -139,10 +139,20 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Emits particles at the specified coordinates.
+     * Emits all particles at the specified position. The particles count
+     * is specified by {@link EmitterParameters#getDefaultCount()}.
      *
-     * @param x     The X-coordinate of the emitted particles.
-     * @param y     The Y-coordinate of the emitted particles.
+     * @param pos The position of the emitted particles.
+     */
+    public void emitAll(Point pos) {
+        emitAll(pos.getX(), pos.getY());
+    }
+
+    /**
+     * Emits particles at the specified position.
+     *
+     * @param x     The X-position of the emitted particles.
+     * @param y     The Y-position of the emitted particles.
      * @param count The number of emitted particles.
      */
     public void emit(float x, float y, int count) {
@@ -158,11 +168,21 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Sequentially emits particles at the specified coordinates. The interval is
+     * Emits particles at the specified position.
+     *
+     * @param pos   The position of the emitted particles.
+     * @param count The number of emitted particles.
+     */
+    public void emit(Point pos, int count) {
+        emit(pos.getX(), pos.getY(), count);
+    }
+
+    /**
+     * Sequentially emits particles at the specified position. The interval is
      * specified by {@link EmitterParameters#getDefaultInterval()}.
      *
-     * @param x         The X-coordinate of the emitted particles.
-     * @param y         The Y-coordinate of the emitted particles.
+     * @param x         The X-position of the emitted particles.
+     * @param y         The Y-position of the emitted particles.
      * @param time      The current emitter time, in seconds. The delta time will be
      *                  added to this value. Particles will be emitted while the
      *                  time exceeds the emitter interval.
@@ -175,10 +195,26 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Sequentially emits particles at the specified coordinates.
+     * Sequentially emits particles at the specified position. The interval is
+     * specified by {@link EmitterParameters#getDefaultInterval()}.
      *
-     * @param x         The X-coordinate of the emitted particles.
-     * @param y         The Y-coordinate of the emitted particles.
+     * @param pos       The position of the emitted particles.
+     * @param time      The current emitter time, in seconds. The delta time will be
+     *                  added to this value. Particles will be emitted while the
+     *                  time exceeds the emitter interval.
+     * @param deltaTime Time since the last update, in seconds.
+     * @return The new emitter time, i.e. how much time has passed since a particle
+     * was emitted.
+     */
+    public float emitSequential(Point pos, float time, float deltaTime) {
+        return emitSequential(pos.getX(), pos.getY(), time, deltaTime);
+    }
+
+    /**
+     * Sequentially emits particles at the specified position.
+     *
+     * @param x         The X-position of the emitted particles.
+     * @param y         The Y-position of the emitted particles.
      * @param time      The current emitter time, in seconds. The delta time will be
      *                  added to this value. Particles will be emitted while the
      *                  time exceeds the emitter interval.
@@ -216,7 +252,23 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
     }
 
     /**
-     * Emits a single particle at the specified coordinates.
+     * Sequentially emits particles at the specified position.
+     *
+     * @param pos       The position of the emitted particles.
+     * @param time      The current emitter time, in seconds. The delta time will be
+     *                  added to this value. Particles will be emitted while the
+     *                  time exceeds the emitter interval.
+     * @param deltaTime Time since the last update, in seconds.
+     * @param interval  The interval between emitted particles, in seconds.
+     * @return The new emitter time, i.e. how much time has passed since a particle
+     * was emitted.
+     */
+    public float emitSequential(Point pos, float time, float deltaTime, float interval) {
+        return emitSequential(pos.getX(), pos.getY(), time, deltaTime, interval);
+    }
+
+    /**
+     * Emits a single particle at the specified position.
      */
     public void emit(float x, float y) {
         var emitterParameters = parameters.getEmitterParameters();
@@ -225,6 +277,13 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
         renderBuffer.ensureCapacity((particleCount + 1) * renderBuffer.getStride());
         updateBuffer.ensureCapacity((particleCount + 1) * updateBuffer.getStride());
         onEmit(x, y);
+    }
+
+    /**
+     * Emits a single particle at the specified position.
+     */
+    public void emit(Point pos) {
+        emit(pos.getX(), pos.getY());
     }
 
     private void onEmit(float x, float y) {

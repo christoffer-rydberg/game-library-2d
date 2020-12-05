@@ -94,10 +94,7 @@ public class EffectMap {
                 disposer);
 
         var destroyedEffects = new HashMap<Byte, InstantEffect>();
-        destroyedEffects.put((byte) 0, obj -> {
-            var pos = obj.getPosition();
-            explosionSystem.emitAll(pos.getX(), pos.getY());
-        });
+        destroyedEffects.put((byte) 0, obj -> explosionSystem.emitAll(obj.getPosition()));
         this.destroyedEffects.put(ObjectTypes.PLAYER, destroyedEffects);
     }
 
@@ -151,9 +148,9 @@ public class EffectMap {
             var soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
 
             destroyedEffects.put(key, obj -> {
-                var pos = obj.getPosition();
-                shockwaveSystem.emitAll(pos.getX(), pos.getY());
-                explosionSystem.emitAll(pos.getX(), pos.getY());
+                var position = obj.getPosition();
+                shockwaveSystem.emitAll(position);
+                explosionSystem.emitAll(position);
                 if (soundEffect != null) {
                     soundPlayer.play(soundEffect, 0.5f);
                 }
