@@ -10,22 +10,24 @@ import java.nio.channels.SocketChannel;
 public abstract class AbstractNetworkServer extends InternalAbstractServer {
     private final NetworkService networkService;
     private final boolean ownsNetworkService;
+    private final int port;
+    private final String hostname;
 
-    private int port;
     private ServerSocketChannelRegistration registration;
 
-    private AbstractNetworkServer(int port, NetworkService networkService, boolean ownsNetworkService) {
+    private AbstractNetworkServer(String hostname, int port, NetworkService networkService, boolean ownsNetworkService) {
+        this.hostname = hostname;
         this.port = port;
         this.networkService = networkService;
         this.ownsNetworkService = ownsNetworkService;
     }
 
-    protected AbstractNetworkServer(int port) {
-        this(port, new NetworkService(), true);
+    protected AbstractNetworkServer(String hostname, int port) {
+        this(hostname, port, new NetworkService(), true);
     }
 
-    protected AbstractNetworkServer(int port, NetworkService networkService) {
-        this(port, networkService, false);
+    protected AbstractNetworkServer(String hostname, int port, NetworkService networkService) {
+        this(hostname, port, networkService, false);
     }
 
     private void onConnected(SocketChannel channel) {
@@ -68,7 +70,7 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
 
     private void enableConnections() throws IOException {
         registration = networkService.registerConnectionListener(
-                "localhost",
+                hostname,
                 port,
                 this::onConnected,
                 (endpoint, exc) -> invokeLater(() -> onConnectionFailed(endpoint, exc)));

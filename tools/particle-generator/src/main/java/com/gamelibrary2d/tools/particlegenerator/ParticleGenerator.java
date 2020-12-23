@@ -36,15 +36,10 @@ public class ParticleGenerator extends AbstractGame {
     }
 
     @Override
-    protected void onStart() throws InitializationException {
-        try {
-            Fonts.create(this);
-            Textures.create(this);
-            Surfaces.create(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    protected void onStart() throws InitializationException, IOException {
+        Fonts.create(this);
+        Textures.create(this);
+        Surfaces.create(this);
         setFrame(frame, FrameDisposal.NONE);
     }
 

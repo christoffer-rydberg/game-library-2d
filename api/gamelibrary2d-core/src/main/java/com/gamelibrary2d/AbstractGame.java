@@ -16,6 +16,7 @@ import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.resources.DefaultShader;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -422,7 +423,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     }
 
-    protected abstract void onStart() throws InitializationException;
+    protected abstract void onStart() throws InitializationException, IOException;
 
     protected abstract void onExit();
 
@@ -442,7 +443,11 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         void run(StartAction onStart) throws InitializationException {
             running = true;
 
-            onStart.invoke();
+            try {
+                onStart.invoke();
+            } catch (IOException e) {
+                throw new InitializationException(e);
+            }
 
             timer.init();
             while (running && !window.isCloseRequested()) {
@@ -461,7 +466,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         }
 
         private interface StartAction {
-            void invoke() throws InitializationException;
+            void invoke() throws InitializationException, IOException;
         }
     }
 }

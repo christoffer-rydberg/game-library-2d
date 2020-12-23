@@ -9,6 +9,7 @@ public class Color {
     public static final Color LIGHT_CORAL = new Color(240f / 255f, 128f / 255f, 128f / 255f);
     public static final Color GREEN = new Color(0, 1, 0);
     public static final Color BLUE = new Color(0, 0, 1);
+    public static final Color SKY_BLUE = new Color(135 / 255f, 206 / 255f, 235 / 255f);
     public static final Color LIGHT_BLUE = new Color(173f / 255f, 216f / 255f, 230f / 255f);
     public static final Color SOFT_BLUE = new Color(171f / 255f, 215f / 255f, 235f / 255f);
     public static final Color SILVER = new Color(192f / 255f, 192f / 255f, 192f / 255f);

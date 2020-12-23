@@ -149,7 +149,6 @@ class MatrixBuffer {
     }
 
     void rotateZ(float angle) {
-
         double angleRadians = Math.toRadians(angle);
         float c = (float) Math.cos(angleRadians);
         float s = (float) Math.sin(angleRadians);
@@ -173,7 +172,6 @@ class MatrixBuffer {
     }
 
     void rotate(float angle, float x, float y, float z) {
-
         double angleRadians = Math.toRadians(angle);
         float c = (float) Math.cos(angleRadians);
         float s = (float) Math.sin(angleRadians);

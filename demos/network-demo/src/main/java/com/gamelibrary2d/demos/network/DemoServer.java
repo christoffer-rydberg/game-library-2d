@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 public class DemoServer extends AbstractNetworkServer {
     private int messagesReceived;
 
-    DemoServer(int port) {
-        super(port);
+    DemoServer(String hostname, int port) {
+        super(hostname, port);
     }
 
     @Override

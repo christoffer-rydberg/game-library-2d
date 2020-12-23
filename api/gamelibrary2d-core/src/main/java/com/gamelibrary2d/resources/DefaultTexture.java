@@ -36,7 +36,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
     }
 
     public static DefaultTexture create(URL url, Disposer disposer) throws IOException {
-        return create(load(url), disposer);
+        return create(ImageIO.read(url), disposer);
     }
 
     public static DefaultTexture create(BufferedImage image, Disposer disposer) {
@@ -92,10 +92,6 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
         g.drawImage(image, 0, 0, null);
         g.dispose();
         return newImage;
-    }
-
-    public static BufferedImage load(URL url) throws IOException {
-        return ImageIO.read(url);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class NetworkDemo {
 
     private static Thread startServerThread() {
         var thread = new Thread(() -> {
-            var server = new DemoServer(4444);
+            var server = new DemoServer("localhost", 4444);
             try {
                 server.start();
                 server.listenForConnections(true);

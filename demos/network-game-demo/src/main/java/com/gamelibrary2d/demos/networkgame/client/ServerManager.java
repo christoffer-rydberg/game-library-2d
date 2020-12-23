@@ -74,7 +74,7 @@ public class ServerManager {
     }
 
     private ServerResult createNetworkServer(int port, int localUpdPort) {
-        var server = new DefaultNetworkServer(port, s -> new DemoGameServer(s, keyPair));
+        var server = new DefaultNetworkServer("localhost", port, s -> new DemoGameServer(s, keyPair));
 
         try {
             server.start();

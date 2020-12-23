@@ -12,13 +12,13 @@ import java.io.IOException;
 public final class DefaultNetworkServer extends AbstractNetworkServer {
     private final ServerContext serverContext;
 
-    public DefaultNetworkServer(int port, Func<Server, ServerContext> serverContextFactory) {
-        super(port);
+    public DefaultNetworkServer(String hostname, int port, Func<Server, ServerContext> serverContextFactory) {
+        super(hostname, port);
         this.serverContext = serverContextFactory.invoke(this);
     }
 
-    public DefaultNetworkServer(int port, NetworkService networkService, Func<Server, ServerContext> serverContextFactory) {
-        super(port, networkService);
+    public DefaultNetworkServer(String hostname, int port, NetworkService networkService, Func<Server, ServerContext> serverContextFactory) {
+        super(hostname, port, networkService);
         this.serverContext = serverContextFactory.invoke(this);
     }
 

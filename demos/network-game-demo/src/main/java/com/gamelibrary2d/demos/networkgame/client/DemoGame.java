@@ -1,7 +1,10 @@
 package com.gamelibrary2d.demos.networkgame.client;
 
 import com.gamelibrary2d.AbstractGame;
-import com.gamelibrary2d.demos.networkgame.client.frames.*;
+import com.gamelibrary2d.demos.networkgame.client.frames.GameFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.LoadingFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.MenuFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
@@ -32,22 +35,17 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    protected void onStart() {
-        try {
-            showSplashScreen();
+    protected void onStart() throws InitializationException, IOException {
+        showSplashScreen();
 
-            var soundManager = initializeAudio();
-            var musicPlayer = MusicPlayer.create(soundManager, 10, this);
-            var soundPlayer = SoundEffectPlayer.create(soundManager, 10);
+        var soundManager = initializeAudio();
+        var musicPlayer = MusicPlayer.create(soundManager, 10, this);
+        var soundPlayer = SoundEffectPlayer.create(soundManager, 10);
 
-            createGlobalResources();
-            initializeFrames(musicPlayer, soundPlayer);
-            setLoadingFrame(loadingFrame);
-            setFrame(menuFrame, FrameDisposal.DISPOSE);
-        } catch (Exception e) {
-            System.err.println("Failed to start game");
-            e.printStackTrace();
-        }
+        createGlobalResources();
+        initializeFrames(musicPlayer, soundPlayer);
+        setLoadingFrame(loadingFrame);
+        setFrame(menuFrame, FrameDisposal.DISPOSE);
     }
 
     private SoundManager initializeAudio() throws IOException {
@@ -70,9 +68,11 @@ public class DemoGame extends AbstractGame {
     public void goToMenu() {
         try {
             setFrame(menuFrame, FrameDisposal.UNLOAD);
-            serverManager.stopHostedServer();
         } catch (InitializationException e) {
             e.printStackTrace();
+            gameFrame.end();
+        } finally {
+            serverManager.stopHostedServer();
         }
     }
 
