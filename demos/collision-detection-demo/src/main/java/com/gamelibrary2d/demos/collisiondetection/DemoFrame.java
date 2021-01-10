@@ -13,10 +13,10 @@ import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.updaters.InfiniteUpdater;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class DemoFrame extends AbstractFrame {
     private BallTool tool;
 
     DemoFrame(Game game) {
-        gameArea = Rectangle.fromBottomLeft(game.getWindow().width(), game.getWindow().height());
+        gameArea = new Rectangle(0, 0, game.getWindow().getWidth(), game.getWindow().getHeight());
         restrictedAreaHandler = new RestrictedAreaHandler<>(gameArea, Ball::accelerate);
         collisionDetection = new CollisionDetection(gameArea, 128, 10);
     }
@@ -40,7 +40,7 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
         Texture ballTexture = DefaultTexture.create(Ball.class.getResource("/ball.png"), this);
-        ballSurface = Quad.create(Rectangle.centered(32, 32), this);
+        ballSurface = Quad.create(Rectangle.create(32, 32), this);
         ballRenderer = new SurfaceRenderer(ballSurface, ballTexture);
         ballRenderer.getParameters().setRgb(152f / 255f, 251f / 255f, 152f / 255f);
         tool = BallTool.create(this, ballRenderer, this::addBall);
@@ -62,10 +62,10 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onLoaded(InitializationContext context) {
-        final var ballWidth = ballSurface.getBounds().width();
-        final var ballHeight = ballSurface.getBounds().height();
-        final float pyramidCenterX = gameArea.width() / 2f;
-        final float pyramidBaseY = 2f * gameArea.height() / 3f;
+        final var ballWidth = ballSurface.getBounds().getWidth();
+        final var ballHeight = ballSurface.getBounds().getHeight();
+        final float pyramidCenterX = gameArea.getWidth() / 2f;
+        final float pyramidBaseY = 2f * gameArea.getHeight() / 3f;
 
         // 1st row
         addBall(pyramidCenterX - 2 * ballWidth, pyramidBaseY);

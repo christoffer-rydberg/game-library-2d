@@ -144,7 +144,7 @@ public class DefaultFont implements Font {
 
             quad.render(shaderProgram);
 
-            float width = quad.getBounds().width();
+            float width = quad.getBounds().getWidth();
 
             ModelMatrix.instance().translatef(width, 0, 0);
         }
@@ -183,7 +183,7 @@ public class DefaultFont implements Font {
             var quad = quads.get(text.charAt(i));
             if (quad != null) {
                 var bounds = quad.getBounds();
-                width += bounds.width();
+                width += bounds.getWidth();
             }
         }
 

@@ -20,12 +20,12 @@ public class RestrictedAreaHandler<T extends Collidable> implements UpdatedHandl
         var bounds = obj.getBounds();
 
         var horizontalBounce =
-                obj.getPosX() + bounds.xMax() > area.xMax()
-                        || obj.getPosX() + bounds.xMin() < area.xMin();
+                obj.getPosX() + bounds.getUpperX() > area.getUpperX()
+                        || obj.getPosX() + bounds.getLowerX() < area.getLowerX();
 
         var verticalBounce =
-                obj.getPosY() + bounds.yMax() > area.yMax()
-                        || obj.getPosY() + bounds.yMin() < area.yMin();
+                obj.getPosY() + bounds.getUpperY() > area.getUpperY()
+                        || obj.getPosY() + bounds.getLowerY() < area.getLowerY();
 
         if (horizontalBounce || verticalBounce) {
             collisionListener.onCollision(

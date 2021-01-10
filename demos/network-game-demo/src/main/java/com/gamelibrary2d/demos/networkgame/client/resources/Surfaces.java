@@ -29,11 +29,11 @@ public class Surfaces {
     public static Quad coverArea(Rectangle area, float ratioWidth, float ratioHeight, Disposer disposer) {
         var ratio = ratioWidth / ratioHeight;
 
-        var boundsWidth = area.width();
-        var boundsHeight = area.height();
+        var boundsWidth = area.getWidth();
+        var boundsHeight = area.getHeight();
 
-        var actualWidth = Math.max(area.width(), boundsHeight * ratio);
-        var actualHeight = Math.max(area.height(), boundsWidth / ratio);
+        var actualWidth = Math.max(area.getWidth(), boundsHeight * ratio);
+        var actualHeight = Math.max(area.getHeight(), boundsWidth / ratio);
 
         var paddedBackgroundBounds = area.pad(
                 (actualWidth - boundsWidth) / 2f,

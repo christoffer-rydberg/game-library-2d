@@ -49,11 +49,11 @@ public class ParticleSystemSettingsPanel extends AbstractPanel<GameObject> imple
             });
             addDragStopListener(v -> setValue(0, false));
 
-            setBounds(Rectangle.centered(handle.getBounds().width() + 200, handle.getBounds().height()));
+            setBounds(Rectangle.create(handle.getBounds().getWidth() + 200, handle.getBounds().getHeight()));
         }
 
         static ResizeSlider create(ParticleSystemModel particleSystem, Disposer disposer) {
-            var quad = Quad.create(Rectangle.centered(32, 16), disposer);
+            var quad = Quad.create(Rectangle.create(32, 16), disposer);
             var handle = new SurfaceRenderer(quad, Textures.sliderHandle());
             return new ResizeSlider(handle, particleSystem);
         }

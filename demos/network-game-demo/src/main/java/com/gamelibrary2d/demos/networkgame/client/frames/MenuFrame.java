@@ -67,13 +67,13 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private static void center(GameObject obj, Window window) {
-        obj.setPosition(window.width() / 2f, window.height() / 2f);
-        obj.getPosition().subtract(obj.getBounds().center());
+        obj.setPosition(window.getWidth() / 2f, window.getHeight() / 2f);
+        obj.getPosition().subtract(obj.getBounds().getCenter());
     }
 
     private GameObject createGameTitle() throws IOException {
         var texture = DefaultTexture.create(Images.MENU_TITLE, this);
-        var surface = Quad.create(Rectangle.centered(texture.getWidth(), texture.getHeight()), this);
+        var surface = Quad.create(Rectangle.create(texture.getWidth(), texture.getHeight()), this);
         var renderer = new SurfaceRenderer(surface, texture);
         return new DefaultGameObject<>(renderer);
     }
@@ -82,7 +82,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
         var backgroundTexture = DefaultTexture.create(Images.MENU_BACKGROUND, this);
 
         var backgroundSurface = Surfaces.coverArea(
-                Rectangle.fromBottomLeft(game.getWindow().width(), game.getWindow().height()),
+                new Rectangle(0, 0, game.getWindow().getWidth(), game.getWindow().getHeight()),
                 backgroundTexture.getWidth(),
                 backgroundTexture.getHeight(),
                 this);
@@ -101,13 +101,13 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
         creditsButton = createCreditsButton();
         creditsButton.setPosition(
-                19 * game.getWindow().width() / 20f,
-                game.getWindow().height() / 20f);
+                19 * game.getWindow().getWidth() / 20f,
+                game.getWindow().getHeight() / 20f);
 
         gameTitle = createGameTitle();
         gameTitle.setPosition(
-                game.getWindow().width() / 2f,
-                game.getWindow().height() * 0.75f);
+                game.getWindow().getWidth() / 2f,
+                game.getWindow().getHeight() * 0.75f);
 
         backgroundLayer = new DefaultLayerObject<>();
         menu = new DefaultLayerObject<>();
@@ -316,9 +316,9 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
             setEnabled(true);
             setSpeedFactor(1f);
 
-            credits.setPosition(window.width() / 2f, 0);
-            var height = credits.getContent().calculateBounds().height();
-            var windowHeight = window.height();
+            credits.setPosition(window.getWidth() / 2f, 0);
+            var height = credits.getContent().calculateBounds().getHeight();
+            var windowHeight = window.getHeight();
 
             updater.clear();
 
@@ -327,7 +327,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
                     true,
                     new PositionUpdate(credits, 0, height + windowHeight)));
 
-            updater.add(new InstantUpdater(dt -> onFinished.invoke()));
+            updater.add(new InstantUpdater(dt -> onFinished.perform()));
         }
     }
 

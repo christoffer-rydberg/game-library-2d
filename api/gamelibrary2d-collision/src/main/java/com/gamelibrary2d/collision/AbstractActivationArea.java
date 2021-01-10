@@ -20,14 +20,14 @@ public abstract class AbstractActivationArea implements ActivationArea {
         var bounds = getBounds();
         var posX = getPosX();
         var posY = getPosY();
-        var shrinkX = collidableBounds.width() + maxMovement;
-        var shrinkY = collidableBounds.height() + maxMovement;
+        var shrinkX = collidableBounds.getWidth() + maxMovement;
+        var shrinkY = collidableBounds.getHeight() + maxMovement;
 
         boolean activated =
-                !(bounds.xMin() + shrinkX + posX > collidableBounds.xMax() + collidablePosX
-                        || bounds.yMin() + shrinkY + posY > collidableBounds.yMax() + collidablePosY
-                        || bounds.xMax() - shrinkX + posX < collidableBounds.xMin() + collidablePosX
-                        || bounds.yMax() - shrinkY + posY < collidableBounds.yMin() + collidablePosY);
+                !(bounds.getLowerX() + shrinkX + posX > collidableBounds.getUpperX() + collidablePosX
+                        || bounds.getLowerY() + shrinkY + posY > collidableBounds.getUpperY() + collidablePosY
+                        || bounds.getUpperX() - shrinkX + posX < collidableBounds.getLowerX() + collidablePosX
+                        || bounds.getUpperY() - shrinkY + posY < collidableBounds.getLowerY() + collidablePosY);
 
         return activated ? activatedResult : ActivationResult.NEAR_EDGE;
     }

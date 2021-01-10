@@ -9,9 +9,9 @@ public class SerializationUtil {
     }
 
     public static void serializeRectangle(Rectangle rectangle, DataBuffer buffer) {
-        buffer.putFloat(rectangle.xMin());
-        buffer.putFloat(rectangle.yMin());
-        buffer.putFloat(rectangle.xMax());
-        buffer.putFloat(rectangle.yMax());
+        buffer.putFloat(rectangle.getLowerX());
+        buffer.putFloat(rectangle.getLowerY());
+        buffer.putFloat(rectangle.getUpperX());
+        buffer.putFloat(rectangle.getUpperY());
     }
 }

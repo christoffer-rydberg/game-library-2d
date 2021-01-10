@@ -19,23 +19,23 @@ public class PictureFrame implements Renderable {
     public static PictureFrame create(Rectangle outer, Rectangle inner, Color color, Disposer disposer) {
         var sides = new ArrayList<Renderable>(4);
 
-        if (inner.xMin() > outer.xMin()) {
-            var bounds = new Rectangle(outer.xMin(), outer.yMin(), inner.xMin(), outer.yMax());
+        if (inner.getLowerX() > outer.getLowerX()) {
+            var bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), inner.getLowerX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
-        if (outer.xMax() > inner.xMax()) {
-            var bounds = new Rectangle(inner.xMax(), outer.yMin(), outer.xMax(), outer.yMax());
+        if (outer.getUpperX() > inner.getUpperX()) {
+            var bounds = new Rectangle(inner.getUpperX(), outer.getLowerY(), outer.getUpperX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
-        if (inner.yMin() > outer.yMin()) {
-            var bounds = new Rectangle(outer.xMin(), outer.yMin(), outer.xMax(), inner.yMin());
+        if (inner.getLowerY() > outer.getLowerY()) {
+            var bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), outer.getUpperX(), inner.getLowerY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
-        if (outer.yMax() > inner.yMax()) {
-            var bounds = new Rectangle(outer.xMin(), inner.yMax(), outer.xMax(), outer.yMax());
+        if (outer.getUpperY() > inner.getUpperY()) {
+            var bounds = new Rectangle(outer.getLowerX(), inner.getUpperY(), outer.getUpperX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 

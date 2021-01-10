@@ -88,7 +88,7 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
     private void renderAction() {
         ModelMatrix.instance().pushMatrix();
         var renderArea = areaRenderer.getResource().getArea();
-        ModelMatrix.instance().translatef(renderArea.xMin(), renderArea.yMin(), 0);
+        ModelMatrix.instance().translatef(renderArea.getLowerX(), renderArea.getLowerY(), 0);
         target.render(1f);
         ModelMatrix.instance().popMatrix();
     }

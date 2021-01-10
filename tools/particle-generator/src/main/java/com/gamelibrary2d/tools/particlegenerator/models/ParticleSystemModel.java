@@ -57,8 +57,8 @@ public class ParticleSystemModel {
                 efficientRenderer.getBounds());
 
         updateParticleSize(
-                efficientRenderer.getBounds().width(),
-                efficientRenderer.getBounds().height());
+                efficientRenderer.getBounds().getWidth(),
+                efficientRenderer.getBounds().getHeight());
 
         setBlendMode(BlendMode.ADDITIVE);
     }
@@ -195,7 +195,7 @@ public class ParticleSystemModel {
     }
 
     public float getWidth() {
-        return bounds.width();
+        return bounds.getWidth();
     }
 
     public void setWidth(float width) {
@@ -205,7 +205,7 @@ public class ParticleSystemModel {
     }
 
     public float getHeight() {
-        return bounds.height();
+        return bounds.getHeight();
     }
 
     public void setHeight(float height) {
@@ -227,7 +227,7 @@ public class ParticleSystemModel {
     }
 
     private void updateParticleSize(float width, float height) {
-        bounds = Rectangle.centered(width, height);
+        bounds = Rectangle.create(width, height);
         efficientRenderer.setBounds(bounds);
         sequentialRenderer.setBounds(bounds);
     }

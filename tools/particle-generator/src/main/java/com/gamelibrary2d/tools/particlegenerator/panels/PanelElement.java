@@ -81,8 +81,8 @@ public class PanelElement {
                     parameter);
 
             checkBox.setPosition(
-                    Surfaces.propertyBaseLine().getBounds().width() / 2f - checkBox.getBounds().centerX(),
-                    -Surfaces.defaultCheckbox().getBounds().yMin() - 2f);
+                    Surfaces.propertyBaseLine().getBounds().getWidth() / 2f - checkBox.getBounds().getCenterX(),
+                    -Surfaces.defaultCheckbox().getBounds().getLowerY() - 2f);
 
             add(label);
             add(checkBox);
@@ -99,7 +99,7 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
-            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 1f);
+            parameterWidget.setPosition(-parameterWidget.getBounds().getLowerX(), 1f);
 
             add(label);
             add(parameterWidget);
@@ -116,7 +116,7 @@ public class PanelElement {
                         VerticalTextAlignment.CENTER);
 
                 plusLabel.setPosition(
-                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
+                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() + 3);
 
                 var minusLabel = createLabelObject(
@@ -127,7 +127,7 @@ public class PanelElement {
                         VerticalTextAlignment.CENTER);
 
                 minusLabel.setPosition(
-                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
+                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() - 3);
 
                 add(plusLabel);
@@ -167,7 +167,7 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
-            parameterWidget.setPosition(-parameterWidget.getBounds().xMin(), 1f);
+            parameterWidget.setPosition(-parameterWidget.getBounds().getLowerX(), 1f);
 
             add(label);
             add(parameterWidget);
@@ -184,7 +184,7 @@ public class PanelElement {
                         VerticalTextAlignment.BASE_LINE);
 
                 plusLabel.setPosition(
-                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
+                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() + 3);
 
                 var minusLabel = createLabelObject(
@@ -195,7 +195,7 @@ public class PanelElement {
                         VerticalTextAlignment.BASE_LINE);
 
                 minusLabel.setPosition(
-                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().xMin() - 8,
+                        varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() - 3);
 
                 add(plusLabel);
@@ -251,8 +251,8 @@ public class PanelElement {
                     this::onDisabled);
 
             checkBox.setPosition(
-                    bounds.xMax() - checkBox.getBounds().xMax() - 6f,
-                    bounds.yMax() - checkBox.getBounds().yMax() - 6f);
+                    bounds.getUpperX() - checkBox.getBounds().getUpperX() - 6f,
+                    bounds.getUpperY() - checkBox.getBounds().getUpperY() - 6f);
 
             add(content);
             add(boundingBox);
@@ -288,7 +288,7 @@ public class PanelElement {
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var backgroundObj = new DefaultGameObject<>(background);
-            backgroundObj.setPosition(-backgroundObj.getBounds().xMin(), 0f);
+            backgroundObj.setPosition(-backgroundObj.getBounds().getLowerX(), 0f);
             backgroundObj.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
 
             var enumLabel = createLabel(
@@ -299,15 +299,15 @@ public class PanelElement {
                     VerticalTextAlignment.BASE_LINE
             );
 
-            var backgroundWidth = backgroundObj.getBounds().width();
+            var backgroundWidth = backgroundObj.getBounds().getWidth();
 
             var widget = new EnumWidget<>(enumType, enumLabel, property);
             widget.setPosition(backgroundWidth / 2, 0);
             widget.setBounds(new Rectangle(
                     -backgroundWidth / 2,
-                    backgroundObj.getBounds().yMin(),
+                    backgroundObj.getBounds().getLowerY(),
                     backgroundWidth / 2,
-                    backgroundObj.getBounds().yMax()));
+                    backgroundObj.getBounds().getUpperY()));
 
             add(label);
             add(backgroundObj);

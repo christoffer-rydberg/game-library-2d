@@ -8,9 +8,9 @@ public interface Window {
 
     void setMouseCursorMode(MouseCursorMode mouseCursorMode);
 
-    int height();
+    int getHeight();
 
-    int width();
+    int getWidth();
 
     void pollEvents();
 

@@ -50,7 +50,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
         var tempResourceDisposer = new DefaultDisposer();
 
         try {
-            var texture = DefaultTexture.create((int) area.width(), (int) area.height(), disposer);
+            var texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
             var frameBuffer = FrameBuffer.create(texture, tempResourceDisposer);
 
             frameBuffer.bind();
@@ -61,7 +61,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
 
             ModelMatrix.instance().pushMatrix();
             ModelMatrix.instance().clearMatrix();
-            ModelMatrix.instance().translatef(-area.xMin(), -area.yMin(), 0);
+            ModelMatrix.instance().translatef(-area.getLowerX(), -area.getLowerY(), 0);
             r.render(alpha);
             ModelMatrix.instance().popMatrix();
             frameBuffer.unbind(true);

@@ -18,7 +18,7 @@ public class AnimationSheet {
         this.cols = cols;
         this.rows = rows;
     }
-    
+
     public static AnimationSheet create(Texture texture, Rectangle bounds, AnimationSheetMetadata metadata, Disposer disposer) {
         int cols = metadata.getCols();
         int rows = metadata.getRows();
@@ -48,8 +48,11 @@ public class AnimationSheet {
         float frameHeight = height / rows;
 
         bounds = relativeBounds
-                ? new Rectangle(frameWidth * bounds.xMin(), frameHeight * bounds.yMin(),
-                frameWidth * bounds.xMax(), frameHeight * bounds.yMax())
+                ? new Rectangle(
+                frameWidth * bounds.getLowerX(),
+                frameHeight * bounds.getLowerY(),
+                frameWidth * bounds.getUpperX(),
+                frameHeight * bounds.getUpperY())
                 : bounds;
 
         for (int col = 0; col < cols; ++col) {

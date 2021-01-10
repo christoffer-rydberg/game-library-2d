@@ -45,8 +45,8 @@ public class BounceHandler<T1 extends Obstacle, T2 extends Obstacle> implements 
         var distY = collided.getY() - updated.getY();
         var dist = Math.sqrt(distX * distX + distY * distY);
 
-        var diameter = updated.getCollidable().getBounds().width();
-        var otherDiameter = collided.getCollidable().getBounds().width();
+        var diameter = updated.getCollidable().getBounds().getWidth();
+        var otherDiameter = collided.getCollidable().getBounds().getWidth();
         var isCollision = dist * 2 <= diameter + otherDiameter;
         if (isCollision) {
             var u1 = getSpeedTowardsCollision(updated, collided);

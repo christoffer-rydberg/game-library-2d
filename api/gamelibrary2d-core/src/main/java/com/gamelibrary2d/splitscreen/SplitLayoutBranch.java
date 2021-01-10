@@ -24,19 +24,19 @@ public class SplitLayoutBranch implements SplitLayout {
 
     public void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer) {
         var childWidth = orientation == SplitOrientation.VERTICAL
-                ? viewArea.width()
-                : viewArea.width() / layouts.size() - margin;
+                ? viewArea.getWidth()
+                : viewArea.getWidth() / layouts.size() - margin;
 
         var childHeight = orientation == SplitOrientation.HORIZONTAL
-                ? viewArea.height()
-                : viewArea.height() / layouts.size() - margin;
+                ? viewArea.getHeight()
+                : viewArea.getHeight() / layouts.size() - margin;
 
         var dx = orientation == SplitOrientation.VERTICAL ? 0 : childWidth + margin;
         var dy = orientation == SplitOrientation.HORIZONTAL ? 0 : childHeight + margin;
 
         for (int i = 0; i < layouts.size(); ++i) {
-            float xMin = viewArea.xMin() + dx * i;
-            float yMin = viewArea.yMin() + dy * i;
+            float xMin = viewArea.getLowerX() + dx * i;
+            float yMin = viewArea.getLowerY() + dy * i;
 
             if (i == layouts.size() - 1) {
                 childWidth += orientation == SplitOrientation.VERTICAL ? 0 : 1;

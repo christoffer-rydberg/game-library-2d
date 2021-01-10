@@ -38,18 +38,18 @@ class DemoFrame extends AbstractFrame {
     }
 
     private Renderable createBackground(Window window) throws IOException {
-        var bounds = Rectangle.fromBottomLeft(window.width(), window.height());
+        var bounds = new Rectangle(0, 0, window.getWidth(), window.getHeight());
         return createRenderer(bounds, "background.jpg");
     }
 
     private Renderable createTorch(DefaultParticleSystem particleSystem, DefaultDynamicLightMap lightMap) throws IOException {
-        var bounds = Rectangle.fromTopLeft(32, 64).move(-5, 10);
+        var bounds = Rectangle.create(32, 64).move(11, -22);
         var renderer = createRenderer(bounds, "torch.png");
         return new Cursor(game, renderer, lightMap, particleSystem);
     }
 
     private LightRenderer createLightRenderer(Window window, LightMap lightMap) {
-        var lightRenderer = DefaultLightRenderer.create(window.width(), window.height(), this);
+        var lightRenderer = DefaultLightRenderer.create(window.getWidth(), window.getHeight(), this);
         lightRenderer.addLightMap(lightMap);
         lightRenderer.prepare(32, 32);
         return lightRenderer;

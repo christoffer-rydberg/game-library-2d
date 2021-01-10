@@ -22,19 +22,19 @@ public class DemoGameLogic {
 
         settings = new GameSettings(
                 new Rectangle(0, 0, 1024, 1024),
-                Rectangle.centered(32f, 32f),
-                Rectangle.centered(32f, 32f));
+                Rectangle.create(32f, 32f),
+                Rectangle.create(32f, 32f));
 
         collisionDetection = new CollisionDetection(
                 settings.getGameBounds(),
-                getGameSettings().getObstacleBounds().width() * 4,
+                getGameSettings().getObstacleBounds().getWidth() * 4,
                 10);
     }
 
     public void startGame(List<ServerPlayer> players) {
         gameOver = false;
 
-        var center = settings.getGameBounds().center();
+        var center = settings.getGameBounds().getCenter();
 
         for (byte i = 0; i < players.size(); ++i) {
             var player = players.get(i);
@@ -47,7 +47,7 @@ public class DemoGameLogic {
         }
 
         var portal = new ServerPortal(this, settings.getPortalBounds());
-        portal.setPosition(settings.getGameBounds().center());
+        portal.setPosition(settings.getGameBounds().getCenter());
         spawn(portal);
     }
 

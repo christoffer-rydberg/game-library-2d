@@ -21,7 +21,7 @@ public class Button<T extends Renderable> extends AbstractWidget<T> {
     @Override
     protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
-        onClick.invoke();
+        onClick.perform();
     }
 
 }

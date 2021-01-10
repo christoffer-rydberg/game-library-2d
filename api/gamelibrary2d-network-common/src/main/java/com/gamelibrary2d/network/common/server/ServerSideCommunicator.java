@@ -27,7 +27,7 @@ public class ServerSideCommunicator extends AbstractNetworkCommunicator {
 
     @Override
     public void configureAuthentication(CommunicationSteps steps) {
-        configureAuthentication.invoke(steps);
+        configureAuthentication.perform(steps);
     }
 
 }

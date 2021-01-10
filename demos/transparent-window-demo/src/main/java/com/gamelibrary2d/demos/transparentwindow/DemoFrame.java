@@ -23,7 +23,7 @@ public class DemoFrame extends AbstractFrame {
 
     private Animation createAnimation() throws IOException {
         var animation = AnimationFactory.create(DemoFrame.class.getResource("/Images/homer.gif"),
-                AnimationFormats.GIF, Rectangle.centered(1f, 1f), AnimationFactory.NO_CONSTRAINTS, this);
+                AnimationFormats.GIF, Rectangle.create(1f, 1f), AnimationFactory.NO_CONSTRAINTS, this);
         var frames = animation.getFrames();
         var frameUpdate = new ArrayList<AnimationFrame>();
         frames.forEach(frameUpdate::add);
@@ -38,7 +38,7 @@ public class DemoFrame extends AbstractFrame {
         try {
             var animation = createAnimation();
             animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
-            animationObj.setPosition(window.width() / 2f, window.height() / 2f);
+            animationObj.setPosition(window.getWidth() / 2f, window.getHeight() / 2f);
             add(animationObj);
         } catch (IOException e) {
             e.printStackTrace();

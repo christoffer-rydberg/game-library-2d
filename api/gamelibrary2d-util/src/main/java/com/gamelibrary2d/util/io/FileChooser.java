@@ -45,7 +45,21 @@ public class FileChooser {
         this.selectedFile = selectedFile;
     }
 
-    public File browse() throws IOException {
+    private void applyBrowseMode(JFileChooser fileChooser, FileSelectionMode mode) {
+        switch (mode) {
+            case FILES_ONLY:
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                break;
+            case DIRECTORIES_ONLY:
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                break;
+            case FILES_AND_DIRECTORIES:
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                break;
+        }
+    }
+
+    public File browse(FileSelectionMode fileSelectionMode) throws IOException {
         JFrame frame = new JFrame();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
@@ -53,11 +67,12 @@ public class FileChooser {
         frame.setExtendedState(JFrame.ICONIFIED);
         frame.setExtendedState(JFrame.NORMAL);
 
-        JFileChooser fc = new JFileChooser(currentDirectory);
-        fc.setSelectedFile(selectedFile);
-        if (fc.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            setSelectedFile(fc.getSelectedFile());
-            setCurrentDirectory(fc.getCurrentDirectory().getAbsolutePath());
+        JFileChooser fileChooser = new JFileChooser(currentDirectory);
+        applyBrowseMode(fileChooser, fileSelectionMode);
+        fileChooser.setSelectedFile(selectedFile);
+        if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            setSelectedFile(fileChooser.getSelectedFile());
+            setCurrentDirectory(fileChooser.getCurrentDirectory().getAbsolutePath());
             frame.setVisible(false);
             frame.dispose();
             return selectedFile;

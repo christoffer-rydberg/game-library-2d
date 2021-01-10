@@ -23,7 +23,7 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
 
     public EfficientParticleRenderer() {
         super(DrawMode.POINTS);
-        setBounds(Rectangle.centered(16f, 16f));
+        setBounds(Rectangle.create(16f, 16f));
     }
 
     public Rectangle getBounds() {
@@ -32,10 +32,10 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
 
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
-        boundsArray[0] = bounds.xMin();
-        boundsArray[1] = bounds.yMin();
-        boundsArray[2] = bounds.xMax();
-        boundsArray[3] = bounds.yMax();
+        boundsArray[0] = bounds.getLowerX();
+        boundsArray[1] = bounds.getLowerY();
+        boundsArray[2] = bounds.getUpperX();
+        boundsArray[3] = bounds.getUpperY();
     }
 
     public PointSmoothing getPointSmoothing() {

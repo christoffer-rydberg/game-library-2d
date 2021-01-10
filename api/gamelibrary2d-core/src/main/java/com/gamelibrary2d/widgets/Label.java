@@ -326,7 +326,7 @@ public class Label implements Renderable {
         void expandBounds(Rectangle bounds) {
             this.bounds = this.bounds == null
                     ? bounds
-                    : this.bounds.expand(bounds);
+                    : this.bounds.add(bounds);
         }
     }
 }

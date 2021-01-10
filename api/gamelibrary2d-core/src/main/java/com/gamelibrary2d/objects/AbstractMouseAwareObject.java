@@ -49,7 +49,7 @@ public abstract class AbstractMouseAwareObject<T extends Renderable> extends Abs
 
     private boolean isPixelVisible(float x, float y) {
         var bounds = getBounds();
-        if (bounds.isInside(x, y)) {
+        if (bounds.contains(x, y)) {
             if (pixelDetectionEnabled()) {
                 if (bitmapRenderer == null || !bitmapRenderer.getArea().equals(bounds)) {
                     disposer.dispose();

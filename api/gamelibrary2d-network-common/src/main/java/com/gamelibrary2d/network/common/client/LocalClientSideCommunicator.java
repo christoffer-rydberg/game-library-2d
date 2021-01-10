@@ -44,7 +44,7 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
     @Override
     public void configureAuthentication(CommunicationSteps steps) {
         if (configureAuthentication != null) {
-            configureAuthentication.invoke(steps);
+            configureAuthentication.perform(steps);
         }
     }
 
@@ -91,7 +91,7 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
         @Override
         public void configureAuthentication(CommunicationSteps steps) {
             if (configureAuthentication != null) {
-                configureAuthentication.invoke(steps);
+                configureAuthentication.perform(steps);
             }
         }
 

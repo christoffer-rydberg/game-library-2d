@@ -12,8 +12,8 @@ public class Surfaces {
     private static Surface propertyBaseLine;
 
     public static void create(Disposer disposer) {
-        defaultCheckbox = Box.create(Rectangle.centered(14f, 14f), disposer);
-        cornerCheckbox = Box.create(Rectangle.centered(12f, 12f), disposer);
+        defaultCheckbox = Box.create(Rectangle.create(14f, 14f), disposer);
+        cornerCheckbox = Box.create(Rectangle.create(12f, 12f), disposer);
         propertyBaseLine = Quad.create(Bounds.PROPERTY_BASE_LINE, disposer);
     }
 

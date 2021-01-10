@@ -72,7 +72,7 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator {
     @Override
     public void configureAuthentication(CommunicationSteps steps) {
         if (configureAuthentication != null) {
-            configureAuthentication.invoke(steps);
+            configureAuthentication.perform(steps);
         }
     }
 

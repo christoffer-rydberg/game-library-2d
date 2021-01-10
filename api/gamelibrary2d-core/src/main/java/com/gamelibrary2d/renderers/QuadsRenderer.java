@@ -33,10 +33,10 @@ public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
 
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
-        boundsArray[0] = bounds.xMin();
-        boundsArray[1] = bounds.yMin();
-        boundsArray[2] = bounds.xMax();
-        boundsArray[3] = bounds.yMax();
+        boundsArray[0] = bounds.getLowerX();
+        boundsArray[1] = bounds.getLowerY();
+        boundsArray[2] = bounds.getUpperX();
+        boundsArray[3] = bounds.getUpperY();
     }
 
     public Texture getTexture() {

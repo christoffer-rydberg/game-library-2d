@@ -4,9 +4,9 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.functional.Func;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.resources.DefaultTexture;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.gif.DisposalMethod;
@@ -40,8 +40,8 @@ class InternalGifAnimationFactory {
         int frameCount = images.size();
         var animationFrames = new ArrayList<AnimationFrame>(frameCount);
 
-        var scaleX = scale.width();
-        var scaleY = scale.height();
+        var scaleX = scale.getWidth();
+        var scaleY = scale.getHeight();
 
         var imageWidth = metadata.getWidth();
         var imageHeight = metadata.getHeight();
@@ -57,8 +57,8 @@ class InternalGifAnimationFactory {
 
             var xOffset = metadataItem.getLeftPosition();
             var yOffset = imageHeight - frameHeight - metadataItem.getTopPosition();
-            var frameBounds = Rectangle.fromBottomLeft(frameWidth * scaleX, frameHeight * scaleY);
-            frameBounds = frameBounds.move(imageWidth * scale.xMin(), imageHeight * scale.yMin());
+            var frameBounds = new Rectangle(0, 0, frameWidth * scaleX, frameHeight * scaleY);
+            frameBounds = frameBounds.move(imageWidth * scale.getLowerX(), imageHeight * scale.getLowerY());
             frameBounds = frameBounds.move(xOffset * scaleX, yOffset * scaleY);
 
             // Ignore disposal method for last frame if no other frame require background buffer rendering

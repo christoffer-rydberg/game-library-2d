@@ -19,6 +19,7 @@ import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.File;
@@ -56,7 +57,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
 
     private void saveParticleSystem() {
         try {
-            File file = fileChooser.browse();
+            File file = fileChooser.browse(FileSelectionMode.FILES_ONLY);
             if (file != null) {
                 saveLoadManager.save(particleSystem.getSettings(), file, true);
             }
@@ -68,7 +69,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     private void loadParticleSystem() {
         ParticleSystemParameters settings;
         try {
-            File file = fileChooser.browse();
+            File file = fileChooser.browse(FileSelectionMode.FILES_ONLY);
 
             if (file != null) {
                 settings = saveLoadManager.load(file, ParticleSystemParameters::new);
@@ -209,31 +210,31 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
             particleSystem.getPositioner().setSpawnAreaHeight(0);
 
             particleSystem.getPositioner().setSpawnAreaWidthVar(
-                    round(random.nextFloat() * game.getWindow().width() / 4, 0));
+                    round(random.nextFloat() * game.getWindow().getWidth() / 4, 0));
 
             particleSystem.getPositioner().setSpawnAreaHeightVar(
-                    round(random.nextFloat() * game.getWindow().height() / 4, 0));
+                    round(random.nextFloat() * game.getWindow().getHeight() / 4, 0));
         } else if (areaRandomizer == 1) {
             particleSystem.getPositioner().setSpawnAreaWidth(
-                    round(random.nextFloat() * game.getWindow().width() / 4, 0));
+                    round(random.nextFloat() * game.getWindow().getWidth() / 4, 0));
 
             particleSystem.getPositioner().setSpawnAreaHeight(
-                    round(random.nextFloat() * game.getWindow().height() / 4, 0));
+                    round(random.nextFloat() * game.getWindow().getHeight() / 4, 0));
 
             particleSystem.getPositioner().setSpawnAreaWidthVar(0);
             particleSystem.getPositioner().setSpawnAreaHeightVar(0);
         } else if (areaRandomizer == 2) {
             particleSystem.getPositioner().setSpawnAreaWidthVar(
-                    round(random.nextFloat() * game.getWindow().width() / 8, 0));
+                    round(random.nextFloat() * game.getWindow().getWidth() / 8, 0));
 
             particleSystem.getPositioner().setSpawnAreaHeightVar(
-                    round(random.nextFloat() * game.getWindow().height() / 8, 0));
+                    round(random.nextFloat() * game.getWindow().getHeight() / 8, 0));
 
             particleSystem.getPositioner().setSpawnAreaWidth(
-                    round(random.nextFloat() * game.getWindow().width() / 8, 0));
+                    round(random.nextFloat() * game.getWindow().getWidth() / 8, 0));
 
             particleSystem.getPositioner().setSpawnAreaHeight(
-                    round(random.nextFloat() * game.getWindow().height() / 8, 0));
+                    round(random.nextFloat() * game.getWindow().getHeight() / 8, 0));
         }
 
         particleSystem.getPositioner()

@@ -36,7 +36,7 @@ public class EncryptionWriter {
         var position = buffer.position();
 
         // Write data and restore position
-        plaintextWriter.invoke(buffer);
+        plaintextWriter.perform(buffer);
         var positionAfter = buffer.position();
         buffer.position(position);
 

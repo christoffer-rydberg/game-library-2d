@@ -17,6 +17,7 @@ import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
 
     private String loadTexture() {
         try {
-            File file = fileChooser.browse();
+            File file = fileChooser.browse(FileSelectionMode.FILES_ONLY);
             if (file != null) {
                 var url = file.toURI().toURL();
                 particleSystem.loadTexture(url);

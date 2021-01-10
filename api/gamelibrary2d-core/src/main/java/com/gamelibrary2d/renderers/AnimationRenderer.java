@@ -9,8 +9,8 @@ import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.DefaultTexture;
+import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
@@ -163,13 +163,13 @@ public class AnimationRenderer extends AbstractRenderer {
 
                 var quad = frame.getQuad();
                 var bounds = quad.getBounds();
-                var scaledWidth = bounds.width();
-                var scaledHeight = bounds.height();
+                var scaledWidth = bounds.getWidth();
+                var scaledHeight = bounds.getHeight();
 
                 var width = frame.getTexture().getWidth();
                 var height = frame.getTexture().getHeight();
-                var offsetX = Math.round((width / scaledWidth) * (bounds.xMin() - animation.getBounds().xMin()));
-                var offsetY = Math.round((height / scaledHeight) * (bounds.yMin() - animation.getBounds().yMin()));
+                var offsetX = Math.round((width / scaledWidth) * (bounds.getLowerX() - animation.getBounds().getLowerX()));
+                var offsetY = Math.round((height / scaledHeight) * (bounds.getLowerY() - animation.getBounds().getLowerY()));
 
                 var fullSizeBounds = new Rectangle(offsetX, offsetY, width + offsetX, height + offsetY);
                 quads[i] = Quad.create(fullSizeBounds, disposer);

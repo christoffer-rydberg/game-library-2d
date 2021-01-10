@@ -16,6 +16,7 @@ import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
+import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
 
@@ -83,11 +84,11 @@ public class DemoFrame extends AbstractFrame {
 
     private void selectGif() throws IOException {
         var fileChooser = new FileChooser(System.getenv("TEMP") + "/ParticleGenerator/particle_path.txt");
-        var path = fileChooser.browse();
+        var path = fileChooser.browse(FileSelectionMode.FILES_ONLY);
         if (path != null) {
             final float windowWidth = game.getWindow().width();
             final float windowHeight = game.getWindow().height();
-            var animation = AnimationFactory.create(path.toURI().toURL(), AnimationFormats.GIF, Rectangle.centered(1f, 1f), new Point(windowWidth, windowHeight), this);
+            var animation = AnimationFactory.create(path.toURI().toURL(), AnimationFormats.GIF, Rectangle.create(1f, 1f), new Point(windowWidth, windowHeight), this);
             var renderer = new AnimationRenderer(animation, true, this);
             animatedObject.setRenderer(renderer);
         }

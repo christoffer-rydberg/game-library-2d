@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class AnimationFactory {
 
-    public static final Point NO_CONSTRAINTS = new Point(Rectangle.INFINITE_VALUE, Rectangle.INFINITE_VALUE);
+    public static final Point NO_CONSTRAINTS = new Point(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
 
     public static Animation create(URL url, String format, Rectangle bounds, Disposer disposer) throws IOException {
         return create(readAllBytes(url), format, bounds, disposer);
@@ -44,7 +44,7 @@ public class AnimationFactory {
     }
 
     private static Rectangle applyConstraints(Rectangle bounds, Point imageSize, Point sizeConstraints) {
-        float scale = bounds.width();
+        float scale = bounds.getWidth();
         var aspect = bounds.resize(1f / scale);
         scale = Math.min(scale, sizeConstraints.getX() / imageSize.getX());
         scale = Math.min(scale, sizeConstraints.getY() / imageSize.getY());

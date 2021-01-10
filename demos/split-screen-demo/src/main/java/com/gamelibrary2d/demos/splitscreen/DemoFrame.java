@@ -16,9 +16,9 @@ import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.QuadsRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.splitscreen.*;
 import com.gamelibrary2d.util.QuadShape;
 
@@ -55,8 +55,8 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
         var spaceCraft = new SpaceCraft(GAME_BOUNDS, renderer);
         spaceCraft.setPosition(
-                GAME_BOUNDS.xMin() + random.nextFloat() * GAME_BOUNDS.width(),
-                GAME_BOUNDS.yMin() + random.nextFloat() * GAME_BOUNDS.height());
+                GAME_BOUNDS.getLowerX() + random.nextFloat() * GAME_BOUNDS.getWidth(),
+                GAME_BOUNDS.getLowerY() + random.nextFloat() * GAME_BOUNDS.getHeight());
 
         return spaceCraft;
     }
@@ -65,15 +65,15 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         var random = RandomInstance.get();
         float[] positions = new float[count * 2];
         for (int i = 0; i < count; ++i) {
-            var x = GAME_BOUNDS.xMin() + random.nextFloat() * GAME_BOUNDS.width();
-            var y = GAME_BOUNDS.yMin() + random.nextFloat() * GAME_BOUNDS.height();
+            var x = GAME_BOUNDS.getLowerX() + random.nextFloat() * GAME_BOUNDS.getWidth();
+            var y = GAME_BOUNDS.getLowerY() + random.nextFloat() * GAME_BOUNDS.getHeight();
             var index = i * 2;
             positions[index] = x;
             positions[index + 1] = y;
         }
 
         var starPositions = PositionBuffer.create(positions, this);
-        var starsRenderer = new QuadsRenderer(Rectangle.centered(8f, 8f));
+        var starsRenderer = new QuadsRenderer(Rectangle.create(8f, 8f));
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
         starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
 
@@ -82,12 +82,12 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
     private void prepareView(SpaceCraft spaceCraft, Rectangle viewArea) {
         var x = Math.min(
-                GAME_BOUNDS.width() - viewArea.width() / 2,
-                Math.max(spaceCraft.getPosition().getX(), viewArea.width() / 2));
+                GAME_BOUNDS.getWidth() - viewArea.getWidth() / 2,
+                Math.max(spaceCraft.getPosition().getX(), viewArea.getWidth() / 2));
         var y = Math.min(
-                GAME_BOUNDS.height() - viewArea.height() / 2,
-                Math.max(spaceCraft.getPosition().getY(), viewArea.height() / 2));
-        spacecraftLayer.setPosition(viewArea.width() / 2 - x, viewArea.height() / 2 - y);
+                GAME_BOUNDS.getHeight() - viewArea.getHeight() / 2,
+                Math.max(spaceCraft.getPosition().getY(), viewArea.getHeight() / 2));
+        spacecraftLayer.setPosition(viewArea.getWidth() / 2 - x, viewArea.getHeight() / 2 - y);
     }
 
     private SplitLayout createSplitLayoutHelper(List<SpaceCraft> spaceCrafts, SplitOrientation orientation) {
@@ -132,7 +132,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         var backgroundLayer = new BasicLayer<>();
         backgroundLayer.setAutoClearing(false);
         backgroundLayer.add(createBackgroundColor());
-        backgroundLayer.add(createStars(Math.round(GAME_BOUNDS.area() * 0.0001f)));
+        backgroundLayer.add(createStars(Math.round(GAME_BOUNDS.getArea() * 0.0001f)));
         return backgroundLayer;
     }
 
@@ -143,7 +143,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         }
 
         if (spaceCrafts.size() > 0) {
-            var viewArea = Rectangle.fromBottomLeft(window.width(), window.height());
+            var viewArea = new Rectangle(0, 0, window.getWidth(), window.getHeight());
             var splitLayer = new SplitLayer<>(createSplitLayout(spaceCrafts), viewArea, this);
             splitLayer.setTarget(spacecraftLayer);
             add(splitLayer);
@@ -172,7 +172,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         try {
             spacecraftLayer.getBackground().add(createBackground());
 
-            spaceCraftQuad = Quad.create(Rectangle.centered(64, 64), this);
+            spaceCraftQuad = Quad.create(Rectangle.create(64, 64), this);
 
             spaceCraftTexture = DefaultTexture.create(
                     getClass().getResource("/spacecraft.png"),

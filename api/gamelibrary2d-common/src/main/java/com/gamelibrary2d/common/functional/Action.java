@@ -8,6 +8,6 @@ public interface Action {
     Action EMPTY = () -> {
     };
 
-    void invoke();
+    void perform();
 
 }

@@ -2,272 +2,461 @@ package com.gamelibrary2d.common;
 
 import java.util.Objects;
 
+/**
+ * A Rectangle is an immutable representation of an area.
+ */
 public class Rectangle {
 
     /**
-     * Defines the min/max value for the X and Y coordinates of the rectangle bounds.
-     * It is smaller than {@link Float#MAX_VALUE} in order to avoid float overflows when performing rectangle operations.
-     */
-    public static final float INFINITE_VALUE = Float.MAX_VALUE / 100;
-
-    /**
-     * Used to represent a rectangle of empty size, e.g. instead of using null for something without bounds.
+     * Represents an empty area.
      */
     public static final Rectangle EMPTY = new Rectangle(0, 0, 0, 0);
 
     /**
-     * Used to represent a rectangle of infinite size.
+     * Represents an infinite area.
      */
-    public static final Rectangle INFINITE = new Rectangle(-INFINITE_VALUE, -INFINITE_VALUE, INFINITE_VALUE,
-            INFINITE_VALUE);
+    public static final Rectangle INFINITE = new Rectangle(
+            Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY,
+            Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
 
-    private final float xMin, yMin, xMax, yMax;
+    private final float lowerX, lowerY, upperX, upperY;
 
     /**
-     * Creates a new instance of {@link Rectangle} with the specified bounds. Note that each field is forcefully
-     * restricted by the {@link Rectangle#INFINITE_VALUE}. As such, exceeding this value will shrink the rectangle
-     * without maintaining the aspect ratio. The infinite value is typically used to indicate an
-     * {@link Rectangle#INFINITE infintie rectangle}.
+     * Creates a new rectangle with the specified bounds.
      *
-     * @param xMin The x-value of the lower left corner.
-     * @param yMin The y-value of the lower left corner.
-     * @param xMax The x-value of the upper right corner.
-     * @param yMax The y-value of the upper right corner.
+     * @param lowerX The x-coordinate of the lower left corner.
+     * @param lowerY The y-coordinate of the lower left corner.
+     * @param upperX The x-coordinate of the upper right corner.
+     * @param upperY The y-coordinate of the upper right corner.
      */
-    public Rectangle(float xMin, float yMin, float xMax, float yMax) {
-        this.xMin = restrict(xMin);
-        this.yMin = restrict(yMin);
-        this.xMax = restrict(xMax);
-        this.yMax = restrict(yMax);
-    }
-
-    public Rectangle(Rectangle rect) {
-        this(rect.xMin(), rect.yMin(), rect.xMax(), rect.yMax());
-    }
-
-    public static Rectangle fromBottomLeft(float width, float height) {
-        return new Rectangle(0, 0, width, height);
-    }
-
-    public static Rectangle fromTopLeft(float width, float height) {
-        return new Rectangle(0, -height, width, 0);
-    }
-
-    public static Rectangle fromTopRight(float width, float height) {
-        return new Rectangle(-width, -height, 0, 0);
-    }
-
-    public static Rectangle fromBottomRight(float width, float height) {
-        return new Rectangle(-width, 0, 0, height);
-    }
-
-    public static Rectangle centered(float width, float height) {
-        return new Rectangle(-width / 2, -height / 2, width / 2, height / 2);
-    }
-
-    public static Rectangle centered(float width) {
-        return centered(width, width);
-    }
-
-    private static float getInRange(float value, float min, float max) {
-        var width = max - min;
-        var dist = (value - min) / width;
-        var distDecimals = dist - (int) dist;
-        if (distDecimals < 0) {
-            distDecimals += 1f;
+    public Rectangle(float lowerX, float lowerY, float upperX, float upperY) {
+        if (lowerX > upperX) {
+            throw new IllegalStateException("The lower X coordinate cannot be higher than the upper X coordinate");
+        } else if (lowerY > upperY) {
+            throw new IllegalStateException("The lower Y coordinate cannot be higher than the upper Y coordinate");
         }
-        return distDecimals * width + min;
+
+        this.lowerX = lowerX;
+        this.lowerY = lowerY;
+        this.upperX = upperX;
+        this.upperY = upperY;
     }
 
-    private float restrict(float value) {
-        return Math.max(-INFINITE_VALUE, Math.min(INFINITE_VALUE, value));
+    /**
+     * Creates a new rectangle of the specified size with center at origin (0, 0).
+     *
+     * @param size The width and height of the rectangle.
+     */
+    public static Rectangle create(float size) {
+        return create(size, size);
     }
 
-    public Rectangle expand(float x, float y) {
-        if (isInside(x, y)) {
+    /**
+     * Creates a new rectangle of the specified size with the specified origin.
+     *
+     * @param size The width and height of the rectangle.
+     */
+    public static Rectangle create(float size, RectangleOrigin origin) {
+        return create(size, size, origin);
+    }
+
+    /**
+     * Creates a new rectangle of the specified size with center at origin (0, 0).
+     *
+     * @param size The width and height of the rectangle.
+     */
+    public static Rectangle create(Point size) {
+        return create(size.getX(), size.getY());
+    }
+
+    /**
+     * Creates a new rectangle of the specified size with the specified origin.
+     *
+     * @param size   The width and height of the rectangle.
+     * @param origin The origin of the rectangle.
+     */
+    public static Rectangle create(Point size, RectangleOrigin origin) {
+        return create(size.getX(), size.getY(), origin);
+    }
+
+    /**
+     * Creates a new rectangle of the specified size with center at origin (0, 0).
+     *
+     * @param width  The width of the rectangle.
+     * @param height The height of the rectangle.
+     */
+    public static Rectangle create(float width, float height) {
+        float halfWidth = 0.5f * width;
+        float halfHeight = 0.5f * height;
+        return new Rectangle(-halfWidth, -halfHeight, halfWidth, halfHeight);
+    }
+
+    /**
+     * Creates a new rectangle of the specified size with the specified origin.
+     *
+     * @param width  The width of the rectangle.
+     * @param height The height of the rectangle.
+     * @param origin The origin of the rectangle.
+     */
+    public static Rectangle create(float width, float height, RectangleOrigin origin) {
+        switch (origin) {
+            case CENTER:
+                return create(width, height);
+            case LOWER_LEFT:
+                return new Rectangle(0, 0, width, height);
+            case LOWER_RIGHT:
+                return new Rectangle(-width, 0, 0, height);
+            case UPPER_LEFT:
+                return new Rectangle(0, -height, width, 0);
+            case UPPER_RIGHT:
+                return new Rectangle(-width, -height, 0, 0);
+            default:
+                throw new IllegalStateException("Unexpected origin: " + origin);
+        }
+    }
+
+    /**
+     * Creates a new rectangle with the specified point added to its bounds.
+     *
+     * @param x The X coordinate of the added point.
+     * @param y The Y coordinate of the added point.
+     */
+    public Rectangle add(float x, float y) {
+        if (contains(x, y)) {
             return this;
         } else {
             return new Rectangle(
-                    Math.min(this.xMin, x),
-                    Math.min(this.yMin, y),
-                    Math.max(this.xMax, x),
-                    Math.max(this.yMax, y));
+                    Math.min(this.lowerX, x),
+                    Math.min(this.lowerY, y),
+                    Math.max(this.upperX, x),
+                    Math.max(this.upperY, y));
         }
     }
 
-    public Rectangle expand(Point p) {
-        return expand(p.getX(), p.getY());
+    /**
+     * Creates a new rectangle with the specified point added to its bounds.
+     */
+    public Rectangle add(Point p) {
+        return add(p.getX(), p.getY());
     }
 
-    public Rectangle expand(float xMin, float yMin, float xMax, float yMax) {
-        if (isInside(xMin, yMin) && isInside(xMax, yMax)) {
+    /**
+     * Creates a new rectangle with the specified rectangle added to its bounds.
+     *
+     * @param lowerX The x-coordinate of the added lower left corner.
+     * @param lowerY The y-coordinate of the added lower left corner.
+     * @param upperX The x-coordinate of the added upper right corner.
+     * @param upperY The y-coordinate of the added upper right corner.
+     */
+    public Rectangle add(float lowerX, float lowerY, float upperX, float upperY) {
+        if (contains(lowerX, lowerY) && contains(upperX, upperY)) {
             return this;
         } else {
             return new Rectangle(
-                    Math.min(this.xMin, xMin),
-                    Math.min(this.yMin, yMin),
-                    Math.max(this.xMax, xMax),
-                    Math.max(this.yMax, yMax));
+                    Math.min(this.lowerX, lowerX),
+                    Math.min(this.lowerY, lowerY),
+                    Math.max(this.upperX, upperX),
+                    Math.max(this.upperY, upperY));
         }
     }
 
-    public Rectangle expand(Rectangle other) {
-        return expand(other.xMin, other.yMin, other.xMax, other.yMax);
+    /**
+     * Creates a new rectangle with the specified rectangle added to its bounds.
+     */
+    public Rectangle add(Rectangle r) {
+        return add(r.lowerX, r.lowerY, r.upperX, r.upperY);
     }
 
-    public boolean isInside(Point p) {
-        return isInside(p.getX(), p.getY());
+    /**
+     * Checks if this rectangle contains the specified point.
+     *
+     * @param x The X coordinate of the point.
+     * @param y The Y coordinate of the point.
+     */
+    public boolean contains(float x, float y) {
+        return !(x < lowerX || y < lowerY || x > upperX || y > upperY);
     }
 
-    public boolean isInside(float x, float y) {
-        return !(x < xMin || y < yMin || x > xMax || y > yMax);
+    /**
+     * Checks if this rectangle contains the specified point.
+     */
+    public boolean contains(Point p) {
+        return contains(p.getX(), p.getY());
     }
 
-    public boolean intersects(Rectangle rect) {
-        return !(xMin() > rect.xMax() || yMin() > rect.yMax() || xMax() < rect.xMin()
-                || yMax() < rect.yMin());
+    /**
+     * Checks if this rectangle contains the specified rectangle.
+     *
+     * @param r The rectangle.
+     */
+    public boolean contains(Rectangle r) {
+        return contains(r.lowerX, r.lowerY, r.upperX, r.upperY);
     }
 
+    /**
+     * Checks if this rectangle contains the specified rectangle.
+     *
+     * @param lowerX The x-coordinate of the lower left corner.
+     * @param lowerY The y-coordinate of the lower left corner.
+     * @param upperX The x-coordinate of the upper right corner.
+     * @param upperY The y-coordinate of the upper right corner.
+     */
+    public boolean contains(float lowerX, float lowerY, float upperX, float upperY) {
+        return lowerX >= this.lowerX && upperX <= this.upperX
+                && lowerY >= this.lowerY && upperY <= this.upperY;
+    }
+
+    /**
+     * Checks if this rectangle intersects with the specified rectangle.
+     */
+    public boolean intersects(Rectangle r) {
+        return intersects(r.lowerX, r.lowerY, r.upperX, r.upperY);
+    }
+
+    /**
+     * Checks if this rectangle intersects with the specified rectangle.
+     *
+     * @param lowerX The x-coordinate of the lower left corner.
+     * @param lowerY The y-coordinate of the lower left corner.
+     * @param upperX The x-coordinate of the upper right corner.
+     * @param upperY The y-coordinate of the upper right corner.
+     */
+    public boolean intersects(float lowerX, float lowerY, float upperX, float upperY) {
+        return lowerX < this.upperX && upperX > this.lowerX
+                && lowerY < this.upperY && upperY > this.lowerY;
+    }
+
+    /**
+     * Creates a new rectangle representing the intersection of this rectangle and the specified rectangle.
+     */
+    public Rectangle getIntersection(Rectangle rect) {
+        return getIntersection(rect.lowerX, rect.lowerY, rect.upperX, rect.upperY);
+    }
+
+    /**
+     * Creates a new rectangle representing the intersection of this rectangle and the specified rectangle.
+     *
+     * @param lowerX The x-coordinate of the lower left corner.
+     * @param lowerY The y-coordinate of the lower left corner.
+     * @param upperX The x-coordinate of the upper right corner.
+     * @param upperY The y-coordinate of the upper right corner.
+     */
+    public Rectangle getIntersection(float lowerX, float lowerY, float upperX, float upperY) {
+        return new Rectangle(
+                Math.max(this.lowerX, lowerX),
+                Math.max(this.lowerY, lowerY),
+                Math.min(this.upperX, upperX),
+                Math.min(this.upperY, upperY)
+        );
+    }
+
+    /**
+     * Creates a new rectangle with the specified offset.
+     */
     public Rectangle move(Point offset) {
         return move(offset.getX(), offset.getY());
     }
 
+    /**
+     * Creates a new rectangle with the specified offset.
+     */
     public Rectangle move(float x, float y) {
-        return new Rectangle(xMin() + x, yMin() + y, xMax() + x, yMax() + y);
+        return new Rectangle(getLowerX() + x, getLowerY() + y, getUpperX() + x, getUpperY() + y);
     }
 
-    public Rectangle resize(float scale) {
-        return new Rectangle(xMin * scale, yMin * scale, xMax * scale, yMax * scale);
-    }
-
-    public Rectangle resize(float scaleX, float scaleY) {
-        return new Rectangle(xMin * scaleX, yMin * scaleY, xMax * scaleX, yMax * scaleY);
-    }
-
-    public Rectangle resize(Point scale) {
-        return resize(scale.getX(), scale.getY());
-    }
-
+    /**
+     * Creates a new rectangle with the specified padding.
+     *
+     * @param padding The padding added to each side.
+     */
     public Rectangle pad(float padding) {
         return pad(padding, padding);
     }
 
-    public Rectangle pad(float horizontalPadding, float verticalPadding) {
-        return pad(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
-    }
-
-    public Rectangle pad(float xMinPadding, float yMinPadding, float xMaxPadding, float yMaxPadding) {
-        return new Rectangle(xMin() - xMinPadding, yMin() - yMinPadding, xMax() + xMaxPadding,
-                yMax() + yMaxPadding);
-    }
-
-    public Rectangle resize(float scaleX, float scaleY, float hotSpotX, float hotSpotY) {
-        // Current Center point
-        float centerX = xMin + width() / 2;
-        float centerY = yMin + height() / 2;
-
-        // New center point
-        float newCenterX = centerX + (hotSpotX - centerX) / scaleX;
-        float newCenterY = centerY + (hotSpotY - centerY) / scaleY;
-
-        return new Rectangle(newCenterX - (width() / 2) * scaleX, newCenterY - (height() / 2) * scaleY,
-                newCenterX + (width() / 2) * scaleX, newCenterY + (height() / 2) * scaleY);
+    /**
+     * Creates a new rectangle with the specified padding.
+     *
+     * @param horizontal The padding added to both horizontal sides.
+     * @param vertical   The padding added to both vertical sides.
+     */
+    public Rectangle pad(float horizontal, float vertical) {
+        return pad(horizontal, vertical, horizontal, vertical);
     }
 
     /**
-     * Rotates each corner of the rectangle and returns the bounds.
+     * Creates a new rectangle with the specified padding.
      *
-     * @param rotation The rotation angle, in degrees.
-     * @param centerX  The X-coordinate of the rotation's center point.
-     * @param centerY  The Y-coordinate of the rotation's center point.
+     * @param left   The padding added to the left side.
+     * @param bottom The padding added to the bottom side.
+     * @param right  The padding added to the right side.
+     * @param top    The padding added to the top side.
+     */
+    public Rectangle pad(float left, float bottom, float right, float top) {
+        return new Rectangle(
+                getLowerX() - left,
+                getLowerY() - bottom,
+                getUpperX() + right,
+                getUpperY() + top);
+    }
+
+    /**
+     * Creates a new rectangle with the specified scaled bounds.
+     *
+     * @param scale The scale applied to the bounds of the rectangle.
+     */
+    public Rectangle resize(float scale) {
+        return resize(scale, scale);
+    }
+
+    /**
+     * Creates a new rectangle with the specified scaled bounds.
+     *
+     * @param scale The scale applied to the bounds of the rectangle.
+     */
+    public Rectangle resize(Point scale) {
+        return resize(scale.getX(), scale.getY());
+    }
+
+    /**
+     * Creates a new rectangle with the specified scaled bounds.
+     *
+     * @param scale       The scale applied to the bounds of the rectangle.
+     * @param centerPoint The scaling center point.
      * @return
      */
+    public Rectangle resize(Point scale, Point centerPoint) {
+        return resize(scale.getX(), scale.getY(), centerPoint.getX(), centerPoint.getY());
+    }
+
+    /**
+     * Creates a new rectangle with the specified scaled bounds.
+     *
+     * @param scaleX The horizontal scale applied to the bounds of the rectangle.
+     * @param scaleY The vertical scale applied to the bounds of the rectangle.
+     */
+    public Rectangle resize(float scaleX, float scaleY) {
+        return new Rectangle(lowerX * scaleX, lowerY * scaleY, upperX * scaleX, upperY * scaleY);
+    }
+
+
+    /**
+     * Creates a new rectangle with the specified scaled bounds.
+     *
+     * @param scaleX       The horizontal scale applied to the bounds of the rectangle.
+     * @param scaleY       The vertical scale applied to the bounds of the rectangle.
+     * @param centerPointX The X coordinate of the scaling center point.
+     * @param centerPointY The Y coordinate of the scaling center point.
+     */
+    public Rectangle resize(float scaleX, float scaleY, float centerPointX, float centerPointY) {
+        float centerX = lowerX + getWidth() / 2;
+        float centerY = lowerY + getHeight() / 2;
+
+        float newCenterX = centerX + (centerPointX - centerX) / scaleX;
+        float newCenterY = centerY + (centerPointY - centerY) / scaleY;
+
+        return new Rectangle(
+                newCenterX - (getWidth() / 2) * scaleX,
+                newCenterY - (getHeight() / 2) * scaleY,
+                newCenterX + (getWidth() / 2) * scaleX,
+                newCenterY + (getHeight() / 2) * scaleY);
+    }
+
+    /**
+     * Creates a new rectangle that represents the bounds of the corners,
+     * when each corner has been rotated with the specified rotation.
+     *
+     * @param rotation The clockwise rotation angle, in degrees.
+     * @param centerX  The X-coordinate of the rotation's center point.
+     * @param centerY  The Y-coordinate of the rotation's center point.
+     */
     public Rectangle rotate(float rotation, float centerX, float centerY) {
-        float xMin = Float.MAX_VALUE;
-        float yMin = Float.MAX_VALUE;
-        float xMax = Float.MIN_VALUE;
-        float yMax = Float.MIN_VALUE;
+        float lowerX = Float.MAX_VALUE;
+        float lowerY = Float.MAX_VALUE;
+        float upperX = Float.MIN_VALUE;
+        float upperY = Float.MIN_VALUE;
 
         // Rotate lower left corner
-        Point rotationPoint = new Point(xMin(), yMin());
+        Point rotationPoint = new Point(getLowerX(), getLowerY());
         rotationPoint.rotate(rotation, centerX, centerY);
-        xMin = Math.min(rotationPoint.getX(), xMin);
-        xMax = Math.max(rotationPoint.getX(), xMax);
-        yMin = Math.min(rotationPoint.getY(), yMin);
-        yMax = Math.max(rotationPoint.getY(), yMax);
+        lowerX = Math.min(rotationPoint.getX(), lowerX);
+        upperX = Math.max(rotationPoint.getX(), upperX);
+        lowerY = Math.min(rotationPoint.getY(), lowerY);
+        upperY = Math.max(rotationPoint.getY(), upperY);
 
         // Rotate upper left corner
-        rotationPoint.set(xMin(), yMax());
+        rotationPoint.set(getLowerX(), getUpperY());
         rotationPoint.rotate(rotation, centerX, centerY);
-        xMin = Math.min(rotationPoint.getX(), xMin);
-        xMax = Math.max(rotationPoint.getX(), xMax);
-        yMin = Math.min(rotationPoint.getY(), yMin);
-        yMax = Math.max(rotationPoint.getY(), yMax);
+        lowerX = Math.min(rotationPoint.getX(), lowerX);
+        upperX = Math.max(rotationPoint.getX(), upperX);
+        lowerY = Math.min(rotationPoint.getY(), lowerY);
+        upperY = Math.max(rotationPoint.getY(), upperY);
 
         // Rotate upper right corner
-        rotationPoint.set(xMax(), yMax());
+        rotationPoint.set(getUpperX(), getUpperY());
         rotationPoint.rotate(rotation, centerX, centerY);
-        xMin = Math.min(rotationPoint.getX(), xMin);
-        xMax = Math.max(rotationPoint.getX(), xMax);
-        yMin = Math.min(rotationPoint.getY(), yMin);
-        yMax = Math.max(rotationPoint.getY(), yMax);
+        lowerX = Math.min(rotationPoint.getX(), lowerX);
+        upperX = Math.max(rotationPoint.getX(), upperX);
+        lowerY = Math.min(rotationPoint.getY(), lowerY);
+        upperY = Math.max(rotationPoint.getY(), upperY);
 
         // Rotate lower right corner
-        rotationPoint.set(xMax(), yMin());
+        rotationPoint.set(getUpperX(), getLowerY());
         rotationPoint.rotate(rotation, centerX, centerY);
-        xMin = Math.min(rotationPoint.getX(), xMin);
-        xMax = Math.max(rotationPoint.getX(), xMax);
-        yMin = Math.min(rotationPoint.getY(), yMin);
-        yMax = Math.max(rotationPoint.getY(), yMax);
+        lowerX = Math.min(rotationPoint.getX(), lowerX);
+        upperX = Math.max(rotationPoint.getX(), upperX);
+        lowerY = Math.min(rotationPoint.getY(), lowerY);
+        upperY = Math.max(rotationPoint.getY(), upperY);
 
-        return new Rectangle(xMin, yMin, xMax, yMax);
+        return new Rectangle(lowerX, lowerY, upperX, upperY);
     }
 
-    public float area() {
-        return width() * height();
+    public float getArea() {
+        return getWidth() * getHeight();
     }
 
-    public float width() {
-        return xMax - xMin;
+    public float getWidth() {
+        return upperX - lowerX;
     }
 
-    public float height() {
-        return yMax - yMin;
+    public float getHeight() {
+        return upperY - lowerY;
     }
 
-    public float xMin() {
-        return xMin;
+    public float getLowerX() {
+        return lowerX;
     }
 
-    public float yMin() {
-        return yMin;
+    public float getLowerY() {
+        return lowerY;
     }
 
-    public float xMax() {
-        return xMax;
+    public float getUpperX() {
+        return upperX;
     }
 
-    public float yMax() {
-        return yMax;
+    public float getUpperY() {
+        return upperY;
     }
 
-    public Point center() {
-        return new Point(centerX(), centerY());
+    public Point getCenter() {
+        return new Point(getCenterX(), getCenterY());
     }
 
-    public float centerX() {
-        return xMin + width() / 2;
+    public float getCenterX() {
+        return 0.5f * lowerX + 0.5f * upperX;
     }
 
-    public float centerY() {
-        return yMin + height() / 2;
+    public float getCenterY() {
+        return 0.5f * lowerY + 0.5f * upperY;
     }
 
-    public void wrap(Point p) {
-        float x = getInRange(p.getX(), xMin, xMax);
-        float y = getInRange(p.getY(), yMin, yMax);
-        p.set(x, y);
-        p.add(xMin, yMin);
+    public boolean isEmpty() {
+        return upperY - lowerY == 0f
+                && upperX - lowerX == 0f;
+    }
+
+    public boolean isInfinite() {
+        return this.equals(Rectangle.INFINITE);
     }
 
     @Override
@@ -277,8 +466,8 @@ public class Rectangle {
         }
 
         if (obj instanceof Rectangle) {
-            Rectangle other = (Rectangle) obj;
-            return other.xMin == xMin && other.yMin == yMin && other.xMax == xMax && other.yMax == yMax;
+            var other = (Rectangle) obj;
+            return other.lowerX == lowerX && other.lowerY == lowerY && other.upperX == upperX && other.upperY == upperY;
         }
 
         return false;
@@ -286,7 +475,6 @@ public class Rectangle {
 
     @Override
     public int hashCode() {
-        return Objects.hash(xMin, yMin, xMax, yMax);
+        return Objects.hash(lowerX, lowerY, upperX, upperY);
     }
-
 }

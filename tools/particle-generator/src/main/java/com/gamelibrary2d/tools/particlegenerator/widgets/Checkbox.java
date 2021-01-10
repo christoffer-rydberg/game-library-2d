@@ -45,12 +45,12 @@ public class Checkbox extends AbstractWidget {
             if (value) {
                 renderer.check();
                 if (onChecked != null) {
-                    onChecked.invoke();
+                    onChecked.perform();
                 }
             } else {
                 renderer.uncheck();
                 if (onUnchecked != null) {
-                    onUnchecked.invoke();
+                    onUnchecked.perform();
                 }
             }
         }
@@ -97,8 +97,8 @@ public class Checkbox extends AbstractWidget {
         @Override
         public void render(float alpha) {
             box.render(renderer, alpha);
-            var centerX = box.getBounds().centerX();
-            var centerY = box.getBounds().centerY();
+            var centerX = box.getBounds().getCenterX();
+            var centerY = box.getBounds().getCenterY();
             ModelMatrix.instance().pushMatrix();
             ModelMatrix.instance().translatef(centerX, centerY, 0f);
             label.render(alpha);

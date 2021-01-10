@@ -90,25 +90,23 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
 
     @Override
     public void expandBounds(Rectangle bounds) {
-        if (getBounds() == Rectangle.INFINITE) {
-            // Bounds can't get any bigger
-            return;
-        }
-
-        if (bounds.equals(Rectangle.EMPTY)) {
-            return;
-        }
-
         Rectangle panelBounds = getBounds();
-        if (panelBounds.equals(Rectangle.EMPTY) || bounds.equals(Rectangle.INFINITE)) {
-            setBounds(bounds);
-        } else {
-            float xMin = Math.min(bounds.xMin(), panelBounds.xMin());
-            float yMin = Math.min(bounds.yMin(), panelBounds.yMin());
-            float xMax = Math.max(bounds.xMax(), panelBounds.xMax());
-            float yMax = Math.max(bounds.yMax(), panelBounds.yMax());
-            setBounds(new Rectangle(xMin, yMin, xMax, yMax));
+
+        if (panelBounds.isInfinite() || bounds.isEmpty()) {
+            return;
         }
+
+        if (panelBounds.isEmpty() || bounds.isInfinite()) {
+            setBounds(bounds);
+            return;
+        }
+
+        float xMin = Math.min(bounds.getLowerX(), panelBounds.getLowerX());
+        float yMin = Math.min(bounds.getLowerY(), panelBounds.getLowerY());
+        float xMax = Math.max(bounds.getUpperX(), panelBounds.getUpperX());
+        float yMax = Math.max(bounds.getUpperY(), panelBounds.getUpperY());
+
+        setBounds(new Rectangle(xMin, yMin, xMax, yMax));
     }
 
     @Override
@@ -137,7 +135,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
 
     @Override
     public void stack(T obj, StackOrientation orientation, float offset, float padding, boolean reposition) {
-        if (getBounds().equals(Rectangle.INFINITE)) {
+        if (getBounds().isInfinite()) {
             throw new IllegalStateException("Cannot stack object in panel with infinite bounds.");
         }
 
@@ -170,13 +168,13 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
      * are infinite.
      */
     protected Rectangle getExtentInPanel(T obj) {
-        if (getBounds().equals(Rectangle.INFINITE)) {
+        if (getBounds().isInfinite()) {
             // Object cannot increase bounds any more.
             return Rectangle.EMPTY;
         }
 
         Rectangle objectBounds = obj.getBounds();
-        if (objectBounds.equals(Rectangle.EMPTY) || objectBounds.equals(Rectangle.INFINITE)) {
+        if (objectBounds.isEmpty() || objectBounds.isInfinite()) {
             return objectBounds;
         }
 
@@ -199,7 +197,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
 
         obj.setPosition(0, 0);
         Rectangle objectBounds = getExtentInPanel(obj);
-        if (objectBounds.equals(Rectangle.INFINITE)) {
+        if (objectBounds.isInfinite()) {
             obj.setPosition(posX, posY);
             throw new IllegalStateException("Stacked object must have valid bounds.");
         }
@@ -223,24 +221,24 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
     }
 
     private float stackLeft(Rectangle objectBounds, float margin) {
-        return getBounds().xMin() - objectBounds.xMax() - margin;
+        return getBounds().getLowerX() - objectBounds.getUpperX() - margin;
     }
 
     private float stackUp(Rectangle objectBounds, float margin) {
-        return getBounds().yMax() - objectBounds.yMin() + margin;
+        return getBounds().getUpperY() - objectBounds.getLowerY() + margin;
     }
 
     private float stackRight(Rectangle objectBounds, float margin) {
-        return getBounds().xMax() - objectBounds.xMin() + margin;
+        return getBounds().getUpperX() - objectBounds.getLowerX() + margin;
     }
 
     private float stackDown(Rectangle objectBounds, float margin) {
-        return getBounds().yMin() - objectBounds.yMax() - margin;
+        return getBounds().getLowerY() - objectBounds.getUpperY() - margin;
     }
 
     private void stackExpandBounds(StackOrientation orientation, Rectangle bounds, float padding) {
         if (getBounds().equals(Rectangle.EMPTY)) {
-            bounds = bounds.expand(0, 0);
+            bounds = bounds.add(0, 0);
         }
 
         if (padding != 0) {
@@ -269,6 +267,6 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
                 break;
         }
 
-        setBounds(getBounds().expand(posX, posY));
+        setBounds(getBounds().add(posX, posY));
     }
 }

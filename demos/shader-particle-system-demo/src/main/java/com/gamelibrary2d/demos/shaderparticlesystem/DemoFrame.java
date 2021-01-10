@@ -22,8 +22,8 @@ public class DemoFrame extends AbstractFrame {
     protected void onInitialize(InitializationContext context) {
         try {
             Window window = game.getWindow();
-            float windowWidth = window.width();
-            float windowHeight = window.height();
+            float windowWidth = window.getWidth();
+            float windowHeight = window.getHeight();
             BufferedImage init = ImageIO.read(DemoFrame.class.getResource("/Images/before.jpg"));
             BufferedImage goal = ImageIO.read(DemoFrame.class.getResource("/Images/after.jpg"));
 

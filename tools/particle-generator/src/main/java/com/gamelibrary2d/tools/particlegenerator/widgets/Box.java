@@ -17,11 +17,11 @@ public class Box implements Bounded {
 
     public static Box create(Rectangle bounds, Disposer disposer) {
         var nodes = PositionBuffer.create(disposer);
-        nodes.add(bounds.xMin(), bounds.yMin());
-        nodes.add(bounds.xMin(), bounds.yMax());
-        nodes.add(bounds.xMax(), bounds.yMax());
-        nodes.add(bounds.xMax(), bounds.yMin());
-        nodes.add(bounds.xMin(), bounds.yMin());
+        nodes.add(bounds.getLowerX(), bounds.getLowerY());
+        nodes.add(bounds.getLowerX(), bounds.getUpperY());
+        nodes.add(bounds.getUpperX(), bounds.getUpperY());
+        nodes.add(bounds.getUpperX(), bounds.getLowerY());
+        nodes.add(bounds.getLowerX(), bounds.getLowerY());
         return new Box(bounds, nodes);
     }
 

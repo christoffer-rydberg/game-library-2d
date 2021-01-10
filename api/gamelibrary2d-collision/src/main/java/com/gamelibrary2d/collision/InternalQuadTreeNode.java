@@ -37,10 +37,10 @@ class InternalQuadTreeNode {
     }
 
     private static boolean isColliding(Rectangle bounds, float xPos, float yPos, Rectangle bounds2, float xPos2, float yPos2) {
-        return !(bounds.xMin() + xPos > bounds2.xMax() + xPos2
-                || bounds.yMin() + yPos > bounds2.yMax() + yPos2
-                || bounds.xMax() + xPos < bounds2.xMin() + xPos2
-                || bounds.yMax() + yPos < bounds2.yMin() + yPos2);
+        return !(bounds.getLowerX() + xPos > bounds2.getUpperX() + xPos2
+                || bounds.getLowerY() + yPos > bounds2.getUpperY() + yPos2
+                || bounds.getUpperX() + xPos < bounds2.getLowerX() + xPos2
+                || bounds.getUpperY() + yPos < bounds2.getLowerY() + yPos2);
     }
 
     private static boolean isColliding(InternalArea updated, InternalArea other) {
@@ -88,10 +88,10 @@ class InternalQuadTreeNode {
 
     private int getNodeIndex(InternalArea area) {
         var bounds = area.getBounds();
-        float xMin = bounds.xMin();
-        float yMin = bounds.yMin();
-        float xMax = bounds.xMax();
-        float yMax = bounds.yMax();
+        float xMin = bounds.getLowerX();
+        float yMin = bounds.getLowerY();
+        float xMax = bounds.getUpperX();
+        float yMax = bounds.getUpperY();
 
         float verticalMidpoint = (xMin + xMax) / 2 - area.getPosX();
         float horizontalMidpoint = (yMin + yMax) / 2 - area.getPosY();

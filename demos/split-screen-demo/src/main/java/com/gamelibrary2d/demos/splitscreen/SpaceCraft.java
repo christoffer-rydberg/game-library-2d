@@ -20,6 +20,23 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
         delta.rotate(direction);
     }
 
+    private static float getInRange(float value, float min, float max) {
+        var width = max - min;
+        var dist = (value - min) / width;
+        var distDecimals = dist - (int) dist;
+        if (distDecimals < 0) {
+            distDecimals += 1f;
+        }
+        return distDecimals * width + min;
+    }
+
+    private static void wrap(Rectangle area, Point p) {
+        float x = getInRange(p.getX(), area.getLowerX(), area.getUpperX());
+        float y = getInRange(p.getY(), area.getLowerY(), area.getUpperY());
+        p.set(x, y);
+        p.add(area.getLowerX(), area.getLowerY());
+    }
+
     @Override
     protected void onRenderProjected(float alpha) {
         renderer.render(alpha);
@@ -29,6 +46,6 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
     public void update(float deltaTime) {
         setRotation(delta.getAngleDegrees());
         getPosition().add(delta.getX() * deltaTime, delta.getY() * deltaTime);
-        area.wrap(getPosition());
+        wrap(area, getPosition());
     }
 }

@@ -174,21 +174,21 @@ public class Quad extends AbstractDisposable implements Surface {
 
         FloatBuffer vertices = BufferUtils.createFloatBuffer(bufferLength);
 
-        vertices.put(bounds.xMin()).put(bounds.yMin());
+        vertices.put(bounds.getLowerX()).put(bounds.getLowerY());
         vertices.put(0).put(0);
-        vertices.put(textureBounds.xMin()).put(textureBounds.yMin());
+        vertices.put(textureBounds.getLowerX()).put(textureBounds.getLowerY());
 
-        vertices.put(bounds.xMax()).put(bounds.yMin());
+        vertices.put(bounds.getUpperX()).put(bounds.getLowerY());
         vertices.put(1).put(0);
-        vertices.put(textureBounds.xMax()).put(textureBounds.yMin());
+        vertices.put(textureBounds.getUpperX()).put(textureBounds.getLowerY());
 
-        vertices.put(bounds.xMax()).put(bounds.yMax());
+        vertices.put(bounds.getUpperX()).put(bounds.getUpperY());
         vertices.put(1).put(1);
-        vertices.put(textureBounds.xMax()).put(textureBounds.yMax());
+        vertices.put(textureBounds.getUpperX()).put(textureBounds.getUpperY());
 
-        vertices.put(bounds.xMin()).put(bounds.yMax());
+        vertices.put(bounds.getLowerX()).put(bounds.getUpperY());
         vertices.put(0).put(1);
-        vertices.put(textureBounds.xMin()).put(textureBounds.yMax());
+        vertices.put(textureBounds.getLowerX()).put(textureBounds.getUpperY());
 
         vertices.flip();
 

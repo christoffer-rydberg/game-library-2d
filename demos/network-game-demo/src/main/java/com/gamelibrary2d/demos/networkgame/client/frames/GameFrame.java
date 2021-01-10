@@ -76,7 +76,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
 
         var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
         timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
-        timeLabel.setPosition(game.getWindow().width() / 2f, 9 * game.getWindow().height() / 10f);
+        timeLabel.setPosition(game.getWindow().getWidth() / 2f, 9 * game.getWindow().getHeight() / 10f);
     }
 
     @Override
@@ -100,16 +100,16 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     void applySettings(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
 
-        var windowWidth = game.getWindow().width();
-        var windowHeight = game.getWindow().height();
+        var windowWidth = game.getWindow().getWidth();
+        var windowHeight = game.getWindow().getHeight();
         var gameBounds = gameSettings.getGameBounds();
-        var scale = Math.min(windowWidth / gameBounds.width(), windowHeight / gameBounds.height());
-        var scaledGameBounds = Rectangle.centered(gameBounds.width(), gameBounds.height()).resize(scale);
+        var scale = Math.min(windowWidth / gameBounds.getWidth(), windowHeight / gameBounds.getHeight());
+        var scaledGameBounds = Rectangle.create(gameBounds.getWidth(), gameBounds.getHeight()).resize(scale);
 
         gameLayer.setScale(scale, scale);
         gameLayer.setPosition(
-                windowWidth / 2f + scaledGameBounds.xMin(),
-                windowHeight / 2f + scaledGameBounds.yMin());
+                windowWidth / 2f + scaledGameBounds.getLowerX(),
+                windowHeight / 2f + scaledGameBounds.getLowerY());
 
         content.initialize(gameSettings, textures, this);
 
@@ -166,7 +166,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     }
 
     public void gameOver() {
-        var portalPosition = gameSettings.getGameBounds().center();
+        var portalPosition = gameSettings.getGameBounds().getCenter();
 
         var parallelUpdater = new ParallelUpdater();
         objectLayer.getChildren().stream()

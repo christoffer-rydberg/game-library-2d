@@ -36,8 +36,8 @@ public class CollisionDetection {
         rootNode = new InternalQuadTreeNode(nodePool);
         updateList = new ArrayList<>();
         updated = new ArrayList<>();
-        rootNode.setBounds(bounds.xMin(), bounds.yMin(), bounds.xMax(), bounds.yMax());
-        rootNode.setMaxDepth((int) Math.round(Math.log(bounds.width() / minNodeWidth) / Math.log(2)));
+        rootNode.setBounds(bounds.getLowerX(), bounds.getLowerY(), bounds.getUpperX(), bounds.getUpperY());
+        rootNode.setMaxDepth((int) Math.round(Math.log(bounds.getWidth() / minNodeWidth) / Math.log(2)));
         rootNode.setCapacity(nodeCapacity);
     }
 

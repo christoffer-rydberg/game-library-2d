@@ -22,7 +22,7 @@ public class Animation {
     }
 
     public Animation(Collection<AnimationFrame> frames, Rectangle bounds) {
-        this(frames, bounds, Math.round(bounds.width()), Math.round(bounds.height()));
+        this(frames, bounds, Math.round(bounds.getWidth()), Math.round(bounds.getHeight()));
     }
 
     public Animation(ArrayList<AnimationFrame> frames) {
@@ -36,10 +36,10 @@ public class Animation {
         float yMax = -Float.MAX_VALUE;
         for (var frame : frames) {
             var bounds = frame.getQuad().getBounds();
-            xMin = Math.min(xMin, bounds.xMin());
-            yMin = Math.min(yMin, bounds.yMin());
-            xMax = Math.max(xMax, bounds.xMax());
-            yMax = Math.max(yMax, bounds.yMax());
+            xMin = Math.min(xMin, bounds.getLowerX());
+            yMin = Math.min(yMin, bounds.getLowerY());
+            xMax = Math.max(xMax, bounds.getUpperX());
+            yMax = Math.max(yMax, bounds.getUpperY());
         }
 
         return new Rectangle(xMin, yMin, xMax, yMax);

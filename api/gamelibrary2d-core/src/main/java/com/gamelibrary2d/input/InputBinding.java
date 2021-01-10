@@ -209,7 +209,7 @@ public class InputBinding implements Serializable {
 
     private void tryInvoke(Action action) {
         if (action != null) {
-            action.invoke();
+            action.perform();
         }
     }
 

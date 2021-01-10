@@ -51,16 +51,16 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
         backgroundLayer = new BasicLayer<>();
 
         settingsPanel = new ParticleSystemSettingsPanel(particleSystem, this);
-        settingsPanel.setPosition(160f, game.getWindow().height() - 20f);
+        settingsPanel.setPosition(160f, game.getWindow().getHeight() - 20f);
 
         renderingPanel = new RenderingPanel(particleSystem);
         renderingPanel.setPosition(
-                game.getWindow().width() - renderingPanel.getBounds().width() - WINDOW_MARGIN,
-                game.getWindow().height() - WINDOW_MARGIN);
+                game.getWindow().getWidth() - renderingPanel.getBounds().getWidth() - WINDOW_MARGIN,
+                game.getWindow().getHeight() - WINDOW_MARGIN);
 
         emitterPanel = new EmitterPanel(particleSystem);
-        emitterPanel.setPosition(game.getWindow().width() - WINDOW_MARGIN,
-                emitterPanel.getBounds().height() + WINDOW_MARGIN);
+        emitterPanel.setPosition(game.getWindow().getWidth() - WINDOW_MARGIN,
+                emitterPanel.getBounds().getHeight() + WINDOW_MARGIN);
 
         saveLoadResetPanel = new SaveLoadResetPanel(particleSystem, game);
         saveLoadResetPanel.setPosition(WINDOW_MARGIN, WINDOW_MARGIN);
@@ -69,8 +69,8 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     @Override
     protected void onLoad(InitializationContext context) {
         particleSystem.setPosition(
-                game.getWindow().width() / 2f,
-                game.getWindow().height() / 2f
+                game.getWindow().getWidth() / 2f,
+                game.getWindow().getHeight() / 2f
         );
         add(backgroundLayer);
         add(particleLayer);

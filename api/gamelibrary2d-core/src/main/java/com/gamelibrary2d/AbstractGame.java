@@ -130,7 +130,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         defaultShaderProgram.attachShader(DefaultShader.fromFile("shaders/Default.fragment", ShaderType.FRAGMENT, this));
         defaultShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional, the shader only has one "out" variable
         defaultShaderProgram.initialize();
-        defaultShaderProgram.initializeMvp(window.width(), window.height());
+        defaultShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setDefaultShaderProgram(defaultShaderProgram);
 
         ShaderProgram particleUpdaterProgram = ShaderProgram.create(this);
@@ -145,7 +145,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         pointParticleShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
         pointParticleShaderProgram.initialize();
-        pointParticleShaderProgram.initializeMvp(window.width(), window.height());
+        pointParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setPointParticleShaderProgram(pointParticleShaderProgram);
 
         ShaderProgram quadParticleShaderProgram = ShaderProgram.create(this);
@@ -156,7 +156,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadParticleShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/QuadParticle.fragment", ShaderType.FRAGMENT, this));
         quadParticleShaderProgram.initialize();
-        quadParticleShaderProgram.initializeMvp(window.width(), window.height());
+        quadParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setQuadParticleShaderProgram(quadParticleShaderProgram);
 
         ShaderProgram pointShaderProgram = ShaderProgram.create(this);
@@ -165,7 +165,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         pointShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/Point.fragment", ShaderType.FRAGMENT, this));
         pointShaderProgram.initialize();
-        pointShaderProgram.initializeMvp(window.width(), window.height());
+        pointShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setPointShaderProgram(pointShaderProgram);
 
         ShaderProgram quadShaderProgram = ShaderProgram.create(this);
@@ -176,7 +176,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/Quad.fragment", ShaderType.FRAGMENT, this));
         quadShaderProgram.initialize();
-        quadShaderProgram.initializeMvp(window.width(), window.height());
+        quadShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setQuadShaderProgram(quadShaderProgram);
     }
 
