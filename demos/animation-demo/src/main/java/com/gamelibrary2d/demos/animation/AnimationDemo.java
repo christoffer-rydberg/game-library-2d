@@ -1,11 +1,11 @@
-package com.gamelibrary2d.demos.gifviewer;
+package com.gamelibrary2d.demos.animation;
 
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 
-public class GifViewerDemo {
-    private static final String title = "GIF Viewer Demo";
+public class AnimationDemo {
+    private static final String title = "Animation Demo";
 
     private static boolean isWindowed(String mode) {
         return mode.equalsIgnoreCase("w") || mode.equalsIgnoreCase("windowed");
@@ -46,6 +46,10 @@ public class GifViewerDemo {
     }
 
     public static void main(String[] args) throws InitializationException {
-        new DemoGame().start(createWindow(args));
+        try {
+            new DemoGame().start(createWindow(args));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

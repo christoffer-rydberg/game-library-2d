@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.gamelibrary2d.demos</groupId>
-    <artifactId>gif-viewer-demo</artifactId>
+    <artifactId>animation-demo</artifactId>
     <version>0.6.0</version>
     <packaging>jar</packaging>
 
@@ -46,7 +46,7 @@
                     <outputDirectory>${project.basedir}/../../jar/demos</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.gamelibrary2d.demos.gifviewer.GifViewerDemo</mainClass>
+                            <mainClass>com.gamelibrary2d.demos.animation.AnimationDemo</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

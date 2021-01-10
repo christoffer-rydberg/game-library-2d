@@ -1,4 +1,4 @@
-package com.gamelibrary2d.demos.gifviewer;
+package com.gamelibrary2d.demos.animation;
 
 import com.gamelibrary2d.AbstractGame;
 import com.gamelibrary2d.exceptions.InitializationException;

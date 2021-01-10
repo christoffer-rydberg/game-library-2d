@@ -1,6 +1,5 @@
 package com.gamelibrary2d.animation;
 
-import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
@@ -17,7 +16,7 @@ public class AnimationFrame {
      * @param surface The frame surface.
      * @param texture The frame texture.
      */
-    public AnimationFrame(Quad surface, Texture texture) {
+    public AnimationFrame(Surface surface, Texture texture) {
         this(surface, texture, 0, false, false);
     }
 
@@ -28,7 +27,7 @@ public class AnimationFrame {
      * @param texture  The frame texture.
      * @param duration Sets the {@link AnimationFrame#getDurationHint} field.
      */
-    public AnimationFrame(Quad surface, Texture texture, float duration) {
+    public AnimationFrame(Surface surface, Texture texture, float duration) {
         this(surface, texture, duration, false, false);
     }
 
@@ -41,7 +40,7 @@ public class AnimationFrame {
      * @param restoreBackground  Sets the {@link AnimationFrame#restoreBackgroundHint} field.
      * @param renderToBackground Sets the {@link AnimationFrame#getRenderToBackgroundHint} field.
      */
-    public AnimationFrame(Quad surface, Texture texture, float duration, boolean restoreBackground, boolean renderToBackground) {
+    public AnimationFrame(Surface surface, Texture texture, float duration, boolean restoreBackground, boolean renderToBackground) {
         this.surface = surface;
         this.texture = texture;
         this.durationHint = duration;

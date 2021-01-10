@@ -20,7 +20,7 @@
 	  <module>api/gamelibrary2d-sound</module>
 	  <module>api/gamelibrary2d-util</module>
 	  <module>tools/particle-generator</module>
-	  <module>demos/gif-viewer-demo</module>
+	  <module>demos/animation-demo</module>
 	  <module>demos/drawing-demo</module>
 	  <module>demos/particle-system-demo</module>
 	  <module>demos/shader-particle-system-demo</module>
