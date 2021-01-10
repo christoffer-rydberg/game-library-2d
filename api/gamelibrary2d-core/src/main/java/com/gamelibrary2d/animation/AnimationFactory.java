@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.URL;
 
 public class AnimationFactory {
-
     public static final Point NO_CONSTRAINTS = new Point(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
 
     public static Animation create(URL url, String format, Rectangle bounds, Disposer disposer) throws IOException {

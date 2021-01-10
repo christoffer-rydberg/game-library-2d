@@ -1,12 +1,13 @@
 package com.gamelibrary2d.animation;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.markers.Bounded;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public class Animation {
+public class Animation implements Bounded {
     public static Animation EMPTY = new Animation(new ArrayList<>(), Rectangle.EMPTY);
 
     private final Rectangle bounds;
@@ -35,7 +36,7 @@ public class Animation {
         float xMax = -Float.MAX_VALUE;
         float yMax = -Float.MAX_VALUE;
         for (var frame : frames) {
-            var bounds = frame.getQuad().getBounds();
+            var bounds = frame.getSurface().getBounds();
             xMin = Math.min(xMin, bounds.getLowerX());
             yMin = Math.min(yMin, bounds.getLowerY());
             xMax = Math.max(xMax, bounds.getUpperX());
@@ -49,6 +50,7 @@ public class Animation {
         return Collections.unmodifiableCollection(frames);
     }
 
+    @Override
     public Rectangle getBounds() {
         return bounds;
     }

@@ -1,10 +1,11 @@
 package com.gamelibrary2d.animation;
 
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
 public class AnimationFrame {
-    private final Quad quad;
+    private final Surface surface;
     private final Texture texture;
     private final boolean restoreBackgroundHint;
     private final boolean renderToBackgroundHint;
@@ -13,35 +14,35 @@ public class AnimationFrame {
     /**
      * Creates a new instance of {@link AnimationFrame}.
      *
-     * @param quad    The frame quad.
+     * @param surface The frame surface.
      * @param texture The frame texture.
      */
-    public AnimationFrame(Quad quad, Texture texture) {
-        this(quad, texture, 0, false, false);
+    public AnimationFrame(Quad surface, Texture texture) {
+        this(surface, texture, 0, false, false);
     }
 
     /**
      * Creates a new instance of {@link AnimationFrame}.
      *
-     * @param quad     The frame quad.
+     * @param surface  The frame surface.
      * @param texture  The frame texture.
      * @param duration Sets the {@link AnimationFrame#getDurationHint} field.
      */
-    public AnimationFrame(Quad quad, Texture texture, float duration) {
-        this(quad, texture, duration, false, false);
+    public AnimationFrame(Quad surface, Texture texture, float duration) {
+        this(surface, texture, duration, false, false);
     }
 
     /**
      * Creates a new instance of {@link AnimationFrame}.
      *
-     * @param quad               The frame quad.
+     * @param surface            The frame surface.
      * @param texture            The frame texture.
      * @param duration           Sets the {@link AnimationFrame#getDurationHint} field.
      * @param restoreBackground  Sets the {@link AnimationFrame#restoreBackgroundHint} field.
      * @param renderToBackground Sets the {@link AnimationFrame#getRenderToBackgroundHint} field.
      */
-    public AnimationFrame(Quad quad, Texture texture, float duration, boolean restoreBackground, boolean renderToBackground) {
-        this.quad = quad;
+    public AnimationFrame(Quad surface, Texture texture, float duration, boolean restoreBackground, boolean renderToBackground) {
+        this.surface = surface;
         this.texture = texture;
         this.durationHint = duration;
         this.restoreBackgroundHint = restoreBackground;
@@ -49,10 +50,10 @@ public class AnimationFrame {
     }
 
     /**
-     * The frame quad.
+     * The frame surface.
      */
-    public Quad getQuad() {
-        return quad;
+    public Surface getSurface() {
+        return surface;
     }
 
     /**

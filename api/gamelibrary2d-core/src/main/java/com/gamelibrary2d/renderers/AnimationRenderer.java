@@ -11,6 +11,7 @@ import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
@@ -124,13 +125,13 @@ public class AnimationRenderer extends AbstractRenderer {
 
     @Override
     protected void onRender(ShaderProgram shaderProgram) {
-        var activeIndex = getCurrentFrameIndex();
-        if (activeIndex < 0)
+        var currentFrame = getCurrentFrameIndex();
+        if (currentFrame < 0)
             return;
 
-        var activeFrame = animation.getFrame(activeIndex);
+        var activeFrame = animation.getFrame(currentFrame);
         if (backgroundBuffer != null) {
-            backgroundBuffer.render(shaderProgram, animation, activeIndex);
+            backgroundBuffer.render(shaderProgram, animation, currentFrame);
 
             if (!activeFrame.getRenderToBackgroundHint()) {
                 render(shaderProgram, activeFrame);
@@ -142,48 +143,54 @@ public class AnimationRenderer extends AbstractRenderer {
 
     private void render(ShaderProgram shaderProgram, AnimationFrame frame) {
         frame.getTexture().bind();
-        frame.getQuad().render(shaderProgram);
+        frame.getSurface().render(shaderProgram);
     }
 
     private static class BackgroundBuffer {
         private final DefaultDisposer resourceDisposer;
         private FrameBuffer frameBuffer;
         private SurfaceRenderer frameBufferRenderer;
-        private Quad[] backgroundQuads;
+        private FrameRenderer[] frameRenderers;
         private int previousFrame;
 
         BackgroundBuffer(Disposer disposer) {
             resourceDisposer = new DefaultDisposer(disposer);
         }
 
-        private static Quad[] createBackgroundQuads(Animation animation, Disposer disposer) {
-            var quads = new Quad[animation.getFrameCount()];
+        private static FrameRenderer[] createFrameRenderers(Animation animation) {
+            var frameRenderers = new FrameRenderer[animation.getFrameCount()];
             for (int i = 0; i < animation.getFrameCount(); ++i) {
                 var frame = animation.getFrame(i);
+                var frameSurface = frame.getSurface();
+                var frameTexture = frame.getTexture();
 
-                var quad = frame.getQuad();
-                var bounds = quad.getBounds();
-                var scaledWidth = bounds.getWidth();
-                var scaledHeight = bounds.getHeight();
+                var animationBounds = animation.getBounds();
+                var frameBounds = frameSurface.getBounds();
+                var textureWidth = frameTexture.getWidth();
+                var textureHeight = frameTexture.getHeight();
 
-                var width = frame.getTexture().getWidth();
-                var height = frame.getTexture().getHeight();
-                var offsetX = Math.round((width / scaledWidth) * (bounds.getLowerX() - animation.getBounds().getLowerX()));
-                var offsetY = Math.round((height / scaledHeight) * (bounds.getLowerY() - animation.getBounds().getLowerY()));
+                var invertedScaleX = textureWidth / frameBounds.getWidth();
+                var invertedScaleY = textureHeight / frameBounds.getHeight();
 
-                var fullSizeBounds = new Rectangle(offsetX, offsetY, width + offsetX, height + offsetY);
-                quads[i] = Quad.create(fullSizeBounds, disposer);
+                frameRenderers[i] = new FrameRenderer(
+                        frameSurface,
+                        -animationBounds.getLowerX(),
+                        -animationBounds.getLowerY(),
+                        invertedScaleX,
+                        invertedScaleY
+                );
             }
-            return quads;
+
+            return frameRenderers;
         }
 
-        private void render(ShaderProgram shaderProgram, Animation animation, int activeIndex) {
+        private void render(ShaderProgram shaderProgram, Animation animation, int currentFrame) {
             if (frameBuffer == null) {
                 var texture = DefaultTexture.create(animation.getOriginalWidth(), animation.getOriginalHeight(), resourceDisposer);
                 var quad = Quad.create(animation.getBounds(), resourceDisposer);
                 frameBuffer = FrameBuffer.create(texture, resourceDisposer);
                 frameBufferRenderer = new SurfaceRenderer(quad, texture);
-                backgroundQuads = createBackgroundQuads(animation, resourceDisposer);
+                frameRenderers = createFrameRenderers(animation);
             }
 
             // Prepare model matrix
@@ -198,8 +205,7 @@ public class AnimationRenderer extends AbstractRenderer {
             OpenGLUtils.setBlendMode(BlendMode.TRANSPARENT);
 
             // Render to background buffer
-            shaderProgram.updateModelMatrix(ModelMatrix.instance());
-            renderToFrameBuffer(shaderProgram, animation, activeIndex);
+            renderToFrameBuffer(shaderProgram, animation, currentFrame);
 
             // Restore model matrix
             modelMatrix.popMatrix();
@@ -210,15 +216,15 @@ public class AnimationRenderer extends AbstractRenderer {
             frameBufferRenderer.render(alpha);
         }
 
-        private void renderToFrameBuffer(ShaderProgram shaderProgram, Animation animation, int activeIndex) {
+        private void renderToFrameBuffer(ShaderProgram shaderProgram, Animation animation, int currentFrame) {
             frameBuffer.bind();
 
-            if (activeIndex < previousFrame) {
+            if (currentFrame < previousFrame) {
                 frameBuffer.clear();
                 previousFrame = 0;
             }
 
-            for (int i = previousFrame; i <= activeIndex; ++i) {
+            for (int i = previousFrame; i <= currentFrame; ++i) {
                 var frame = animation.getFrame(i);
 
                 if (frame.getRestoreBackgroundHint()) {
@@ -231,10 +237,11 @@ public class AnimationRenderer extends AbstractRenderer {
                         shaderProgram.applyParameters();
                     }
                     frame.getTexture().bind();
-                    backgroundQuads[i].render(shaderProgram);
+
+                    frameRenderers[i].render(shaderProgram);
                 }
             }
-            previousFrame = activeIndex;
+            previousFrame = currentFrame;
 
             frameBuffer.unbind(true);
         }
@@ -244,7 +251,33 @@ public class AnimationRenderer extends AbstractRenderer {
                 resourceDisposer.dispose();
                 frameBuffer = null;
                 frameBufferRenderer = null;
-                backgroundQuads = null;
+                frameRenderers = null;
+            }
+        }
+
+        private static class FrameRenderer {
+            private final Surface frameSurface;
+            private final float translationX;
+            private final float translationY;
+            private final float scaleX;
+            private final float scaleY;
+
+            FrameRenderer(Surface frameSurface, float translationX, float translationY, float scaleX, float scaleY) {
+                this.frameSurface = frameSurface;
+                this.translationX = translationX;
+                this.translationY = translationY;
+                this.scaleX = scaleX;
+                this.scaleY = scaleY;
+            }
+
+            void render(ShaderProgram shaderProgram) {
+                var modelMatrix = ModelMatrix.instance();
+                modelMatrix.pushMatrix();
+                modelMatrix.scalef(scaleX, scaleY, 0f);
+                modelMatrix.translatef(translationX, translationY, 0f);
+                shaderProgram.updateModelMatrix(modelMatrix);
+                frameSurface.render(shaderProgram);
+                modelMatrix.popMatrix();
             }
         }
     }
