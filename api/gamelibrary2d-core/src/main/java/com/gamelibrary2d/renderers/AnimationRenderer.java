@@ -17,9 +17,10 @@ import com.gamelibrary2d.util.BlendMode;
 public class AnimationRenderer extends AbstractRenderer {
     private final Disposer disposer;
     private Animation animation;
-    private boolean looping;
-    private float frameDuration; // TODO: Respect individual frame duration
     private BackgroundBuffer backgroundBuffer;
+    private boolean looping;
+    private int previousFrameIndex = -1;
+    private float globalFrameDuration = -1;
 
     public AnimationRenderer(Animation animation, boolean loop) {
         disposer = null;
@@ -43,18 +44,10 @@ public class AnimationRenderer extends AbstractRenderer {
         return false;
     }
 
-    private float calcAverageFrameDuration() {
-        float duration = 0;
-        for (var frame : animation.getFrames()) {
-            duration += frame.getDurationHint();
-        }
-        return duration / animation.getFrameCount();
-    }
-
     private void setAnimation(Animation animation, boolean loop) {
         this.animation = animation;
         this.looping = loop;
-        this.frameDuration = calcAverageFrameDuration();
+        this.previousFrameIndex = -1;
 
         if (backgroundBuffer != null) {
             backgroundBuffer.dispose();
@@ -67,19 +60,32 @@ public class AnimationRenderer extends AbstractRenderer {
     }
 
     /**
-     * The duration of each frame in seconds.
+     * The global frame duration is used to determine the duration of each frame.
+     * It can be enabled by invoking {@link #setGlobalFrameDuration} and disabled by invoking {@link #disableGlobalFrameDuration}.
+     * If disabled, the {@link AnimationFrame#getDurationHint() duration hint} for each frame will be respected.
+     *
+     * @return The global frame duration if enabled, otherwise -1.
      */
-    public float getFrameDuration() {
-        return frameDuration;
+    public float getGlobalFrameDuration() {
+        return this.globalFrameDuration;
     }
 
     /**
-     * Sets the {@link #getFrameDuration frame duration}.
-     *
-     * @param duration The duration of each frame in seconds.
+     * Sets the {@link #getGlobalFrameDuration() global frame duration}.
      */
-    public void setFrameDuration(float duration) {
-        this.frameDuration = duration;
+    public void setGlobalFrameDuration(float duration) {
+        if (duration <= 0f) {
+            throw new IllegalStateException("The global frame duration must be greater than 0");
+        }
+
+        this.globalFrameDuration = duration;
+    }
+
+    /**
+     * Disables the {@link #getGlobalFrameDuration() global frame duration}.
+     */
+    public void disableGlobalFrameDuration() {
+        this.globalFrameDuration = -1;
     }
 
     public boolean isLooping() {
@@ -90,26 +96,56 @@ public class AnimationRenderer extends AbstractRenderer {
         this.looping = looping;
     }
 
-    public int getCurrentFrameIndex() {
-        var size = animation.getFrameCount();
-        if (size == 0)
-            return -1;
-        var index = getIndex();
-        return looping ? index % size : Math.min(index, size - 1);
+    private int getFrameIndexFromAnimation(int previousFrame, float time) {
+        if (previousFrame > 0) {
+            // Try previous frame again:
+            if (animation.isFrameActive(previousFrame, time)) {
+                return previousFrame;
+            }
+
+            var nextFrame = looping
+                    ? (previousFrame + 1) % animation.getFrames().size()
+                    : previousFrame + 1;
+
+            // Try next frame:
+            if (animation.isFrameActive(nextFrame, time)) {
+                return nextFrame;
+            }
+        }
+
+        // Search for frame:
+        return animation.getFrameIndex(time);
     }
 
-    public AnimationFrame getCurrentFrame() {
-        int index = getCurrentFrameIndex();
-        return index < 0 ? null : animation.getFrame(index);
+    private int getFrameIndex(int previousIndex) {
+        var time = getParameters().get(ShaderParameters.TIME);
+        if (globalFrameDuration > 0f) {
+            var size = animation.getFrames().size();
+            var index = (int) (time / globalFrameDuration);
+            return looping ? index % size : Math.min(index, size - 1);
+        } else {
+            if (looping) {
+                var duration = animation.getDuration();
+                var roundTrips = (int) (time / duration);
+                var timeWithinAnimation = time - roundTrips * duration;
+                return getFrameIndexFromAnimation(previousIndex, timeWithinAnimation);
+            }
+
+            return getFrameIndexFromAnimation(previousIndex, time);
+        }
+    }
+
+    private int getFrameIndex() {
+        previousFrameIndex = getFrameIndex(previousFrameIndex);
+        return previousFrameIndex;
+    }
+
+    public AnimationFrame getFrame() {
+        return animation.getFrame(getFrameIndex());
     }
 
     public boolean isAnimationFinished() {
-        return !looping && getIndex() >= animation.getFrameCount();
-    }
-
-    private int getIndex() {
-        var time = getParameters().get(ShaderParameters.TIME);
-        return (int) (time / frameDuration);
+        return !looping && getFrameIndex() == animation.getFrames().size() - 1;
     }
 
     @Override
@@ -125,13 +161,11 @@ public class AnimationRenderer extends AbstractRenderer {
 
     @Override
     protected void onRender(ShaderProgram shaderProgram) {
-        var currentFrame = getCurrentFrameIndex();
-        if (currentFrame < 0)
-            return;
+        var frameIndex = getFrameIndex();
 
-        var activeFrame = animation.getFrame(currentFrame);
+        var activeFrame = animation.getFrame(frameIndex);
         if (backgroundBuffer != null) {
-            backgroundBuffer.render(shaderProgram, animation, currentFrame);
+            backgroundBuffer.render(shaderProgram, animation, frameIndex);
 
             if (!activeFrame.getRenderToBackgroundHint()) {
                 render(shaderProgram, activeFrame);
@@ -158,8 +192,9 @@ public class AnimationRenderer extends AbstractRenderer {
         }
 
         private static FrameRenderer[] createFrameRenderers(Animation animation) {
-            var frameRenderers = new FrameRenderer[animation.getFrameCount()];
-            for (int i = 0; i < animation.getFrameCount(); ++i) {
+            var size = animation.getFrames().size();
+            var frameRenderers = new FrameRenderer[size];
+            for (int i = 0; i < size; ++i) {
                 var frame = animation.getFrame(i);
                 var frameSurface = frame.getSurface();
                 var frameTexture = frame.getTexture();
@@ -232,7 +267,6 @@ public class AnimationRenderer extends AbstractRenderer {
                 }
 
                 if (frame.getRenderToBackgroundHint()) {
-                    // Make opaque. Alpha will be applied when rendered to default frame buffer.
                     if (shaderProgram.setParameter(ShaderParameters.ALPHA, 1f)) {
                         shaderProgram.applyParameters();
                     }
