@@ -1,34 +1,24 @@
-package com.gamelibrary2d.animation;
+package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.objects.AbstractGameObject;
-import com.gamelibrary2d.objects.ComposableObject;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.ShaderParameters;
 
-public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableObject<T>, Updatable {
+public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableGameObject<T>, Updatable {
     private float animationTime;
 
-    public AnimatedObject() {
+    public AnimatedGameObject() {
 
     }
 
-    public AnimatedObject(T renderer) {
+    public AnimatedGameObject(T renderer) {
         super(renderer);
     }
 
-    public AnimatedObject(T renderer, Rectangle bounds) {
+    public AnimatedGameObject(T renderer, Rectangle bounds) {
         super(renderer);
         setBounds(bounds);
-    }
-
-    public T getRenderer() {
-        return super.getContent();
-    }
-
-    public void setRenderer(T content) {
-        super.setContent(content);
     }
 
     protected float getAnimationTime() {
@@ -57,5 +47,9 @@ public class AnimatedObject<T extends Renderer> extends AbstractGameObject<T> im
     @Override
     public T getContent() {
         return super.getContent();
+    }
+
+    public void setContent(T content) {
+        super.setContent(content);
     }
 }

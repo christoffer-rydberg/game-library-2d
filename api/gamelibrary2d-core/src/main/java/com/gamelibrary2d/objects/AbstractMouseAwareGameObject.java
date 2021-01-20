@@ -7,17 +7,17 @@ import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.renderers.BitmapRenderer;
 import com.gamelibrary2d.util.Projection;
 
-public abstract class AbstractMouseAwareObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
+public abstract class AbstractMouseAwareGameObject<T extends Renderable> extends AbstractGameObject<T> implements MouseAware {
 
     private final MouseButtonStates mouseButtonStates = new MouseButtonStates(5);
     private BitmapRenderer bitmapRenderer;
     private DefaultDisposer disposer;
 
-    protected AbstractMouseAwareObject() {
+    protected AbstractMouseAwareGameObject() {
 
     }
 
-    protected AbstractMouseAwareObject(T content) {
+    protected AbstractMouseAwareGameObject(T content) {
         super(content);
     }
 

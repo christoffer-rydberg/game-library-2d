@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 public class Quad extends AbstractDisposable implements Surface {
-
+    private static final Rectangle DEFAULT_TEXTURE_BOUNDS = new Rectangle(0, 0, 1, 1);
     private final static String POSITION_ATTRIBUTE = "position";
     private final static String VERTEX_COORDINATE_ATTRIBUTE = "coord";
     private final static String TEXTURE_COORDINATE_ATTRIBUTE = "texcoord";
@@ -105,7 +105,7 @@ public class Quad extends AbstractDisposable implements Surface {
     }
 
     public static Quad create(Rectangle bounds, QuadShape shape, Disposer disposer) {
-        Quad quad = new Quad(bounds, new Rectangle(0, 0, 1, 1), shape);
+        Quad quad = new Quad(bounds, DEFAULT_TEXTURE_BOUNDS, shape);
         quad.setup();
         disposer.registerDisposal(quad);
         return quad;

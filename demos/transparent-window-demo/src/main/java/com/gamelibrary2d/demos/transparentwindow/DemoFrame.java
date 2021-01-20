@@ -1,11 +1,15 @@
 package com.gamelibrary2d.demos.transparentwindow;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.animation.*;
+import com.gamelibrary2d.animation.Animation;
+import com.gamelibrary2d.animation.AnimationFrame;
+import com.gamelibrary2d.animation.io.AnimationLoader;
+import com.gamelibrary2d.animation.io.StandardAnimationFormats;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
-import com.gamelibrary2d.objects.ComposableObject;
+import com.gamelibrary2d.objects.AnimatedGameObject;
+import com.gamelibrary2d.objects.ComposableGameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 
 import java.io.IOException;
@@ -15,21 +19,32 @@ import java.util.Collections;
 public class DemoFrame extends AbstractFrame {
 
     private final Game game;
-    private ComposableObject<AnimationRenderer> animationObj;
+    private ComposableGameObject<AnimationRenderer> animationObj;
 
     DemoFrame(Game game) {
         this.game = game;
     }
 
     private Animation createAnimation() throws IOException {
-        var animation = AnimationFactory.create(DemoFrame.class.getResource("/Images/homer.gif"),
-                AnimationFormats.GIF, Rectangle.create(1f, 1f), AnimationFactory.NO_CONSTRAINTS, this);
+        var animationUrl = DemoFrame.class.getResource("/Images/homer.gif");
+        var animationScale = Rectangle.create(1f, 1f);
+
+        var animation = AnimationLoader
+                .load(animationUrl, StandardAnimationFormats.GIF)
+                .createAnimation(
+                        animationScale,
+                        game.getWindow().getWidth(),
+                        game.getWindow().getHeight(),
+                        this);
+
         var frames = animation.getFrames();
-        var frameUpdate = new ArrayList<AnimationFrame>();
-        frames.forEach(frameUpdate::add);
-        Collections.reverse(frameUpdate);
-        frames.forEach(frameUpdate::add);
-        return new Animation(frameUpdate, animation.getBounds());
+
+        var updatedFrames = new ArrayList<AnimationFrame>(frames.size() * 2);
+        frames.forEach(updatedFrames::add);
+        Collections.reverse(updatedFrames);
+        frames.forEach(updatedFrames::add);
+
+        return new Animation(updatedFrames);
     }
 
     @Override
@@ -37,7 +52,7 @@ public class DemoFrame extends AbstractFrame {
         var window = game.getWindow();
         try {
             var animation = createAnimation();
-            animationObj = new AnimatedObject<>(new AnimationRenderer(animation, false, this));
+            animationObj = new AnimatedGameObject<>(new AnimationRenderer(animation, false, this));
             animationObj.setPosition(window.getWidth() / 2f, window.getHeight() / 2f);
             add(animationObj);
         } catch (IOException e) {

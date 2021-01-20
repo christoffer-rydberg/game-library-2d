@@ -3,11 +3,11 @@ package com.gamelibrary2d.splitscreen;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.objects.AbstractObjectWrapper;
+import com.gamelibrary2d.objects.AbstractGameObjectWrapper;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.objects.GameObject;
 
-public class SplitLayer<T extends GameObject> extends AbstractObjectWrapper<T> implements Clearable {
+public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<T> implements Clearable {
     private final Rectangle renderArea;
     private final Disposer layoutDisposer;
     private SplitLayout layout;

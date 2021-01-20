@@ -13,16 +13,6 @@ public class AnimationFrame {
     /**
      * Creates a new instance of {@link AnimationFrame}.
      *
-     * @param surface The frame surface.
-     * @param texture The frame texture.
-     */
-    public AnimationFrame(Surface surface, Texture texture) {
-        this(surface, texture, 0, false, false);
-    }
-
-    /**
-     * Creates a new instance of {@link AnimationFrame}.
-     *
      * @param surface  The frame surface.
      * @param texture  The frame texture.
      * @param duration Sets the {@link AnimationFrame#getDurationHint} field.

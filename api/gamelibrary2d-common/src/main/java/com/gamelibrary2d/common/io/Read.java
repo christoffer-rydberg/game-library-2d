@@ -10,60 +10,52 @@ import java.nio.charset.StandardCharsets;
 
 public class Read {
 
-    public static void bytes(InputStream is, boolean closeStream, DataBuffer buffer) throws IOException {
-        try {
-            while (true) {
-                int readBytes = is.read(buffer.array(), buffer.position(), buffer.remaining());
-                if (readBytes == -1)
-                    break;
-                buffer.position(buffer.position() + readBytes);
-                buffer.ensureRemaining(1);
-            }
-        } finally {
-            if (closeStream) {
-                is.close();
-            }
+    public static void bytes(InputStream is, DataBuffer buffer) throws IOException {
+        while (true) {
+            int readBytes = is.read(buffer.array(), buffer.position(), buffer.remaining());
+            if (readBytes == -1)
+                break;
+            buffer.position(buffer.position() + readBytes);
+            buffer.ensureRemaining(1);
         }
     }
 
-    public static DataBuffer bytes(InputStream is, boolean closeStream) throws IOException {
+    public static DataBuffer bytes(InputStream is) throws IOException {
         var buffer = new DynamicByteBuffer(512);
-        bytes(is, closeStream, buffer);
+        bytes(is, buffer);
         return buffer;
     }
 
-    public static void bytesWithSizeHeader(InputStream is, boolean closeStream, DataBuffer buffer) throws IOException {
-        try {
-            buffer.ensureRemaining(4);
-            is.read(buffer.array(), buffer.position(), buffer.remaining());
-            var length = buffer.getInt();
-            buffer.position(0);
-            buffer.ensureRemaining(length);
-            buffer.position(is.read(buffer.array(), buffer.position(), buffer.remaining()));
-        } finally {
-            if (closeStream) {
-                is.close();
-            }
-        }
+    public static void bytesWithSizeHeader(InputStream is, DataBuffer buffer) throws IOException {
+        buffer.ensureRemaining(4);
+        is.read(buffer.array(), buffer.position(), buffer.remaining());
+        var length = buffer.getInt();
+        buffer.position(0);
+        buffer.ensureRemaining(length);
+        buffer.position(is.read(buffer.array(), buffer.position(), buffer.remaining()));
     }
 
-    public static DataBuffer bytesWithSizeHeader(InputStream is, boolean closeStream) throws IOException {
+    public static DataBuffer bytesWithSizeHeader(InputStream is) throws IOException {
         var buffer = new DynamicByteBuffer(Integer.BYTES);
-        bytesWithSizeHeader(is, closeStream, buffer);
+        bytesWithSizeHeader(is, buffer);
         return buffer;
     }
 
     public static String text(URL url, Charset charset) throws IOException {
-        return text(url.openStream(), charset, true);
+        try (var stream = url.openStream()) {
+            return text(stream, charset);
+        }
     }
 
     public static String text(File file, Charset charset) throws IOException {
-        return text(new FileInputStream(file), charset, true);
+        try (var stream = new FileInputStream(file)) {
+            return text(stream, charset);
+        }
     }
 
-    public static String text(InputStream is, Charset charset, boolean closeStream) throws IOException {
+    public static String text(InputStream is, Charset charset) throws IOException {
         DataBuffer buffer = new DynamicByteBuffer(512);
-        bytes(is, closeStream, buffer);
+        bytes(is, buffer);
         buffer.flip();
         int length = buffer.remaining();
         byte[] bytes = new byte[length];

@@ -12,12 +12,13 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
+import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
     private final Disposer disposer;
     private Animation animation;
-    private BackgroundBuffer backgroundBuffer;
+    private AnimationBackgroundBuffer backgroundBuffer;
     private boolean looping;
     private int previousFrameIndex = -1;
     private float globalFrameDuration = -1;
@@ -55,7 +56,7 @@ public class AnimationRenderer extends AbstractRenderer {
         }
 
         if (requiresBackgroundBuffering()) {
-            backgroundBuffer = new BackgroundBuffer(disposer);
+            backgroundBuffer = new AnimationBackgroundBuffer(animation, disposer);
         }
     }
 
@@ -78,14 +79,21 @@ public class AnimationRenderer extends AbstractRenderer {
             throw new IllegalStateException("The global frame duration must be greater than 0");
         }
 
-        this.globalFrameDuration = duration;
+        setGlobalFrameDurationInternal(duration);
     }
 
     /**
      * Disables the {@link #getGlobalFrameDuration() global frame duration}.
      */
     public void disableGlobalFrameDuration() {
-        this.globalFrameDuration = -1;
+        setGlobalFrameDurationInternal(-1);
+    }
+
+    private void setGlobalFrameDurationInternal(float globalFrameDuration) {
+        if (this.globalFrameDuration != globalFrameDuration) {
+            this.globalFrameDuration = globalFrameDuration;
+            this.previousFrameIndex = -1;
+        }
     }
 
     public boolean isLooping() {
@@ -165,7 +173,7 @@ public class AnimationRenderer extends AbstractRenderer {
 
         var activeFrame = animation.getFrame(frameIndex);
         if (backgroundBuffer != null) {
-            backgroundBuffer.render(shaderProgram, animation, frameIndex);
+            backgroundBuffer.render(shaderProgram, frameIndex);
 
             if (!activeFrame.getRenderToBackgroundHint()) {
                 render(shaderProgram, activeFrame);
@@ -180,18 +188,20 @@ public class AnimationRenderer extends AbstractRenderer {
         frame.getSurface().render(shaderProgram);
     }
 
-    private static class BackgroundBuffer {
+    private static class AnimationBackgroundBuffer {
+        private final Animation animation;
         private final DefaultDisposer resourceDisposer;
         private FrameBuffer frameBuffer;
         private SurfaceRenderer frameBufferRenderer;
         private FrameRenderer[] frameRenderers;
         private int previousFrame;
 
-        BackgroundBuffer(Disposer disposer) {
+        AnimationBackgroundBuffer(Animation animation, Disposer disposer) {
+            this.animation = animation;
             resourceDisposer = new DefaultDisposer(disposer);
         }
 
-        private static FrameRenderer[] createFrameRenderers(Animation animation) {
+        private FrameRenderer[] createFrameRenderers() {
             var size = animation.getFrames().size();
             var frameRenderers = new FrameRenderer[size];
             for (int i = 0; i < size; ++i) {
@@ -219,13 +229,38 @@ public class AnimationRenderer extends AbstractRenderer {
             return frameRenderers;
         }
 
-        private void render(ShaderProgram shaderProgram, Animation animation, int currentFrame) {
+        private Texture createBackgroundTexture(Animation animation) {
+            float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
+            float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
+            for (var frame : animation.getFrames()) {
+                var bounds = frame.getSurface().getBounds();
+
+                var texture = frame.getTexture();
+                var width = texture.getWidth();
+                var height = texture.getHeight();
+
+                var imageBounds = bounds.resize(width / bounds.getWidth(), height / bounds.getHeight());
+                xMin = Math.min(xMin, imageBounds.getLowerX());
+                yMin = Math.min(yMin, imageBounds.getLowerY());
+                xMax = Math.max(xMax, imageBounds.getUpperX());
+                yMax = Math.max(yMax, imageBounds.getUpperY());
+            }
+
+            return DefaultTexture.create(
+                    Math.round(xMax - xMin),
+                    Math.round(yMax - yMin),
+                    resourceDisposer);
+        }
+
+        private void render(ShaderProgram shaderProgram, int currentFrame) {
             if (frameBuffer == null) {
-                var texture = DefaultTexture.create(animation.getOriginalWidth(), animation.getOriginalHeight(), resourceDisposer);
-                var quad = Quad.create(animation.getBounds(), resourceDisposer);
+                // Create OpenGL resources when rendering for the first time
+                var texture = createBackgroundTexture(animation);
                 frameBuffer = FrameBuffer.create(texture, resourceDisposer);
-                frameBufferRenderer = new SurfaceRenderer(quad, texture);
-                frameRenderers = createFrameRenderers(animation);
+                frameBufferRenderer = new SurfaceRenderer(
+                        Quad.create(animation.getBounds(), resourceDisposer),
+                        texture);
+                frameRenderers = createFrameRenderers();
             }
 
             // Prepare model matrix
@@ -240,7 +275,7 @@ public class AnimationRenderer extends AbstractRenderer {
             OpenGLUtils.setBlendMode(BlendMode.TRANSPARENT);
 
             // Render to background buffer
-            renderToFrameBuffer(shaderProgram, animation, currentFrame);
+            renderToFrameBuffer(shaderProgram, currentFrame);
 
             // Restore model matrix
             modelMatrix.popMatrix();
@@ -251,7 +286,7 @@ public class AnimationRenderer extends AbstractRenderer {
             frameBufferRenderer.render(alpha);
         }
 
-        private void renderToFrameBuffer(ShaderProgram shaderProgram, Animation animation, int currentFrame) {
+        private void renderToFrameBuffer(ShaderProgram shaderProgram, int currentFrame) {
             frameBuffer.bind();
 
             if (currentFrame < previousFrame) {

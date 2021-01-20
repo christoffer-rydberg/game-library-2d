@@ -3,42 +3,27 @@ package com.gamelibrary2d.animation;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.markers.Bounded;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Animation implements Bounded {
-    private final Rectangle bounds;
     private final List<AnimationFrame> frames;
     private final float[] timeIndex;
-    private final int originalWidth;
-    private final int originalHeight;
+    private final Rectangle bounds;
 
-    public Animation(Collection<AnimationFrame> frames, Rectangle bounds, int originalWidth, int originalHeight) {
+    public Animation(Collection<AnimationFrame> frames) {
         if (frames.isEmpty()) {
             throw new IllegalStateException("An animation must contain at least one frame");
         }
 
         this.frames = List.copyOf(frames);
         this.timeIndex = createTimeIndex(this.frames);
-        this.bounds = bounds;
-        this.originalWidth = originalWidth;
-        this.originalHeight = originalHeight;
+        this.bounds = calculateBounds(this.frames);
     }
 
-    public Animation(Collection<AnimationFrame> frames, Rectangle bounds) {
-        this(frames, bounds, Math.round(bounds.getWidth()), Math.round(bounds.getHeight()));
-    }
-
-    public Animation(ArrayList<AnimationFrame> frames) {
-        this(frames, computeBounds(frames));
-    }
-
-    private static Rectangle computeBounds(Iterable<AnimationFrame> frames) {
-        float xMin = Float.MAX_VALUE;
-        float yMin = Float.MAX_VALUE;
-        float xMax = -Float.MAX_VALUE;
-        float yMax = -Float.MAX_VALUE;
+    private static Rectangle calculateBounds(List<AnimationFrame> frames) {
+        float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
+        float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
         for (var frame : frames) {
             var bounds = frame.getSurface().getBounds();
             xMin = Math.min(xMin, bounds.getLowerX());
@@ -105,13 +90,5 @@ public class Animation implements Bounded {
 
     public AnimationFrame getFrame(int index) {
         return frames.get(index);
-    }
-
-    public int getOriginalWidth() {
-        return originalWidth;
-    }
-
-    public int getOriginalHeight() {
-        return originalHeight;
     }
 }

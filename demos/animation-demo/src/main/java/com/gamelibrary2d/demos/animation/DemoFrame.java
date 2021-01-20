@@ -1,20 +1,19 @@
 package com.gamelibrary2d.demos.animation;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.animation.*;
+import com.gamelibrary2d.animation.io.AnimationLoader;
+import com.gamelibrary2d.animation.io.AnimationMetadata;
+import com.gamelibrary2d.animation.io.StandardAnimationFormats;
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.objects.AnimatedGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultFont;
-import com.gamelibrary2d.resources.DefaultTexture;
-import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
@@ -22,84 +21,23 @@ import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 public class DemoFrame extends AbstractFrame {
-    private static float DEFAULT_FRAME_DURATION = 0.05f;
+    private static final float DEFAULT_FRAME_DURATION = 0.05f;
 
     private final Game game;
-    private AnimatedObject<AnimationRenderer> animatedObject;
+    private Future<AnimationMetadata> loadingAnimation;
+    private AnimatedGameObject<AnimationRenderer> animatedObject;
 
     DemoFrame(Game game) {
         this.game = game;
-    }
-
-    private static List<Path> getFilePaths(Path folderPath, Pattern pattern) throws IOException {
-        var filePaths = new ArrayList<Path>();
-        try (var stream = Files.walk(folderPath, 1)) {
-            for (var itr = stream.iterator(); itr.hasNext(); ) {
-                var filePath = itr.next();
-                if (pattern.matcher(filePath.toString()).find()) {
-                    filePaths.add(filePath);
-                }
-            }
-        }
-
-        filePaths.sort(Comparator.comparing(a -> a.getFileName().toString()));
-
-        return filePaths;
-    }
-
-    private static List<BufferedImage> loadImages(List<Path> filePaths) throws IOException {
-        var images = new ArrayList<BufferedImage>(filePaths.size());
-        for (var filePath : filePaths) {
-            images.add(ImageIO.read(filePath.toUri().toURL()));
-        }
-
-        return images;
-    }
-
-    private static Rectangle getAnimationBounds(List<BufferedImage> images) {
-        float width = 0, height = 0;
-
-        for (var img : images) {
-            width = Math.max(width, img.getWidth());
-            height = Math.max(height, img.getHeight());
-        }
-
-        return Rectangle.create(width, height);
-    }
-
-    private static Animation loadAnimation(
-            Path folderPath,
-            Pattern pattern,
-            float frameDuration,
-            Rectangle scale,
-            Point sizeConstraints,
-            Disposer disposer) throws IOException {
-
-        var images = loadImages(getFilePaths(folderPath, pattern));
-        var bounds = getAnimationBounds(images);
-
-        var frames = new ArrayList<AnimationFrame>(images.size());
-        for (var img : images) {
-            // TODO: Use scale and constraints to determine bounds.
-            var frameBounds = Rectangle.create(img.getWidth(), img.getHeight());
-            var texture = DefaultTexture.create(img, disposer);
-            var surface = Quad.create(frameBounds, disposer);
-            frames.add(new AnimationFrame(surface, texture, frameDuration));
-        }
-
-        return new Animation(frames, bounds);
     }
 
     private GameObject createLoadButton() {
@@ -127,7 +65,7 @@ public class DemoFrame extends AbstractFrame {
         var loadButton = createLoadButton();
         loadButton.setPosition(windowWidth / 2, windowHeight - windowHeight / 6);
 
-        animatedObject = new AnimatedObject<>();
+        animatedObject = new AnimatedGameObject<>();
         animatedObject.setPosition(windowWidth / 2, windowHeight / 2);
 
         add(animatedObject);
@@ -154,51 +92,73 @@ public class DemoFrame extends AbstractFrame {
 
     }
 
-    private Animation loadAnimation(File file, Rectangle scale, Point sizeConstraints, Disposer disposer) throws IOException {
+    private AnimationMetadata loadAnimation(File file) throws IOException {
         if (file.isDirectory()) {
-            return loadAnimation(
+            return AnimationLoader.load(
                     file.toPath(),
                     Pattern.compile("^*.(png|jpe?g)$"),
-                    DEFAULT_FRAME_DURATION,
-                    scale,
-                    sizeConstraints,
-                    disposer);
+                    DEFAULT_FRAME_DURATION);
         } else {
-            return AnimationFactory.create(
-                    file.toURI().toURL(),
-                    AnimationFormats.GIF,
-                    scale,
-                    sizeConstraints,
-                    disposer);
+            return AnimationLoader.load(file.toURI().toURL(), StandardAnimationFormats.GIF);
         }
     }
 
-    private void selectAnimation() throws IOException {
+    private Future<AnimationMetadata> loadAnimationAsync(File file) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return loadAnimation(file);
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    private Future<AnimationMetadata> selectAnimation() throws IOException {
         var fileChooser = new FileChooser(System.getenv("TEMP") + "/animation_demo/file_chooser_path.txt");
         var file = fileChooser.browse(FileSelectionMode.FILES_AND_DIRECTORIES);
-        if (file != null) {
-            var disposer = new DefaultDisposer(this);
+        return file != null ? loadAnimationAsync(file) : null;
+    }
 
-            var scale = Rectangle.create(1f, 1f);
+    private void onException(Exception e) {
+        e.printStackTrace();
+        game.exit();
+    }
 
-            var sizeConstraints = new Point(
-                    game.getWindow().getWidth(),
-                    game.getWindow().getHeight());
+    @Override
+    protected void onUpdate(float deltaTime) {
+        if (loadingAnimation != null) {
+            if (loadingAnimation.isDone()) {
+                try {
+                    var animationMetadata = loadingAnimation.get();
+                    var scale = Rectangle.create(1f, 1f);
+                    var disposer = new DefaultDisposer(this);
+                    var animation = animationMetadata.createAnimation(
+                            scale,
+                            game.getWindow().getWidth(),
+                            game.getWindow().getHeight(),
+                            disposer);
 
-            var animation = loadAnimation(file, scale, sizeConstraints, disposer);
+                    animatedObject.setContent(new AnimationRenderer(animation, true, disposer));
 
-            animatedObject.setRenderer(
-                    new AnimationRenderer(animation, true, disposer)
-            );
+                    loadingAnimation = null;
+                } catch (InterruptedException | ExecutionException e) {
+                    onException(e);
+                }
+            } else if (loadingAnimation.isCancelled()) {
+                loadingAnimation = null;
+            }
         }
+
+        super.onUpdate(deltaTime);
     }
 
     private void onLoadButtonClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        try {
-            selectAnimation();
-        } catch (IOException e) {
-            e.printStackTrace();
-            game.exit();
+        if (loadingAnimation == null) {
+            try {
+                loadingAnimation = selectAnimation();
+            } catch (IOException e) {
+                onException(e);
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.gamelibrary2d.tools.particlegenerator.widgets;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.objects.ComposableObject;
+import com.gamelibrary2d.objects.ComposableGameObject;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
 
-public class ToggleButton extends AbstractWidget<Label> implements ComposableObject<Label> {
+public class ToggleButton extends AbstractWidget<Label> implements ComposableGameObject<Label> {
     private boolean toggled;
     private Color defaultColor;
 

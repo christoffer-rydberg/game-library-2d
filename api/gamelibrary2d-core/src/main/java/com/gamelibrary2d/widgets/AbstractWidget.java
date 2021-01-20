@@ -7,10 +7,10 @@ import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseWhenFocusedAware;
-import com.gamelibrary2d.objects.AbstractMouseAwareObject;
+import com.gamelibrary2d.objects.AbstractMouseAwareGameObject;
 
 public abstract class AbstractWidget<T extends Renderable>
-        extends AbstractMouseAwareObject<T> implements FocusAware, KeyAware, InputAware, MouseWhenFocusedAware {
+        extends AbstractMouseAwareGameObject<T> implements FocusAware, KeyAware, InputAware, MouseWhenFocusedAware {
 
     private boolean focused;
     private boolean awareOfMouseEvent;

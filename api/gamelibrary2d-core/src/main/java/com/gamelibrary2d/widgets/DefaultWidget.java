@@ -1,9 +1,9 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.objects.ComposableObject;
+import com.gamelibrary2d.objects.ComposableGameObject;
 
-public final class DefaultWidget<T extends Renderable> extends AbstractObservableWidget<T> implements ComposableObject<T> {
+public final class DefaultWidget<T extends Renderable> extends AbstractObservableWidget<T> implements ComposableGameObject<T> {
     private Renderable background;
     private Renderable foreground;
 

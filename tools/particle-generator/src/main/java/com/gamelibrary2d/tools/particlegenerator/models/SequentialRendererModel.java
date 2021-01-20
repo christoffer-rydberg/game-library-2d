@@ -1,8 +1,8 @@
 package com.gamelibrary2d.tools.particlegenerator.models;
 
 import com.gamelibrary2d.animation.Animation;
-import com.gamelibrary2d.animation.AnimationFactory;
-import com.gamelibrary2d.animation.AnimationFormats;
+import com.gamelibrary2d.animation.io.StandardAnimationFormats;
+import com.gamelibrary2d.animation.io.AnimationLoader;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
@@ -15,6 +15,7 @@ import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.QuadShape;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 
@@ -47,9 +48,11 @@ public class SequentialRendererModel {
 
         if (animationRenderer != null) {
             try {
-                var animation = AnimationFactory.create(
-                        animationData,
-                        AnimationFormats.GIF,
+                var loadedAnimation = AnimationLoader.load(
+                        new ByteArrayInputStream(animationData),
+                        StandardAnimationFormats.GIF);
+
+                var animation = loadedAnimation.createAnimation(
                         bounds,
                         resourceDisposer);
 
@@ -88,9 +91,11 @@ public class SequentialRendererModel {
             animationData = stream.readAllBytes();
         }
 
-        var animation = AnimationFactory.create(
-                animationData,
-                AnimationFormats.GIF,
+        var loadedAnimation = AnimationLoader.load(
+                new ByteArrayInputStream(animationData),
+                StandardAnimationFormats.GIF);
+
+        var animation = loadedAnimation.createAnimation(
                 bounds,
                 resourceDisposer);
 

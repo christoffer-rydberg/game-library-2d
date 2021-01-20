@@ -7,16 +7,16 @@ import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.markers.Updatable;
 
-public class AbstractObjectWrapper<T extends GameObject>
+public class AbstractGameObjectWrapper<T extends GameObject>
         implements GameObject, MouseAware, KeyAware, InputAware, Updatable {
 
     private T wrapped;
 
-    protected AbstractObjectWrapper() {
+    protected AbstractGameObjectWrapper() {
 
     }
 
-    protected AbstractObjectWrapper(T wrapped) {
+    protected AbstractGameObjectWrapper(T wrapped) {
         this.wrapped = wrapped;
     }
 

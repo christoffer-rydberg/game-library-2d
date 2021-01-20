@@ -3,7 +3,7 @@ package com.gamelibrary2d.objects;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 
-public final class DefaultGameObject<T extends Renderable> extends AbstractGameObject<T> implements ComposableObject<T> {
+public final class DefaultGameObject<T extends Renderable> extends AbstractGameObject<T> implements ComposableGameObject<T> {
     private Renderable background;
     private Renderable foreground;
 
