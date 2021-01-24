@@ -4,6 +4,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.imaging.BufferedImageParser;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,14 +14,14 @@ import java.util.Map;
 
 public class DefaultFont implements Font {
     private final Texture texture;
-    private final Map<Character, Surface> quads;
+    private final Map<Character, Surface> surfaces;
     private final int ascent;
     private final int descent;
     private final int height;
 
-    public DefaultFont(Texture texture, Map<Character, Surface> quads, int ascent, int descent, int height) {
+    public DefaultFont(Texture texture, Map<Character, Surface> surfaces, int ascent, int descent, int height) {
         this.texture = texture;
-        this.quads = Collections.unmodifiableMap(quads);
+        this.surfaces = Collections.unmodifiableMap(surfaces);
         this.ascent = ascent;
         this.descent = descent;
         this.height = height;
@@ -74,7 +75,11 @@ public class DefaultFont implements Font {
             quads.put((char) i, quad);
         }
 
-        return new DefaultFont(DefaultTexture.create(textureImage, disposer), quads, ascent, descent, height);
+        var image = new BufferedImageParser().parse(textureImage);
+
+        var texture = DefaultTexture.create(image, disposer);
+
+        return new DefaultFont(texture, quads, ascent, descent, height);
     }
 
     private static BufferedImage[] createCharImages(FontMetrics fontMetrics) {
@@ -136,7 +141,7 @@ public class DefaultFont implements Font {
         ModelMatrix.instance().pushMatrix();
 
         for (int i = start; i < end; ++i) {
-            Surface quad = quads.get(text.charAt(i));
+            Surface quad = surfaces.get(text.charAt(i));
             if (quad == null)
                 continue;
 
@@ -156,8 +161,8 @@ public class DefaultFont implements Font {
         return texture;
     }
 
-    public Map<Character, Surface> getQuads() {
-        return quads;
+    public Map<Character, Surface> getSurfaces() {
+        return surfaces;
     }
 
     @Override
@@ -180,7 +185,7 @@ public class DefaultFont implements Font {
         float width = 0;
         int end = Math.min(offset + len, text.length());
         for (int i = offset; i < end; ++i) {
-            var quad = quads.get(text.charAt(i));
+            var quad = surfaces.get(text.charAt(i));
             if (quad != null) {
                 var bounds = quad.getBounds();
                 width += bounds.getWidth();

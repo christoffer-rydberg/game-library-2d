@@ -1,15 +1,9 @@
-package com.gamelibrary2d.animation.io;
+package com.gamelibrary2d.imaging;
 
-import com.gamelibrary2d.animation.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.resources.DefaultTexture;
-import com.gamelibrary2d.resources.Quad;
 
-import java.awt.image.BufferedImage;
-
-public class AnimationFrameMetadata {
-    private final BufferedImage img;
+public class ImageAnimationFrame {
+    private final Image img;
     private final Rectangle imageCoordinates;
     private final float offsetX;
     private final float offsetY;
@@ -18,18 +12,18 @@ public class AnimationFrameMetadata {
     private final boolean renderToBackgroundHint;
 
     /**
-     * Creates a new instance of {@link AnimationFrameMetadata}.
+     * Creates a new instance of {@link ImageAnimationFrame}.
      *
      * @param img                The frame image.
      * @param imageCoordinates   The image coordinates used for this frame.
      * @param offsetX            The offset along the X axis.
      * @param offsetY            The offset along the Y axis.
-     * @param duration           Sets the {@link AnimationFrameMetadata#getDurationHint} field.
-     * @param restoreBackground  Sets the {@link AnimationFrameMetadata#restoreBackgroundHint} field.
-     * @param renderToBackground Sets the {@link AnimationFrameMetadata#getRenderToBackgroundHint} field.
+     * @param duration           Sets the {@link ImageAnimationFrame#getDurationHint} field.
+     * @param restoreBackground  Sets the {@link ImageAnimationFrame#restoreBackgroundHint} field.
+     * @param renderToBackground Sets the {@link ImageAnimationFrame#getRenderToBackgroundHint} field.
      */
-    public AnimationFrameMetadata(
-            BufferedImage img,
+    public ImageAnimationFrame(
+            Image img,
             Rectangle imageCoordinates,
             float offsetX,
             float offsetY,
@@ -48,7 +42,7 @@ public class AnimationFrameMetadata {
     /**
      * The frame image.
      */
-    public BufferedImage getImage() {
+    public Image getImage() {
         return img;
     }
 
@@ -81,9 +75,7 @@ public class AnimationFrameMetadata {
         return offsetY;
     }
 
-    public AnimationFrame createAnimationFrame(Rectangle bounds, Disposer disposer) {
-        var texture = DefaultTexture.create(img, disposer);
-        var surface = Quad.create(bounds, imageCoordinates, disposer);
-        return new AnimationFrame(surface, texture, durationHint, restoreBackgroundHint, renderToBackgroundHint);
+    public Rectangle getImageCoordinates() {
+        return imageCoordinates;
     }
 }

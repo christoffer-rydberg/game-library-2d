@@ -1,18 +1,20 @@
 package com.gamelibrary2d.demos.animation;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.animation.io.AnimationLoader;
-import com.gamelibrary2d.animation.io.AnimationMetadata;
-import com.gamelibrary2d.animation.io.StandardAnimationFormats;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.imaging.AnimationLoader;
+import com.gamelibrary2d.imaging.ImageAnimation;
+import com.gamelibrary2d.imaging.StandardAnimationFormats;
 import com.gamelibrary2d.objects.AnimatedGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
+import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
@@ -33,7 +35,8 @@ public class DemoFrame extends AbstractFrame {
     private static final float DEFAULT_FRAME_DURATION = 0.05f;
 
     private final Game game;
-    private Future<AnimationMetadata> loadingAnimation;
+    private final Disposer animationDisposer = new DefaultDisposer(this);
+    private Future<ImageAnimation> loadingAnimation;
     private AnimatedGameObject<AnimationRenderer> animatedObject;
 
     DemoFrame(Game game) {
@@ -92,7 +95,7 @@ public class DemoFrame extends AbstractFrame {
 
     }
 
-    private AnimationMetadata loadAnimation(File file) throws IOException {
+    private ImageAnimation loadAnimation(File file) throws IOException {
         if (file.isDirectory()) {
             return AnimationLoader.load(
                     file.toPath(),
@@ -103,7 +106,7 @@ public class DemoFrame extends AbstractFrame {
         }
     }
 
-    private Future<AnimationMetadata> loadAnimationAsync(File file) {
+    private Future<ImageAnimation> loadAnimationAsync(File file) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return loadAnimation(file);
@@ -113,7 +116,7 @@ public class DemoFrame extends AbstractFrame {
         });
     }
 
-    private Future<AnimationMetadata> selectAnimation() throws IOException {
+    private Future<ImageAnimation> selectAnimation() throws IOException {
         var fileChooser = new FileChooser(System.getenv("TEMP") + "/animation_demo/file_chooser_path.txt");
         var file = fileChooser.browse(FileSelectionMode.FILES_AND_DIRECTORIES);
         return file != null ? loadAnimationAsync(file) : null;
@@ -129,16 +132,17 @@ public class DemoFrame extends AbstractFrame {
         if (loadingAnimation != null) {
             if (loadingAnimation.isDone()) {
                 try {
-                    var animationMetadata = loadingAnimation.get();
+                    animationDisposer.dispose();
+
                     var scale = Rectangle.create(1f, 1f);
-                    var disposer = new DefaultDisposer(this);
-                    var animation = animationMetadata.createAnimation(
+                    var animation = Animation.fromImageAnimation(
+                            loadingAnimation.get(),
                             scale,
                             game.getWindow().getWidth(),
                             game.getWindow().getHeight(),
-                            disposer);
+                            animationDisposer);
 
-                    animatedObject.setContent(new AnimationRenderer(animation, true, disposer));
+                    animatedObject.setContent(new AnimationRenderer(animation, true, animationDisposer));
 
                     loadingAnimation = null;
                 } catch (InterruptedException | ExecutionException e) {

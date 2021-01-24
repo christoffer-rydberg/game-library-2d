@@ -1,9 +1,11 @@
-package com.gamelibrary2d.animation;
+package com.gamelibrary2d.resources;
 
-import com.gamelibrary2d.resources.Surface;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.imaging.ImageAnimationFrame;
+import com.gamelibrary2d.markers.Bounded;
 
-public class AnimationFrame {
+public class AnimationFrame implements Bounded {
     private final Surface surface;
     private final Texture texture;
     private final boolean restoreBackgroundHint;
@@ -36,6 +38,17 @@ public class AnimationFrame {
         this.durationHint = duration;
         this.restoreBackgroundHint = restoreBackground;
         this.renderToBackgroundHint = renderToBackground;
+    }
+
+    public static AnimationFrame fromImageAnimationFrame(ImageAnimationFrame imageAnimationFrame, Rectangle bounds, Disposer disposer) {
+        var texture = DefaultTexture.create(imageAnimationFrame.getImage(), disposer);
+        var surface = Quad.create(bounds, imageAnimationFrame.getImageCoordinates(), disposer);
+        return new AnimationFrame(
+                surface,
+                texture,
+                imageAnimationFrame.getDurationHint(),
+                imageAnimationFrame.getRestoreBackgroundHint(),
+                imageAnimationFrame.getRenderToBackgroundHint());
     }
 
     /**
@@ -71,5 +84,10 @@ public class AnimationFrame {
      */
     public float getDurationHint() {
         return durationHint;
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return surface.getBounds();
     }
 }

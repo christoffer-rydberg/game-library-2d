@@ -1,7 +1,7 @@
 package com.gamelibrary2d.renderers;
 
-import com.gamelibrary2d.animation.Animation;
-import com.gamelibrary2d.animation.AnimationFrame;
+import com.gamelibrary2d.resources.Animation;
+import com.gamelibrary2d.resources.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
@@ -233,7 +233,7 @@ public class AnimationRenderer extends AbstractRenderer {
             float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
             float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
             for (var frame : animation.getFrames()) {
-                var bounds = frame.getSurface().getBounds();
+                var bounds = frame.getBounds();
 
                 var texture = frame.getTexture();
                 var width = texture.getWidth();

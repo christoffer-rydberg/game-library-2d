@@ -1,15 +1,15 @@
 package com.gamelibrary2d.tools.particlegenerator.models;
 
-import com.gamelibrary2d.animation.Animation;
-import com.gamelibrary2d.animation.io.StandardAnimationFormats;
-import com.gamelibrary2d.animation.io.AnimationLoader;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.imaging.AnimationLoader;
+import com.gamelibrary2d.imaging.StandardAnimationFormats;
 import com.gamelibrary2d.particle.renderers.SequentialParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.BlendMode;
@@ -48,11 +48,12 @@ public class SequentialRendererModel {
 
         if (animationRenderer != null) {
             try {
-                var loadedAnimation = AnimationLoader.load(
+                var imageAnimation = AnimationLoader.load(
                         new ByteArrayInputStream(animationData),
                         StandardAnimationFormats.GIF);
 
-                var animation = loadedAnimation.createAnimation(
+                var animation = Animation.fromImageAnimation(
+                        imageAnimation,
                         bounds,
                         resourceDisposer);
 
@@ -91,11 +92,12 @@ public class SequentialRendererModel {
             animationData = stream.readAllBytes();
         }
 
-        var loadedAnimation = AnimationLoader.load(
+        var imageAnimation = AnimationLoader.load(
                 new ByteArrayInputStream(animationData),
                 StandardAnimationFormats.GIF);
 
-        var animation = loadedAnimation.createAnimation(
+        var animation = Animation.fromImageAnimation(
+                imageAnimation,
                 bounds,
                 resourceDisposer);
 

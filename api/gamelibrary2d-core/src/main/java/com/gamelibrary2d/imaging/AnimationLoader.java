@@ -1,8 +1,7 @@
-package com.gamelibrary2d.animation.io;
+package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -52,7 +51,7 @@ public class AnimationLoader {
      * @param stream The animation stream.
      * @param format The animation format.
      */
-    public static AnimationMetadata load(InputStream stream, String format) throws IOException {
+    public static ImageAnimation load(InputStream stream, String format) throws IOException {
         var lowerCaseFormat = format.toLowerCase();
         if (animationReaders.containsKey(lowerCaseFormat)) {
             return animationReaders.get(lowerCaseFormat).read(stream);
@@ -67,7 +66,7 @@ public class AnimationLoader {
      * @param url    The animation url.
      * @param format The animation format.
      */
-    public static AnimationMetadata load(URL url, String format) throws IOException {
+    public static ImageAnimation load(URL url, String format) throws IOException {
         try (var stream = url.openStream()) {
             return load(stream, format);
         }
@@ -76,21 +75,37 @@ public class AnimationLoader {
     /**
      * Loads an animation from all image files inside the specified folder that matches the specified pattern.
      */
-    public static AnimationMetadata load(Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
+    public static ImageAnimation load(Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
+        return load(
+                new DefaultImageReader(),
+                folderPath,
+                filePattern,
+                frameDuration
+        );
+    }
+
+    /**
+     * Loads an animation from all image files inside the specified folder that matches the specified pattern.
+     */
+    public static ImageAnimation load(ImageReader imageReader, Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
         var filePaths = getFilePaths(folderPath, filePattern);
-        var frames = new ArrayList<AnimationFrameMetadata>(filePaths.size());
+        var frames = new ArrayList<ImageAnimationFrame>(filePaths.size());
         for (var filePath : filePaths) {
-            var image = ImageIO.read(filePath.toUri().toURL());
-            frames.add(new AnimationFrameMetadata(
-                    image,
-                    new Rectangle(0, 0, 1, 1),
-                    -image.getWidth() / 2f,
-                    -image.getHeight() / 2f,
-                    frameDuration,
-                    false,
-                    false));
+            try (var stream = filePath.toUri().toURL().openStream()) {
+                var image = imageReader.read(stream);
+                frames.add(new ImageAnimationFrame(
+                        image,
+                        new Rectangle(0, 0, 1, 1),
+                        -image.getWidth() / 2f,
+                        -image.getHeight() / 2f,
+                        frameDuration,
+                        false,
+                        false));
+            }
+
         }
 
-        return new AnimationMetadata(frames);
+        return new ImageAnimation(frames);
     }
+
 }

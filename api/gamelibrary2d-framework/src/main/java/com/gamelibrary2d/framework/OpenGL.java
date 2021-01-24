@@ -78,6 +78,7 @@ public interface OpenGL {
     int GL_LINEAR_MIPMAP_LINEAR = 9987;
     int GL_COLOR_BUFFER_BIT = 16384;
     int GL_RENDERBUFFER = 36161;
+    int GL_RGB = 6407;
     int GL_RGB8 = 32849;
     int GL_FRAMEBUFFER = 36160;
     int GL_COLOR_ATTACHMENT0 = 36064;
