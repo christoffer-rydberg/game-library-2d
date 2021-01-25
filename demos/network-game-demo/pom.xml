@@ -6,7 +6,7 @@
 
     <groupId>com.gamelibrary2d.demos</groupId>
     <artifactId>network-game-demo</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,37 +20,37 @@
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-core</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-framework-lwjgl</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-network</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-collision</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-sound</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-util</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
