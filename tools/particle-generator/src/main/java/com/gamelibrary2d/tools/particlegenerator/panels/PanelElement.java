@@ -72,7 +72,7 @@ public class PanelElement {
             var label = createParameterLabel(parameterName);
 
             var lineRenderer = new LineRenderer();
-            lineRenderer.getParameters().setRgba(Color.SILVER);
+            lineRenderer.getParameters().setColor(Color.SILVER);
 
             var checkBox = new Checkbox(
                     Surfaces.defaultCheckbox(),
@@ -142,7 +142,7 @@ public class PanelElement {
                     Textures.propertyBaseLine()
             );
 
-            background.getParameters().setRgb(backgroundColor);
+            background.getParameters().setColor(backgroundColor);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var textBox = new FloatPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
@@ -151,7 +151,7 @@ public class PanelElement {
             var propertyWidget = new DefaultWidget<>(textBox);
             propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
-                    background.getParameters().setRgb(focused ? Color.GOLD : backgroundColor));
+                    background.getParameters().setColor(focused ? Color.GOLD : backgroundColor));
             propertyWidget.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
 
             return propertyWidget;
@@ -210,7 +210,7 @@ public class PanelElement {
                     Textures.propertyBaseLine()
             );
 
-            background.getParameters().setRgb(backgroundColor);
+            background.getParameters().setColor(backgroundColor);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var textBox = new IntegerPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
@@ -219,7 +219,7 @@ public class PanelElement {
             var propertyWidget = new DefaultWidget<>(textBox);
             propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
-                    background.getParameters().setRgb(focused ? Color.GOLD : backgroundColor));
+                    background.getParameters().setColor(focused ? Color.GOLD : backgroundColor));
             propertyWidget.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
 
             return propertyWidget;
@@ -240,7 +240,7 @@ public class PanelElement {
             boundingBox.setBounds(bounds);
 
             var checkBoxRenderer = new LineRenderer();
-            checkBoxRenderer.getParameters().setRgba(Color.SILVER);
+            checkBoxRenderer.getParameters().setColor(Color.SILVER);
 
             var checkBox = new Checkbox(
                     Surfaces.cornerCheckbox(),
@@ -284,7 +284,7 @@ public class PanelElement {
                     Textures.propertyBaseLine()
             );
 
-            background.getParameters().setRgb(ENUM_BASE_LINE_COLOR);
+            background.getParameters().setColor(ENUM_BASE_LINE_COLOR);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
             var backgroundObj = new DefaultGameObject<>(background);

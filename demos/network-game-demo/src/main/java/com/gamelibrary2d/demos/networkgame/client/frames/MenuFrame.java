@@ -198,7 +198,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
                 Surfaces.button(),
                 Textures.button());
 
-        background.getParameters().setRgba(Settings.BUTTON_COLOR);
+        background.getParameters().setColor(Settings.BUTTON_COLOR);
 
         var label = new Label(text, new TextRenderer(Fonts.button()));
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);

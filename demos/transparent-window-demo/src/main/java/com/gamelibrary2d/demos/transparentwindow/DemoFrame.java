@@ -27,13 +27,14 @@ public class DemoFrame extends AbstractFrame {
 
     private Animation createAnimation() throws IOException {
         var animationUrl = DemoFrame.class.getResource("/Images/homer.gif");
-        var animationScale = Rectangle.create(1f, 1f);
+
+        var imageAnimation = AnimationLoader.load(animationUrl, StandardAnimationFormats.GIF);
 
         var animation = Animation.fromImageAnimation(
-                AnimationLoader.load(animationUrl, StandardAnimationFormats.GIF),
-                animationScale,
-                game.getWindow().getWidth(),
-                game.getWindow().getHeight(),
+                imageAnimation,
+                imageAnimation.getBounds()
+                        .resize(Rectangle.create(1f, 1f))
+                        .restrict(game.getWindow().getWidth(), game.getWindow().getHeight()),
                 this);
 
         var frames = animation.getFrames();

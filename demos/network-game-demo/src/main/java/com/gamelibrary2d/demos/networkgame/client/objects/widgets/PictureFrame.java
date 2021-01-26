@@ -44,7 +44,7 @@ public class PictureFrame implements Renderable {
 
     private static Renderable createSideRenderer(Color color, Rectangle bounds, Disposer disposer) {
         var renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
-        renderer.getParameters().setRgb(color);
+        renderer.getParameters().setColor(color);
         return renderer;
     }
 

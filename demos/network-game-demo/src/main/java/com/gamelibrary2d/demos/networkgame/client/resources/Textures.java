@@ -56,7 +56,7 @@ public class Textures {
 
     public static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {
         var renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
-        renderer.getParameters().setRgba(color);
+        renderer.getParameters().setColor(color);
         return renderer;
     }
 }

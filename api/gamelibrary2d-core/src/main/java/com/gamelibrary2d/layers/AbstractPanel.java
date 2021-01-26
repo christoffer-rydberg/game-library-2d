@@ -178,15 +178,13 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
             return objectBounds;
         }
 
-        objectBounds = objectBounds.move(obj.getPosition().getX(), obj.getPosition().getY());
+        objectBounds = objectBounds.move(obj.getPosition());
 
         if (obj.getScale().getX() != 1 || obj.getScale().getY() != 1) {
-            objectBounds = objectBounds.resize(obj.getScale().getX(), obj.getScale().getY(), obj.getPosition().getX(),
-                    obj.getPosition().getY());
+            objectBounds = objectBounds.resize(obj.getScale(), obj.getPosition());
         }
         if (obj.getRotation() != 0) {
-            objectBounds = objectBounds.rotate(obj.getRotation(), obj.getPosition().getX(),
-                    obj.getPosition().getY());
+            objectBounds = objectBounds.rotate(obj.getRotation(), obj.getPosition());
         }
         return objectBounds;
     }

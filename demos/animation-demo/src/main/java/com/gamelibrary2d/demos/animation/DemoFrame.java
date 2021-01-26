@@ -134,12 +134,13 @@ public class DemoFrame extends AbstractFrame {
                 try {
                     animationDisposer.dispose();
 
-                    var scale = Rectangle.create(1f, 1f);
+                    var imageAnimation = loadingAnimation.get();
+
                     var animation = Animation.fromImageAnimation(
-                            loadingAnimation.get(),
-                            scale,
-                            game.getWindow().getWidth(),
-                            game.getWindow().getHeight(),
+                            imageAnimation,
+                            imageAnimation.getBounds()
+                                    .resize(Rectangle.create(1f, 1f))
+                                    .restrict(game.getWindow().getWidth(), game.getWindow().getHeight()),
                             animationDisposer);
 
                     animatedObject.setContent(new AnimationRenderer(animation, true, animationDisposer));

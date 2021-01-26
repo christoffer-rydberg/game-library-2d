@@ -46,21 +46,19 @@ public class ShaderParameters {
         parameters[index] = value;
     }
 
-    public void setRgba(Color color) {
-        setRgba(color.getR(), color.getG(), color.getB(), color.getA());
+    public void setColor(Color color) {
+        setColor(color, color.getA());
     }
 
-    public void setRgb(Color color) {
-        setRgb(color.getR(), color.getG(), color.getB());
+    public void setColor(Color color, float alpha) {
+        setColor(color.getR(), color.getG(), color.getB(), alpha);
     }
 
-    public void setRgb(float r, float g, float b) {
-        parameters[COLOR_R] = r;
-        parameters[COLOR_G] = g;
-        parameters[COLOR_B] = b;
+    public void setColor(float r, float g, float b) {
+        setColor(r, g, b, 1f);
     }
 
-    public void setRgba(float r, float g, float b, float a) {
+    public void setColor(float r, float g, float b, float a) {
         parameters[COLOR_R] = r;
         parameters[COLOR_G] = g;
         parameters[COLOR_B] = b;

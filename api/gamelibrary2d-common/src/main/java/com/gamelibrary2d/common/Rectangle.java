@@ -300,50 +300,48 @@ public class Rectangle {
     }
 
     /**
-     * Creates a new rectangle with the specified scaled bounds.
+     * Creates a new resized rectangle.
      *
-     * @param scale The scale applied to the bounds of the rectangle.
+     * @param scale The scale of the new rectangle.
      */
     public Rectangle resize(float scale) {
         return resize(scale, scale);
     }
 
     /**
-     * Creates a new rectangle with the specified scaled bounds.
+     * Creates a new resized rectangle.
      *
-     * @param scale The scale applied to the bounds of the rectangle.
+     * @param scale The scale of the new rectangle.
      */
     public Rectangle resize(Point scale) {
         return resize(scale.getX(), scale.getY());
     }
 
     /**
-     * Creates a new rectangle with the specified scaled bounds.
+     * Creates a new resized rectangle.
      *
-     * @param scale       The scale applied to the bounds of the rectangle.
+     * @param scale       The scale of the new rectangle.
      * @param centerPoint The scaling center point.
-     * @return
      */
     public Rectangle resize(Point scale, Point centerPoint) {
         return resize(scale.getX(), scale.getY(), centerPoint.getX(), centerPoint.getY());
     }
 
     /**
-     * Creates a new rectangle with the specified scaled bounds.
+     * Creates a new resized rectangle.
      *
-     * @param scaleX The horizontal scale applied to the bounds of the rectangle.
-     * @param scaleY The vertical scale applied to the bounds of the rectangle.
+     * @param scaleX The horizontal scale of the new rectangle.
+     * @param scaleY The vertical scale of the new rectangle.
      */
     public Rectangle resize(float scaleX, float scaleY) {
         return new Rectangle(lowerX * scaleX, lowerY * scaleY, upperX * scaleX, upperY * scaleY);
     }
 
-
     /**
-     * Creates a new rectangle with the specified scaled bounds.
+     * Creates a new resized rectangle.
      *
-     * @param scaleX       The horizontal scale applied to the bounds of the rectangle.
-     * @param scaleY       The vertical scale applied to the bounds of the rectangle.
+     * @param scaleX       The horizontal scale of the new rectangle.
+     * @param scaleY       The vertical scale of the new rectangle.
      * @param centerPointX The X coordinate of the scaling center point.
      * @param centerPointY The Y coordinate of the scaling center point.
      */
@@ -359,6 +357,54 @@ public class Rectangle {
                 newCenterY - (getHeight() / 2) * scaleY,
                 newCenterX + (getWidth() / 2) * scaleX,
                 newCenterY + (getHeight() / 2) * scaleY);
+    }
+
+    /**
+     * Creates a new resized rectangle.
+     *
+     * @param scale The scale and relative position of the new rectangle.
+     */
+    public Rectangle resize(Rectangle scale) {
+        var scaledWith = scale.getWidth() * getWidth();
+        var scaledHeight = scale.getHeight() * getHeight();
+
+        var offsetX = (scale.getLowerX() / scale.getWidth()) * scaledWith;
+        var offsetY = (scale.getLowerY() / scale.getHeight()) * scaledHeight;
+
+        return new Rectangle(
+                offsetX,
+                offsetY,
+                scaledWith + offsetX,
+                scaledHeight + offsetY);
+    }
+
+    /**
+     * Creates a new resized rectangle with the specified maximum width and height.
+     * The aspect ratio of the current rectangle will be respected.
+     *
+     * @param maxWidth  The maximum width of the new rectangle.
+     * @param maxHeight The maximum height of the new rectangle.
+     */
+    public Rectangle restrict(float maxWidth, float maxHeight) {
+        var width = getWidth();
+        var height = getHeight();
+        var aspectRatio = width / height;
+
+        var restrictedWidth = Math.min(width, maxWidth);
+        var restrictedHeight = Math.min(height, maxHeight);
+        var restrictedAspectRatio = restrictedWidth / restrictedHeight;
+
+        // Maintain aspect ratio:
+        if (restrictedAspectRatio > aspectRatio) {
+            restrictedWidth = restrictedHeight * aspectRatio;
+        } else if (restrictedAspectRatio < aspectRatio) {
+            restrictedHeight = restrictedWidth / aspectRatio;
+        }
+
+        float scaleX = restrictedWidth / width;
+        float scaleY = restrictedHeight / height;
+
+        return resize(scaleX, scaleY);
     }
 
     /**
@@ -408,6 +454,10 @@ public class Rectangle {
         upperY = Math.max(rotationPoint.getY(), upperY);
 
         return new Rectangle(lowerX, lowerY, upperX, upperY);
+    }
+
+    public Rectangle rotate(float rotation, Point center) {
+        return rotate(rotation, center.getX(), center.getY());
     }
 
     public float getArea() {

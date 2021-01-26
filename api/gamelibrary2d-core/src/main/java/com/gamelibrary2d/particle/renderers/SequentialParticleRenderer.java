@@ -58,7 +58,7 @@ public class SequentialParticleRenderer implements ParticleRenderer {
                         ShaderParameters.TIME,
                         particleSystem.getParticleTime(i));
 
-                renderer.getParameters().setRgba(
+                renderer.getParameters().setColor(
                         renderBuffer.getColorR(renderOffset),
                         renderBuffer.getColorG(renderOffset),
                         renderBuffer.getColorB(renderOffset),

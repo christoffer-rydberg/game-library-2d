@@ -86,10 +86,17 @@ public interface OpenGL {
     int GL_DRAW_FRAMEBUFFER = 36009;
     int GL_VIEWPORT = 2978;
     int GL_COLOR = 6144;
+    int GL_QUADS = 7;
 
     static OpenGL instance() {
         return Runtime.getFramework().getOpenGL();
     }
+
+    void glBegin(int i);
+
+    void glEnd();
+
+    void glVertex2f(float x, float y);
 
     void glBlendFunc(int sfactor, int dfactor);
 

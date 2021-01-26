@@ -17,7 +17,7 @@ public class IntegerPropertyTextField extends TextField {
         super(textRenderer);
         this.property = property;
         cachedValue = property.get();
-        textRenderer.getParameters().setRgba(VALID);
+        textRenderer.getParameters().setColor(VALID);
         setText(toString(cachedValue));
         addTextChangedListener(this::onTextChanged);
     }
@@ -39,9 +39,9 @@ public class IntegerPropertyTextField extends TextField {
     private void onTextChanged(String before, String after) {
         try {
             property.set(Integer.parseInt(after));
-            getTextRenderer().getParameters().setRgba(VALID);
+            getTextRenderer().getParameters().setColor(VALID);
         } catch (Exception e) {
-            getTextRenderer().getParameters().setRgba(INVALID);
+            getTextRenderer().getParameters().setColor(INVALID);
         }
     }
 

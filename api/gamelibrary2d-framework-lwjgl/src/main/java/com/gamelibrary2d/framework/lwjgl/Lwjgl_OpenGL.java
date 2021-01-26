@@ -25,6 +25,21 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
+    public void glBegin(int i) {
+        GL11.glBegin(i);
+    }
+
+    @Override
+    public void glEnd() {
+        GL11.glEnd();
+    }
+
+    @Override
+    public void glVertex2f(float x, float y) {
+        GL11.glVertex2f(x, y);
+    }
+
+    @Override
     public void glBlendFunc(int sfactor, int dfactor) {
         GL11.glBlendFunc(sfactor, dfactor);
     }

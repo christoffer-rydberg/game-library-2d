@@ -1,4 +1,4 @@
-package com.gamelibrary2d.demos.geometry;
+package com.gamelibrary2d.demos.drawing;
 
 import com.gamelibrary2d.AbstractGame;
 import com.gamelibrary2d.exceptions.InitializationException;

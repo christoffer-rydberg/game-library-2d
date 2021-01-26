@@ -40,7 +40,7 @@
                     <outputDirectory>${project.basedir}/../../jar/demos</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.gamelibrary2d.demos.geometry.DrawingDemo</mainClass>
+                            <mainClass>com.gamelibrary2d.demos.drawing.DrawingDemo</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

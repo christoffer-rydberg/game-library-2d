@@ -67,51 +67,16 @@ public class Animation implements Bounded {
         return new Animation(frames);
     }
 
-    public static Animation fromImageAnimation(ImageAnimation imageAnimation, Rectangle animationBounds, Disposer disposer) {
+    public static Animation fromImageAnimation(ImageAnimation imageAnimation, Rectangle size, Disposer disposer) {
         var bounds = imageAnimation.getBounds();
 
-        var scaleX = animationBounds.getWidth() / bounds.getWidth();
-        var scaleY = animationBounds.getHeight() / bounds.getHeight();
+        var scaleX = size.getWidth() / bounds.getWidth();
+        var scaleY = size.getHeight() / bounds.getHeight();
 
-        var offsetX = animationBounds.getLowerX() - (bounds.getLowerX() * scaleX);
-        var offsetY = animationBounds.getLowerY() - (bounds.getLowerY() * scaleY);
+        var offsetX = size.getLowerX() - (bounds.getLowerX() * scaleX);
+        var offsetY = size.getLowerY() - (bounds.getLowerY() * scaleY);
 
         return fromImageAnimation(imageAnimation, scaleX, scaleY, offsetX, offsetY, disposer);
-    }
-
-    public static Animation fromImageAnimation(ImageAnimation imageAnimation, Rectangle scale, float maxWidth, float maxHeight, Disposer disposer) {
-        var bounds = imageAnimation.getBounds();
-
-        // Scale width and height:
-        var scaledWith = scale.getWidth() * bounds.getWidth();
-        var scaledHeight = scale.getHeight() * bounds.getHeight();
-        var aspectRatio = scaledWith / scaledHeight;
-
-        // Restrict to max size:
-        var restrictedWidth = Math.min(scaledWith, maxWidth);
-        var restrictedHeight = Math.min(scaledHeight, maxHeight);
-        var restrictedAspectRatio = restrictedWidth / restrictedHeight;
-
-        // Maintain aspect ratio:
-        if (restrictedAspectRatio > aspectRatio) {
-            // Restricted animation is too wide
-            restrictedWidth = restrictedHeight * aspectRatio;
-        } else if (restrictedAspectRatio < aspectRatio) {
-            // Restricted animation is too tall
-            restrictedHeight = restrictedWidth / aspectRatio;
-        }
-
-        // Compute offset:
-        var offsetX = (scale.getLowerX() / scale.getWidth()) * restrictedWidth;
-        var offsetY = (scale.getLowerY() / scale.getHeight()) * restrictedHeight;
-
-        var animationBounds = new Rectangle(
-                offsetX,
-                offsetY,
-                restrictedWidth + offsetX,
-                restrictedHeight + offsetY);
-
-        return fromImageAnimation(imageAnimation, animationBounds, disposer);
     }
 
     public float getDuration() {

@@ -20,7 +20,7 @@ public class InputField extends AbstractWidget<TextField> {
                 Surfaces.inputField(),
                 Textures.inputField());
 
-        background.getParameters().setRgba(Settings.INPUT_FIELD_COLOR);
+        background.getParameters().setColor(Settings.INPUT_FIELD_COLOR);
 
         var content = new TextField(text, new TextRenderer(Fonts.inputField()));
         content.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);

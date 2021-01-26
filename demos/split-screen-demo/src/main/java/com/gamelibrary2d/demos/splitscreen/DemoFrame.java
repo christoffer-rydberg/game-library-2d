@@ -48,7 +48,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private SpaceCraft createSpaceCraft(Quad quad, Texture texture) {
         var random = RandomInstance.get();
         var renderer = new SurfaceRenderer(quad, texture);
-        renderer.getParameters().setRgb(
+        renderer.getParameters().setColor(
                 random.nextFloat() * 0.5f + 0.5f,
                 random.nextFloat() * 0.5f + 0.5f,
                 random.nextFloat() * 0.5f + 0.5f);
@@ -75,7 +75,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         var starPositions = PositionBuffer.create(positions, this);
         var starsRenderer = new QuadsRenderer(Rectangle.create(8f, 8f));
         starsRenderer.setShape(QuadShape.RADIAL_GRADIENT);
-        starsRenderer.getParameters().setRgba(Color.LIGHT_YELLOW);
+        starsRenderer.getParameters().setColor(Color.LIGHT_YELLOW);
 
         return a -> starsRenderer.render(a, starPositions, 0, starPositions.getCapacity());
     }
@@ -120,7 +120,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
     private DefaultGameObject createBackgroundColor() {
         var quad = Quad.create(GAME_BOUNDS, this);
         var renderer = new SurfaceRenderer(quad);
-        renderer.getParameters().setRgba(
+        renderer.getParameters().setColor(
                 BACKGROUND_COLOR.getR(),
                 BACKGROUND_COLOR.getG(),
                 BACKGROUND_COLOR.getB(),

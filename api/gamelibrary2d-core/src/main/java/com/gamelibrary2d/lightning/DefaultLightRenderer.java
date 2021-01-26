@@ -83,7 +83,7 @@ public class DefaultLightRenderer implements LightRenderer {
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_NEAREST);
 
         var parameters = new ShaderParameters(new float[ShaderParameters.MIN_LENGTH + 2]);
-        parameters.setRgba(0, 0, 0, 1f);
+        parameters.setColor(0, 0, 0, 1f);
         renderer = new SurfaceRenderer(parameters);
         renderer.setShaderProgram(shaderProgram);
     }

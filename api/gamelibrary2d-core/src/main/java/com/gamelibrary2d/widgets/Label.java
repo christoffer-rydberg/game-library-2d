@@ -173,7 +173,7 @@ public class Label implements Renderable {
         var b = params.get(ShaderParameters.COLOR_B);
         var a = params.get(ShaderParameters.ALPHA);
 
-        params.setRgba(color);
+        params.setColor(color);
 
         var index = onRender(alpha, offset, len);
 
