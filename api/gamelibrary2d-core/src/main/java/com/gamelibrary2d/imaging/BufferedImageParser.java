@@ -1,8 +1,10 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.io.BufferUtils;
+import com.gamelibrary2d.framework.Image;
 
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 
 public class BufferedImageParser {
     private static int[] getArgb(BufferedImage image) {
@@ -43,12 +45,42 @@ public class BufferedImageParser {
 
         buffer.flip();
 
-        return new InternalDefaultImage(buffer, width, height, channels);
+        return new DefaultImage(buffer, width, height, channels);
     }
 
     public Image parse(BufferedImage image) {
         int[] argb = getArgb(image);
         int[] argbFlipped = flipYAxis(argb, image.getWidth(), image.getHeight());
         return parseImage(argbFlipped, image.getWidth(), image.getHeight(), image.getColorModel().hasAlpha());
+    }
+
+    private static class DefaultImage implements Image {
+        private final ByteBuffer data;
+        private final int width;
+        private final int height;
+        private final int channels;
+
+        DefaultImage(ByteBuffer data, int width, int height, int channels) {
+            this.data = data;
+            this.width = width;
+            this.height = height;
+            this.channels = channels;
+        }
+
+        public ByteBuffer getData() {
+            return data;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int getChannels() {
+            return channels;
+        }
     }
 }

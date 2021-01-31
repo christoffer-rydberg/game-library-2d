@@ -4,13 +4,10 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.AbstractDisposable;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.framework.Runtime;
+import com.gamelibrary2d.framework.*;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.imaging.DefaultImageReader;
-import com.gamelibrary2d.imaging.Image;
-import com.gamelibrary2d.imaging.ImageReader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -74,7 +71,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
     }
 
     public static DefaultTexture create(URL url, Disposer disposer) throws IOException {
-        return create(url, new DefaultImageReader(), disposer);
+        return create(url, Runtime.getFramework().createImageReader(), disposer);
     }
 
     public static DefaultTexture create(URL url, ImageReader imageReader, Disposer disposer) throws IOException {

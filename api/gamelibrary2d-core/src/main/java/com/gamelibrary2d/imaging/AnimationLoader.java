@@ -1,6 +1,8 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.ImageReader;
+import com.gamelibrary2d.framework.Runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,7 +79,7 @@ public class AnimationLoader {
      */
     public static ImageAnimation load(Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
         return load(
-                new DefaultImageReader(),
+                Runtime.getFramework().createImageReader(),
                 folderPath,
                 filePattern,
                 frameDuration

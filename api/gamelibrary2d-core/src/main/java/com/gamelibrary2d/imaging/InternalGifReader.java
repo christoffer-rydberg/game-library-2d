@@ -1,6 +1,7 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.Image;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.gif.DisposalMethod;

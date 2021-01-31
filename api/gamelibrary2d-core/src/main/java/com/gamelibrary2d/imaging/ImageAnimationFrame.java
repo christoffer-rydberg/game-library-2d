@@ -1,6 +1,7 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.Image;
 
 public class ImageAnimationFrame {
     private final Image img;

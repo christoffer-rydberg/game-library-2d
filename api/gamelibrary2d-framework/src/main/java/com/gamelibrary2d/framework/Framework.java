@@ -11,4 +11,6 @@ public interface Framework {
     OpenGL getOpenGL();
 
     Timer createTimer();
+
+    ImageReader createImageReader();
 }

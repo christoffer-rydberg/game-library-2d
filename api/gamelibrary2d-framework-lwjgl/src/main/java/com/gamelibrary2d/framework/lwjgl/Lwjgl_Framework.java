@@ -28,4 +28,9 @@ public class Lwjgl_Framework implements Framework {
     public Timer createTimer() {
         return new Lwjgl_Timer();
     }
+
+    @Override
+    public ImageReader createImageReader() {
+        return new Lwjgl_ImageReader();
+    }
 }
