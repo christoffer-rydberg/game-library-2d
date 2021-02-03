@@ -2,6 +2,7 @@ package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.*;
@@ -11,9 +12,11 @@ import com.gamelibrary2d.particle.parameters.EmitterParameters;
 import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 
+import java.nio.FloatBuffer;
+
 public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem implements Clearable {
     private final float[] position = new float[2];
-    private final float[] externalAcceleration = new float[2];
+    private final FloatBuffer externalAcceleration = BufferUtils.createFloatBuffer(2);
 
     private final MirroredIntBuffer atomicBuffer;
     private final MirroredFloatBuffer parametersBuffer;
@@ -134,8 +137,10 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
     }
 
     public void setExternalAcceleration(float x, float y) {
-        externalAcceleration[0] = x;
-        externalAcceleration[1] = y;
+        externalAcceleration.clear();
+        externalAcceleration.put(x);
+        externalAcceleration.put(y);
+        externalAcceleration.flip();
     }
 
     /**

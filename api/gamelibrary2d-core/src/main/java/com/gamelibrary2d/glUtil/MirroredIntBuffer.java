@@ -52,9 +52,14 @@ public class MirroredIntBuffer extends AbstractMirroredBuffer {
     protected void onAllocate(int target) {
         if (ioBuffer == null || ioBuffer.capacity() != data.length) {
             ioBuffer = BufferUtils.createIntBuffer(data.length);
-            OpenGL.instance().glBufferData(target, data, usage);
+            ioBuffer.put(data);
+            ioBuffer.flip();
+            OpenGL.instance().glBufferData(target, ioBuffer, usage);
         } else {
-            OpenGL.instance().glBufferSubData(target, 0, data);
+            ioBuffer.clear();
+            ioBuffer.put(data);
+            ioBuffer.flip();
+            OpenGL.instance().glBufferSubData(target, 0, ioBuffer);
         }
     }
 

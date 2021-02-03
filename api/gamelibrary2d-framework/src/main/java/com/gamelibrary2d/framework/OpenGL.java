@@ -104,13 +104,7 @@ public interface OpenGL {
 
     void glClear(int mask);
 
-    void glGenBuffers(int[] buffers);
-
-    void glBufferSubData(int target, long offset, float[] data);
-
     void glBufferSubData(int target, long offset, FloatBuffer data);
-
-    void glBufferSubData(int target, long offset, int[] data);
 
     void glBufferSubData(int target, long offset, IntBuffer data);
 
@@ -118,17 +112,11 @@ public interface OpenGL {
 
     void glBufferData(int target, long size, int usage);
 
-    void glBufferData(int target, int[] data, int usage);
-
     void glBufferData(int target, IntBuffer data, int usage);
-
-    void glBufferData(int target, float[] data, int usage);
 
     void glBufferData(int target, ByteBuffer data, int usage);
 
     void glBufferData(int target, FloatBuffer data, int usage);
-
-    void glGetBufferSubData(int target, int offset, ByteBuffer data);
 
     void glGetBufferSubData(int target, int offset, FloatBuffer data);
 
@@ -136,23 +124,15 @@ public interface OpenGL {
 
     int glGenVertexArrays();
 
-    void glGenVertexArrays(int[] arrays);
-
     void glBindVertexArray(int array);
 
     void glVertexAttribPointer(int index, int size, int type, boolean normalized, int stride, long pointer);
 
     void glEnableVertexAttribArray(int index);
 
-    void glDisableVertexAttribArray(int index);
-
     void glDeleteBuffers(int buffers);
 
-    void glDeleteBuffers(IntBuffer buffers);
-
     void glDeleteVertexArrays(int arrays);
-
-    void glDeleteVertexArrays(IntBuffer arrays);
 
     void glDrawElements(int mode, int count, int type, long indices);
 
@@ -168,17 +148,13 @@ public interface OpenGL {
 
     void glDeleteShader(int shader);
 
-    int glGetShaderi(int shader, int glCompileStatus);
-
-    void glUniform1fv(int location, float[] buffer);
+    int glGetShaderi(int shader, int pname);
 
     void glUniform2f(int location, float v1, float v2);
 
-    void glUniform2fv(int location, float[] buffer);
+    void glUniform2fv(int location, FloatBuffer buffer);
 
-    void glUniform3fv(int location, float[] buffer);
-
-    void glUniform4fv(int location, float[] buffer);
+    void glUniform4fv(int location, FloatBuffer buffer);
 
     void glUniform1fv(int location, FloatBuffer buffer);
 
@@ -216,8 +192,6 @@ public interface OpenGL {
 
     int glGenTextures();
 
-    void glActiveTexture(int texture);
-
     void glPixelStorei(int pname, int param);
 
     void glTexImage2D(int glTexture2d, int level, int internalformat, int width, int height, int border, int format,
@@ -227,8 +201,6 @@ public interface OpenGL {
 
     void glBindTexture(int target, int texture);
 
-    void glCullFace(int mode);
-
     void glEnable(int target);
 
     void glDisable(int target);
@@ -236,10 +208,6 @@ public interface OpenGL {
     void glMemoryBarrier(int barriers);
 
     void glDispatchCompute(int numGroupsX, int numGroupsY, int numGroupsZ);
-
-    void glBindBufferRange(int target, int index, int buffer, long offset, long size);
-
-    void glBindVertexBuffer(int bufferIndex, int buffer, long offset, int stride);
 
     void glBindBufferBase(int target, int index, int buffer);
 
@@ -253,37 +221,17 @@ public interface OpenGL {
 
     void glClearColor(float r, float g, float b, float a);
 
-    int glGenRenderbuffers();
-
     void glBindRenderbuffer(int target, int renderbuffer);
-
-    void glRenderbufferStorage(int target, int internalFormat, int width, int height);
-
-    void glRenderbufferStorageMultisample(int target, int samples, int internalFormat, int width, int height);
 
     int glGenFramebuffers();
 
     void glBindFramebuffer(int target, int framebuffer);
 
-    void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer);
-
-    void glBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int destX0, int destY0, int destX1, int destY1, int mask, int filter);
-
     void glDeleteFramebuffers(int framebuffer);
-
-    void glDeleteRenderbuffers(int renderbuffer);
 
     void glReadPixels(int x, int y, int width, int height, int format, int type, ByteBuffer pixels);
 
-    void glGetIntegerv(int pname, IntBuffer params);
-
     void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level);
 
-    void glClearBufferiv(int buffer, int drawbuffer, IntBuffer color);
-
     void glBlendFuncSeparate(int sFactorRGB, int dFactorRGB, int sFactorAlpha, int dFactorAlpha);
-
-    void glGetTexImage(int glTexture2d, int i, int glRgba, int glUnsignedByte, ByteBuffer buffer);
-
-    void glReadBuffer(int src);
 }

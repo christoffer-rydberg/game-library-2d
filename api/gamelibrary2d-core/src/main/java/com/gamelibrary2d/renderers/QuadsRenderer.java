@@ -1,17 +1,20 @@
 package com.gamelibrary2d.renderers;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.PositionBuffer;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.QuadShape;
 
+import java.nio.FloatBuffer;
+
 public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
     private final static String boundsUniformName = "bounds";
     private final static String texturedUniformName = "textured";
     private final static String shapeUniformName = "shape";
-    private final float[] boundsArray = new float[4];
+    private final FloatBuffer boundsBuffer = BufferUtils.createFloatBuffer(4);
 
     private Texture texture;
     private Rectangle bounds;
@@ -33,10 +36,12 @@ public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
 
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
-        boundsArray[0] = bounds.getLowerX();
-        boundsArray[1] = bounds.getLowerY();
-        boundsArray[2] = bounds.getUpperX();
-        boundsArray[3] = bounds.getUpperY();
+        boundsBuffer.clear();
+        boundsBuffer.put(bounds.getLowerX());
+        boundsBuffer.put(bounds.getLowerY());
+        boundsBuffer.put(bounds.getUpperX());
+        boundsBuffer.put(bounds.getUpperY());
+        boundsBuffer.flip();
     }
 
     public Texture getTexture() {
@@ -62,7 +67,7 @@ public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
         }
 
         var glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
-        OpenGL.instance().glUniform4fv(glBoundsUniform, boundsArray);
+        OpenGL.instance().glUniform4fv(glBoundsUniform, boundsBuffer);
 
         var glTexturedUniform = shaderProgram.getUniformLocation(texturedUniformName);
         OpenGL.instance().glUniform1i(glTexturedUniform, texture != null ? 1 : 0);

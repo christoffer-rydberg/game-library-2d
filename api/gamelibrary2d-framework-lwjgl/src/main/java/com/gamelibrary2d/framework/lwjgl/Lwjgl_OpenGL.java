@@ -45,17 +45,7 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glBufferSubData(int target, long offset, float[] data) {
-        GL15.glBufferSubData(target, offset, data);
-    }
-
-    @Override
     public void glBufferSubData(int target, long offset, FloatBuffer data) {
-        GL15.glBufferSubData(target, offset, data);
-    }
-
-    @Override
-    public void glBufferSubData(int target, long offset, int[] data) {
         GL15.glBufferSubData(target, offset, data);
     }
 
@@ -70,11 +60,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glGenBuffers(int[] buffers) {
-        GL15.glGenBuffers(buffers);
-    }
-
-    @Override
     public void glBindBuffer(int target, int buffer) {
         GL15.glBindBuffer(target, buffer);
     }
@@ -85,17 +70,7 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glBufferData(int target, int[] data, int usage) {
-        GL15.glBufferData(target, data, usage);
-    }
-
-    @Override
     public void glBufferData(int target, IntBuffer data, int usage) {
-        GL15.glBufferData(target, data, usage);
-    }
-
-    @Override
-    public void glBufferData(int target, float[] data, int usage) {
         GL15.glBufferData(target, data, usage);
     }
 
@@ -107,11 +82,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     @Override
     public void glBufferData(int target, FloatBuffer data, int usage) {
         GL15.glBufferData(target, data, usage);
-    }
-
-    @Override
-    public void glGetBufferSubData(int target, int offset, ByteBuffer data) {
-        GL15.glGetBufferSubData(target, offset, data);
     }
 
     @Override
@@ -130,11 +100,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glGenVertexArrays(int[] arrays) {
-        GL30.glGenVertexArrays(arrays);
-    }
-
-    @Override
     public void glBindVertexArray(int array) {
         GL30.glBindVertexArray(array);
     }
@@ -150,27 +115,12 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glDisableVertexAttribArray(int index) {
-        GL20.glDisableVertexAttribArray(index);
-    }
-
-    @Override
     public void glDeleteBuffers(int buffers) {
         GL15.glDeleteBuffers(buffers);
     }
 
     @Override
-    public void glDeleteBuffers(IntBuffer buffers) {
-        GL15.glDeleteBuffers(buffers);
-    }
-
-    @Override
     public void glDeleteVertexArrays(int arrays) {
-        GL30.glDeleteVertexArrays(arrays);
-    }
-
-    @Override
-    public void glDeleteVertexArrays(IntBuffer arrays) {
         GL30.glDeleteVertexArrays(arrays);
     }
 
@@ -210,17 +160,12 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public int glGetShaderi(int shader, int glCompileStatus) {
-        return GL20.glGetShaderi(shader, glCompileStatus);
+    public int glGetShaderi(int shader, int pname) {
+        return GL20.glGetShaderi(shader, pname);
     }
 
     @Override
-    public void glUniform1fv(int location, float[] value) {
-        GL20.glUniform1fv(location, value);
-    }
-
-    @Override
-    public void glUniform2fv(int location, float[] value) {
+    public void glUniform2fv(int location, FloatBuffer value) {
         GL20.glUniform2fv(location, value);
     }
 
@@ -230,12 +175,7 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glUniform3fv(int location, float[] value) {
-        GL20.glUniform3fv(location, value);
-    }
-
-    @Override
-    public void glUniform4fv(int location, float[] value) {
+    public void glUniform4fv(int location, FloatBuffer value) {
         GL20.glUniform4fv(location, value);
     }
 
@@ -330,11 +270,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glActiveTexture(int texture) {
-        GL13.glActiveTexture(texture);
-    }
-
-    @Override
     public void glPixelStorei(int pname, int param) {
         GL11.glPixelStorei(pname, param);
     }
@@ -366,11 +301,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glCullFace(int mode) {
-        GL11.glCullFace(mode);
-    }
-
-    @Override
     public void glMemoryBarrier(int barriers) {
         GL42.glMemoryBarrier(barriers);
     }
@@ -378,16 +308,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     @Override
     public void glDispatchCompute(int numGroupsX, int numGroupsY, int numGroupsZ) {
         GL43.glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
-    }
-
-    @Override
-    public void glBindBufferRange(int target, int index, int buffer, long offset, long size) {
-        GL30.glBindBufferRange(target, index, buffer, offset, size);
-    }
-
-    @Override
-    public void glBindVertexBuffer(int bufferIndex, int buffer, long offset, int stride) {
-        GL43.glBindVertexBuffer(bufferIndex, buffer, offset, stride);
     }
 
     @Override
@@ -421,23 +341,8 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public int glGenRenderbuffers() {
-        return GL30.glGenRenderbuffers();
-    }
-
-    @Override
     public void glBindRenderbuffer(int target, int renderbuffer) {
         GL30.glBindRenderbuffer(target, renderbuffer);
-    }
-
-    @Override
-    public void glRenderbufferStorage(int target, int internalFormat, int width, int height) {
-        GL30.glRenderbufferStorage(target, internalFormat, width, height);
-    }
-
-    @Override
-    public void glRenderbufferStorageMultisample(int target, int samples, int internalFormat, int width, int height) {
-        GL30.glRenderbufferStorageMultisample(target, samples, internalFormat, width, height);
     }
 
     @Override
@@ -451,23 +356,8 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-        GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
-    }
-
-    @Override
-    public void glBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int destX0, int destY0, int destX1, int destY1, int mask, int filter) {
-        GL30.glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, destX0, destY0, destX1, destY1, mask, filter);
-    }
-
-    @Override
     public void glDeleteFramebuffers(int framebuffer) {
         GL30.glDeleteFramebuffers(framebuffer);
-    }
-
-    @Override
-    public void glDeleteRenderbuffers(int renderbuffer) {
-        GL30.glDeleteRenderbuffers(renderbuffer);
     }
 
     @Override
@@ -476,32 +366,12 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glReadBuffer(int src) {
-        GL20.glReadBuffer(src);
-    }
-
-    @Override
-    public void glGetIntegerv(int pname, IntBuffer params) {
-        GL11.glGetIntegerv(pname, params);
-    }
-
-    @Override
     public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
         GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
     }
 
     @Override
-    public void glClearBufferiv(int buffer, int drawbuffer, IntBuffer color) {
-        GL30.glClearBufferiv(buffer, drawbuffer, color);
-    }
-
-    @Override
     public void glBlendFuncSeparate(int sFactorRGB, int dFactorRGB, int sFactorAlpha, int dFactorAlpha) {
         GL30.glBlendFuncSeparate(sFactorRGB, dFactorRGB, sFactorAlpha, dFactorAlpha);
-    }
-
-    @Override
-    public void glGetTexImage(int tex, int level, int format, int type, ByteBuffer pixels) {
-        GL30.glGetTexImage(tex, level, format, type, pixels);
     }
 }
