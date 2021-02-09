@@ -52,7 +52,7 @@ public class FocusManager {
         List<Object> focused = new ArrayList<>(focusedObjects.size());
         focused.addAll(focusedObjects);
         for (int i = 0; i < focused.size(); ++i) {
-            var focusedObject = focused.get(i);
+            Object focusedObject = focused.get(i);
             if (focusedObject != obj) {
                 unfocus(focused.get(i), false);
             }
@@ -63,7 +63,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                var obj = iterationList.get(i);
+                Object obj = iterationList.get(i);
                 if (obj instanceof KeyAware) {
                     ((KeyAware) obj).keyDown(key, scanCode, repeat, mods);
                 }
@@ -77,7 +77,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                var obj = iterationList.get(i);
+                Object obj = iterationList.get(i);
                 if (obj instanceof KeyAware) {
                     ((KeyAware) obj).keyReleased(key, scanCode, mods);
                 }
@@ -91,7 +91,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                var obj = iterationList.get(i);
+                Object obj = iterationList.get(i);
                 if (obj instanceof InputAware) {
                     ((InputAware) obj).charInput(charInput);
                 }
@@ -105,7 +105,7 @@ public class FocusManager {
         try {
             iterationList.addAll(focusedObjects);
             for (int i = 0; i < iterationList.size(); ++i) {
-                var obj = iterationList.get(i);
+                Object obj = iterationList.get(i);
                 if (obj instanceof MouseWhenFocusedAware) {
                     if (released) {
                         ((MouseWhenFocusedAware) obj).mouseButtonReleasedWhenFocused(button, mods);

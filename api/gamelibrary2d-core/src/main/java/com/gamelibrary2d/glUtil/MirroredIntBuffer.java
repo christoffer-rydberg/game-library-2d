@@ -18,7 +18,7 @@ public class MirroredIntBuffer extends AbstractMirroredBuffer {
     }
 
     public static MirroredIntBuffer create(int[] data, int target, int usage, Disposer disposer) {
-        var buffer = new MirroredIntBuffer(target, usage);
+        MirroredIntBuffer buffer = new MirroredIntBuffer(target, usage);
         buffer.allocate(data);
         disposer.registerDisposal(buffer);
         return buffer;

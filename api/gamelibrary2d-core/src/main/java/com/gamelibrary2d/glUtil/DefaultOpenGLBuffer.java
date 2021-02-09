@@ -13,7 +13,7 @@ public class DefaultOpenGLBuffer extends AbstractOpenGLBuffer {
     }
 
     public static DefaultOpenGLBuffer create(int target, int usage, Disposer disposer) {
-        var buffer = new DefaultOpenGLBuffer(target, usage);
+        DefaultOpenGLBuffer buffer = new DefaultOpenGLBuffer(target, usage);
         disposer.registerDisposal(buffer);
         return buffer;
     }

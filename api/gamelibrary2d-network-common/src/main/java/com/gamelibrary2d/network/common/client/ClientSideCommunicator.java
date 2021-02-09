@@ -1,10 +1,7 @@
 package com.gamelibrary2d.network.common.client;
 
 import com.gamelibrary2d.common.functional.ParameterizedAction;
-import com.gamelibrary2d.network.common.AbstractNetworkCommunicator;
-import com.gamelibrary2d.network.common.Communicator;
-import com.gamelibrary2d.network.common.SocketChannelConnectedHandler;
-import com.gamelibrary2d.network.common.SocketChannelFailedConnectionHandler;
+import com.gamelibrary2d.network.common.*;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import java.io.IOException;
@@ -32,12 +29,12 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator {
             TcpConnectionSettings connectionSettings,
             ParameterizedAction<CommunicationSteps> configureAuthentication) {
 
-        var future = new CompletableFuture<Communicator>();
+        CompletableFuture<Communicator> future = new CompletableFuture<>();
 
-        var networkService = connectionSettings.getNetworkService();
+        NetworkService networkService = connectionSettings.getNetworkService();
 
         SocketChannelConnectedHandler onConnected = socketChannel -> {
-            var communicator = new ClientSideCommunicator(connectionSettings, configureAuthentication);
+            ClientSideCommunicator communicator = new ClientSideCommunicator(connectionSettings, configureAuthentication);
             socketChannel.socket().setTcpNoDelay(true);
             communicator.setSocketChannel(socketChannel);
             networkService.connect(socketChannel, communicator, communicator::onSocketChannelDisconnected);
@@ -47,7 +44,7 @@ public class ClientSideCommunicator extends AbstractNetworkCommunicator {
         SocketChannelFailedConnectionHandler onConnectionFailed =
                 (endpoint, error) -> future.completeExceptionally(error);
 
-        var networkServiceWasRunning = networkService.isRunning();
+        boolean networkServiceWasRunning = networkService.isRunning();
         try {
             networkService.start();
             networkService.connect(

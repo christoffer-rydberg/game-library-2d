@@ -29,7 +29,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         this.min = min;
         this.max = max;
         this.step = step;
-        var content = new BasicLayer<>();
+        Layer<Renderable> content = new BasicLayer<>();
         content.add(this.handle);
         setContent(content);
     }
@@ -61,7 +61,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     }
 
     public int setValue(int value, boolean publishEvent) {
-        var actual = (int) Math.max(min, Math.min(max, value));
+        int actual = (int) Math.max(min, Math.min(max, value));
         switch (direction) {
             case HORIZONTAL:
                 handle.setPosition(actual * step, 0);
@@ -74,7 +74,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         }
 
         if (publishEvent) {
-            for (var listener : valueChangedListeners) {
+            for (ValueChangedListener listener : valueChangedListeners) {
                 listener.onValueChanged(actual);
             }
         }
@@ -98,7 +98,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     }
 
     private GameObject createHandle(Renderable renderable) {
-        var handleObj = new DefaultWidget<>(renderable);
+        DefaultWidget<Renderable> handleObj = new DefaultWidget<>(renderable);
         handleObj.addMouseButtonDownListener(this::onHandleClicked);
         handleObj.addMouseDragListener(this::onHandleDragged);
         handleObj.addMouseButtonReleasedListener(this::onHandleReleased);
@@ -110,7 +110,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
             dragButton = button;
             dragOriginX = projectedX;
             dragOriginY = projectedY;
-            for (var listener : dragBeginListeners) {
+            for (DragBeginListener listener : dragBeginListeners) {
                 listener.onDragBegin(getValue());
             }
         }
@@ -119,7 +119,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     private void onHandleReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (dragButton == button) {
             dragButton = -1;
-            for (var listener : dragStopListeners) {
+            for (DragStopListener listener : dragStopListeners) {
                 listener.onDragStop(getValue());
             }
         }

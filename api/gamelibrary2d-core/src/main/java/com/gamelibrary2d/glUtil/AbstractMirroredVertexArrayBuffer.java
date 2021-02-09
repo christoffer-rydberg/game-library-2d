@@ -10,19 +10,19 @@ public abstract class AbstractMirroredVertexArrayBuffer<T extends MirroredBuffer
 
     @Override
     public void updateGPU(int offset, int len) {
-        var stride = getStride();
+        int stride = getStride();
         getBuffer().updateGPU(offset * stride, len * stride);
     }
 
     @Override
     public void updateCPU(int offset, int len) {
-        var stride = getStride();
+        int stride = getStride();
         getBuffer().updateCPU(offset * stride, len * stride);
     }
 
     @Override
     public void copy(int offset, int destination, int len) {
-        var stride = getStride();
+        int stride = getStride();
         getBuffer().copy(offset * stride, destination * stride, len * stride);
     }
 }

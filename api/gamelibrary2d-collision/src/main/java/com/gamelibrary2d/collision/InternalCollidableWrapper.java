@@ -2,6 +2,7 @@ package com.gamelibrary2d.collision;
 
 import com.gamelibrary2d.collision.handlers.CollisionHandler;
 import com.gamelibrary2d.collision.handlers.UpdatedHandler;
+import com.gamelibrary2d.common.Rectangle;
 
 import java.util.ArrayList;
 
@@ -70,9 +71,9 @@ class InternalCollidableWrapper<T1 extends Collidable> {
     }
 
     void update(float deltaTime) {
-        var xBeforeUpdate = collidable.getPosX();
-        var yBeforeUpdate = collidable.getPosY();
-        var boundsBeforeUpdate = collidable.getBounds();
+        float xBeforeUpdate = collidable.getPosX();
+        float yBeforeUpdate = collidable.getPosY();
+        Rectangle boundsBeforeUpdate = collidable.getBounds();
 
         collidable.update(deltaTime);
 
@@ -102,7 +103,7 @@ class InternalCollidableWrapper<T1 extends Collidable> {
 
     CollisionResult handleCollision(InternalCollidableWrapper other) {
         for (int i = 0; i < collisionHandlers.size(); ++i) {
-            var result = onCollision(collisionHandlers.get(i), other.info);
+            CollisionResult result = onCollision(collisionHandlers.get(i), other.info);
             if (result == CollisionResult.ABORT || !collidable.canCollide()) {
                 return CollisionResult.ABORT;
             }

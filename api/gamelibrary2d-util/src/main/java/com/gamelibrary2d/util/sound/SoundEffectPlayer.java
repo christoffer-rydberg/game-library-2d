@@ -30,7 +30,7 @@ public class SoundEffectPlayer {
 
     public void play(URL url, float volume) {
         for (int i = 0; i < soundEffects.length; ++i) {
-            var soundEffect = soundEffects[i];
+            SoundSource soundEffect = soundEffects[i];
             if (soundEffect.isStopped()) {
                 soundEffect.setVolume(volume);
                 soundEffect.setSoundBuffer(soundManager.getSoundBuffer(url));

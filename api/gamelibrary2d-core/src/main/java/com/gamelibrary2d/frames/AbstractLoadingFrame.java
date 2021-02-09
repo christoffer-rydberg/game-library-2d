@@ -20,7 +20,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
         if (workerThread != null && !workerThread.isAlive()) {
-            var loadResult = this.loadResult;
+            LoadResult loadResult = this.loadResult;
             workerThread = null;
             this.loadResult = null;
             if (loadResult.error == null) {
@@ -63,7 +63,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         try {
             game.setFrame(result.previousFrame, FrameDisposal.NONE);
         } catch (InitializationException e) {
-            var exception = new IllegalStateException(
+            IllegalStateException exception = new IllegalStateException(
                     "Failed to restore previous frame after failed load",
                     e);
 
@@ -85,7 +85,7 @@ public abstract class AbstractLoadingFrame extends AbstractFrame implements Load
         } else {
             workerThread = new Thread(() -> {
                 try {
-                    var context = loadFrame(frame);
+                    InitializationContext context = loadFrame(frame);
                     loadResult = new LoadResult(frame, context, previousFrame, previousFrameDisposal, null);
                 } catch (InitializationException e) {
                     frame.dispose(FrameDisposal.UNLOAD);

@@ -29,7 +29,7 @@ public class IntegerPropertyTextField extends TextField {
     }
 
     private void updateLabel() {
-        var value = property.get();
+        float value = property.get();
         if (cachedValue != value) {
             cachedValue = value;
             setText(toString(value));

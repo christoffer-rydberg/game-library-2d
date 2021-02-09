@@ -24,9 +24,9 @@ public class ServerState implements Message {
 
     @Override
     public void serializeMessage(DataBuffer buffer) {
-        var objects = objectRegister.getAll();
+        Collection<DemoServerObject> objects = objectRegister.getAll();
         buffer.putInt(objects.size());
-        for (var obj : objects) {
+        for (DemoServerObject obj : objects) {
             buffer.put(obj.getObjectIdentifier());
             obj.serializeMessage(buffer);
         }

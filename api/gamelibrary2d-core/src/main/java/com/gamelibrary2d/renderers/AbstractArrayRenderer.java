@@ -68,7 +68,7 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
 
         applyParameters(alpha);
 
-        var drawMode = getOpenGlDrawMode();
+        int drawMode = getOpenGlDrawMode();
         if (blendMode != BlendMode.NONE && isMaskingOutBackground()) {
             OpenGLUtils.setBlendMode(BlendMode.MASKED);
             OpenGL.instance().glDrawArrays(drawMode, offset, len);
@@ -88,10 +88,10 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
         float alphaSetting = parameters.get(ShaderParameters.ALPHA);
 
         try {
-            var shaderProgram = getShaderProgram();
+            ShaderProgram program = getShaderProgram();
             parameters.set(ShaderParameters.ALPHA, alphaSetting * alpha);
-            shaderProgram.setParameters(parameters.getArray(), 0, parameters.getLength());
-            shaderProgram.applyParameters();
+            program.setParameters(parameters.getArray(), 0, parameters.getLength());
+            program.applyParameters();
         } finally {
             parameters.set(ShaderParameters.ALPHA, alphaSetting);
         }

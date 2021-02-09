@@ -1,5 +1,7 @@
 package com.gamelibrary2d.objects;
 
+import com.gamelibrary2d.common.Point;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
@@ -48,7 +50,7 @@ public abstract class AbstractMouseAwareGameObject<T extends Renderable> extends
     }
 
     private boolean isPixelVisible(float x, float y) {
-        var bounds = getBounds();
+        Rectangle bounds = getBounds();
         if (bounds.contains(x, y)) {
             if (pixelDetectionEnabled()) {
                 if (bitmapRenderer == null || !bitmapRenderer.getArea().equals(bounds)) {
@@ -68,7 +70,7 @@ public abstract class AbstractMouseAwareGameObject<T extends Renderable> extends
     @Override
     public final boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            var projected = Projection.projectTo(this, projectedX, projectedY);
+            Point projected = Projection.projectTo(this, projectedX, projectedY);
             if (isPixelVisible(projected.getX(), projected.getY())) {
                 mouseEventStarted(projectedX, projectedY);
                 onMouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
@@ -87,13 +89,13 @@ public abstract class AbstractMouseAwareGameObject<T extends Renderable> extends
     public final boolean mouseMove(float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
             if (mouseButtonStates.hasActiveButtons() && isListeningToMouseDragEvents()) {
-                var projected = Projection.projectTo(this, projectedX, projectedY);
+                Point projected = Projection.projectTo(this, projectedX, projectedY);
                 mouseEventStarted(projectedX, projectedY);
                 onMouseDrag(x, y, projected.getX(), projected.getY());
                 mouseEventFinished(projectedX, projectedY);
                 return true;
             } else if (isListeningToMouseHoverEvents()) {
-                var projected = Projection.projectTo(this, projectedX, projectedY);
+                Point projected = Projection.projectTo(this, projectedX, projectedY);
                 if (isPixelVisible(projected.getX(), projected.getY())) {
                     mouseEventStarted(projectedX, projectedY);
                     onMouseHover(x, y, projected.getX(), projected.getY());
@@ -110,7 +112,7 @@ public abstract class AbstractMouseAwareGameObject<T extends Renderable> extends
     public final void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled() && mouseButtonStates.isActive(button)) {
             mouseButtonStates.setActive(button, false);
-            var projected = Projection.projectTo(this, projectedX, projectedY);
+            Point projected = Projection.projectTo(this, projectedX, projectedY);
             mouseEventStarted(projectedX, projectedY);
             onMouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
             mouseEventFinished(projectedX, projectedY);

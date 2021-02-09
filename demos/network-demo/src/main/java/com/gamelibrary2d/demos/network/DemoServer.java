@@ -63,17 +63,17 @@ public class DemoServer extends AbstractNetworkServer {
     }
 
     private void sendMessage(Communicator communicator, String message) {
-        var bytes = message.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
         communicator.getOutgoing().putInt(bytes.length);
         communicator.getOutgoing().put(bytes);
     }
 
     @Override
     protected void onMessage(Communicator communicator, DataBuffer buffer) {
-        var length = buffer.getInt();
+        int length = buffer.getInt();
         byte[] bytes = new byte[length];
         buffer.get(bytes, 0, length);
-        var message = new String(bytes, StandardCharsets.UTF_8);
+        String message = new String(bytes, StandardCharsets.UTF_8);
         System.out.println(String.format("Client: %s", message));
 
         ++messagesReceived;

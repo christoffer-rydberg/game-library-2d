@@ -33,15 +33,15 @@ public class EncryptionWriter {
      * @param plaintextWriter Writes plain data to the buffer.
      */
     public void write(DataBuffer buffer, ParameterizedAction<DataBuffer> plaintextWriter) throws IOException {
-        var position = buffer.position();
+        int position = buffer.position();
 
         // Write data and restore position
         plaintextWriter.perform(buffer);
-        var positionAfter = buffer.position();
+        int positionAfter = buffer.position();
         buffer.position(position);
 
         // Read data and restore position
-        var bytes = new byte[positionAfter - position];
+        byte[] bytes = new byte[positionAfter - position];
         buffer.get(bytes);
         buffer.position(position);
 

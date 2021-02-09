@@ -44,7 +44,7 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
 
     @Override
     public void serializeMessage(DataBuffer buffer) {
-        var isLocal = communicator.getOutgoing() == buffer;
+        boolean isLocal = communicator.getOutgoing() == buffer;
         buffer.putBool(isLocal);
         super.serializeMessage(buffer);
     }
@@ -52,7 +52,7 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
     @Override
     public void update(float deltaTime) {
         if (isRotating()) {
-            var rotationAcceleration = isAccelerating()
+            float rotationAcceleration = isAccelerating()
                     ? this.rotationAcceleration / 2f
                     : this.rotationAcceleration;
 
@@ -60,12 +60,12 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
         }
 
         if (isAccelerating()) {
-            var velocity = getVelocity();
+            Point velocity = getVelocity();
             velocity.add(
                     accelerationVector.getX() * deltaTime,
                     accelerationVector.getY() * deltaTime);
 
-            var speed = velocity.getLength();
+            float speed = velocity.getLength();
             if (speed > MAX_SPEED) {
                 velocity.multiply(MAX_SPEED / speed);
             }

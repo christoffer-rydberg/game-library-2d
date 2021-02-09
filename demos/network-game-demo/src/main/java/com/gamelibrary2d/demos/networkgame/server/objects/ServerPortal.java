@@ -29,10 +29,10 @@ public class ServerPortal extends AbstractDemoServerObject {
         super.update(deltaTime);
 
         if (!collided && spawnTimer > SPAWN_RATE) {
-            var type = RandomInstance.get().nextInt(NUMBER_OF_OBJECTS);
-            var boulder = new ServerObstacle((byte) type, gameLogic.getGameSettings().getObstacleBounds());
-            boulder.setPosition(getPosition());
-            gameLogic.spawn(boulder);
+            int type = RandomInstance.get().nextInt(NUMBER_OF_OBJECTS);
+            ServerObstacle obstacle = new ServerObstacle((byte) type, gameLogic.getGameSettings().getObstacleBounds());
+            obstacle.setPosition(getPosition());
+            gameLogic.spawn(obstacle);
             spawnTimer -= SPAWN_RATE;
         }
 

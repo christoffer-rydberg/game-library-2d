@@ -16,6 +16,7 @@ import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.DefaultFont;
+import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.util.io.FileChooser;
@@ -44,15 +45,15 @@ public class DemoFrame extends AbstractFrame {
     }
 
     private GameObject createLoadButton() {
-        var font = DefaultFont.create(new java.awt.Font("Gabriola", java.awt.Font.BOLD, 48), this);
+        Font font = DefaultFont.create(new java.awt.Font("Gabriola", java.awt.Font.BOLD, 48), this);
 
-        var label = new Label();
+        Label label = new Label();
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         label.setTextRenderer(new TextRenderer(font));
         label.setColor(Color.WHITE);
         label.setText("Click here to load an animation");
 
-        var loadButton = new DefaultWidget<>();
+        DefaultWidget<Label> loadButton = new DefaultWidget<>();
         loadButton.setContent(label);
         loadButton.setBounds(label.calculateBounds());
         loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);
@@ -65,7 +66,7 @@ public class DemoFrame extends AbstractFrame {
         final float windowWidth = game.getWindow().getWidth();
         final float windowHeight = game.getWindow().getHeight();
 
-        var loadButton = createLoadButton();
+        GameObject loadButton = createLoadButton();
         loadButton.setPosition(windowWidth / 2, windowHeight - windowHeight / 6);
 
         animatedObject = new AnimatedGameObject<>();
@@ -117,8 +118,8 @@ public class DemoFrame extends AbstractFrame {
     }
 
     private Future<ImageAnimation> selectAnimation() throws IOException {
-        var fileChooser = new FileChooser(System.getenv("TEMP") + "/animation_demo/file_chooser_path.txt");
-        var file = fileChooser.browse(FileSelectionMode.FILES_AND_DIRECTORIES);
+        FileChooser fileChooser = new FileChooser(System.getenv("TEMP") + "/animation_demo/file_chooser_path.txt");
+        File file = fileChooser.browse(FileSelectionMode.FILES_AND_DIRECTORIES);
         return file != null ? loadAnimationAsync(file) : null;
     }
 
@@ -134,9 +135,9 @@ public class DemoFrame extends AbstractFrame {
                 try {
                     animationDisposer.dispose();
 
-                    var imageAnimation = loadingAnimation.get();
+                    ImageAnimation imageAnimation = loadingAnimation.get();
 
-                    var animation = Animation.fromImageAnimation(
+                    Animation animation = Animation.fromImageAnimation(
                             imageAnimation,
                             imageAnimation.getBounds()
                                     .resize(Rectangle.create(1f, 1f))

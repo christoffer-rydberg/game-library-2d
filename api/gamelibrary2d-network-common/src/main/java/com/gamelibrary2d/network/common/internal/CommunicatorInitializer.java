@@ -22,7 +22,7 @@ public class CommunicatorInitializer {
             return InitializationResult.FINISHED;
         }
 
-        var next = initializationSteps.peekFirst();
+        ConditionalCommunicationStep next = initializationSteps.peekFirst();
         if (runner.run(context, communicator, next)) {
             initializationSteps.pollFirst();
             return initializationSteps.isEmpty() ? InitializationResult.FINISHED : InitializationResult.PENDING;

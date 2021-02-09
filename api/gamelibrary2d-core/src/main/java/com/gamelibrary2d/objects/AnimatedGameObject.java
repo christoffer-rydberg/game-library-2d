@@ -27,7 +27,7 @@ public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject<T
 
     protected void setAnimationTime(float time) {
         this.animationTime = time;
-        var renderer = getContent();
+        Renderer renderer = getContent();
         if (renderer != null) {
             renderer.getParameters().set(ShaderParameters.TIME, time);
         }

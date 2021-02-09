@@ -22,7 +22,7 @@ public class ClientState {
 
     public ServerPlayer getPlayer(int playerId) {
         for (int i = 0; i < players.size(); ++i) {
-            var player = players.get(i);
+            ServerPlayer player = players.get(i);
             if (player.getId() == playerId) {
                 return player;
             }

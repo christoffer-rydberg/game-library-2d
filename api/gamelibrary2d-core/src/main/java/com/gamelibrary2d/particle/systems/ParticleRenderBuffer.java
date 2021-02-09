@@ -29,8 +29,8 @@ public class ParticleRenderBuffer extends AbstractMirroredVertexArrayBuffer<Mirr
     }
 
     static ParticleRenderBuffer create(int capacity, Disposer disposer) {
-        var data = new float[capacity * STRIDE];
-        var buffer = new ParticleRenderBuffer(
+        float[] data = new float[capacity * STRIDE];
+        ParticleRenderBuffer buffer = new ParticleRenderBuffer(
                 MirroredFloatBuffer.create(data, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer));
         disposer.registerDisposal(buffer);
         return buffer;

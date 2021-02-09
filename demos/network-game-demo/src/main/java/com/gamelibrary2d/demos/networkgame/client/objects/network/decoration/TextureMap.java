@@ -8,6 +8,7 @@ import com.gamelibrary2d.resources.Texture;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ public class TextureMap {
     }
 
     private static Texture createTexture(Path path, Disposer disposer) throws IOException {
-        var url = path.toUri().toURL();
+        URL url = path.toUri().toURL();
         return DefaultTexture.create(url, disposer);
     }
 
@@ -48,24 +49,24 @@ public class TextureMap {
 
         if (uri.getScheme().equals("jar")) {
             try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                var path = fileSystem.getPath(resourceFolder);
+                Path path = fileSystem.getPath(resourceFolder);
                 return load(path, pattern, disposer);
             }
         } else {
-            var path = Paths.get(uri);
+            Path path = Paths.get(uri);
             return load(path, pattern, disposer);
         }
     }
 
     private Map<Byte, Texture> load(Path path, Pattern pattern, Disposer disposer) throws IOException {
-        var textures = new HashMap<Byte, Texture>();
+        Map<Byte, Texture> textures = new HashMap<>();
         try (Stream<Path> walk = Files.walk(path, 1)) {
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
                 path = it.next();
                 if (pattern == null || pattern.matcher(path.toString()).find()) {
-                    var key = readFileNameAsByte(path);
+                    Byte key = readFileNameAsByte(path);
                     if (key != null) {
-                        var texture = createTexture(path, disposer);
+                        Texture texture = createTexture(path, disposer);
                         textures.put(key, texture);
                     }
                 }
@@ -76,12 +77,12 @@ public class TextureMap {
     }
 
     private void initializePlayerTextures(Disposer disposer) throws IOException {
-        var textures = load("/images/spacecrafts/", "^*.png$", disposer);
+        Map<Byte, Texture> textures = load("/images/spacecrafts/", "^*.png$", disposer);
         this.textures.put(ObjectTypes.PLAYER, textures);
     }
 
     private void initializeObstacleTextures(Disposer disposer) throws IOException {
-        var textures = load("/images/obstacles/", "^*.png$", disposer);
+        Map<Byte, Texture> textures = load("/images/obstacles/", "^*.png$", disposer);
         this.textures.put(ObjectTypes.OBSTACLE, textures);
     }
 
@@ -91,12 +92,12 @@ public class TextureMap {
     }
 
     public Texture getTexture(Byte primaryType, Byte secondaryType) {
-        var textures = this.textures.get(primaryType);
+        Map<Byte, Texture> textures = this.textures.get(primaryType);
         return textures != null ? textures.get(secondaryType) : null;
     }
 
     public Set<Byte> getKeys(byte primaryType) {
-        var textures = this.textures.get(primaryType);
+        Map<Byte, Texture> textures = this.textures.get(primaryType);
         return textures != null ? textures.keySet() : emptyKeySet;
     }
 }

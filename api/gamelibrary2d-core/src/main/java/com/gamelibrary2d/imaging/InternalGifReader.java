@@ -1,15 +1,19 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.framework.Image;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.gif.DisposalMethod;
 import org.apache.commons.imaging.formats.gif.GifImageMetadata;
+import org.apache.commons.imaging.formats.gif.GifImageMetadataItem;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 class InternalGifReader implements AnimationReader {
     private static final Rectangle IMAGE_COORDINATES = new Rectangle(0, 0, 1, 1);
@@ -32,28 +36,28 @@ class InternalGifReader implements AnimationReader {
     }
 
     private static ImageAnimation loadInternal(InputStream stream) throws IOException, ImageReadException {
-        var bytes = stream.readAllBytes();
-        var images = Imaging.getAllBufferedImages(bytes);
-        var metadata = (GifImageMetadata) Imaging.getMetadata(bytes);
+        byte[] bytes = Read.byteArray(stream);
+        List<BufferedImage> images = Imaging.getAllBufferedImages(bytes);
+        GifImageMetadata metadata = (GifImageMetadata) Imaging.getMetadata(bytes);
 
         int frameCount = images.size();
-        var animationFrames = new ArrayList<ImageAnimationFrame>(frameCount);
+        List<ImageAnimationFrame> animationFrames = new ArrayList<>(frameCount);
 
-        var bufferedImageParser = new BufferedImageParser();
+        BufferedImageParser bufferedImageParser = new BufferedImageParser();
 
-        var backgroundRenderingRequired = false;
+        boolean backgroundRenderingRequired = false;
         for (int i = 0; i < frameCount; ++i) {
-            var frameImage = images.get(i);
-            var metadataItem = metadata.getItems().get(i);
+            BufferedImage frameImage = images.get(i);
+            GifImageMetadataItem metadataItem = metadata.getItems().get(i);
 
-            var xOffset = metadataItem.getLeftPosition();
-            var yOffset = metadata.getHeight() - frameImage.getHeight() - metadataItem.getTopPosition();
+            int xOffset = metadataItem.getLeftPosition();
+            int yOffset = metadata.getHeight() - frameImage.getHeight() - metadataItem.getTopPosition();
 
-            var disposalMethod = i == frameCount - 1 && !backgroundRenderingRequired
+            DisposalMethod disposalMethod = i == frameCount - 1 && !backgroundRenderingRequired
                     ? DisposalMethod.UNSPECIFIED
                     : metadataItem.getDisposalMethod();
 
-            var frame = createAnimationFrame(
+            ImageAnimationFrame frame = createAnimationFrame(
                     bufferedImageParser.parse(frameImage),
                     xOffset,
                     yOffset,

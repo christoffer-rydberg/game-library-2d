@@ -10,6 +10,7 @@ import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
@@ -65,7 +66,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
     }
 
     public static DefaultTexture create(int width, int height, Disposer disposer) {
-        var texture = new DefaultTexture(null, width, height, 4);
+        DefaultTexture texture = new DefaultTexture(null, width, height, 4);
         disposer.registerDisposal(texture);
         return texture;
     }
@@ -75,24 +76,24 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
     }
 
     public static DefaultTexture create(URL url, ImageReader imageReader, Disposer disposer) throws IOException {
-        try (var stream = url.openStream()) {
-            var img = imageReader.read(stream);
+        try (InputStream stream = url.openStream()) {
+            Image img = imageReader.read(stream);
             return create(img, disposer);
         }
     }
 
     public static DefaultTexture create(Image image, Disposer disposer) {
-        var texture = new DefaultTexture(image.getData(), image.getWidth(), image.getHeight(), image.getChannels());
+        DefaultTexture texture = new DefaultTexture(image.getData(), image.getWidth(), image.getHeight(), image.getChannels());
         disposer.registerDisposal(texture);
         return texture;
     }
 
     public static DefaultTexture create(Renderable r, float alpha, Rectangle area, Disposer disposer) {
-        var frameBufferDisposer = new DefaultDisposer();
+        Disposer frameBufferDisposer = new DefaultDisposer();
 
         try {
-            var texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
-            var frameBuffer = FrameBuffer.create(texture, frameBufferDisposer);
+            DefaultTexture texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
+            FrameBuffer frameBuffer = FrameBuffer.create(texture, frameBufferDisposer);
 
             frameBuffer.bind();
 

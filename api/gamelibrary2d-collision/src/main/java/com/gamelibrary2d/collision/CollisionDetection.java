@@ -147,9 +147,9 @@ public class CollisionDetection {
 
         if (!activationAreas.isEmpty()) {
             for (int i = 0; i < participants.size(); ++i) {
-                var participant = participants.get(i);
-                var activationResult = rootNode.insert(participant);
-                if (activationResult == InsertionResult.INSERTED_ACTIVE) {
+                InternalCollidableWrapper participant = participants.get(i);
+                InsertionResult result = rootNode.insert(participant);
+                if (result == InsertionResult.INSERTED_ACTIVE) {
                     updateList.add(participant);
                 }
             }
@@ -161,7 +161,7 @@ public class CollisionDetection {
         }
 
         for (int i = 0; i < updateList.size(); ++i) {
-            var obj = updateList.get(i);
+            InternalCollidableWrapper obj = updateList.get(i);
             rootNode.update(obj, deltaTime);
             updated.add(obj.collidable);
         }

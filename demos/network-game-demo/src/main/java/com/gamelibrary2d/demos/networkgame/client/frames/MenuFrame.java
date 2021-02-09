@@ -23,10 +23,13 @@ import com.gamelibrary2d.markers.KeyAware;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Surface;
+import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
@@ -40,6 +43,7 @@ import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MenuFrame extends AbstractFrame implements KeyAware {
@@ -72,16 +76,16 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private GameObject createGameTitle() throws IOException {
-        var texture = DefaultTexture.create(Images.MENU_TITLE, this);
-        var surface = Quad.create(Rectangle.create(texture.getWidth(), texture.getHeight()), this);
-        var renderer = new SurfaceRenderer(surface, texture);
+        Texture texture = DefaultTexture.create(Images.MENU_TITLE, this);
+        Surface surface = Quad.create(Rectangle.create(texture.getWidth(), texture.getHeight()), this);
+        Renderer renderer = new SurfaceRenderer(surface, texture);
         return new DefaultGameObject<>(renderer);
     }
 
     private Renderable createBackground() throws IOException {
-        var backgroundTexture = DefaultTexture.create(Images.MENU_BACKGROUND, this);
+        Texture backgroundTexture = DefaultTexture.create(Images.MENU_BACKGROUND, this);
 
-        var backgroundSurface = Surfaces.coverArea(
+        Surface backgroundSurface = Surfaces.coverArea(
                 new Rectangle(0, 0, game.getWindow().getWidth(), game.getWindow().getHeight()),
                 backgroundTexture.getWidth(),
                 backgroundTexture.getHeight(),
@@ -188,26 +192,26 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private Button createCreditsButton() {
-        var label = new Label("Credits", new TextRenderer(Fonts.button()));
+        Label label = new Label("Credits", new TextRenderer(Fonts.button()));
         label.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.BOTTOM);
         return new Button(label, label.calculateBounds(), this::showCredits);
     }
 
     private Button createButton(String text, Action onClick) {
-        var background = new SurfaceRenderer(
+        Renderer background = new SurfaceRenderer(
                 Surfaces.button(),
                 Textures.button());
 
         background.getParameters().setColor(Settings.BUTTON_COLOR);
 
-        var label = new Label(text, new TextRenderer(Fonts.button()));
+        Label label = new Label(text, new TextRenderer(Fonts.button()));
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
 
         return new Button(label, background, background.getBounds(), onClick);
     }
 
     private GameObject createMainPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
         stack(panel, createButton("Local", game::startLocalGame));
         stack(panel, createButton("Join", () -> navigationPanel.navigateTo(joinPanel, true)));
@@ -220,10 +224,10 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private GameObject createHostPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var tcpField = new InputField("4444");
-        var udpField = new InputField("4444");
+        InputField tcpField = new InputField("4444");
+        InputField udpField = new InputField("4444");
 
         stack(panel, tcpField);
         stack(panel, udpField);
@@ -237,16 +241,16 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private GameObject createJoinPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var ipField = new InputField("localhost");
-        var tcpField = new InputField("4444");
-        var udpField = new InputField("4444");
+        InputField ipField = new InputField("localhost");
+        InputField tcpField = new InputField("4444");
+        InputField udpField = new InputField("4444");
 
-        var startButton = createButton("Start game",
+        Button startButton = createButton("Start game",
                 () -> game.joinNetworkGame(ipField.getStringValue(), tcpField.getIntValue(), udpField.getIntValue()));
 
-        var backButton = createButton("Go back", navigationPanel::goBack);
+        Button backButton = createButton("Go back", navigationPanel::goBack);
 
         stack(panel, ipField);
         stack(panel, tcpField);
@@ -291,9 +295,9 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
         Credits(Window window) throws IOException {
             this.window = window;
-            var url = Credits.class.getResource("/credits.txt");
-            var text = Read.text(url, StandardCharsets.UTF_8);
-            var label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
+            URL url = Credits.class.getResource("/credits.txt");
+            String text = Read.text(url, StandardCharsets.UTF_8);
+            Label label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
             credits = new DefaultGameObject<>(label);
             add(credits);
         }
@@ -317,8 +321,8 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
             setSpeedFactor(1f);
 
             credits.setPosition(window.getWidth() / 2f, 0);
-            var height = credits.getContent().calculateBounds().getHeight();
-            var windowHeight = window.getHeight();
+            float height = credits.getContent().calculateBounds().getHeight();
+            float windowHeight = window.getHeight();
 
             updater.clear();
 
@@ -345,9 +349,9 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
         @Override
         public void update(float deltaTime) {
             alpha += deltaTime;
-            var radius = initialScale - 1;
-            var x = -radius * (1f - alpha) + 0 * alpha;
-            var y = Math.sqrt(radius * radius - x * x);
+            float radius = initialScale - 1;
+            float x = -radius * (1f - alpha) + 0 * alpha;
+            double y = Math.sqrt(radius * radius - x * x);
             obj.setScale(initialScale - (float) y);
         }
     }

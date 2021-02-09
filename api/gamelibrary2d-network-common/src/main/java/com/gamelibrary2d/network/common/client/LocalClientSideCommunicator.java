@@ -36,7 +36,8 @@ public class LocalClientSideCommunicator extends AbstractCommunicator implements
             LocalServer localServer,
             ParameterizedAction<CommunicationSteps> configureAuthentication) {
 
-        var communicator = new LocalClientSideCommunicator(localServer, configureAuthentication);
+        LocalClientSideCommunicator communicator =
+                new LocalClientSideCommunicator(localServer, configureAuthentication);
         localServer.connectCommunicator(communicator.serverSideCommunicator);
         return communicator;
     }

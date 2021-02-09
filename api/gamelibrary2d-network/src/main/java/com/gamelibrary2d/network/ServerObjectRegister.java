@@ -19,7 +19,7 @@ public class ServerObjectRegister<T extends ServerObject> {
 
     public void register(T obj) {
         int key = ++lastId;
-        var previous = dictionary.put(key, obj);
+        T previous = dictionary.put(key, obj);
         if (previous != null) {
             dictionary.put(key, previous);
             throw new IllegalStateException("Id is already in use");

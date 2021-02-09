@@ -82,7 +82,7 @@ public class DefaultLightRenderer implements LightRenderer {
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_NEAREST);
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_NEAREST);
 
-        var parameters = new ShaderParameters(new float[ShaderParameters.MIN_LENGTH + 2]);
+        ShaderParameters parameters = new ShaderParameters(new float[ShaderParameters.MIN_LENGTH + 2]);
         parameters.setColor(0, 0, 0, 1f);
         renderer = new SurfaceRenderer(parameters);
         renderer.setShaderProgram(shaderProgram);
@@ -125,8 +125,8 @@ public class DefaultLightRenderer implements LightRenderer {
     }
 
     public void prepare(float gameCellWidth, float gameCellHeight, int colOffset, int rowOffset) {
-        var colSpan = (int) Math.ceil(windowWidth / gameCellWidth);
-        var rowSpan = (int) Math.ceil(windowHeight / gameCellHeight);
+        int colSpan = (int) Math.ceil(windowWidth / gameCellWidth);
+        int rowSpan = (int) Math.ceil(windowHeight / gameCellHeight);
         prepare(gameCellWidth, gameCellHeight, colOffset, colSpan, rowOffset, rowSpan);
     }
 

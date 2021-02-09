@@ -10,7 +10,7 @@ import com.gamelibrary2d.widgets.Label;
 public class TimeLabel extends AbstractGameObject<Label> {
 
     public TimeLabel(TextRenderer textRenderer) {
-        var label = new Label(textRenderer);
+        Label label = new Label(textRenderer);
         label.setColor(Color.LAVENDER);
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
         setContent(label);

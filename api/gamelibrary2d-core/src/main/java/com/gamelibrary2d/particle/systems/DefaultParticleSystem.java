@@ -134,7 +134,7 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
      * @param y The Y-position of the emitted particles.
      */
     public void emitAll(float x, float y) {
-        var emitterParameters = parameters.getEmitterParameters();
+        EmitterParameters emitterParameters = parameters.getEmitterParameters();
         emit(x, y, Math.round(emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar() * RandomInstance.random11()));
     }
 
@@ -156,10 +156,10 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
      * @param count The number of emitted particles.
      */
     public void emit(float x, float y, int count) {
-        var updateParticleCount = particleCount + count;
+        int updateParticleCount = particleCount + count;
         renderBuffer.ensureCapacity(updateParticleCount * renderBuffer.getStride());
         updateBuffer.ensureCapacity(updateParticleCount * updateBuffer.getStride());
-        var emitterParameters = parameters.getEmitterParameters();
+        EmitterParameters emitterParameters = parameters.getEmitterParameters();
         x += emitterParameters.getOffsetX() + emitterParameters.getOffsetXVar() * RandomInstance.random11();
         y += emitterParameters.getOffsetY() + emitterParameters.getOffsetYVar() * RandomInstance.random11();
         for (int i = 0; i < count; ++i) {
@@ -228,18 +228,18 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
             time += deltaTime;
             int iterations = (int) (time / interval);
 
-            var emitterParameters = parameters.getEmitterParameters();
+            EmitterParameters emitterParameters = parameters.getEmitterParameters();
 
             int count = emitterParameters.isPulsating()
                     ? Math.round(emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar() * RandomInstance.random11())
                     : 1;
 
-            var updateParticleCount = particleCount + iterations * count;
+            int updateParticleCount = particleCount + iterations * count;
             renderBuffer.ensureCapacity(updateParticleCount * renderBuffer.getStride());
             updateBuffer.ensureCapacity(updateParticleCount * updateBuffer.getStride());
             for (int i = 0; i < iterations; ++i) {
-                var emittedX = x + emitterParameters.getOffsetX() + emitterParameters.getOffsetXVar() * RandomInstance.random11();
-                var emittedY = y + emitterParameters.getOffsetY() + emitterParameters.getOffsetYVar() * RandomInstance.random11();
+                float emittedX = x + emitterParameters.getOffsetX() + emitterParameters.getOffsetXVar() * RandomInstance.random11();
+                float emittedY = y + emitterParameters.getOffsetY() + emitterParameters.getOffsetYVar() * RandomInstance.random11();
                 for (int j = 0; j < count; ++j) {
                     onEmit(emittedX, emittedY);
                 }
@@ -271,7 +271,7 @@ public class DefaultParticleSystem implements ParticleSystem, Clearable {
      * Emits a single particle at the specified position.
      */
     public void emit(float x, float y) {
-        var emitterParameters = parameters.getEmitterParameters();
+        EmitterParameters emitterParameters = parameters.getEmitterParameters();
         x += emitterParameters.getOffsetX() + emitterParameters.getOffsetXVar() * RandomInstance.random11();
         y += emitterParameters.getOffsetY() + emitterParameters.getOffsetYVar() * RandomInstance.random11();
         renderBuffer.ensureCapacity((particleCount + 1) * renderBuffer.getStride());

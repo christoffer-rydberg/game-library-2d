@@ -31,15 +31,15 @@ public class FutureChain<T> {
     }
 
     public void moveNext() throws InterruptedException, ExecutionException {
-        var result = current.get();
-        var next = chain.pollFirst();
+        T result = current.get();
+        Func<T, Future<T>> next = chain.pollFirst();
         current = next.invoke(result);
     }
 
     public void moveNext(long timeout, TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException {
-        var result = current.get(timeout, unit);
-        var next = chain.pollFirst();
+        T result = current.get(timeout, unit);
+        Func<T, Future<T>> next = chain.pollFirst();
         current = next.invoke(result);
     }
 

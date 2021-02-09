@@ -77,7 +77,7 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
     @Override
     public void render(float alpha) {
         updateTargetFromSettings();
-        var areaRenderer = this.areaRenderer.getResource();
+        BitmapRenderer areaRenderer = this.areaRenderer.getResource();
         if (prepareRender != null)
             prepareRender.invoke(param, areaRenderer.getArea());
         areaRenderer.render(this::renderAction);
@@ -87,7 +87,7 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
 
     private void renderAction() {
         ModelMatrix.instance().pushMatrix();
-        var renderArea = areaRenderer.getResource().getArea();
+        Rectangle renderArea = areaRenderer.getResource().getArea();
         ModelMatrix.instance().translatef(renderArea.getLowerX(), renderArea.getLowerY(), 0);
         target.render(1f);
         ModelMatrix.instance().popMatrix();

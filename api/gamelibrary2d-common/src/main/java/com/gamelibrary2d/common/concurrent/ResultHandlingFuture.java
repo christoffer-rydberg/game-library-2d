@@ -50,7 +50,7 @@ public class ResultHandlingFuture<T1, T2> implements Future<T2> {
         }
 
         try {
-            var res = future.get();
+            T1 res = future.get();
             result = onCompletion.handle(res);
             completed = true;
             return result;
@@ -70,7 +70,7 @@ public class ResultHandlingFuture<T1, T2> implements Future<T2> {
         }
 
         try {
-            var res = future.get(timeout, unit);
+            T1 res = future.get(timeout, unit);
             result = onCompletion.handle(res);
             completed = true;
             return result;

@@ -365,11 +365,11 @@ public class Rectangle {
      * @param scale The scale and relative position of the new rectangle.
      */
     public Rectangle resize(Rectangle scale) {
-        var scaledWith = scale.getWidth() * getWidth();
-        var scaledHeight = scale.getHeight() * getHeight();
+        float scaledWith = scale.getWidth() * getWidth();
+        float scaledHeight = scale.getHeight() * getHeight();
 
-        var offsetX = (scale.getLowerX() / scale.getWidth()) * scaledWith;
-        var offsetY = (scale.getLowerY() / scale.getHeight()) * scaledHeight;
+        float offsetX = (scale.getLowerX() / scale.getWidth()) * scaledWith;
+        float offsetY = (scale.getLowerY() / scale.getHeight()) * scaledHeight;
 
         return new Rectangle(
                 offsetX,
@@ -386,13 +386,13 @@ public class Rectangle {
      * @param maxHeight The maximum height of the new rectangle.
      */
     public Rectangle restrict(float maxWidth, float maxHeight) {
-        var width = getWidth();
-        var height = getHeight();
-        var aspectRatio = width / height;
+        float width = getWidth();
+        float height = getHeight();
+        float aspectRatio = width / height;
 
-        var restrictedWidth = Math.min(width, maxWidth);
-        var restrictedHeight = Math.min(height, maxHeight);
-        var restrictedAspectRatio = restrictedWidth / restrictedHeight;
+        float restrictedWidth = Math.min(width, maxWidth);
+        float restrictedHeight = Math.min(height, maxHeight);
+        float restrictedAspectRatio = restrictedWidth / restrictedHeight;
 
         // Maintain aspect ratio:
         if (restrictedAspectRatio > aspectRatio) {
@@ -516,7 +516,7 @@ public class Rectangle {
         }
 
         if (obj instanceof Rectangle) {
-            var other = (Rectangle) obj;
+            Rectangle other = (Rectangle) obj;
             return other.lowerX == lowerX && other.lowerY == lowerY && other.upperX == upperX && other.upperY == upperY;
         }
 

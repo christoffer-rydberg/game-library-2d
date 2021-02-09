@@ -2,6 +2,7 @@ package com.gamelibrary2d.tools.particlegenerator.panels;
 
 import com.gamelibrary2d.layers.AbstractPanel;
 import com.gamelibrary2d.layers.DefaultPanel;
+import com.gamelibrary2d.layers.Panel;
 import com.gamelibrary2d.markers.Parent;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.particle.parameters.ParticleParameters;
@@ -126,7 +127,7 @@ public class ParticleParametersPanel extends AbstractPanel<GameObject> implement
     }
 
     private GameObject endScale() {
-        var endScale = new PanelElement.Float(
+        PanelElement.Float endScale = new PanelElement.Float(
                 "End Scale",
                 new FloatProperty(() -> params().getEndScale(), v -> params().setEndScale(v)),
                 new FloatProperty(() -> params().getEndScaleVar(), v -> params().setEndScaleVar(v))
@@ -136,21 +137,21 @@ public class ParticleParametersPanel extends AbstractPanel<GameObject> implement
     }
 
     private GameObject rotation() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var rotation = new PanelElement.Float(
+        PanelElement.Float rotation = new PanelElement.Float(
                 "Rotation",
                 new FloatProperty(() -> params().getRotation(), v -> params().setRotation(v)),
                 new FloatProperty(() -> params().getRotationVar(), v -> params().setRotationVar(v))
         );
 
-        var rotationSpeed = new PanelElement.Float(
+        PanelElement.Float rotationSpeed = new PanelElement.Float(
                 "Rotation Speed",
                 new FloatProperty(() -> params().getRotationSpeed(), v -> params().setRotationSpeed(v)),
                 new FloatProperty(() -> params().getRotationSpeedVar(), v -> params().setRotationSpeedVar(v))
         );
 
-        var rotationAcceleration = new PanelElement.Float(
+        PanelElement.Float rotationAcceleration = new PanelElement.Float(
                 "Rotation Acceleration",
                 new FloatProperty(() -> params().getRotationAcceleration(), v -> params().setRotationAcceleration(v)),
                 new FloatProperty(() -> params().getRotationAccelerationVar(), v -> params().setRotationAccelerationVar(v))
@@ -164,21 +165,21 @@ public class ParticleParametersPanel extends AbstractPanel<GameObject> implement
     }
 
     private GameObject colors() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var r = new PanelElement.Float(
+        PanelElement.Float r = new PanelElement.Float(
                 "Color R",
                 new FloatProperty(() -> params().getColorR(), v -> params().setColorR(v)),
                 new FloatProperty(() -> params().getColorRVar(), v -> params().setColorRVar(v))
         );
 
-        var g = new PanelElement.Float(
+        PanelElement.Float g = new PanelElement.Float(
                 "Color G",
                 new FloatProperty(() -> params().getColorG(), v -> params().setColorG(v)),
                 new FloatProperty(() -> params().getColorGVar(), v -> params().setColorGVar(v))
         );
 
-        var b = new PanelElement.Float(
+        PanelElement.Float b = new PanelElement.Float(
                 "Color B",
                 new FloatProperty(() -> params().getColorB(), v -> params().setColorB(v)),
                 new FloatProperty(() -> params().getColorBVar(), v -> params().setColorBVar(v))
@@ -192,21 +193,21 @@ public class ParticleParametersPanel extends AbstractPanel<GameObject> implement
     }
 
     private GameObject endColors() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var r = new PanelElement.Float(
+        PanelElement.Float r = new PanelElement.Float(
                 "End Color R",
                 new FloatProperty(() -> params().getEndColorR(), v -> params().setEndColorR(v)),
                 new FloatProperty(() -> params().getEndColorRVar(), v -> params().setEndColorRVar(v))
         );
 
-        var g = new PanelElement.Float(
+        PanelElement.Float g = new PanelElement.Float(
                 "End Color G",
                 new FloatProperty(() -> params().getEndColorG(), v -> params().setEndColorG(v)),
                 new FloatProperty(() -> params().getEndColorGVar(), v -> params().setEndColorGVar(v))
         );
 
-        var b = new PanelElement.Float(
+        PanelElement.Float b = new PanelElement.Float(
                 "End Color B",
                 new FloatProperty(() -> params().getEndColorB(), v -> params().setEndColorB(v)),
                 new FloatProperty(() -> params().getEndColorBVar(), v -> params().setEndColorBVar(v))
@@ -228,7 +229,7 @@ public class ParticleParametersPanel extends AbstractPanel<GameObject> implement
     }
 
     private GameObject endAlpha() {
-        var endAlpha = new PanelElement.Float(
+        PanelElement.Float endAlpha = new PanelElement.Float(
                 "End Alpha",
                 new FloatProperty(() -> params().getEndAlpha(), v -> params().setEndAlpha(v)),
                 new FloatProperty(() -> params().getEndAlphaVar(), v -> params().setEndAlphaVar(v))

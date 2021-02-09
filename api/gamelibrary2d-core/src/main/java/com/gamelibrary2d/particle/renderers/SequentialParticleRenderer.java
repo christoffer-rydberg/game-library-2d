@@ -32,13 +32,13 @@ public class SequentialParticleRenderer implements ParticleRenderer {
         }
 
         if (renderer != null) {
-            var renderBuffer = (ParticleRenderBuffer) buffer;
+            ParticleRenderBuffer renderBuffer = (ParticleRenderBuffer) buffer;
 
             ModelMatrix modelMatrix = ModelMatrix.instance();
 
             int end = offset + len;
             for (int i = offset; i < end; ++i) {
-                var renderOffset = i * renderBuffer.getStride();
+                int renderOffset = i * renderBuffer.getStride();
 
                 modelMatrix.pushMatrix();
 

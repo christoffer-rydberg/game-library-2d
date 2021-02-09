@@ -27,9 +27,10 @@ public class ClientHandshake {
                 return CompletableFuture.completedFuture(
                         new CipherTransformation(DEFAULT_RSA_CIPHER_TRANSFORMATION));
             default:
-                var errorMessage = "A PublicKeyValidator must be specified. Missing default cipher transformation for algorithm: %s";
-                return CompletableFuture.failedFuture(
-                        new IllegalStateException(String.format(errorMessage, pk.getAlgorithm())));
+                String errorMessage = "A PublicKeyValidator must be specified. Missing default cipher transformation for algorithm: %s";
+                CompletableFuture<CipherTransformation> future = new CompletableFuture<>();
+                future.completeExceptionally(new IllegalStateException(String.format(errorMessage, pk.getAlgorithm())));
+                return future;
         }
     };
 
@@ -61,9 +62,9 @@ public class ClientHandshake {
     private void readPublicKey(CommunicationSteps steps) {
         steps.add((context, com, inbox) -> {
             try {
-                var publicKey = new PublicKeyMessage(inbox).getKey();
-                var validationFuture = publicKeyValidator.validate(publicKey);
-                var cipherTransformation = validationFuture.get();
+                PublicKey publicKey = new PublicKeyMessage(inbox).getKey();
+                Future<CipherTransformation> validationFuture = publicKeyValidator.validate(publicKey);
+                CipherTransformation cipherTransformation = validationFuture.get();
                 context.register(PublicKey.class, publicKey);
                 context.register(CipherTransformation.class, cipherTransformation);
                 return true;
@@ -83,8 +84,8 @@ public class ClientHandshake {
 
     private void shareSecretKey(CommunicationSteps steps) {
         steps.add((context, com) -> {
-            var publicKey = context.get(PublicKey.class);
-            var publicKeyCipherTransformation = context.get(CipherTransformation.class);
+            PublicKey publicKey = context.get(PublicKey.class);
+            CipherTransformation publicKeyCipherTransformation = context.get(CipherTransformation.class);
 
             SecretKeyMessage secretKeyMessage;
             try {
@@ -93,19 +94,19 @@ public class ClientHandshake {
                 throw new IOException("Failed to generate secret key", e);
             }
 
-            var encryptionWriter = new EncryptionWriter(
+            EncryptionWriter encryptionWriter = new EncryptionWriter(
                     new DefaultEncryptor(
                             publicKey,
                             createCipher(publicKeyCipherTransformation.value)));
 
-            var encryptionHeader = createEncryptionHeader();
+            byte[] encryptionHeader = createEncryptionHeader();
             com.getOutgoing().putInt(encryptionHeader.length);
             com.getOutgoing().put(encryptionHeader);
 
             Write.textWithSizeHeader(publicKeyCipherTransformation.value, com.getOutgoing());
             encryptionWriter.write(com.getOutgoing(), secretKeyMessage::serializeMessage);
 
-            var cipher = createCipher(secretKeyMessage.getCipherTransformation());
+            Cipher cipher = createCipher(secretKeyMessage.getCipherTransformation());
 
             com.setEncryptionWriter(new EncryptionWriter(
                     encryptionHeader,

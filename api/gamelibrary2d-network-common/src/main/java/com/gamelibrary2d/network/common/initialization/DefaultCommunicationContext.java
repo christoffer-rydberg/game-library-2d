@@ -12,7 +12,7 @@ public class DefaultCommunicationContext implements CommunicationContext {
     }
 
     public <T> T get(Class<T> type, Object key) {
-        var obj = register.get(key);
+        Object obj = register.get(key);
         if (obj != null && type.isAssignableFrom(obj.getClass())) {
             return type.cast(obj);
         }

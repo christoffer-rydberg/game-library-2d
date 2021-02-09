@@ -41,8 +41,8 @@ public class AnimationFrame implements Bounded {
     }
 
     public static AnimationFrame fromImageAnimationFrame(ImageAnimationFrame imageAnimationFrame, Rectangle bounds, Disposer disposer) {
-        var texture = DefaultTexture.create(imageAnimationFrame.getImage(), disposer);
-        var surface = Quad.create(bounds, imageAnimationFrame.getImageCoordinates(), disposer);
+        Texture texture = DefaultTexture.create(imageAnimationFrame.getImage(), disposer);
+        Surface surface = Quad.create(bounds, imageAnimationFrame.getImageCoordinates(), disposer);
         return new AnimationFrame(
                 surface,
                 texture,

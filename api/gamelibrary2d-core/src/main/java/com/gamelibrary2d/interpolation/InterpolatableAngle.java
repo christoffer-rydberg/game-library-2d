@@ -60,7 +60,7 @@ public class InterpolatableAngle implements Updatable {
             if (timer >= endTime) {
                 finishInterpolation();
             } else {
-                var alpha = timer / endTime;
+                float alpha = timer / endTime;
                 angle = angle0 * (1f - alpha) + angle1 * alpha;
             }
         }

@@ -26,7 +26,7 @@ public class DemoClient extends AbstractClient {
     void run(CommunicatorFactory communicatorFactory) {
         try {
             setCommunicatorFactory(communicatorFactory);
-            var context = initialize();
+            CommunicationContext context = initialize();
             initialized(context);
         } catch (NetworkConnectionException e) {
             System.err.println("Failed to connect client");
@@ -55,8 +55,8 @@ public class DemoClient extends AbstractClient {
     }
 
     private void sendMessage(String message) {
-        var communicator = getCommunicator();
-        var bytes = message.getBytes(StandardCharsets.UTF_8);
+        Communicator communicator = getCommunicator();
+        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
         communicator.getOutgoing().putInt(bytes.length);
         communicator.getOutgoing().put(bytes);
     }
@@ -68,10 +68,10 @@ public class DemoClient extends AbstractClient {
 
     @Override
     protected void onMessage(DataBuffer buffer) {
-        var length = buffer.getInt();
+        int length = buffer.getInt();
         byte[] bytes = new byte[length];
         buffer.get(bytes, 0, length);
-        var message = new String(bytes, StandardCharsets.UTF_8);
+        String message = new String(bytes, StandardCharsets.UTF_8);
         System.out.println(String.format("Server: %s", message));
         sendMessage("Roberto.");
     }

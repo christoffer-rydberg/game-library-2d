@@ -1,5 +1,6 @@
 package com.gamelibrary2d.widgets;
 
+import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.objects.AbstractGameObject;
@@ -11,9 +12,9 @@ public abstract class AbstractAggregatingWidget<T extends Renderable>
     @Override
     public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            var content = getContent();
+            T content = getContent();
             if (content instanceof MouseAware) {
-                var projected = Projection.projectTo(this, projectedX, projectedY);
+                Point projected = Projection.projectTo(this, projectedX, projectedY);
                 return ((MouseAware) content).mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
             }
         }
@@ -23,9 +24,9 @@ public abstract class AbstractAggregatingWidget<T extends Renderable>
     @Override
     public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            var content = getContent();
+            T content = getContent();
             if (content instanceof MouseAware) {
-                var projected = Projection.projectTo(this, projectedX, projectedY);
+                Point projected = Projection.projectTo(this, projectedX, projectedY);
                 return ((MouseAware) content).mouseMove(x, y, projected.getX(), projected.getY());
             }
         }
@@ -35,9 +36,9 @@ public abstract class AbstractAggregatingWidget<T extends Renderable>
     @Override
     public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            var content = getContent();
+            T content = getContent();
             if (content instanceof MouseAware) {
-                var projected = Projection.projectTo(this, projectedX, projectedY);
+                Point projected = Projection.projectTo(this, projectedX, projectedY);
                 ((MouseAware) content).mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
             }
         }

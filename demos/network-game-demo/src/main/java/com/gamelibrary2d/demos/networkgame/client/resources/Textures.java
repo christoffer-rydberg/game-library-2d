@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.demos.networkgame.client.Settings;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
@@ -34,11 +35,11 @@ public class Textures {
     }
 
     public static Texture createQuadStackTexture(Rectangle bounds, Color bottom, Color top, int depth, Disposer disposer) {
-        var deltaColor = top.subtract(bottom);
+        Color deltaColor = top.subtract(bottom);
 
-        var layers = new Renderable[depth];
+        Renderable[] layers = new Renderable[depth];
         for (int i = 0; i < depth; ++i) {
-            var interpolation = i / (float) depth;
+            float interpolation = i / (float) depth;
             layers[i] = createQuadRenderer(
                     bounds.pad(i * -1),
                     bottom.add(deltaColor.multiply(interpolation)),
@@ -46,7 +47,7 @@ public class Textures {
         }
 
         Renderable r = a -> {
-            for (var layer : layers) {
+            for (Renderable layer : layers) {
                 layer.render(1f);
             }
         };
@@ -55,7 +56,7 @@ public class Textures {
     }
 
     public static Renderable createQuadRenderer(Rectangle bounds, Color color, Disposer disposer) {
-        var renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
+        Renderer renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
         renderer.getParameters().setColor(color);
         return renderer;
     }

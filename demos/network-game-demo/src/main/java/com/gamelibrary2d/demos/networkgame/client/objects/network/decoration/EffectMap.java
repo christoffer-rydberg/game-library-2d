@@ -1,5 +1,6 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.network.decoration;
 
+import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.SaveLoadManager;
@@ -42,7 +43,7 @@ public class EffectMap {
     }
 
     private DurationEffect createUpdateEffect(DefaultParticleSystem particleSystem) {
-        var emitter = new SequentialParticleEmitter(particleSystem);
+        SequentialParticleEmitter emitter = new SequentialParticleEmitter(particleSystem);
         return (obj, deltaTime) -> {
             emitter.getPosition().set(obj.getParticleHotspot());
             emitter.getPosition().rotate(obj.getRotation());
@@ -70,85 +71,85 @@ public class EffectMap {
             int simultaneousEffects,
             Scene scene,
             Disposer disposer) {
-        var initialCapacity = simultaneousEffects * params.estimateCapacity();
-        var particleSystem = DefaultParticleSystem.create(params, renderer, initialCapacity, disposer);
+        int initialCapacity = simultaneousEffects * params.estimateCapacity();
+        DefaultParticleSystem particleSystem = DefaultParticleSystem.create(params, renderer, initialCapacity, disposer);
         this.particleSystems.add(new ParticleSystemItem(particleSystem, scene));
         return particleSystem;
     }
 
     private void initializePlayerEffects(Disposer disposer) throws IOException {
-        var engineSystem = createParticleSystem(
+        DefaultParticleSystem engineSystem = createParticleSystem(
                 loadParameters(Particles.ENGINE),
                 8,
                 Scene.FOREGROUND,
                 disposer);
 
-        var updateEffects = new HashMap<Byte, Factory<DurationEffect>>();
+        Map<Byte, Factory<DurationEffect>> updateEffects = new HashMap<>();
         updateEffects.put((byte) 0, () -> createUpdateEffect(engineSystem));
         this.updateEffects.put(ObjectTypes.PLAYER, updateEffects);
 
-        var explosionSystem = createParticleSystem(
+        DefaultParticleSystem explosionSystem = createParticleSystem(
                 loadParameters(Particles.EXPLOSION),
                 8,
                 Scene.FOREGROUND,
                 disposer);
 
-        var destroyedEffects = new HashMap<Byte, InstantEffect>();
+        Map<Byte, InstantEffect> destroyedEffects = new HashMap<>();
         destroyedEffects.put((byte) 0, obj -> explosionSystem.emitAll(obj.getPosition()));
         this.destroyedEffects.put(ObjectTypes.PLAYER, destroyedEffects);
     }
 
     private void initializePortalEffects(Disposer disposer) throws IOException {
-        var portalSystem = createParticleSystem(
+        DefaultParticleSystem portalSystem = createParticleSystem(
                 loadParameters(Particles.PORTAL),
                 1,
                 Scene.BACKGROUND,
                 disposer);
 
-        var updateEffects = new HashMap<Byte, Factory<DurationEffect>>();
+        Map<Byte, Factory<DurationEffect>> updateEffects = new HashMap<>();
         updateEffects.put((byte) 0, () -> createUpdateEffect(portalSystem));
         this.updateEffects.put(ObjectTypes.PORTAL, updateEffects);
     }
 
     private void initializeObstacleEffects(TextureMap textures, Disposer disposer) throws IOException {
-        var updateSystem = createParticleSystem(
+        DefaultParticleSystem updateSystem = createParticleSystem(
                 loadParameters(Particles.OBSTACLE),
                 100,
                 Scene.BACKGROUND,
                 disposer);
 
-        var updateEffects = new HashMap<Byte, Factory<DurationEffect>>();
-        for (var key : textures.getKeys(ObjectTypes.OBSTACLE)) {
+        Map<Byte, Factory<DurationEffect>> updateEffects = new HashMap<>();
+        for (Byte key : textures.getKeys(ObjectTypes.OBSTACLE)) {
             updateEffects.put(key, () -> createUpdateEffect(updateSystem));
         }
         this.updateEffects.put(ObjectTypes.OBSTACLE, updateEffects);
 
-        var shockwaveSystem = createParticleSystem(
+        DefaultParticleSystem shockwaveSystem = createParticleSystem(
                 loadParameters(Particles.SHOCK_WAVE),
                 8,
                 Scene.FOREGROUND,
                 disposer);
 
-        var destroyedEffects = new HashMap<Byte, InstantEffect>();
+        Map<Byte, InstantEffect> destroyedEffects = new HashMap<>();
         this.destroyedEffects.put(ObjectTypes.OBSTACLE, destroyedEffects);
 
-        var destroyParams = loadParameters(Particles.OBSTACLE_EXPLOSION);
-        for (var key : textures.getKeys(ObjectTypes.OBSTACLE)) {
-            var particleRenderer = new EfficientParticleRenderer();
+        ParticleSystemParameters destroyParams = loadParameters(Particles.OBSTACLE_EXPLOSION);
+        for (Byte key : textures.getKeys(ObjectTypes.OBSTACLE)) {
+            EfficientParticleRenderer particleRenderer = new EfficientParticleRenderer();
             particleRenderer.setBlendMode(BlendMode.TRANSPARENT);
             particleRenderer.setTexture(textures.getTexture(ObjectTypes.OBSTACLE, key));
 
-            var explosionSystem = createParticleSystem(
+            DefaultParticleSystem explosionSystem = createParticleSystem(
                     destroyParams,
                     particleRenderer,
                     destroyParams.estimateCapacity(),
                     Scene.FOREGROUND,
                     disposer);
 
-            var soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
+            URL soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
 
             destroyedEffects.put(key, obj -> {
-                var position = obj.getPosition();
+                Point position = obj.getPosition();
                 shockwaveSystem.emitAll(position);
                 explosionSystem.emitAll(position);
                 if (soundEffect != null) {
@@ -165,7 +166,7 @@ public class EffectMap {
     }
 
     public void onLoaded(Layer<Renderable> backgroundEffects, Layer<Renderable> foregroundEffects) {
-        for (var particleSystem : particleSystems) {
+        for (ParticleSystemItem particleSystem : particleSystems) {
             if (particleSystem.scene == Scene.BACKGROUND) {
                 backgroundEffects.add(particleSystem.particleSystem);
             } else {
@@ -175,9 +176,9 @@ public class EffectMap {
     }
 
     public InstantEffect getDestroyed(ClientObject obj) {
-        var effects = destroyedEffects.get(obj.getPrimaryType());
+        Map<Byte, InstantEffect> effects = destroyedEffects.get(obj.getPrimaryType());
         if (effects != null) {
-            var secondaryType = obj.getSecondaryType();
+            byte secondaryType = obj.getSecondaryType();
             return secondaryType >= effects.size()
                     ? effects.get((byte) 0)
                     : effects.get(secondaryType);
@@ -187,10 +188,10 @@ public class EffectMap {
     }
 
     public DurationEffect getUpdate(ClientObject obj) {
-        var effects = updateEffects.get(obj.getPrimaryType());
+        Map<Byte, Factory<DurationEffect>> effects = updateEffects.get(obj.getPrimaryType());
         if (effects != null) {
-            var secondaryType = obj.getSecondaryType();
-            var effectFactory = secondaryType >= effects.size()
+            byte secondaryType = obj.getSecondaryType();
+            Factory<DurationEffect> effectFactory = secondaryType >= effects.size()
                     ? effects.get((byte) 0)
                     : effects.get(secondaryType);
 

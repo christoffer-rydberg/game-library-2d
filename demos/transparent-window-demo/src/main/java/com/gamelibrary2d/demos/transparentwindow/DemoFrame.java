@@ -4,7 +4,9 @@ import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.imaging.AnimationLoader;
+import com.gamelibrary2d.imaging.ImageAnimation;
 import com.gamelibrary2d.imaging.StandardAnimationFormats;
 import com.gamelibrary2d.objects.AnimatedGameObject;
 import com.gamelibrary2d.objects.ComposableGameObject;
@@ -13,8 +15,10 @@ import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.AnimationFrame;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class DemoFrame extends AbstractFrame {
 
@@ -26,20 +30,20 @@ public class DemoFrame extends AbstractFrame {
     }
 
     private Animation createAnimation() throws IOException {
-        var animationUrl = DemoFrame.class.getResource("/Images/homer.gif");
+        URL animationUrl = DemoFrame.class.getResource("/Images/homer.gif");
 
-        var imageAnimation = AnimationLoader.load(animationUrl, StandardAnimationFormats.GIF);
+        ImageAnimation imageAnimation = AnimationLoader.load(animationUrl, StandardAnimationFormats.GIF);
 
-        var animation = Animation.fromImageAnimation(
+        Animation animation = Animation.fromImageAnimation(
                 imageAnimation,
                 imageAnimation.getBounds()
                         .resize(Rectangle.create(1f, 1f))
                         .restrict(game.getWindow().getWidth(), game.getWindow().getHeight()),
                 this);
 
-        var frames = animation.getFrames();
+        List<AnimationFrame> frames = animation.getFrames();
 
-        var updatedFrames = new ArrayList<AnimationFrame>(frames.size() * 2);
+        List<AnimationFrame> updatedFrames = new ArrayList<>(frames.size() * 2);
         updatedFrames.addAll(frames);
         Collections.reverse(updatedFrames);
         updatedFrames.addAll(frames);
@@ -49,9 +53,9 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onInitialize(InitializationContext context) {
-        var window = game.getWindow();
+        Window window = game.getWindow();
         try {
-            var animation = createAnimation();
+            Animation animation = createAnimation();
             animationObj = new AnimatedGameObject<>(new AnimationRenderer(animation, false, this));
             animationObj.setPosition(window.getWidth() / 2f, window.getHeight() / 2f);
             add(animationObj);

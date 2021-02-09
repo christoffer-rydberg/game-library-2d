@@ -146,7 +146,7 @@ public abstract class AbstractPanel<T extends GameObject> extends AbstractLayerO
         stackObject(obj, orientation, offset);
 
         if (autoResizing) {
-            var objectBounds = getExtentInPanel(obj);
+            Rectangle objectBounds = getExtentInPanel(obj);
 
             if (!objectBounds.equals(Rectangle.EMPTY)) {
                 stackExpandBounds(orientation, objectBounds, padding);

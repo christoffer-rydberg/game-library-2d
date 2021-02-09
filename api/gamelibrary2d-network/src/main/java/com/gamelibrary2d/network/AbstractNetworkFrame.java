@@ -45,7 +45,7 @@ public abstract class AbstractNetworkFrame<T extends Client> extends AbstractFra
     private void initializeClient(Client client, InitializationContext context) throws InitializationException {
         try {
             client.clearInbox();
-            var clientContext = client.initialize();
+            CommunicationContext clientContext = client.initialize();
             context.register(clientContextKey, clientContext);
         } catch (NetworkInitializationException | NetworkConnectionException | NetworkAuthenticationException e) {
             throw new InitializationException("Failed to initialize client", e);

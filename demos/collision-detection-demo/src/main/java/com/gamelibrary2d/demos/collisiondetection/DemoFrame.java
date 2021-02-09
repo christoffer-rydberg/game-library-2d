@@ -62,8 +62,8 @@ public class DemoFrame extends AbstractFrame {
 
     @Override
     protected void onLoaded(InitializationContext context) {
-        final var ballWidth = ballSurface.getBounds().getWidth();
-        final var ballHeight = ballSurface.getBounds().getHeight();
+        final float ballWidth = ballSurface.getBounds().getWidth();
+        final float ballHeight = ballSurface.getBounds().getHeight();
         final float pyramidCenterX = gameArea.getWidth() / 2f;
         final float pyramidBaseY = 2f * gameArea.getHeight() / 3f;
 

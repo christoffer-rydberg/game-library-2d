@@ -26,7 +26,7 @@ public final class Lwjgl_ImageReader implements ImageReader {
                     break;
                 }
                 if (imageBuffer.remaining() == 0) {
-                    var newBuffer = BufferUtils.createByteBuffer(imageBuffer.capacity() * 3 / 2);
+                    ByteBuffer newBuffer = BufferUtils.createByteBuffer(imageBuffer.capacity() * 3 / 2);
                     imageBuffer.flip();
                     newBuffer.put(imageBuffer);
                     imageBuffer = newBuffer;
@@ -36,14 +36,14 @@ public final class Lwjgl_ImageReader implements ImageReader {
             imageBuffer.flip();
         }
 
-        try (var stack = MemoryStack.stackPush()) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
             IntBuffer channels = stack.mallocInt(1);
 
             STBImage.stbi_set_flip_vertically_on_load(true);
 
-            var image = STBImage.stbi_load_from_memory(
+            ByteBuffer image = STBImage.stbi_load_from_memory(
                     imageBuffer, width, height, channels, 0);
 
             if (image == null) {

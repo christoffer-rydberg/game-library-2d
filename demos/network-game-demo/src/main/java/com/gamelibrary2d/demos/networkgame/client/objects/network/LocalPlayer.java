@@ -16,15 +16,15 @@ public class LocalPlayer extends AbstractPlayer {
 
         playerAcceleration = new PlayerAcceleration(client, getId());
 
-        var leftInput = InputBinding.keyboard(Keyboard.instance().keyLeft());
+        InputBinding leftInput = InputBinding.keyboard(Keyboard.instance().keyLeft());
         leftInput.onActive(() -> playerAcceleration.setLeftAcceleration(1f));
         leftInput.onReleased(() -> playerAcceleration.setLeftAcceleration(0f));
 
-        var rightInput = InputBinding.keyboard(Keyboard.instance().keyRight());
+        InputBinding rightInput = InputBinding.keyboard(Keyboard.instance().keyRight());
         rightInput.onActive(() -> playerAcceleration.setRightAcceleration(1f));
         rightInput.onReleased(() -> playerAcceleration.setRightAcceleration(0f));
 
-        var forwardInput = InputBinding.keyboard(Keyboard.instance().keyUp());
+        InputBinding forwardInput = InputBinding.keyboard(Keyboard.instance().keyUp());
         forwardInput.onActive(() -> playerAcceleration.setAcceleration(1f));
         forwardInput.onReleased(() -> playerAcceleration.setAcceleration(0f));
 

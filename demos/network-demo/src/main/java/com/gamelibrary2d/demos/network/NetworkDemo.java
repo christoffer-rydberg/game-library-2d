@@ -15,8 +15,8 @@ public class NetworkDemo {
     }
 
     private static Thread startServerThread() {
-        var thread = new Thread(() -> {
-            var server = new DemoServer("localhost", 4444);
+        Thread thread = new Thread(() -> {
+            DemoServer server = new DemoServer("localhost", 4444);
             try {
                 server.start();
                 server.listenForConnections(true);
@@ -31,8 +31,8 @@ public class NetworkDemo {
     }
 
     private static Thread startClientThread() {
-        var thread = new Thread(() -> {
-            var client = new DemoClient();
+        Thread thread = new Thread(() -> {
+            DemoClient client = new DemoClient();
 
             // Run update loop that will send outgoing messages and listen for incoming messages once connected (blocking).
             client.run(() -> ClientSideCommunicator.connect(
@@ -44,8 +44,8 @@ public class NetworkDemo {
     }
 
     public static void main(String[] args) {
-        var serverThread = startServerThread();
-        var clientThread = startClientThread();
+        Thread serverThread = startServerThread();
+        Thread clientThread = startClientThread();
         try {
             clientThread.join();
             serverThread.interrupt();

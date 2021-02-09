@@ -56,7 +56,7 @@ public class GameFrameClient extends AbstractClient {
     private void onDisconnected(CommunicatorDisconnectedEvent event) {
         frame.invokeLater(() -> {
             System.err.println("Disconnected from server");
-            var cause = event.getCause();
+            Throwable cause = event.getCause();
             if (cause != null) {
                 cause.printStackTrace();
             }
@@ -101,7 +101,7 @@ public class GameFrameClient extends AbstractClient {
             case ObjectTypes.OBSTACLE:
                 return new Obstacle(primaryType, this, buffer);
             case ObjectTypes.PLAYER:
-                var isLocal = buffer.getBool();
+                boolean isLocal = buffer.getBool();
                 if (isLocal) {
                     return new LocalPlayer(primaryType, this, buffer);
                 } else {
@@ -115,7 +115,7 @@ public class GameFrameClient extends AbstractClient {
     }
 
     private void destroy(int id) {
-        var obj = objects.remove(id);
+        ClientObject obj = objects.remove(id);
         frame.destroy(obj);
     }
 
@@ -125,7 +125,7 @@ public class GameFrameClient extends AbstractClient {
     }
 
     private <T extends ClientObject> void addObjects(List<T> objects) {
-        for (var obj : objects) {
+        for (ClientObject obj : objects) {
             spawn(obj);
         }
     }
@@ -151,14 +151,14 @@ public class GameFrameClient extends AbstractClient {
             float x = bitParser.getInt(NetworkConstants.POS_X_BIT_SIZE);
             float y = bitParser.getInt(NetworkConstants.POS_Y_BIT_SIZE);
 
-            var isAccelerating = bitParser.getInt(1) == 1;
+            boolean isAccelerating = bitParser.getInt(1) == 1;
 
             float rotation = bitParser.getInt(1) == 1
                     ? bitParser.getInt(NetworkConstants.ROTATION_BIT_SIZE)
                     : 0f;
 
             float direction = bitParser.getInt(NetworkConstants.DIRECTION_BIT_SIZE);
-            var obj = objects.get(id);
+            ClientObject obj = objects.get(id);
             if (obj != null) {
                 obj.setAccelerating(isAccelerating);
                 obj.setGoalPosition(x, y);
@@ -186,10 +186,10 @@ public class GameFrameClient extends AbstractClient {
         private final List<ClientObject> objects;
 
         InitialState(DataBuffer buffer) {
-            var size = buffer.getInt();
+            int size = buffer.getInt();
             objects = new ArrayList<>(size);
             for (int i = 0; i < size; ++i) {
-                var obj = readObject(buffer.get(), buffer);
+                ClientObject obj = readObject(buffer.get(), buffer);
                 objects.add(obj);
             }
         }

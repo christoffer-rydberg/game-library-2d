@@ -31,7 +31,7 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onCharInput(char charInput) {
-        var content = getContent();
+        T content = getContent();
         if (content instanceof InputAware) {
             ((InputAware) (content)).charInput(charInput);
         }
@@ -45,7 +45,7 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        var content = getContent();
+        T content = getContent();
         if (content instanceof KeyAware) {
             ((KeyAware) (content)).keyDown(key, scanCode, repeat, mods);
         }
@@ -59,7 +59,7 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onKeyReleased(int key, int scanCode, int mods) {
-        var content = getContent();
+        T content = getContent();
         if (content instanceof KeyAware) {
             ((KeyAware) (content)).keyReleased(key, scanCode, mods);
         }

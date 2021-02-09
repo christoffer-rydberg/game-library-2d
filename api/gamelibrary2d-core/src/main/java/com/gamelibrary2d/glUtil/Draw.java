@@ -56,7 +56,7 @@ public class Draw {
 
         OpenGLUtils.setBlendMode(blendMode);
 
-        var openGl = OpenGL.instance();
+        OpenGL openGl = OpenGL.instance();
         openGl.glBegin(OpenGL.GL_QUADS);
         openGl.glVertex2f(lowerX, lowerY);
         openGl.glVertex2f(upperX, lowerY);

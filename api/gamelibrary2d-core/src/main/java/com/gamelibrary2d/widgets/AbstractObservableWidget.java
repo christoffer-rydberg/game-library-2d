@@ -105,21 +105,21 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
-        for (var listener : mouseButtonDownListeners) {
+        for (MouseButtonDownListener listener : mouseButtonDownListeners) {
             listener.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
         }
     }
 
     @Override
     protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
-        for (var listener : mouseHoverListeners) {
+        for (MouseHoverListener listener : mouseHoverListeners) {
             listener.onMouseHover(x, y, projectedX, projectedY);
         }
     }
 
     @Override
     protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
-        for (var listener : mouseDragListeners) {
+        for (MouseDragListener listener : mouseDragListeners) {
             listener.onMouseDrag(x, y, projectedX, projectedY);
         }
     }
@@ -127,7 +127,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
-        for (var listener : mouseButtonReleasedListeners) {
+        for (MouseButtonReleasedListener listener : mouseButtonReleasedListeners) {
             listener.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
         }
     }
@@ -135,7 +135,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     public void onCharInput(char charInput) {
         super.onCharInput(charInput);
-        for (var listener : charInputListeners) {
+        for (CharInputListener listener : charInputListeners) {
             listener.onCharInput(charInput);
         }
     }
@@ -143,7 +143,7 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
         super.onKeyDown(key, scanCode, repeat, mods);
-        for (var listener : keyDownListeners) {
+        for (KeyDownListener listener : keyDownListeners) {
             listener.onKeyDown(key, scanCode, repeat, mods);
         }
     }
@@ -151,21 +151,21 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     @Override
     public void onKeyReleased(int key, int scanCode, int mods) {
         super.onKeyReleased(key, scanCode, mods);
-        for (var listener : keyReleasedListeners) {
+        for (KeyReleasedListener listener : keyReleasedListeners) {
             listener.onKeyReleased(key, scanCode, mods);
         }
     }
 
     @Override
     public void onFocused() {
-        for (var listener : focusChangedListeners) {
+        for (FocusChangedListener listener : focusChangedListeners) {
             listener.onFocusChanged(true);
         }
     }
 
     @Override
     public void onUnfocused() {
-        for (var listener : focusChangedListeners) {
+        for (FocusChangedListener listener : focusChangedListeners) {
             listener.onFocusChanged(false);
         }
     }

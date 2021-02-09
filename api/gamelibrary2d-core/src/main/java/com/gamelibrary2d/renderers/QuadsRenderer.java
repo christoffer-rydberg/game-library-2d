@@ -3,8 +3,8 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.glUtil.PositionBuffer;
+import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.QuadShape;
 
@@ -66,13 +66,13 @@ public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
             texture.bind();
         }
 
-        var glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
+        int glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
         OpenGL.instance().glUniform4fv(glBoundsUniform, boundsBuffer);
 
-        var glTexturedUniform = shaderProgram.getUniformLocation(texturedUniformName);
+        int glTexturedUniform = shaderProgram.getUniformLocation(texturedUniformName);
         OpenGL.instance().glUniform1i(glTexturedUniform, texture != null ? 1 : 0);
 
-        var glShapeUniform = shaderProgram.getUniformLocation(shapeUniformName);
+        int glShapeUniform = shaderProgram.getUniformLocation(shapeUniformName);
         switch (shape) {
             case RECTANGLE:
                 OpenGL.instance().glUniform1i(glShapeUniform, 0);

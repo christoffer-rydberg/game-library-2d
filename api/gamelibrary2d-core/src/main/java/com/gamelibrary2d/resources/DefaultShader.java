@@ -39,7 +39,7 @@ public class DefaultShader implements Shader, Disposable {
     }
 
     public static DefaultShader fromString(String src, ShaderType shaderType, Disposer disposer) {
-        var shader = createShader(src, shaderType);
+        DefaultShader shader = createShader(src, shaderType);
         disposer.registerDisposal(shader);
         return shader;
     }

@@ -22,6 +22,7 @@ import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.layers.Layer;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.network.AbstractNetworkFrame;
+import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultFont;
@@ -36,6 +37,7 @@ import com.gamelibrary2d.updates.ScaleUpdate;
 import com.gamelibrary2d.util.sound.MusicPlayer;
 import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
+import java.awt.*;
 import java.io.IOException;
 
 public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
@@ -74,7 +76,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
         textures.initialize(this);
         effects.initialize(textures, this);
 
-        var font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
+        Font font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
         timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
         timeLabel.setPosition(game.getWindow().getWidth() / 2f, 9 * game.getWindow().getHeight() / 10f);
     }
@@ -100,11 +102,11 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     void applySettings(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
 
-        var windowWidth = game.getWindow().getWidth();
-        var windowHeight = game.getWindow().getHeight();
-        var gameBounds = gameSettings.getGameBounds();
-        var scale = Math.min(windowWidth / gameBounds.getWidth(), windowHeight / gameBounds.getHeight());
-        var scaledGameBounds = Rectangle.create(gameBounds.getWidth(), gameBounds.getHeight()).resize(scale);
+        float windowWidth = game.getWindow().getWidth();
+        float windowHeight = game.getWindow().getHeight();
+        Rectangle gameBounds = gameSettings.getGameBounds();
+        float scale = Math.min(windowWidth / gameBounds.getWidth(), windowHeight / gameBounds.getHeight());
+        Rectangle scaledGameBounds = Rectangle.create(gameBounds.getWidth(), gameBounds.getHeight()).resize(scale);
 
         gameLayer.setScale(scale, scale);
         gameLayer.setPosition(
@@ -129,9 +131,9 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     }
 
     private Renderable createBackground(Rectangle windowBounds, Rectangle gameBounds) {
-        var gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.BLACK, this);
+        PictureFrame gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.BLACK, this);
 
-        var background = new SurfaceRenderer(
+        Renderer background = new SurfaceRenderer(
                 Surfaces.coverArea(
                         gameBounds,
                         backgroundTexture.getWidth(),
@@ -166,9 +168,9 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     }
 
     public void gameOver() {
-        var portalPosition = gameSettings.getGameBounds().getCenter();
+        Point portalPosition = gameSettings.getGameBounds().getCenter();
 
-        var parallelUpdater = new ParallelUpdater();
+        ParallelUpdater parallelUpdater = new ParallelUpdater();
         objectLayer.getChildren().stream()
                 .map(obj -> new DurationUpdater(
                         2f,
@@ -176,7 +178,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
                         new SuckedIntoPortalUpdate(obj, portalPosition)))
                 .forEach(parallelUpdater::add);
 
-        var sequentialUpdater = new SequentialUpdater();
+        SequentialUpdater sequentialUpdater = new SequentialUpdater();
         sequentialUpdater.add(new DurationUpdater(1.5f, new EmptyUpdate()));
         sequentialUpdater.add(parallelUpdater);
         sequentialUpdater.add(new InstantUpdater(dt -> objectLayer.clear()));

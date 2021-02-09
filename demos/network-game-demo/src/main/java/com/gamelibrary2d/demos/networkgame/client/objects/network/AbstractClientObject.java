@@ -95,7 +95,7 @@ public abstract class AbstractClientObject
             updateEffect.onUpdate(this, deltaTime);
         }
 
-        var content = getContent();
+        Object content = getContent();
         if (content instanceof Updatable) {
             ((Updatable) content).update(deltaTime);
         }

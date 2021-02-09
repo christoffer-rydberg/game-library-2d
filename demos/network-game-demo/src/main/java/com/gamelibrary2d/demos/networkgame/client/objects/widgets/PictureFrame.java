@@ -4,6 +4,7 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
 
@@ -17,25 +18,25 @@ public class PictureFrame implements Renderable {
     }
 
     public static PictureFrame create(Rectangle outer, Rectangle inner, Color color, Disposer disposer) {
-        var sides = new ArrayList<Renderable>(4);
+        ArrayList<Renderable> sides = new ArrayList<>(4);
 
         if (inner.getLowerX() > outer.getLowerX()) {
-            var bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), inner.getLowerX(), outer.getUpperY());
+            Rectangle bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), inner.getLowerX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
         if (outer.getUpperX() > inner.getUpperX()) {
-            var bounds = new Rectangle(inner.getUpperX(), outer.getLowerY(), outer.getUpperX(), outer.getUpperY());
+            Rectangle bounds = new Rectangle(inner.getUpperX(), outer.getLowerY(), outer.getUpperX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
         if (inner.getLowerY() > outer.getLowerY()) {
-            var bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), outer.getUpperX(), inner.getLowerY());
+            Rectangle bounds = new Rectangle(outer.getLowerX(), outer.getLowerY(), outer.getUpperX(), inner.getLowerY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
         if (outer.getUpperY() > inner.getUpperY()) {
-            var bounds = new Rectangle(outer.getLowerX(), inner.getUpperY(), outer.getUpperX(), outer.getUpperY());
+            Rectangle bounds = new Rectangle(outer.getLowerX(), inner.getUpperY(), outer.getUpperX(), outer.getUpperY());
             sides.add(createSideRenderer(color, bounds, disposer));
         }
 
@@ -43,7 +44,7 @@ public class PictureFrame implements Renderable {
     }
 
     private static Renderable createSideRenderer(Color color, Rectangle bounds, Disposer disposer) {
-        var renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
+        Renderer renderer = new SurfaceRenderer(Quad.create(bounds, disposer));
         renderer.getParameters().setColor(color);
         return renderer;
     }

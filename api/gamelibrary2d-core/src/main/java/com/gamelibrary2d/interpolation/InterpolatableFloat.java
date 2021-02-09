@@ -50,7 +50,7 @@ public class InterpolatableFloat implements Updatable {
             if (timer >= endTime) {
                 finishInterpolation();
             } else {
-                var alpha = timer / endTime;
+                float alpha = timer / endTime;
                 value = value0 * (1f - alpha) + value1 * alpha;
             }
         }

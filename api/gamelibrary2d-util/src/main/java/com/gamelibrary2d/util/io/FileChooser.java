@@ -84,18 +84,18 @@ public class FileChooser {
     }
 
     private void loadCurrentDirectory(String filePath) throws IOException {
-        var file = new File(filePath);
+        File file = new File(filePath);
         if (file.exists() && !file.isDirectory()) {
-            try (var reader = new BufferedReader(new FileReader(file))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 currentDirectory = reader.readLine();
             }
         }
     }
 
     private void saveCurrentDirectory(String filePath) throws IOException {
-        var file = new File(filePath);
+        File file = new File(filePath);
         file.getParentFile().mkdirs();
-        try (var writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(currentDirectory);
         }
     }

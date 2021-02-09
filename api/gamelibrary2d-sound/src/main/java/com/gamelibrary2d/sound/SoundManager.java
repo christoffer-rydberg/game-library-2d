@@ -35,13 +35,13 @@ public class SoundManager extends AbstractDisposer implements Disposable {
     }
 
     public static SoundManager create(Disposer disposer) {
-        var device = alcOpenDevice((ByteBuffer) null);
+        long device = alcOpenDevice((ByteBuffer) null);
         if (device == NULL) {
             throw new IllegalStateException("Failed to open the default OpenAL device.");
         }
 
         ALCCapabilities deviceCaps = ALC.createCapabilities(device);
-        var context = alcCreateContext(device, (IntBuffer) null);
+        long context = alcCreateContext(device, (IntBuffer) null);
         if (context == NULL) {
             throw new IllegalStateException("Failed to create OpenAL context.");
         }
@@ -49,7 +49,7 @@ public class SoundManager extends AbstractDisposer implements Disposable {
         alcMakeContextCurrent(context);
         AL.createCapabilities(deviceCaps);
 
-        var soundManager = new SoundManager(device, context);
+        SoundManager soundManager = new SoundManager(device, context);
         disposer.registerDisposal(soundManager);
         return soundManager;
     }

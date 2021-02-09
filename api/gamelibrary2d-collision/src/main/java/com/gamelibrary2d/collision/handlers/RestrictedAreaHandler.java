@@ -15,15 +15,15 @@ public class RestrictedAreaHandler<T extends Collidable> implements UpdatedHandl
 
     @Override
     public void updated(CollidableInfo<T> info) {
-        var obj = info.getCollidable();
+        T obj = info.getCollidable();
 
-        var bounds = obj.getBounds();
+        Rectangle bounds = obj.getBounds();
 
-        var horizontalBounce =
+        boolean horizontalBounce =
                 obj.getPosX() + bounds.getUpperX() > area.getUpperX()
                         || obj.getPosX() + bounds.getLowerX() < area.getLowerX();
 
-        var verticalBounce =
+        boolean verticalBounce =
                 obj.getPosY() + bounds.getUpperY() > area.getUpperY()
                         || obj.getPosY() + bounds.getLowerY() < area.getLowerY();
 

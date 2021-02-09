@@ -84,8 +84,8 @@ public class RandomInstance {
     public static <E> void pickNRandomElements(E[] input, E[] output, int n) {
         int length = input.length;
         for (int i = 0; i < n; ++i) {
-            var index = get().nextInt(length - i);
-            var tmp = input[i];
+            int index = get().nextInt(length - i);
+            E tmp = input[i];
             output[i] = input[index];
             output[index] = tmp;
         }

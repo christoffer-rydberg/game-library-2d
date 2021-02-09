@@ -38,9 +38,9 @@ public class DemoGame extends AbstractGame {
     protected void onStart() throws InitializationException, IOException {
         showSplashScreen();
 
-        var soundManager = initializeAudio();
-        var musicPlayer = MusicPlayer.create(soundManager, 10, this);
-        var soundPlayer = SoundEffectPlayer.create(soundManager, 10);
+        SoundManager soundManager = initializeAudio();
+        MusicPlayer musicPlayer = MusicPlayer.create(soundManager, 10, this);
+        SoundEffectPlayer soundPlayer = SoundEffectPlayer.create(soundManager, 10);
 
         createGlobalResources();
         initializeFrames(musicPlayer, soundPlayer);
@@ -49,7 +49,7 @@ public class DemoGame extends AbstractGame {
     }
 
     private SoundManager initializeAudio() throws IOException {
-        var soundManager = SoundManager.create(this);
+        SoundManager soundManager = SoundManager.create(this);
         AudioDecoder decoder = new VorbisDecoder();
         soundManager.loadSoundBuffer(Music.MENU, decoder);
         soundManager.loadSoundBuffer(Music.GAME, decoder);
@@ -89,7 +89,7 @@ public class DemoGame extends AbstractGame {
     }
 
     private void showSplashScreen() throws InitializationException {
-        var splashFrame = new SplashFrame(this);
+        SplashFrame splashFrame = new SplashFrame(this);
         setFrame(splashFrame);
         getWindow().show();
         renderFrame();

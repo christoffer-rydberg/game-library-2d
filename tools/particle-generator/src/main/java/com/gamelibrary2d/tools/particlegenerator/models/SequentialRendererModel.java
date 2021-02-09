@@ -3,7 +3,9 @@ package com.gamelibrary2d.tools.particlegenerator.models;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.imaging.AnimationLoader;
+import com.gamelibrary2d.imaging.ImageAnimation;
 import com.gamelibrary2d.imaging.StandardAnimationFormats;
 import com.gamelibrary2d.particle.renderers.SequentialParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
@@ -17,6 +19,7 @@ import com.gamelibrary2d.util.QuadShape;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 public class SequentialRendererModel {
@@ -48,11 +51,11 @@ public class SequentialRendererModel {
 
         if (animationRenderer != null) {
             try {
-                var imageAnimation = AnimationLoader.load(
+                ImageAnimation imageAnimation = AnimationLoader.load(
                         new ByteArrayInputStream(animationData),
                         StandardAnimationFormats.GIF);
 
-                var animation = Animation.fromImageAnimation(
+                Animation animation = Animation.fromImageAnimation(
                         imageAnimation,
                         bounds,
                         resourceDisposer);
@@ -88,15 +91,15 @@ public class SequentialRendererModel {
         resourceDisposer.dispose();
         surfaceRenderer.setTexture(null);
 
-        try (var stream = url.openStream()) {
-            animationData = stream.readAllBytes();
+        try (InputStream stream = url.openStream()) {
+            animationData = Read.byteArray(stream);
         }
 
-        var imageAnimation = AnimationLoader.load(
+        ImageAnimation imageAnimation = AnimationLoader.load(
                 new ByteArrayInputStream(animationData),
                 StandardAnimationFormats.GIF);
 
-        var animation = Animation.fromImageAnimation(
+        Animation animation = Animation.fromImageAnimation(
                 imageAnimation,
                 bounds,
                 resourceDisposer);

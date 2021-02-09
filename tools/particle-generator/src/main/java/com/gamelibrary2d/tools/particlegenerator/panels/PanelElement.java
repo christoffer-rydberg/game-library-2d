@@ -2,13 +2,12 @@ package com.gamelibrary2d.tools.particlegenerator.panels;
 
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.layers.AbstractPanel;
+import com.gamelibrary2d.objects.ComposableGameObject;
 import com.gamelibrary2d.objects.DefaultGameObject;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.renderers.LineRenderer;
-import com.gamelibrary2d.renderers.ShaderParameters;
-import com.gamelibrary2d.renderers.SurfaceRenderer;
-import com.gamelibrary2d.renderers.TextRenderer;
+import com.gamelibrary2d.renderers.*;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.ParticleGenerator;
 import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;
@@ -24,6 +23,7 @@ import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.widgets.TextField;
 
 public class PanelElement {
     private static final Color BASE_LINE_COLOR = Color.SOFT_BLUE;
@@ -36,8 +36,8 @@ public class PanelElement {
             Color color,
             HorizontalTextAlignment horizontalAlignment,
             VerticalTextAlignment verticalAlignment) {
-        var textRenderer = new TextRenderer(font);
-        var label = new Label(text, textRenderer, color);
+        TextRenderer textRenderer = new TextRenderer(font);
+        Label label = new Label(text, textRenderer, color);
         label.setAlignment(horizontalAlignment, verticalAlignment);
         return label;
     }
@@ -54,7 +54,7 @@ public class PanelElement {
     }
 
     private static DefaultGameObject<Label> createParameterLabel(String parameterName) {
-        var label = createLabelObject(
+        DefaultGameObject<Label> label = createLabelObject(
                 parameterName + ":",
                 Fonts.getDefaultFont(),
                 Color.SAND,
@@ -69,12 +69,12 @@ public class PanelElement {
 
     public static class Boolean extends AbstractPanel<GameObject> {
         public Boolean(String parameterName, BooleanProperty parameter) {
-            var label = createParameterLabel(parameterName);
+            DefaultGameObject<Label> label = createParameterLabel(parameterName);
 
-            var lineRenderer = new LineRenderer();
+            LineRenderer lineRenderer = new LineRenderer();
             lineRenderer.getParameters().setColor(Color.SILVER);
 
-            var checkBox = new Checkbox(
+            Checkbox checkBox = new Checkbox(
                     Surfaces.defaultCheckbox(),
                     lineRenderer,
                     Fonts.getLargeFont(),
@@ -96,19 +96,19 @@ public class PanelElement {
         }
 
         public Float(String parameterName, FloatProperty parameter, FloatProperty variance) {
-            var label = createParameterLabel(parameterName);
+            ComposableGameObject<Label> label = createParameterLabel(parameterName);
 
-            var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
+            GameObject parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
             parameterWidget.setPosition(-parameterWidget.getBounds().getLowerX(), 1f);
 
             add(label);
             add(parameterWidget);
 
             if (variance != null) {
-                var varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
+                GameObject varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
                 varianceWidget.setPosition(120, 1f);
 
-                var plusLabel = createLabelObject(
+                GameObject plusLabel = createLabelObject(
                         "+",
                         Fonts.getDefaultFont(),
                         Color.SAND,
@@ -119,7 +119,7 @@ public class PanelElement {
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() + 3);
 
-                var minusLabel = createLabelObject(
+                GameObject minusLabel = createLabelObject(
                         "-",
                         Fonts.getDefaultFont(),
                         Color.SAND,
@@ -137,7 +137,7 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(FloatProperty property, Color backgroundColor) {
-            var background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );
@@ -145,10 +145,10 @@ public class PanelElement {
             background.getParameters().setColor(backgroundColor);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
-            var textBox = new FloatPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
+            FloatPropertyTextField textBox = new FloatPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
 
-            var propertyWidget = new DefaultWidget<>(textBox);
+            DefaultWidget<Renderable> propertyWidget = new DefaultWidget<>(textBox);
             propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
                     background.getParameters().setColor(focused ? Color.GOLD : backgroundColor));
@@ -164,19 +164,19 @@ public class PanelElement {
         }
 
         public Integer(String parameterName, IntegerProperty parameter, IntegerProperty variance) {
-            var label = createParameterLabel(parameterName);
+            GameObject label = createParameterLabel(parameterName);
 
-            var parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
+            GameObject parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
             parameterWidget.setPosition(-parameterWidget.getBounds().getLowerX(), 1f);
 
             add(label);
             add(parameterWidget);
 
             if (variance != null) {
-                var varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
+                GameObject varianceWidget = createPropertyWidget(variance, BASE_LINE_COLOR);
                 varianceWidget.setPosition(120, 1f);
 
-                var plusLabel = createLabelObject(
+                GameObject plusLabel = createLabelObject(
                         "+",
                         Fonts.getDefaultFont(),
                         Color.SAND,
@@ -187,7 +187,7 @@ public class PanelElement {
                         varianceWidget.getPosition().getX() + varianceWidget.getBounds().getLowerX() - 8,
                         varianceWidget.getPosition().getY() + 3);
 
-                var minusLabel = createLabelObject(
+                GameObject minusLabel = createLabelObject(
                         "-",
                         Fonts.getDefaultFont(),
                         Color.SAND,
@@ -205,7 +205,7 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(IntegerProperty property, Color backgroundColor) {
-            var background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );
@@ -213,10 +213,10 @@ public class PanelElement {
             background.getParameters().setColor(backgroundColor);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
-            var textBox = new IntegerPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
+            TextField textBox = new IntegerPropertyTextField(new TextRenderer(Fonts.getDefaultFont()), property);
             textBox.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.BASE_LINE);
 
-            var propertyWidget = new DefaultWidget<>(textBox);
+            DefaultWidget<Renderable> propertyWidget = new DefaultWidget<>(textBox);
             propertyWidget.setBackground(background);
             propertyWidget.addFocusChangedListener(focused ->
                     background.getParameters().setColor(focused ? Color.GOLD : backgroundColor));
@@ -232,17 +232,17 @@ public class PanelElement {
         public Optional(GameObject content, BooleanProperty isEnabled) {
             this.content = content;
 
-            var bounds = content.getBounds().pad(2f, 2f, 40f, 2f);
-            var box = Box.create(bounds, ParticleGenerator.GLOBAL_DISPOSER);
-            var lineRenderer = new LineRenderer();
+            Rectangle bounds = content.getBounds().pad(2f, 2f, 40f, 2f);
+            Box box = Box.create(bounds, ParticleGenerator.GLOBAL_DISPOSER);
+            LineRenderer lineRenderer = new LineRenderer();
 
-            var boundingBox = new DefaultGameObject<>(alpha -> box.render(lineRenderer, alpha));
+            DefaultGameObject<Renderable> boundingBox = new DefaultGameObject<>(alpha -> box.render(lineRenderer, alpha));
             boundingBox.setBounds(bounds);
 
-            var checkBoxRenderer = new LineRenderer();
+            LineRenderer checkBoxRenderer = new LineRenderer();
             checkBoxRenderer.getParameters().setColor(Color.SILVER);
 
-            var checkBox = new Checkbox(
+            Checkbox checkBox = new Checkbox(
                     Surfaces.cornerCheckbox(),
                     checkBoxRenderer,
                     Fonts.getDefaultFont(),
@@ -277,9 +277,9 @@ public class PanelElement {
     public static class Enum<T extends java.lang.Enum<T>> extends AbstractPanel<GameObject> {
 
         public Enum(String parameterName, Class<T> enumType, GenericProperty<T> property) {
-            var label = createParameterLabel(parameterName);
+            GameObject label = createParameterLabel(parameterName);
 
-            var background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );
@@ -287,11 +287,11 @@ public class PanelElement {
             background.getParameters().setColor(ENUM_BASE_LINE_COLOR);
             background.getParameters().set(ShaderParameters.ALPHA, 0.5f);
 
-            var backgroundObj = new DefaultGameObject<>(background);
+            DefaultGameObject<Renderer> backgroundObj = new DefaultGameObject<>(background);
             backgroundObj.setPosition(-backgroundObj.getBounds().getLowerX(), 0f);
             backgroundObj.setBounds(Bounds.PROPERTY_BASE_LINE.pad(0, 0, 0, 15f));
 
-            var enumLabel = createLabel(
+            Label enumLabel = createLabel(
                     property.get().toString(),
                     Fonts.getSmallFont(),
                     ENUM_FONT_COLOR,
@@ -299,9 +299,9 @@ public class PanelElement {
                     VerticalTextAlignment.BASE_LINE
             );
 
-            var backgroundWidth = backgroundObj.getBounds().getWidth();
+            float backgroundWidth = backgroundObj.getBounds().getWidth();
 
-            var widget = new EnumWidget<>(enumType, enumLabel, property);
+            EnumWidget<T> widget = new EnumWidget<>(enumType, enumLabel, property);
             widget.setPosition(backgroundWidth / 2, 0);
             widget.setBounds(new Rectangle(
                     -backgroundWidth / 2,
@@ -318,7 +318,7 @@ public class PanelElement {
     public static class CustomElement extends AbstractPanel<GameObject> {
 
         public CustomElement(String parameterName, GameObject element) {
-            var label = createParameterLabel(parameterName);
+            GameObject label = createParameterLabel(parameterName);
             add(label);
             add(element);
         }

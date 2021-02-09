@@ -63,7 +63,7 @@ public class Write {
     }
 
     public static void text(String text, File file, Charset charset, boolean overwrite) throws IOException {
-        var bytes = text.getBytes(charset);
+        byte[] bytes = text.getBytes(charset);
         bytes(bytes, 0, bytes.length, file, overwrite);
     }
 
@@ -72,7 +72,7 @@ public class Write {
     }
 
     public static void textWithSizeHeader(String text, Charset charset, DataBuffer dataBuffer) {
-        var bytes = text.getBytes(charset);
+        byte[] bytes = text.getBytes(charset);
         dataBuffer.putInt(bytes.length);
         dataBuffer.put(bytes);
     }

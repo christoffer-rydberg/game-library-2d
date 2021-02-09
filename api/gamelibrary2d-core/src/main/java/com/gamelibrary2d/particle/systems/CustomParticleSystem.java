@@ -30,13 +30,13 @@ public class CustomParticleSystem extends AbstractGpuBasedParticleSystem {
             EfficientParticleRenderer renderer,
             Disposer disposer) {
 
-        var updateBuffer = MirroredFloatBuffer.create(
+        MirroredFloatBuffer updateBuffer = MirroredFloatBuffer.create(
                 update, OpenGL.GL_SHADER_STORAGE_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
-        var renderBuffer = MirroredFloatBuffer.create(
+        MirroredFloatBuffer renderBuffer = MirroredFloatBuffer.create(
                 state, OpenGL.GL_ARRAY_BUFFER, OpenGL.GL_DYNAMIC_DRAW, disposer);
 
-        var arrayBuffer = CustomParticleBuffer.create(
+        CustomParticleBuffer arrayBuffer = CustomParticleBuffer.create(
                 renderBuffer,
                 stride,
                 4,
@@ -70,7 +70,7 @@ public class CustomParticleSystem extends AbstractGpuBasedParticleSystem {
         }
 
         public static CustomParticleBuffer create(MirroredBuffer buffer, int stride, int elementSize, Disposer disposer) {
-            var obj = new CustomParticleBuffer(buffer, stride, elementSize);
+            CustomParticleBuffer obj = new CustomParticleBuffer(buffer, stride, elementSize);
             disposer.registerDisposal(obj);
             return obj;
         }

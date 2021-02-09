@@ -1,5 +1,6 @@
 package com.gamelibrary2d.layers;
 
+import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.util.Projection;
@@ -77,7 +78,7 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
+        Point projected = Projection.projectTo(this, projectedX, projectedY);
         return getContent().mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
     }
 
@@ -87,7 +88,7 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
+        Point projected = Projection.projectTo(this, projectedX, projectedY);
         return getContent().mouseMove(x, y, projected.getX(), projected.getY());
     }
 
@@ -99,7 +100,7 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        var projected = Projection.projectTo(this, projectedX, projectedY);
+        Point projected = Projection.projectTo(this, projectedX, projectedY);
         getContent().mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
     }
 

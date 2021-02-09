@@ -7,6 +7,7 @@ import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
+import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.frames.LoadingFrame;
 import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
@@ -264,7 +265,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             frame.initialize(this);
         }
 
-        var previousFrame = this.frame;
+        Frame previousFrame = this.frame;
         setFrame(loadingFrame, FrameDisposal.NONE);
         loadingFrame.load(frame, previousFrame, previousFrameDisposal);
     }
@@ -278,7 +279,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
             if (!frame.isLoaded()) {
                 try {
-                    var context = frame.load();
+                    InitializationContext context = frame.load();
                     frame.loaded(context);
                 } catch (InitializationException e) {
                     frame.dispose(FrameDisposal.UNLOAD);
@@ -358,7 +359,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void onKeyCallback(int key, int scancode, int action, int mods) {
-        var frame = getFrame();
+        Frame frame = getFrame();
         if (action == Keyboard.instance().actionPressed()) {
             if (frame instanceof KeyAware)
                 ((KeyAware) frame).keyDown(key, scancode, false, mods);
@@ -387,7 +388,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             MouseEventState.setHandlingEvent(true);
             cursorPosX = (float) xpos;
             cursorPosY = (float) ypos;
-            var frame = getFrame();
+            Frame frame = getFrame();
             if (frame != null) {
                 frame.mouseMove(cursorPosX, cursorPosY, cursorPosX, cursorPosY);
             }

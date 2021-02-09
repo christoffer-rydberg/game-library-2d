@@ -13,7 +13,9 @@ import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.systems.AcceleratedParticleSystem;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
+import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.DefaultTexture;
+import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.util.BlendMode;
 
 import java.io.IOException;
@@ -87,12 +89,12 @@ public class ParticleSystemModel {
     public void loadTexture(URL url) throws IOException {
         textureDisposer.dispose();
         if (url.getPath().endsWith(".gif")) {
-            var animation = sequentialRenderer.setAnimation(url);
+            Animation animation = sequentialRenderer.setAnimation(url);
             efficientRenderer.setTexture(
                     animation.getFrame(0).getTexture()
             );
         } else {
-            var texture = DefaultTexture.create(url, textureDisposer);
+            Texture texture = DefaultTexture.create(url, textureDisposer);
             sequentialRenderer.setTexture(texture);
             efficientRenderer.setTexture(texture);
         }

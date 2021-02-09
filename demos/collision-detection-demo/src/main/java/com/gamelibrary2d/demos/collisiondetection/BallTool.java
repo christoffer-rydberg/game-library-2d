@@ -68,9 +68,9 @@ public class BallTool implements Renderable, MouseAware {
     public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == button) {
             drawButton = -1;
-            var direction = line.getStart().getDirectionDegrees(line.getEnd());
-            var speed = 2 * line.getStart().getDistance(line.getEnd());
-            var ball = new Ball(ballRenderer, line.getStart().getX(), line.getStart().getY());
+            float direction = line.getStart().getDirectionDegrees(line.getEnd());
+            float speed = 2 * line.getStart().getDistance(line.getEnd());
+            Ball ball = new Ball(ballRenderer, line.getStart().getX(), line.getStart().getY());
             ball.setSpeedAndDirection(speed, direction);
             ballCreatedListener.onBallCreated(ball);
         }

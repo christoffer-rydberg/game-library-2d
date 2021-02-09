@@ -574,7 +574,7 @@ public class ParticleParameters implements Serializable {
 
         float emittedSpeed = getSpeed() + getSpeedVar() * RandomInstance.random11();
 
-        var centripetalAcc = getCentripetalAcceleration() + getCentripetalAccelerationVar() * RandomInstance.random11();
+        float centripetalAcc = getCentripetalAcceleration() + getCentripetalAccelerationVar() * RandomInstance.random11();
         if (centripetalAcc != 0 && emittedSpeed == 0) {
             emittedSpeed = 1f; // A little bump to get a direction for the velocity vector.
         }
@@ -642,7 +642,7 @@ public class ParticleParameters implements Serializable {
             particle.setDeltaScale(0);
         }
 
-        var deltaAlpha = isUpdatingAlpha()
+        float deltaAlpha = isUpdatingAlpha()
                 ? ((getEndAlpha() + getEndAlphaVar() * RandomInstance.random11()) - emittedAlpha) / emittedLife
                 : 0;
 

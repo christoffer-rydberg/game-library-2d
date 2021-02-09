@@ -54,7 +54,7 @@ public abstract class AbstractRenderer implements Renderer {
     }
 
     protected void applyParameters(float alpha) {
-        var parameters = getParameters();
+        ShaderParameters parameters = getParameters();
         float alphaSetting = parameters.get(ShaderParameters.ALPHA);
 
         try {

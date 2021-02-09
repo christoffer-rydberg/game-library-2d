@@ -1,5 +1,7 @@
 package com.gamelibrary2d.collision;
 
+import com.gamelibrary2d.common.Rectangle;
+
 public abstract class AbstractActivationArea implements ActivationArea {
     private final float maxMovement;
     private final ActivationResult activatedResult;
@@ -13,15 +15,15 @@ public abstract class AbstractActivationArea implements ActivationArea {
 
     @Override
     public ActivationResult onActivation(Collidable collidable) {
-        var collidableBounds = collidable.getBounds();
-        var collidablePosX = collidable.getPosX();
-        var collidablePosY = collidable.getPosY();
+        Rectangle collidableBounds = collidable.getBounds();
+        float collidablePosX = collidable.getPosX();
+        float collidablePosY = collidable.getPosY();
 
-        var bounds = getBounds();
-        var posX = getPosX();
-        var posY = getPosY();
-        var shrinkX = collidableBounds.getWidth() + maxMovement;
-        var shrinkY = collidableBounds.getHeight() + maxMovement;
+        Rectangle bounds = getBounds();
+        float posX = getPosX();
+        float posY = getPosY();
+        float shrinkX = collidableBounds.getWidth() + maxMovement;
+        float shrinkY = collidableBounds.getHeight() + maxMovement;
 
         boolean activated =
                 !(bounds.getLowerX() + shrinkX + posX > collidableBounds.getUpperX() + collidablePosX

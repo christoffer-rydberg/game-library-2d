@@ -64,25 +64,27 @@ public class ServerManager {
     }
 
     private ServerResult createLocalServer() {
-        var localServer = new DefaultLocalServer(DemoGameServer::new);
+        LocalServer localServer = new DefaultLocalServer(DemoGameServer::new);
         try {
             localServer.start();
             return new ServerResult(localServer, () -> connectToLocalServer(localServer));
         } catch (IOException e) {
-            return new ServerResult(localServer, () -> CompletableFuture.failedFuture(e));
+            CompletableFuture<Communicator> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return new ServerResult(localServer, () -> future);
         }
     }
 
     private ServerResult createNetworkServer(int port, int localUpdPort) {
-        var server = new DefaultNetworkServer("localhost", port, s -> new DemoGameServer(s, keyPair));
+        DefaultNetworkServer server = new DefaultNetworkServer("localhost", port, s -> new DemoGameServer(s, keyPair));
 
         try {
             server.start();
             server.listenForConnections(true);
             return new ServerResult(server, () -> {
-                var future = connectToServer("localhost", port, localUpdPort);
+                Future<Communicator> comFuture = connectToServer("localhost", port, localUpdPort);
                 return new ResultHandlingFuture<>(
-                        future,
+                        comFuture,
                         com -> {
                             com.addDisconnectedListener(e -> stopServer(server));
                             return com;
@@ -94,12 +96,14 @@ public class ServerManager {
                 );
             });
         } catch (IOException e) {
-            return new ServerResult(server, () -> CompletableFuture.failedFuture(e));
+            CompletableFuture<Communicator> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return new ServerResult(server, () -> future);
         }
     }
 
     private void authenticate(CommunicationSteps steps, int localUpdPort) {
-        var clientHandshake = new ClientHandshake();
+        ClientHandshake clientHandshake = new ClientHandshake();
         clientHandshake.configure(steps);
         steps.add((__, com) -> com.writeEncrypted(b -> Write.textWithSizeHeader("serverPassword123", b)));
         steps.add((__, com) -> {
@@ -109,9 +113,9 @@ public class ServerManager {
     }
 
     private Future<Communicator> startServer(Factory<ServerResult> serverFactory) {
-        var futureCommunicator = new CompletableFuture<Communicator>();
+        CompletableFuture futureCommunicator = new CompletableFuture<Communicator>();
         serverThread = new Thread(() -> {
-            var serverResult = serverFactory.create();
+            ServerResult serverResult = serverFactory.create();
 
             try {
                 futureCommunicator.complete(serverResult.communicatorFactory.create().get());

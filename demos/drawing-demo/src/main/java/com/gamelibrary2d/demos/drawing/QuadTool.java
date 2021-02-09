@@ -61,7 +61,7 @@ public class QuadTool implements Renderable, MouseAware {
     @Override
     public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == button) {
-            var quad = quadFactory.invoke(inProgress.getBounds());
+            Quad quad = quadFactory.invoke(inProgress.getBounds());
             onCreated.publish(quad);
             inProgress = null;
         }

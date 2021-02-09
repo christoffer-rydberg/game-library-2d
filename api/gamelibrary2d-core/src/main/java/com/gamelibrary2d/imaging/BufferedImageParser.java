@@ -33,7 +33,7 @@ public class BufferedImageParser {
 
     private static Image parseImage(int[] argb, int width, int height, boolean hasAlphaChannel) {
         int channels = hasAlphaChannel ? 4 : 3;
-        var buffer = BufferUtils.createByteBuffer(argb.length * channels);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(argb.length * channels);
         for (int pixel : argb) {
             buffer.put((byte) ((pixel >> 16) & 0xFF)); // R
             buffer.put((byte) ((pixel >> 8) & 0xFF));  // G

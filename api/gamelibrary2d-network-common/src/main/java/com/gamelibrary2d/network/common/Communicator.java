@@ -122,7 +122,7 @@ public interface Communicator {
      * @throws IOException Occurs if the encryption fails.
      */
     default void writeEncrypted(ParameterizedAction<DataBuffer> plaintextWriter) throws IOException {
-        var encryptionWriter = getEncryptionWriter();
+        EncryptionWriter encryptionWriter = getEncryptionWriter();
         if (encryptionWriter == null) {
             throw new NullPointerException("No encryption writer has been set");
         }
@@ -150,7 +150,7 @@ public interface Communicator {
      * @throws IOException Occurs if the decryption fails.
      */
     default boolean readEncrypted(DataBuffer input, DataBuffer output) throws IOException {
-        var encryptionReader = getEncryptionReader();
+        EncryptionReader encryptionReader = getEncryptionReader();
         if (encryptionReader == null) {
             throw new NullPointerException("No encryption reader has been set");
         }

@@ -57,7 +57,7 @@ public class NetworkService {
 
     public DatagramChannel openDatagramChannel(Communicator communicator, ConnectionType operations,
                                                ChannelDisconnectedHandler disconnectedHandler, int localPort, int hostPort) throws IOException {
-        var udpConnection = new UdpConnection(communicator, operations, disconnectedHandler);
+        UdpConnection udpConnection = new UdpConnection(communicator, operations, disconnectedHandler);
         DatagramChannel channel = DatagramChannel.open();
         channel.bind(new InetSocketAddress(localPort));
         channel.connect(new InetSocketAddress(communicator.getEndpoint(), hostPort));
@@ -89,14 +89,14 @@ public class NetworkService {
     }
 
     public void deregisterConnectionListener(ServerSocketChannelRegistration registration) throws IOException {
-        var channel = registration.getServerSocketChannel();
+        ServerSocketChannel channel = registration.getServerSocketChannel();
         connectionListeners.remove(registration.getServerSocketChannel());
         channel.close();
     }
 
     public void send(DatagramChannel channel, DataBuffer buffer) throws IOException {
         try {
-            var udpConnection = udpConnections.get(channel);
+            UdpConnection udpConnection = udpConnections.get(channel);
 
             if (udpConnection == null) {
                 throw new IOException("No connected UDP communicator");
@@ -106,9 +106,9 @@ public class NetworkService {
                 throw new IOException("UDP connection is read-only");
             }
 
-            var byteBuffer = udpConnection.getWriteBuffer();
+            DataBuffer byteBuffer = udpConnection.getWriteBuffer();
             synchronized (byteBuffer) {
-                var transmissionId = udpConnection.incrementTransmissionId();
+                int transmissionId = udpConnection.incrementTransmissionId();
                 byteBuffer.putBool(true);
                 byteBuffer.putInt(transmissionId);
                 byteBuffer.putInt(buffer.remaining());
@@ -125,11 +125,11 @@ public class NetworkService {
 
     public void send(SocketChannel channel, DataBuffer buffer) throws IOException {
         try {
-            var tcpConnection = tcpConnections.get(channel);
+            TcpConnection tcpConnection = tcpConnections.get(channel);
             if (tcpConnection == null) {
                 throw new IOException("No connected TCP communicator");
             }
-            var byteBuffer = tcpConnection.getWriteBuffer();
+            DataBuffer byteBuffer = tcpConnection.getWriteBuffer();
             synchronized (byteBuffer) {
                 tcpConnection.incrementTransmissionId();
                 byteBuffer.putBool(false);
@@ -147,7 +147,7 @@ public class NetworkService {
 
     public void connect(String hostname, int port, SocketChannelConnectedHandler onConnected,
                         SocketChannelFailedConnectionHandler onConnectionFailed) throws IOException {
-        var channel = SocketChannel.open();
+        SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
         channel.connect(new InetSocketAddress(hostname, port));
         connectionListeners.put(channel, new ConnectionListener(onConnected, onConnectionFailed));
@@ -158,7 +158,7 @@ public class NetworkService {
     public void connect(SocketChannel socketChannel, Communicator communicator,
                         ChannelDisconnectedHandler disconnectedHandler) {
         try {
-            var tcpConnection = new TcpConnection(communicator, disconnectedHandler);
+            TcpConnection tcpConnection = new TcpConnection(communicator, disconnectedHandler);
             tcpConnections.put(socketChannel, tcpConnection);
             socketChannel.register(selector, SelectionKey.OP_READ, tcpConnection);
             selector.wakeup();
@@ -172,9 +172,9 @@ public class NetworkService {
     }
 
     public void closeAfterLastScheduledSend(SocketChannel channel) {
-        var tcpConnection = tcpConnections.get(channel);
+        TcpConnection tcpConnection = tcpConnections.get(channel);
         if (tcpConnection != null) {
-            var byteBuffer = tcpConnection.getWriteBuffer();
+            DataBuffer byteBuffer = tcpConnection.getWriteBuffer();
             synchronized (byteBuffer) {
                 tcpConnection.scheduleCloseConnection();
                 if (tcpConnection.shouldClose()) {
@@ -221,14 +221,14 @@ public class NetworkService {
     private void accept(SelectionKey key) {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
         SocketChannel socketChannel = null;
-        var connectionHandler = connectionListeners.get(serverSocketChannel);
+        ConnectionListener connectionListener = connectionListeners.get(serverSocketChannel);
         try {
             socketChannel = serverSocketChannel.accept();
             socketChannel.configureBlocking(false);
-            connectionHandler.onConnected(socketChannel);
+            connectionListener.onConnected(socketChannel);
         } catch (IOException e) {
-            var hostName = socketChannel.socket().getInetAddress().getCanonicalHostName();
-            connectionHandler.onConnectionFailed(hostName, e);
+            String hostName = socketChannel.socket().getInetAddress().getCanonicalHostName();
+            connectionListener.onConnectionFailed(hostName, e);
             close(socketChannel);
         }
     }
@@ -244,7 +244,7 @@ public class NetworkService {
     }
 
     private void write(SelectionKey key) {
-        var connection = (AbstractConnection) key.attachment();
+        Object connection = key.attachment();
         if (connection instanceof TcpConnection) {
             writeTcp(key, (TcpConnection) connection);
         } else if (connection instanceof UdpConnection) {
@@ -253,8 +253,8 @@ public class NetworkService {
     }
 
     private void writeTcp(SelectionKey key, TcpConnection tcpConnection) {
-        var channel = (SocketChannel) key.channel();
-        var byteBuffer = tcpConnection.getWriteBuffer();
+        SocketChannel channel = (SocketChannel) key.channel();
+        DataBuffer byteBuffer = tcpConnection.getWriteBuffer();
         try {
             synchronized (byteBuffer) {
                 byteBuffer.flip();
@@ -281,8 +281,8 @@ public class NetworkService {
     }
 
     private void writeUdp(SelectionKey key, UdpConnection udpConnection) {
-        var channel = (DatagramChannel) key.channel();
-        var byteBuffer = udpConnection.getWriteBuffer();
+        DatagramChannel channel = (DatagramChannel) key.channel();
+        DataBuffer byteBuffer = udpConnection.getWriteBuffer();
         try {
             synchronized (byteBuffer) {
                 byteBuffer.flip();
@@ -306,7 +306,7 @@ public class NetworkService {
     }
 
     private void read(SelectionKey key) {
-        var connection = (AbstractConnection) key.attachment();
+        Object connection = key.attachment();
         if (connection instanceof TcpConnection) {
             readTcp(key, (TcpConnection) connection);
         } else if (connection instanceof UdpConnection) {
@@ -315,7 +315,7 @@ public class NetworkService {
     }
 
     private void readTcp(SelectionKey key, TcpConnection tcpConnection) {
-        var channel = (SocketChannel) key.channel();
+        SocketChannel channel = (SocketChannel) key.channel();
         try {
             tcpConnection.getCommunicator().addIncoming(tcpConnection.getChannel(), buffer -> {
                 while (true) {
@@ -338,7 +338,7 @@ public class NetworkService {
     }
 
     private void readUdp(SelectionKey key, UdpConnection udpConnection) {
-        var channel = (DatagramChannel) key.channel();
+        DatagramChannel channel = (DatagramChannel) key.channel();
         try {
             udpConnection.getCommunicator().addIncoming(udpConnection.getChannel(), buffer -> {
                 while (true) {
@@ -362,17 +362,17 @@ public class NetworkService {
 
     private void handleConnect(SelectionKey key) {
         SocketChannel channel = (SocketChannel) key.channel();
-        var connectionHandler = connectionListeners.remove(channel);
+        ConnectionListener connectionListener = connectionListeners.remove(channel);
         try {
             if (channel.isConnectionPending()) {
                 channel.finishConnect();
             }
             channel.configureBlocking(false);
-            connectionHandler.onConnected(channel);
+            connectionListener.onConnected(channel);
         } catch (IOException e) {
             try {
-                var hostName = channel.socket().getInetAddress().getCanonicalHostName();
-                connectionHandler.onConnectionFailed(hostName, e);
+                String hostName = channel.socket().getInetAddress().getCanonicalHostName();
+                connectionListener.onConnectionFailed(hostName, e);
                 channel.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -381,7 +381,7 @@ public class NetworkService {
     }
 
     private void disconnect(SocketChannel socketChannel, IOException e) {
-        var tcpConnection = tcpConnections.remove(socketChannel);
+        TcpConnection tcpConnection = tcpConnections.remove(socketChannel);
         try {
             socketChannel.close();
         } catch (IOException ioe) {
@@ -394,7 +394,7 @@ public class NetworkService {
     }
 
     private void disconnect(DatagramChannel datagramChannel, IOException e) {
-        var udpConnection = udpConnections.remove(datagramChannel);
+        UdpConnection udpConnection = udpConnections.remove(datagramChannel);
         try {
             datagramChannel.close();
         } catch (IOException ioe) {
@@ -411,17 +411,17 @@ public class NetworkService {
             close(selector);
             readBuffer.clear();
 
-            for (var channel : connectionListeners.keySet()) {
+            for (Closeable channel : connectionListeners.keySet()) {
                 close(channel);
             }
             connectionListeners.clear();
 
-            for (var socketChannel : tcpConnections.keySet()) {
+            for (Closeable socketChannel : tcpConnections.keySet()) {
                 close(socketChannel);
             }
             tcpConnections.clear();
 
-            for (var datagramChannel : udpConnections.keySet()) {
+            for (Closeable datagramChannel : udpConnections.keySet()) {
                 close(datagramChannel);
             }
             udpConnections.clear();

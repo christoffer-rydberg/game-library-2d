@@ -30,7 +30,7 @@ public class DefaultDecryptor implements Decryptor {
     }
 
     public byte[] decrypt(byte[] ciphertext) throws GeneralSecurityException {
-        var ivLength = iv != null ? iv.length : 0;
+        int ivLength = iv != null ? iv.length : 0;
 
         if (ivLength == 0) {
             cipher.init(Cipher.DECRYPT_MODE, key);
@@ -40,7 +40,7 @@ public class DefaultDecryptor implements Decryptor {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(iv));
         }
 
-        var cipertext = Arrays.copyOfRange(ciphertext, ivLength, ciphertext.length);
+        byte[] cipertext = Arrays.copyOfRange(ciphertext, ivLength, ciphertext.length);
 
         return cipher.doFinal(cipertext);
     }

@@ -298,7 +298,7 @@ public class Particle {
             setInitialized(true);
         }
 
-        var time = getTime() + deltaTime;
+        float time = getTime() + deltaTime;
         setTime(time);
 
         float posX = getPosX();
@@ -306,8 +306,8 @@ public class Particle {
         float centerX = getCenterX();
         float centerY = getCenterY();
 
-        var deltaX = getDeltaX();
-        var deltaY = getDeltaY();
+        float deltaX = getDeltaX();
+        float deltaY = getDeltaY();
 
         float centripetalDirX, centripetalDirY;
         if (centerX == posX && centerY == posY) {

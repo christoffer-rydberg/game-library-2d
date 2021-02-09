@@ -8,6 +8,7 @@ import com.gamelibrary2d.sound.SoundSource;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
+import com.gamelibrary2d.updaters.Updater;
 import com.gamelibrary2d.updates.EmptyUpdate;
 
 import java.net.URL;
@@ -35,9 +36,9 @@ public class MusicPlayer {
     }
 
     public static MusicPlayer create(SoundManager manager, int channels, Game game) {
-        var musicManager = new MusicPlayer(game.getFrame(), manager, channels);
-        game.addFrameChangedListener(musicManager::setFrame);
-        return musicManager;
+        MusicPlayer musicPlayer = new MusicPlayer(game.getFrame(), manager, channels);
+        game.addFrameChangedListener(musicPlayer::setFrame);
+        return musicPlayer;
     }
 
     public SoundManager getSoundManager() {
@@ -52,7 +53,7 @@ public class MusicPlayer {
         this.frame = frame;
 
         if (frame != null) {
-            for (var updater : updaters) {
+            for (Updater updater : updaters) {
                 if (!updater.isFinished()) {
                     frame.runUpdater(updater, false);
                 }
@@ -167,7 +168,7 @@ public class MusicPlayer {
     private boolean canResume() {
         moveToPreviousChannel();
         SoundSource source = getSource();
-        var buffer = source.getSoundBuffer();
+        SoundBuffer buffer = source.getSoundBuffer();
         moveToNextChannel();
         return buffer != null;
     }
@@ -175,8 +176,8 @@ public class MusicPlayer {
     private boolean canResume(URL musicUrl) {
         moveToPreviousChannel();
         SoundSource source = getSource();
-        var buffer = source.getSoundBuffer();
-        var wantedBuffer = soundManager.getSoundBuffer(musicUrl);
+        SoundBuffer buffer = source.getSoundBuffer();
+        SoundBuffer wantedBuffer = soundManager.getSoundBuffer(musicUrl);
         moveToNextChannel();
         return buffer != null && buffer == wantedBuffer;
     }

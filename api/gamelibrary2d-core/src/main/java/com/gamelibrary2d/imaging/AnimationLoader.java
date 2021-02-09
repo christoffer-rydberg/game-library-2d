@@ -1,6 +1,7 @@
 package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.framework.Image;
 import com.gamelibrary2d.framework.ImageReader;
 import com.gamelibrary2d.framework.Runtime;
 
@@ -11,21 +12,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class AnimationLoader {
     private final static Map<String, AnimationReader> animationReaders = initializeAnimationReaders();
 
     private static Map<String, AnimationReader> initializeAnimationReaders() {
-        var animationLoaders = new HashMap<String, AnimationReader>();
+        HashMap<String, AnimationReader> animationLoaders = new HashMap<>();
         animationLoaders.put(StandardAnimationFormats.GIF, new InternalGifReader());
         return animationLoaders;
     }
 
     private static List<Path> getFilePaths(Path folderPath, Pattern pattern) throws IOException {
-        var filePaths = new ArrayList<Path>();
-        try (var stream = Files.walk(folderPath, 1)) {
-            for (var itr = stream.iterator(); itr.hasNext(); ) {
-                var filePath = itr.next();
+        List<Path> filePaths = new ArrayList<>();
+        try (Stream stream = Files.walk(folderPath, 1)) {
+            for (Iterator<Path> itr = stream.iterator(); itr.hasNext(); ) {
+                Path filePath = itr.next();
                 if (pattern.matcher(filePath.toString()).find()) {
                     filePaths.add(filePath);
                 }
@@ -54,7 +56,7 @@ public class AnimationLoader {
      * @param format The animation format.
      */
     public static ImageAnimation load(InputStream stream, String format) throws IOException {
-        var lowerCaseFormat = format.toLowerCase();
+        String lowerCaseFormat = format.toLowerCase();
         if (animationReaders.containsKey(lowerCaseFormat)) {
             return animationReaders.get(lowerCaseFormat).read(stream);
         } else {
@@ -69,7 +71,7 @@ public class AnimationLoader {
      * @param format The animation format.
      */
     public static ImageAnimation load(URL url, String format) throws IOException {
-        try (var stream = url.openStream()) {
+        try (InputStream stream = url.openStream()) {
             return load(stream, format);
         }
     }
@@ -90,11 +92,11 @@ public class AnimationLoader {
      * Loads an animation from all image files inside the specified folder that matches the specified pattern.
      */
     public static ImageAnimation load(ImageReader imageReader, Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
-        var filePaths = getFilePaths(folderPath, filePattern);
-        var frames = new ArrayList<ImageAnimationFrame>(filePaths.size());
-        for (var filePath : filePaths) {
-            try (var stream = filePath.toUri().toURL().openStream()) {
-                var image = imageReader.read(stream);
+        List<Path> filePaths = getFilePaths(folderPath, filePattern);
+        List<ImageAnimationFrame> frames = new ArrayList<>(filePaths.size());
+        for (Path filePath : filePaths) {
+            try (InputStream stream = filePath.toUri().toURL().openStream()) {
+                Image image = imageReader.read(stream);
                 frames.add(new ImageAnimationFrame(
                         image,
                         new Rectangle(0, 0, 1, 1),

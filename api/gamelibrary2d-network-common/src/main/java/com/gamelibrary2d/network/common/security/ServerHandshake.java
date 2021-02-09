@@ -3,6 +3,7 @@ package com.gamelibrary2d.network.common.security;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.io.Read;
+import com.gamelibrary2d.network.common.Message;
 import com.gamelibrary2d.network.common.initialization.CommunicationSteps;
 
 import javax.crypto.Cipher;
@@ -26,29 +27,29 @@ public class ServerHandshake {
 
     private void sharePublicKey(CommunicationSteps steps) {
         steps.add((context, com) -> {
-            var message = new PublicKeyMessage(keyPair.getPublic());
+            Message message = new PublicKeyMessage(keyPair.getPublic());
             message.serializeMessage(com.getOutgoing());
         });
     }
 
     private void readSecretKey(CommunicationSteps steps) {
         steps.add((context, com, inbox) -> {
-            var encryptionHeaderLength = inbox.getInt();
-            var encryptionHeader = new byte[encryptionHeaderLength];
+            int encryptionHeaderLength = inbox.getInt();
+            byte[] encryptionHeader = new byte[encryptionHeaderLength];
             inbox.get(encryptionHeader);
 
-            var cipherTransformation = Read.textWithSizeHeader(inbox);
+            String cipherTransformation = Read.textWithSizeHeader(inbox);
 
-            var decryptionReader = new EncryptionReader(
+            EncryptionReader encryptionReader = new EncryptionReader(
                     new DefaultDecryptor(keyPair.getPrivate(), createCipher(cipherTransformation)));
 
             plaintextBuffer.clear();
-            decryptionReader.readNext(inbox, plaintextBuffer);
+            encryptionReader.readNext(inbox, plaintextBuffer);
             plaintextBuffer.flip();
 
-            var secretKeyMessage = new SecretKeyMessage(plaintextBuffer);
+            SecretKeyMessage secretKeyMessage = new SecretKeyMessage(plaintextBuffer);
 
-            var cipher = createCipher(secretKeyMessage.getCipherTransformation());
+            Cipher cipher = createCipher(secretKeyMessage.getCipherTransformation());
 
             com.setEncryptionWriter(new EncryptionWriter(
                     encryptionHeader,

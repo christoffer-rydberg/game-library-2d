@@ -11,6 +11,7 @@ import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.resources.Textures;
 import com.gamelibrary2d.tools.particlegenerator.widgets.Slider;
@@ -31,15 +32,17 @@ public class ParticleSystemSettingsPanel extends AbstractPanel<GameObject> imple
 
         private ResizeSlider(Renderer handle, ParticleSystemModel particleSystem) {
             super(handle, SliderDirection.HORIZONTAL, -50, 50, 2);
-            var saveLoadManager = new SaveLoadManager();
+            SaveLoadManager saveLoadManager = new SaveLoadManager();
             addDragBeginListener(value -> {
                 originalPositionParameters = saveLoadManager.clone(particleSystem.getPositioner(), PositionParameters::new);
                 originalParticleParameters = saveLoadManager.clone(particleSystem.getParameters(), ParticleParameters::new);
             });
             addValueChangedListener(value -> {
                 float resizeValue = ((value < 0 ? value : value * 2) + 100f) * 0.01f;
-                var updatedParticlePositioner = saveLoadManager.clone(originalPositionParameters, PositionParameters::new);
-                var updatedParticleParameters = saveLoadManager.clone(originalParticleParameters, ParticleParameters::new);
+                PositionParameters updatedParticlePositioner
+                        = saveLoadManager.clone(originalPositionParameters, PositionParameters::new);
+                ParticleParameters updatedParticleParameters =
+                        saveLoadManager.clone(originalParticleParameters, ParticleParameters::new);
 
                 updatedParticlePositioner.scale(resizeValue);
                 updatedParticleParameters.scale(resizeValue);
@@ -53,8 +56,8 @@ public class ParticleSystemSettingsPanel extends AbstractPanel<GameObject> imple
         }
 
         static ResizeSlider create(ParticleSystemModel particleSystem, Disposer disposer) {
-            var quad = Quad.create(Rectangle.create(32, 16), disposer);
-            var handle = new SurfaceRenderer(quad, Textures.sliderHandle());
+            Surface quad = Quad.create(Rectangle.create(32, 16), disposer);
+            Renderer handle = new SurfaceRenderer(quad, Textures.sliderHandle());
             return new ResizeSlider(handle, particleSystem);
         }
     }

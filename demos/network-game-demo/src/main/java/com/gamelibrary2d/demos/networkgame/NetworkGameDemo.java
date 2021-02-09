@@ -3,6 +3,7 @@ package com.gamelibrary2d.demos.networkgame;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ServerManager;
 import com.gamelibrary2d.exceptions.InitializationException;
+import com.gamelibrary2d.framework.Framework;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
@@ -53,14 +54,14 @@ public class NetworkGameDemo {
     }
 
     private static KeyPair createKeyPair() throws NoSuchAlgorithmException {
-        var keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(2048);
         return keyGen.generateKeyPair();
     }
 
     public static void main(String[] args) throws InitializationException, NoSuchAlgorithmException {
-        var framework = new Lwjgl_Framework();
-        var serverManager = new ServerManager(createKeyPair());
+        Framework framework = new Lwjgl_Framework();
+        ServerManager serverManager = new ServerManager(createKeyPair());
         new DemoGame(framework, serverManager).start(createWindow(args));
     }
 }

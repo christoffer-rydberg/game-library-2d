@@ -56,7 +56,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator i
 
     @Override
     protected void send(DataBuffer buffer) throws IOException {
-        var socketChannel = this.socketChannel;
+        SocketChannel socketChannel = this.socketChannel;
         if (socketChannel == null)
             throw new IOException("Socket channel not connected");
         networkService.send(socketChannel, buffer);
@@ -74,7 +74,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator i
 
     protected void disconnectTcp() {
         if (socketChannelConnected()) {
-            var socketChannel = this.socketChannel;
+            SocketChannel socketChannel = this.socketChannel;
             setSocketChannel(null);
             networkService.closeAfterLastScheduledSend(socketChannel);
         }
@@ -88,7 +88,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator i
 
         disableUdp();
 
-        var channel = networkService.openDatagramChannel(this, connectionType,
+        DatagramChannel channel = networkService.openDatagramChannel(this, connectionType,
                 this::onDatagramChannelDisconnected, localPort, hostPort);
 
         this.udpConnection = new UdpConnection(channel, connectionType);
@@ -97,7 +97,7 @@ public abstract class AbstractNetworkCommunicator extends AbstractCommunicator i
     @Override
     public void disableUdp() {
         if (this.udpConnection != null) {
-            var connection = this.udpConnection;
+            UdpConnection connection = this.udpConnection;
             this.udpConnection = null;
             networkService.disconnect(connection.channel);
         }

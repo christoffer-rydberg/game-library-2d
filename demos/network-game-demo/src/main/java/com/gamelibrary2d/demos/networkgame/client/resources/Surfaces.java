@@ -27,15 +27,15 @@ public class Surfaces {
      * Creates a small as possible quad that covers the specific area while respecting the aspect ratio.
      */
     public static Quad coverArea(Rectangle area, float ratioWidth, float ratioHeight, Disposer disposer) {
-        var ratio = ratioWidth / ratioHeight;
+        float ratio = ratioWidth / ratioHeight;
 
-        var boundsWidth = area.getWidth();
-        var boundsHeight = area.getHeight();
+        float boundsWidth = area.getWidth();
+        float boundsHeight = area.getHeight();
 
-        var actualWidth = Math.max(area.getWidth(), boundsHeight * ratio);
-        var actualHeight = Math.max(area.getHeight(), boundsWidth / ratio);
+        float actualWidth = Math.max(area.getWidth(), boundsHeight * ratio);
+        float actualHeight = Math.max(area.getHeight(), boundsWidth / ratio);
 
-        var paddedBackgroundBounds = area.pad(
+        Rectangle paddedBackgroundBounds = area.pad(
                 (actualWidth - boundsWidth) / 2f,
                 (actualHeight - boundsHeight) / 2f);
 

@@ -24,16 +24,16 @@ public final class ParticleSystemParameters implements Serializable {
     }
 
     public int estimateCapacityFromCount() {
-        var emitterParameters = getEmitterParameters();
+        EmitterParameters emitterParameters = getEmitterParameters();
         return emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar();
     }
 
     public int estimateCapacityFromInterval() {
-        var maxLife = getParticleParameters().getLife() + getParticleParameters().getLifeVar();
+        float maxLife = getParticleParameters().getLife() + getParticleParameters().getLifeVar();
 
-        var emitterParameters = getEmitterParameters();
+        EmitterParameters emitterParameters = getEmitterParameters();
 
-        var particleCount = emitterParameters.isPulsating()
+        int particleCount = emitterParameters.isPulsating()
                 ? emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar()
                 : 1;
 

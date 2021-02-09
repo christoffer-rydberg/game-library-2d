@@ -60,7 +60,7 @@ public class Label implements Renderable {
         if (text.charAt(index) == '\n') {
             return 1;
         } else if (text.charAt(index) == '\r') {
-            var next = index + 1;
+            int next = index + 1;
             return next < text.length() && text.charAt(next) == '\n' ? 2 : 1;
         } else {
             return 0;
@@ -141,7 +141,7 @@ public class Label implements Renderable {
     }
 
     public void setText(String text) {
-        var oldText = this.text;
+        String oldText = this.text;
         this.text = text;
         for (TextChangedListener listener : textChangedListeners) {
             listener.onTextChanged(oldText, text);
@@ -167,15 +167,15 @@ public class Label implements Renderable {
             return onRender(alpha, offset, len);
         }
 
-        var params = textRenderer.getParameters();
-        var r = params.get(ShaderParameters.COLOR_R);
-        var g = params.get(ShaderParameters.COLOR_G);
-        var b = params.get(ShaderParameters.COLOR_B);
-        var a = params.get(ShaderParameters.ALPHA);
+        ShaderParameters params = textRenderer.getParameters();
+        float r = params.get(ShaderParameters.COLOR_R);
+        float g = params.get(ShaderParameters.COLOR_G);
+        float b = params.get(ShaderParameters.COLOR_B);
+        float a = params.get(ShaderParameters.ALPHA);
 
         params.setColor(color);
 
-        var index = onRender(alpha, offset, len);
+        int index = onRender(alpha, offset, len);
 
         params.set(ShaderParameters.COLOR_R, r);
         params.set(ShaderParameters.COLOR_G, g);
@@ -186,20 +186,20 @@ public class Label implements Renderable {
     }
 
     public Rectangle calculateBounds() {
-        var output = new TextBoundsOutput();
+        TextBoundsOutput output = new TextBoundsOutput();
         iterateRows(0, text.length(), false, 1f, output);
         return output.bounds;
     }
 
     private int onRender(float alpha, int offset, int len) {
         ModelMatrix.instance().pushMatrix();
-        var index = iterateRows(offset, len, true, alpha, null);
+        int index = iterateRows(offset, len, true, alpha, null);
         ModelMatrix.instance().popMatrix();
         return index;
     }
 
     private Rectangle getRowBounds(Font font, int offset, int len) {
-        var textWidth = font.getTextWidth(text, offset, len);
+        float textWidth = font.getTextWidth(text, offset, len);
         float offsetX = offsetFromHorizontalAlignment(textWidth);
         float offsetY = offsetFromVerticalAlignment(font);
         return new Rectangle(
@@ -211,7 +211,7 @@ public class Label implements Renderable {
 
     private int iterateRows(int offset, int len, boolean render, float alpha, TextBoundsOutput output) {
         final float rowHeight = this.rowHeight > 0 ? this.rowHeight : textRenderer.getFont().getHeight();
-        final var textRenderer = this.getTextRenderer();
+        final TextRenderer textRenderer = this.getTextRenderer();
         final Font font = textRenderer.getFont();
         final int rowCount = (int) (height / font.getHeight());
 
@@ -222,7 +222,7 @@ public class Label implements Renderable {
         while (rowStart < end && currentRow < rowCount) {
             rowEnd = Math.min(getRowEnd(text, rowStart, width), end);
 
-            var endOfText = rowEnd == end;
+            boolean endOfText = rowEnd == end;
             int newLineSize = endOfText ? 0 : getNewLineSize(text, rowEnd);
             boolean newLineSeparatorFound = newLineSize > 0;
             if (!endOfText && !newLineSeparatorFound) {
@@ -310,7 +310,7 @@ public class Label implements Renderable {
                 break;
             }
 
-            var font = getTextRenderer().getFont();
+            Font font = getTextRenderer().getFont();
             pixelWidth -= font.getTextWidth(text, startIndex, 1);
             if (pixelWidth > 0) {
                 ++startIndex;

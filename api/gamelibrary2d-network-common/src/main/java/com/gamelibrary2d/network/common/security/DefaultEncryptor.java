@@ -37,7 +37,7 @@ public class DefaultEncryptor implements Encryptor {
 
     private static byte[] combine(byte[] iv, byte[] ciphertext) {
         int length = iv.length + ciphertext.length;
-        var result = new byte[length];
+        byte[] result = new byte[length];
         System.arraycopy(iv, 0, result, 0, iv.length);
         System.arraycopy(ciphertext, 0, result, iv.length, ciphertext.length);
         return result;
@@ -56,7 +56,7 @@ public class DefaultEncryptor implements Encryptor {
                     new IvParameterSpec(iv));
         }
 
-        var iv = cipher.getIV();
+        byte[] iv = cipher.getIV();
         if (iv == null) {
             return cipher.doFinal(plaintext);
         } else {

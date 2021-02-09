@@ -9,7 +9,9 @@ import com.gamelibrary2d.glUtil.*;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.parameters.EmitterParameters;
+import com.gamelibrary2d.particle.parameters.ParticleParameters;
 import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
+import com.gamelibrary2d.particle.parameters.PositionParameters;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 
 import java.nio.FloatBuffer;
@@ -88,21 +90,21 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
             int capacity,
             Disposer disposer) {
 
-        var positionBuffer = MirroredFloatBuffer.create(
+        MirroredFloatBuffer positionBuffer = MirroredFloatBuffer.create(
                 parameters.getPositionParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
                 OpenGL.GL_DYNAMIC_DRAW,
                 disposer);
 
-        var parametersBuffer = MirroredFloatBuffer.create(
+        MirroredFloatBuffer parametersBuffer = MirroredFloatBuffer.create(
                 parameters.getParticleParameters().getInternalStateArray(),
                 OpenGL.GL_SHADER_STORAGE_BUFFER,
                 OpenGL.GL_DYNAMIC_DRAW,
                 disposer);
 
-        var renderBuffer = new DefaultVertexArrayBuffer[2];
+        DefaultVertexArrayBuffer[] renderBuffer = new DefaultVertexArrayBuffer[2];
         for (int i = 0; i < 2; ++i) {
-            var buffer = DefaultOpenGLBuffer.create(
+            DefaultOpenGLBuffer buffer = DefaultOpenGLBuffer.create(
                     OpenGL.GL_ARRAY_BUFFER,
                     OpenGL.GL_DYNAMIC_DRAW,
                     disposer);
@@ -115,9 +117,9 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
                     4);
         }
 
-        var updateBuffer = new DefaultOpenGLBuffer[2];
+        DefaultOpenGLBuffer[] updateBuffer = new DefaultOpenGLBuffer[2];
         for (int i = 0; i < 2; ++i) {
-            var buffer = DefaultOpenGLBuffer.create(
+            DefaultOpenGLBuffer buffer = DefaultOpenGLBuffer.create(
                     OpenGL.GL_SHADER_STORAGE_BUFFER,
                     OpenGL.GL_DYNAMIC_DRAW,
                     disposer);
@@ -174,7 +176,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
      * is specified by {@link EmitterParameters#getDefaultCount()}.
      */
     public void emitAll() {
-        var emitterParameters = parameters.getEmitterParameters();
+        EmitterParameters emitterParameters = parameters.getEmitterParameters();
         emit(Math.round(emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar() * RandomInstance.random11()));
     }
 
@@ -226,7 +228,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
             float remainingTime = time - (iterations * interval);
 
-            var emitterParameters = parameters.getEmitterParameters();
+            EmitterParameters emitterParameters = parameters.getEmitterParameters();
             int count = emitterParameters.isPulsating()
                     ? (emitterParameters.getDefaultCount() + emitterParameters.getDefaultCountVar()) * iterations
                     : iterations;
@@ -269,7 +271,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
 
         openGL.glUniform1i(glUniformParticlesInGpu, particlesInGpuBuffer);
 
-        var emitterParameters = parameters.getEmitterParameters();
+        EmitterParameters emitterParameters = parameters.getEmitterParameters();
 
         openGL.glUniform2f(
                 glUniformPosition,
@@ -277,7 +279,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
                 position[1] + emitterParameters.getOffsetY());
         openGL.glUniform2fv(glUniformExternalAcceleration, externalAcceleration);
 
-        var positionParameters = parameters.getPositionParameters();
+        PositionParameters positionParameters = parameters.getPositionParameters();
         if (!positionbuffer.allocate(positionParameters.getInternalStateArray())) {
             if (positionUpdateCounter != positionParameters.getUpdateCounter()) {
                 positionUpdateCounter = positionParameters.getUpdateCounter();
@@ -285,7 +287,7 @@ public class AcceleratedParticleSystem extends AbstractGpuBasedParticleSystem im
             }
         }
 
-        var particleParameters = parameters.getParticleParameters();
+        ParticleParameters particleParameters = parameters.getParticleParameters();
         if (!parametersBuffer.allocate(particleParameters.getInternalStateArray())) {
             if (parameterUpdateCounter != particleParameters.getUpdateCounter()) {
                 parameterUpdateCounter = particleParameters.getUpdateCounter();

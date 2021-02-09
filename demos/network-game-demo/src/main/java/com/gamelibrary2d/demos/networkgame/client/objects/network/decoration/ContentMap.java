@@ -6,8 +6,10 @@ import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Quad;
+import com.gamelibrary2d.resources.Surface;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +18,10 @@ public class ContentMap {
     private final Map<Byte, Map<Byte, Renderable>> renderers = new HashMap<>();
 
     private void initializeRenderers(byte primaryType, TextureMap textures, Rectangle bounds, Disposer disposer) {
-        var renderers = new HashMap<Byte, Renderable>();
-        var quad = Quad.create(bounds, disposer);
-        for (var key : textures.getKeys(primaryType)) {
-            var renderer = new SurfaceRenderer(quad, textures.getTexture(primaryType, key));
+        Map<Byte, Renderable> renderers = new HashMap<>();
+        Surface surface = Quad.create(bounds, disposer);
+        for (Byte key : textures.getKeys(primaryType)) {
+            Renderer renderer = new SurfaceRenderer(surface, textures.getTexture(primaryType, key));
             renderers.put(key, renderer);
         }
 
@@ -44,7 +46,7 @@ public class ContentMap {
     }
 
     public Renderable get(Byte primaryType, Byte secondaryType) {
-        var renderers = this.renderers.get(primaryType);
+        Map<Byte, Renderable> renderers = this.renderers.get(primaryType);
         return renderers != null ? renderers.get(secondaryType) : null;
     }
 }

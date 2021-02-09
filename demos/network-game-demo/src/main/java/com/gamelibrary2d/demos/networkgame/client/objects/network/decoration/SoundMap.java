@@ -51,24 +51,24 @@ public class SoundMap {
 
         if (uri.getScheme().equals("jar")) {
             try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                var path = fileSystem.getPath(resourceFolder);
+                Path path = fileSystem.getPath(resourceFolder);
                 return load(path, pattern);
             }
         } else {
-            var path = Paths.get(uri);
+            Path path = Paths.get(uri);
             return load(path, pattern);
         }
     }
 
     private Map<Byte, URL> load(Path path, Pattern pattern) throws IOException {
-        var sound = new HashMap<Byte, URL>();
+        Map<Byte, URL> sound = new HashMap<>();
         try (Stream<Path> walk = Files.walk(path, 1)) {
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
                 path = it.next();
                 if (pattern == null || pattern.matcher(path.toString()).find()) {
-                    var key = readFileNameAsByte(path);
+                    Byte key = readFileNameAsByte(path);
                     if (key != null) {
-                        var url = path.toUri().toURL();
+                        URL url = path.toUri().toURL();
                         soundManager.loadSoundBuffer(url, decoder);
                         sound.put(key, url);
                     }
@@ -80,8 +80,8 @@ public class SoundMap {
     }
 
     private void initializeDestroyedObjects() throws IOException {
-        var sound = load("/sounds/obstacles/destroyed/", "^*.ogg$");
-        this.sound.put(ObjectTypes.OBSTACLE, sound);
+        Map<Byte, URL> sounds = load("/sounds/obstacles/destroyed/", "^*.ogg$");
+        this.sound.put(ObjectTypes.OBSTACLE, sounds);
     }
 
     public void initialize() throws IOException {
@@ -89,9 +89,9 @@ public class SoundMap {
     }
 
     public URL getDestroyedSound(Byte primaryType, Byte secondaryType) {
-        var sounds = this.sound.get(primaryType);
+        Map<Byte, URL> sounds = this.sound.get(primaryType);
         if (sounds != null) {
-            var sound = sounds.get(secondaryType);
+            URL sound = sounds.get(secondaryType);
             return sound != null ? sound : sounds.get((byte) 0);
         } else {
             return null;

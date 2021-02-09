@@ -243,7 +243,7 @@ public class GlfwWindow implements Window {
     }
 
     private void onCreate(String title, int width, int height, long monitor) {
-        for (var hint : additionalWindowHints)
+        for (WindowHint hint : additionalWindowHints)
             glfwWindowHint(hint.hint, hint.value);
 
         long windowId = glfwCreateWindow(width, height, title, monitor, NULL);

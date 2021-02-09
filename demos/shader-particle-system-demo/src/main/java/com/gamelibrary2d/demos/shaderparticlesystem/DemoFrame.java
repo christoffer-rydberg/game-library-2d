@@ -3,8 +3,11 @@ package com.gamelibrary2d.demos.shaderparticlesystem;
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.DefaultLayerObject;
+import com.gamelibrary2d.layers.LayerObject;
+import com.gamelibrary2d.particle.systems.ParticleSystem;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,7 +30,7 @@ public class DemoFrame extends AbstractFrame {
             BufferedImage init = ImageIO.read(DemoFrame.class.getResource("/Images/before.jpg"));
             BufferedImage goal = ImageIO.read(DemoFrame.class.getResource("/Images/after.jpg"));
 
-            var particleSystem = ParticleSystemFactory.create(init, goal, windowWidth / 2f,
+            ParticleSystem particleSystem = ParticleSystemFactory.create(init, goal, windowWidth / 2f,
                     windowHeight / 2f, this);
 
             // Adjust scale to fit on screen
@@ -35,7 +38,7 @@ public class DemoFrame extends AbstractFrame {
             float scaleY = Math.min(1f, 0.5f * windowHeight / init.getHeight());
             float scale = Math.min(scaleX, scaleY);
 
-            var layer = new DefaultLayerObject<>();
+            LayerObject<Renderable> layer = new DefaultLayerObject<>();
             layer.setScale(scale, scale);
             layer.setScaleAndRotationCenter(windowWidth / 2, windowHeight / 2);
             layer.add(particleSystem);

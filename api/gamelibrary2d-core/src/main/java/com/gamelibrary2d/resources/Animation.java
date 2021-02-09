@@ -3,6 +3,7 @@ package com.gamelibrary2d.resources;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.imaging.ImageAnimation;
+import com.gamelibrary2d.imaging.ImageAnimationFrame;
 import com.gamelibrary2d.markers.Bounded;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class Animation implements Bounded {
             throw new IllegalStateException("An animation must contain at least one frame");
         }
 
-        this.frames = List.copyOf(frames);
+        this.frames = new ArrayList<>(frames);
         this.timeIndex = createTimeIndex(this.frames);
         this.bounds = calculateBounds(this.frames);
     }
@@ -27,8 +28,8 @@ public class Animation implements Bounded {
     private static Rectangle calculateBounds(List<AnimationFrame> frames) {
         float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
         float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
-        for (var frame : frames) {
-            var bounds = frame.getBounds();
+        for (AnimationFrame frame : frames) {
+            Rectangle bounds = frame.getBounds();
             xMin = Math.min(xMin, bounds.getLowerX());
             yMin = Math.min(yMin, bounds.getLowerY());
             xMax = Math.max(xMax, bounds.getUpperX());
@@ -39,10 +40,10 @@ public class Animation implements Bounded {
     }
 
     private static float[] createTimeIndex(List<AnimationFrame> frames) {
-        var index = new float[frames.size()];
+        float[] index = new float[frames.size()];
         float duration = 0f;
         for (int i = 0; i < index.length; ++i) {
-            var frame = frames.get(i);
+            AnimationFrame frame = frames.get(i);
             duration += frame.getDurationHint();
             index[i] = duration;
         }
@@ -51,12 +52,12 @@ public class Animation implements Bounded {
     }
 
     private static Animation fromImageAnimation(ImageAnimation imageAnimation, float scaleX, float scaleY, float offsetX, float offsetY, Disposer disposer) {
-        var frames = new ArrayList<AnimationFrame>(imageAnimation.getFrames().size());
-        for (var frame : imageAnimation.getFrames()) {
-            var imageWidth = frame.getImage().getWidth();
-            var imageHeight = frame.getImage().getHeight();
+        List<AnimationFrame> frames = new ArrayList<>(imageAnimation.getFrames().size());
+        for (ImageAnimationFrame frame : imageAnimation.getFrames()) {
+            int imageWidth = frame.getImage().getWidth();
+            int imageHeight = frame.getImage().getHeight();
 
-            var frameBounds = new Rectangle(0, 0, imageWidth, imageHeight)
+            Rectangle frameBounds = new Rectangle(0, 0, imageWidth, imageHeight)
                     .move(frame.getOffsetX(), frame.getOffsetY())
                     .resize(scaleX, scaleY)
                     .move(offsetX, offsetY);
@@ -68,13 +69,13 @@ public class Animation implements Bounded {
     }
 
     public static Animation fromImageAnimation(ImageAnimation imageAnimation, Rectangle size, Disposer disposer) {
-        var bounds = imageAnimation.getBounds();
+        Rectangle bounds = imageAnimation.getBounds();
 
-        var scaleX = size.getWidth() / bounds.getWidth();
-        var scaleY = size.getHeight() / bounds.getHeight();
+        float scaleX = size.getWidth() / bounds.getWidth();
+        float scaleY = size.getHeight() / bounds.getHeight();
 
-        var offsetX = size.getLowerX() - (bounds.getLowerX() * scaleX);
-        var offsetY = size.getLowerY() - (bounds.getLowerY() * scaleY);
+        float offsetX = size.getLowerX() - (bounds.getLowerX() * scaleX);
+        float offsetY = size.getLowerY() - (bounds.getLowerY() * scaleY);
 
         return fromImageAnimation(imageAnimation, scaleX, scaleY, offsetX, offsetY, disposer);
     }
@@ -84,8 +85,8 @@ public class Animation implements Bounded {
     }
 
     public boolean isFrameActive(int frameIndex, float animationTime) {
-        var frameStart = frameIndex == 0 ? 0 : timeIndex[frameIndex - 1];
-        var frameEnd = timeIndex[frameIndex];
+        float frameStart = frameIndex == 0 ? 0 : timeIndex[frameIndex - 1];
+        float frameEnd = timeIndex[frameIndex];
         return animationTime >= frameStart && animationTime < frameEnd;
     }
 
@@ -97,9 +98,9 @@ public class Animation implements Bounded {
         } else {
             int start = 0, end = timeIndex.length;
             while (true) {
-                var index = (start + end) / 2;
-                var frameStart = index == 0 ? 0 : timeIndex[index - 1];
-                var frameEnd = timeIndex[index];
+                int index = (start + end) / 2;
+                float frameStart = index == 0 ? 0 : timeIndex[index - 1];
+                float frameEnd = timeIndex[index];
                 if (time >= frameEnd) {
                     start = index;
                 } else if (time < frameStart) {

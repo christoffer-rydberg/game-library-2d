@@ -1,9 +1,6 @@
 package com.gamelibrary2d.common.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -20,8 +17,20 @@ public class Read {
         }
     }
 
+    public static byte[] byteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024];
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+
+        return buffer.toByteArray();
+    }
+
     public static DataBuffer bytes(InputStream is) throws IOException {
-        var buffer = new DynamicByteBuffer(512);
+        DataBuffer buffer = new DynamicByteBuffer(512);
         bytes(is, buffer);
         return buffer;
     }
@@ -29,26 +38,26 @@ public class Read {
     public static void bytesWithSizeHeader(InputStream is, DataBuffer buffer) throws IOException {
         buffer.ensureRemaining(4);
         is.read(buffer.array(), buffer.position(), buffer.remaining());
-        var length = buffer.getInt();
+        int length = buffer.getInt();
         buffer.position(0);
         buffer.ensureRemaining(length);
         buffer.position(is.read(buffer.array(), buffer.position(), buffer.remaining()));
     }
 
     public static DataBuffer bytesWithSizeHeader(InputStream is) throws IOException {
-        var buffer = new DynamicByteBuffer(Integer.BYTES);
+        DataBuffer buffer = new DynamicByteBuffer(Integer.BYTES);
         bytesWithSizeHeader(is, buffer);
         return buffer;
     }
 
     public static String text(URL url, Charset charset) throws IOException {
-        try (var stream = url.openStream()) {
+        try (InputStream stream = url.openStream()) {
             return text(stream, charset);
         }
     }
 
     public static String text(File file, Charset charset) throws IOException {
-        try (var stream = new FileInputStream(file)) {
+        try (InputStream stream = new FileInputStream(file)) {
             return text(stream, charset);
         }
     }

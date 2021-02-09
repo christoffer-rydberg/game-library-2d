@@ -46,7 +46,7 @@ public class DurationUpdater implements Updater {
             return 0f;
         }
 
-        var usedTime = Math.min(timeLeft, deltaTime);
+        float usedTime = Math.min(timeLeft, deltaTime);
         update.update(scaleOverDuration ? usedTime / duration : usedTime);
         timeLeft -= usedTime;
         return usedTime;

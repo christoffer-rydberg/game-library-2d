@@ -34,7 +34,7 @@ public class EmitterParametersPanel extends AbstractPanel<GameObject> implements
     }
 
     private GameObject particlesPerSecond() {
-        var property = new IntervalToPerSecondConverter(
+        IntervalToPerSecondConverter property = new IntervalToPerSecondConverter(
                 () -> settings().getDefaultInterval(),
                 v -> settings().setDefaultInterval(v));
 
@@ -82,7 +82,7 @@ public class EmitterParametersPanel extends AbstractPanel<GameObject> implements
 
         @Override
         public float get() {
-            var interval = getter.get();
+            float interval = getter.get();
             if (interval != cachedInterval) {
                 cachedInterval = interval;
                 perSecond = interval == 0 ? 0 : 1f / interval;

@@ -42,7 +42,7 @@ public class EncryptionReader {
                 return false;
             }
 
-            var prevPos = input.position();
+            int prevPos = input.position();
             input.get(encryptionHeaderBuffer);
             if (!Arrays.equals(encryptionHeader, encryptionHeaderBuffer)) {
                 input.position(prevPos);
@@ -51,8 +51,8 @@ public class EncryptionReader {
         }
 
         // Read input data
-        var length = input.getInt();
-        var bytes = new byte[length];
+        int length = input.getInt();
+        byte[] bytes = new byte[length];
         input.get(bytes);
 
         // Decrypt

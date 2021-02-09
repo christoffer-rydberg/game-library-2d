@@ -52,12 +52,12 @@ public class Ball extends AbstractGameObject<Renderable> implements Obstacle {
     }
 
     private void updateVelocity(float deltaTime) {
-        var speed2 = velocity.getX() * velocity.getX() + velocity.getY() * velocity.getY();
+        float speed2 = velocity.getX() * velocity.getX() + velocity.getY() * velocity.getY();
         if (speed2 > 0f) {
-            var airResistanceDeceleration = AIR_RESISTANCE_FACTOR * speed2 / RADIUS;
-            var totalDeceleration = airResistanceDeceleration + FRICTION;
-            var speed = Math.sqrt(speed2);
-            var newSpeed = speed - totalDeceleration * deltaTime;
+            float airResistanceDeceleration = AIR_RESISTANCE_FACTOR * speed2 / RADIUS;
+            float totalDeceleration = airResistanceDeceleration + FRICTION;
+            double speed = Math.sqrt(speed2);
+            double newSpeed = speed - totalDeceleration * deltaTime;
             if (newSpeed <= 0) {
                 velocity.set(0, 0);
             } else {

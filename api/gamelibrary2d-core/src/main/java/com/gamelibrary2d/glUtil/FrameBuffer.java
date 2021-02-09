@@ -20,7 +20,7 @@ public class FrameBuffer implements Disposable {
     }
 
     public static FrameBuffer create(Texture texture, Disposer disposer) {
-        var openGl = OpenGL.instance();
+        OpenGL openGl = OpenGL.instance();
 
         // Create a frame buffer
         int fbo = openGl.glGenFramebuffers();

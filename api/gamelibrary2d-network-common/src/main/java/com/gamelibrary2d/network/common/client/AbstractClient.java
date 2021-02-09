@@ -8,6 +8,7 @@ import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationExceptio
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;
 import com.gamelibrary2d.network.common.exceptions.NetworkInitializationException;
 import com.gamelibrary2d.network.common.initialization.*;
+import com.gamelibrary2d.network.common.internal.CommunicationStep;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
 import com.gamelibrary2d.network.common.internal.DefaultCommunicationSteps;
@@ -82,10 +83,10 @@ public abstract class AbstractClient implements Client {
     @Override
     public CommunicationContext initialize()
             throws NetworkConnectionException, NetworkAuthenticationException, NetworkInitializationException {
-        var communicator = connectCommunicator();
+        Communicator communicator = connectCommunicator();
         try {
             reallocateOutgoingBuffer(communicator);
-            var context = new DefaultCommunicationContext();
+            CommunicationContext context = new DefaultCommunicationContext();
             authenticate(context, communicator);
             initialize(context, communicator);
             context.register(communicatorKey, communicator);
@@ -102,7 +103,7 @@ public abstract class AbstractClient implements Client {
         }
 
         try {
-            var communicator = communicatorFactory.create().get();
+            Communicator communicator = communicatorFactory.create().get();
             if (!communicator.isConnected()) {
                 throw new NetworkConnectionException("Created communicator is not connected");
             }
@@ -114,7 +115,7 @@ public abstract class AbstractClient implements Client {
 
     private void authenticate(CommunicationContext context, Communicator communicator) throws NetworkAuthenticationException {
         if (!communicator.isAuthenticated()) {
-            var steps = new DefaultCommunicationSteps();
+            DefaultCommunicationSteps steps = new DefaultCommunicationSteps();
             configureAuthentication(communicator, steps);
             try {
                 runCommunicationSteps(context, communicator, new CommunicatorInitializer(steps.getAll()));
@@ -127,7 +128,7 @@ public abstract class AbstractClient implements Client {
     }
 
     private void initialize(CommunicationContext context, Communicator communicator) throws NetworkInitializationException {
-        var steps = new DefaultCommunicationSteps();
+        DefaultCommunicationSteps steps = new DefaultCommunicationSteps();
         configureInitialization(steps);
         try {
             context.register(communicatorKey, communicator);
@@ -139,7 +140,7 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public final void initialized(CommunicationContext context) {
-        var communicator = context.get(Communicator.class, communicatorKey);
+        Communicator communicator = context.get(Communicator.class, communicatorKey);
         reallocateOutgoingBuffer(communicator);
         this.communicator = communicator;
         onInitialized(context, communicator);
@@ -152,7 +153,7 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void update(float deltaTime, UpdateAction updateAction) {
-        var communicator = getCommunicator();
+        Communicator communicator = getCommunicator();
         if (communicator != null && communicator.isConnected()) {
             try {
                 triggerLocalServerUpdate(communicator, deltaTime);
@@ -260,7 +261,7 @@ public abstract class AbstractClient implements Client {
             return true;
         }
 
-        var step = conditionalStep.step;
+        CommunicationStep step = conditionalStep.step;
         if (step instanceof ConsumerStep) {
             try {
                 return refreshInboxIfEmpty(communicator) && ((ConsumerStep) step).run(context, communicator, inbox);

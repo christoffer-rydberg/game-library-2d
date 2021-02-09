@@ -47,7 +47,7 @@ public class PositionParameters implements Serializable {
     }
 
     public SpawnArea getSpawnArea() {
-        var value = internalState[SPAWN_AREA];
+        float value = internalState[SPAWN_AREA];
         if (value == 0f) {
             return SpawnArea.RECTANGLE;
         } else {
@@ -164,15 +164,15 @@ public class PositionParameters implements Serializable {
     }
 
     private void positionInRectangleArea(Particle particle, float centerX, float centerY, double angleRadians) {
-        var spawnAreaWidth = getSpawnAreaWidth();
-        var spawnAreaWidthVar = getSpawnAreaWidthVar();
-        var spawnAreaHeight = getSpawnAreaHeight();
-        var spawnAreaHeightVar = getSpawnAreaHeightVar();
+        float spawnAreaWidth = getSpawnAreaWidth();
+        float spawnAreaWidthVar = getSpawnAreaWidthVar();
+        float spawnAreaHeight = getSpawnAreaHeight();
+        float spawnAreaHeightVar = getSpawnAreaHeightVar();
 
         // Create a circle that is touching the corners of the rectangle
-        var radius = Math.sqrt(spawnAreaWidth * spawnAreaWidth + spawnAreaHeight * spawnAreaHeight);
-        var posX = Math.cos(angleRadians) * radius;
-        var posY = -Math.sin(angleRadians) * radius;
+        double radius = Math.sqrt(spawnAreaWidth * spawnAreaWidth + spawnAreaHeight * spawnAreaHeight);
+        double posX = Math.cos(angleRadians) * radius;
+        double posY = -Math.sin(angleRadians) * radius;
 
         // Cut the circle horizontally and vertically from the rectangle corners.
         if (Math.abs(posX) > spawnAreaWidth)
@@ -188,18 +188,18 @@ public class PositionParameters implements Serializable {
     }
 
     private void positionInEllipseArea(Particle particle, float centerX, float centerY, double angleRadians) {
-        var spawnAreaWidth = getSpawnAreaWidth();
-        var spawnAreaWidthVar = getSpawnAreaWidthVar();
-        var spawnAreaHeight = getSpawnAreaHeight();
-        var spawnAreaHeightVar = getSpawnAreaHeightVar();
+        float spawnAreaWidth = getSpawnAreaWidth();
+        float spawnAreaWidthVar = getSpawnAreaWidthVar();
+        float spawnAreaHeight = getSpawnAreaHeight();
+        float spawnAreaHeightVar = getSpawnAreaHeightVar();
 
         // Randomize radius based on variation
         float width = spawnAreaWidth + spawnAreaWidthVar * RandomInstance.random11();
         float height = spawnAreaHeight + spawnAreaHeightVar * RandomInstance.random11();
 
         // Create an ellipse
-        var posX = Math.cos(angleRadians) * width;
-        var posY = -Math.sin(angleRadians) * height;
+        double posX = Math.cos(angleRadians) * width;
+        double posY = -Math.sin(angleRadians) * height;
 
         particle.setPosition(centerX + (float) posX, centerY + (float) posY);
     }

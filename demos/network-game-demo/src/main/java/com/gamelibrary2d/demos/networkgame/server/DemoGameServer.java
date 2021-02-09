@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.common.ClientMessages;
+import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.demos.networkgame.common.NetworkConstants;
 import com.gamelibrary2d.demos.networkgame.common.ServerMessages;
 import com.gamelibrary2d.demos.networkgame.server.objects.DemoServerObject;
@@ -23,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class DemoGameServer implements ServerContext {
     public final static float UPDATES_PER_SECOND = 30;
@@ -60,7 +62,7 @@ public class DemoGameServer implements ServerContext {
             throw new NullPointerException("Key pair has not been set");
         }
 
-        var serverHandshake = new ServerHandshake(keyPair);
+        ServerHandshake serverHandshake = new ServerHandshake(keyPair);
         serverHandshake.configure(steps);
         steps.add(this::readPassword);
         steps.add(this::readUdpPort);
@@ -79,7 +81,7 @@ public class DemoGameServer implements ServerContext {
         communicator.readEncrypted(inbox, decryptionBuffer);
         decryptionBuffer.flip();
 
-        var serverPassword = Read.textWithSizeHeader(decryptionBuffer, StandardCharsets.UTF_8);
+        String serverPassword = Read.textWithSizeHeader(decryptionBuffer, StandardCharsets.UTF_8);
         if (!serverPassword.equals("serverPassword123")) {
             throw new IOException("Wrong password");
         }
@@ -91,7 +93,7 @@ public class DemoGameServer implements ServerContext {
         communicator.readEncrypted(inbox, decryptionBuffer);
         decryptionBuffer.flip();
 
-        var udpPort = decryptionBuffer.getInt();
+        int udpPort = decryptionBuffer.getInt();
         ((NetworkCommunicator) communicator).enableUdp(ConnectionType.WRITE, 0, udpPort);
         return true;
     }
@@ -125,16 +127,16 @@ public class DemoGameServer implements ServerContext {
     public void onClientInitialized(CommunicationContext context, Communicator communicator) {
         log(String.format("Client has been initialized: %s", communicator.getEndpoint()));
 
-        var settings = gameLogic.getGameSettings();
+        GameSettings settings = gameLogic.getGameSettings();
 
-        var requestedPlayers = context.get(Integer.class, "requestedPlayers");
+        int requestedPlayers = context.get(Integer.class, "requestedPlayers");
 
-        var players = new ArrayList<ServerPlayer>(requestedPlayers);
+        ArrayList<ServerPlayer> players = new ArrayList<ServerPlayer>(requestedPlayers);
         for (int i = 0; i < requestedPlayers; ++i) {
             players.add(new ServerPlayer(gameLogic, communicator, settings.getSpaceCraftBounds()));
         }
 
-        var communicatorState = new ClientState(communicator, players);
+        ClientState communicatorState = new ClientState(communicator, players);
         clientStateService.put(communicatorState);
 
         if (gameLogic.gameOver()) {
@@ -147,9 +149,9 @@ public class DemoGameServer implements ServerContext {
     @Override
     public void onDisconnected(Communicator communicator, boolean pending) {
         log(String.format("Connection lost: %s", communicator.getEndpoint()));
-        var clientState = clientStateService.remove(communicator);
+        ClientState clientState = clientStateService.remove(communicator);
         if (clientState != null) {
-            for (var player : clientState.getPlayers()) {
+            for (ServerPlayer player : clientState.getPlayers()) {
                 gameLogic.destroy(player);
             }
         }
@@ -160,9 +162,9 @@ public class DemoGameServer implements ServerContext {
         byte id = buffer.get();
         switch (id) {
             case ClientMessages.PLAYER_ACCELERATION:
-                var player = clientStateService.get(communicator).getPlayer(buffer.getInt());
-                var acceleration = buffer.getFloat();
-                var rotationAcceleration = buffer.getFloat();
+                ServerPlayer player = clientStateService.get(communicator).getPlayer(buffer.getInt());
+                float acceleration = buffer.getFloat();
+                float rotationAcceleration = buffer.getFloat();
                 player.setAcceleration(acceleration);
                 player.setRotationAcceleration(rotationAcceleration);
                 break;
@@ -210,7 +212,7 @@ public class DemoGameServer implements ServerContext {
     private void startGame() {
         timer = 0;
 
-        for (var clientState : clientStateService.getAll()) {
+        for (ClientState clientState : clientStateService.getAll()) {
             if (!clientState.isReady()) {
                 clientState.getCommunicator().disconnect();
             }
@@ -221,7 +223,7 @@ public class DemoGameServer implements ServerContext {
 
     void endGame() {
         state.clear();
-        for (var communicatorState : clientStateService.getAll()) {
+        for (ClientState communicatorState : clientStateService.getAll()) {
             communicatorState.setReady(false);
         }
 
@@ -236,8 +238,8 @@ public class DemoGameServer implements ServerContext {
     }
 
     private boolean allPlayersAreDead() {
-        var players = clientStateService.getPlayers();
-        for (var player : players) {
+        Collection<ServerPlayer> players = clientStateService.getPlayers();
+        for (ServerPlayer player : players) {
             if (!player.isDestroyed()) {
                 return false;
             }
@@ -265,8 +267,8 @@ public class DemoGameServer implements ServerContext {
 
         bitParser.putInt((int) timer);
 
-        var objects = state.getAll();
-        for (var object : objects) {
+        Collection<DemoServerObject> objects = state.getAll();
+        for (DemoServerObject object : objects) {
             bitParser.putInt(object.getId(), NetworkConstants.OBJECT_ID_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getX()), NetworkConstants.POS_X_BIT_SIZE);
             bitParser.putInt(Math.round(object.getPosition().getY()), NetworkConstants.POS_Y_BIT_SIZE);

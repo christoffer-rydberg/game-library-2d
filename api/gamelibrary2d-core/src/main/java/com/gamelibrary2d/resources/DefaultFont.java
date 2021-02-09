@@ -2,6 +2,7 @@ package com.gamelibrary2d.resources;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.framework.Image;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.imaging.BufferedImageParser;
@@ -28,31 +29,31 @@ public class DefaultFont implements Font {
     }
 
     public static DefaultFont create(java.awt.Font font, Disposer disposer) {
-        var fontMetrics = createFontMetrics(font);
-        var charImages = createCharImages(fontMetrics);
+        FontMetrics fontMetrics = createFontMetrics(font);
+        BufferedImage[] charImages = createCharImages(fontMetrics);
 
         final int padding = 1;
         int imageWidth = 0;
         int imageHeight = fontMetrics.getAscent() + fontMetrics.getDescent();
         for (BufferedImage image : charImages) {
-            var charImage = image;
+            BufferedImage charImage = image;
             if (charImage == null) {
                 charImage = charImages[(int) '_'];
             }
             imageWidth += charImage.getWidth() + padding;
         }
 
-        var textureImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-        var graphics = textureImage.createGraphics();
+        BufferedImage textureImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = textureImage.createGraphics();
 
-        var ascent = fontMetrics.getAscent();
-        var descent = fontMetrics.getDescent();
-        var height = ascent + descent;
+        int ascent = fontMetrics.getAscent();
+        int descent = fontMetrics.getDescent();
+        int height = ascent + descent;
 
         int currentTextureWidth = 0;
         Map<Character, Surface> quads = new HashMap<>();
         for (int i = 0; i < charImages.length; ++i) {
-            var charImage = charImages[i];
+            BufferedImage charImage = charImages[i];
             if (charImage == null) {
                 charImage = charImages[(int) '_'];
             }
@@ -67,7 +68,7 @@ public class DefaultFont implements Font {
             float textureEnd = (float) currentTextureWidth / imageWidth;
             currentTextureWidth += padding;
 
-            var quad = Quad.create(
+            Quad quad = Quad.create(
                     new Rectangle(0, -descent, charWidth, ascent),
                     new Rectangle(textureStart, 0, textureEnd, (float) charHeight / imageHeight),
                     disposer);
@@ -75,22 +76,22 @@ public class DefaultFont implements Font {
             quads.put((char) i, quad);
         }
 
-        var image = new BufferedImageParser().parse(textureImage);
+        Image image = new BufferedImageParser().parse(textureImage);
 
-        var texture = DefaultTexture.create(image, disposer);
+        Texture texture = DefaultTexture.create(image, disposer);
 
         return new DefaultFont(texture, quads, ascent, descent, height);
     }
 
     private static BufferedImage[] createCharImages(FontMetrics fontMetrics) {
         final int size = 256 + 8;
-        var charImages = new BufferedImage[size];
+        BufferedImage[] charImages = new BufferedImage[size];
 
         // Skip control codes (ASCII 0 to 31)
         for (int i = 32; i < size; i++) {
             // ASCII 127 is a DEL control code that we can skip
             if (i != 127) {
-                var charImage = createCharImage(fontMetrics, (char) i);
+                BufferedImage charImage = createCharImage(fontMetrics, (char) i);
                 if (charImage != null) {
                     charImages[i] = charImage;
                 }
@@ -185,9 +186,9 @@ public class DefaultFont implements Font {
         float width = 0;
         int end = Math.min(offset + len, text.length());
         for (int i = offset; i < end; ++i) {
-            var quad = surfaces.get(text.charAt(i));
-            if (quad != null) {
-                var bounds = quad.getBounds();
+            Surface surface = surfaces.get(text.charAt(i));
+            if (surface != null) {
+                Rectangle bounds = surface.getBounds();
                 width += bounds.getWidth();
             }
         }

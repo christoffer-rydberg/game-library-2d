@@ -15,18 +15,19 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
     public SpaceCraft(Rectangle area, Renderer renderer) {
         this.area = area;
         this.renderer = renderer;
-        var direction = RandomInstance.get().nextFloat() * 360f;
+        float direction = RandomInstance.get().nextFloat() * 360f;
         delta = new Point(0, 100);
         delta.rotate(direction);
     }
 
     private static float getInRange(float value, float min, float max) {
-        var width = max - min;
-        var dist = (value - min) / width;
-        var distDecimals = dist - (int) dist;
+        float width = max - min;
+        float dist = (value - min) / width;
+        float distDecimals = dist - (int) dist;
         if (distDecimals < 0) {
             distDecimals += 1f;
         }
+        
         return distDecimals * width + min;
     }
 

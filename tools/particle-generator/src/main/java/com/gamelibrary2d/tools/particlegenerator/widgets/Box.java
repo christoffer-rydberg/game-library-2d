@@ -16,7 +16,7 @@ public class Box implements Bounded {
     }
 
     public static Box create(Rectangle bounds, Disposer disposer) {
-        var nodes = PositionBuffer.create(disposer);
+        PositionBuffer nodes = PositionBuffer.create(disposer);
         nodes.add(bounds.getLowerX(), bounds.getLowerY());
         nodes.add(bounds.getLowerX(), bounds.getUpperY());
         nodes.add(bounds.getUpperX(), bounds.getUpperY());

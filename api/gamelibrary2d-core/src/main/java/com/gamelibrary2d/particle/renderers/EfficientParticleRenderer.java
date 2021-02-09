@@ -93,10 +93,10 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
     @Override
     protected void renderPrepare(ShaderProgram shaderProgram) {
         if (particleShape == ParticleShape.QUAD) {
-            var glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
+            int glBoundsUniform = shaderProgram.getUniformLocation(boundsUniformName);
             OpenGL.instance().glUniform4fv(glBoundsUniform, boundsBuffer);
 
-            var texture = getTexture();
+            Texture texture = getTexture();
             if (texture != null) {
                 texture.bind();
                 getParameters().set(ShaderParameters.IS_TEXTURED, 1);

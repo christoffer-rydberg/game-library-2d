@@ -233,7 +233,7 @@ public class Quad extends AbstractDisposable implements Surface {
                     textureCoordinateByteOffset);
         }
 
-        var glShapeUniform = shaderProgram.getUniformLocation(SHAPE_ATTRIBUTE);
+        int glShapeUniform = shaderProgram.getUniformLocation(SHAPE_ATTRIBUTE);
         if (glShapeUniform >= 0) {
             switch (shape) {
                 case RECTANGLE:

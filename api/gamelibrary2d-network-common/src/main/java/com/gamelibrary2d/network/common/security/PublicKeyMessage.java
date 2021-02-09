@@ -19,8 +19,8 @@ public class PublicKeyMessage implements Message {
     }
 
     public PublicKeyMessage(DataBuffer buffer) throws IOException {
-        var algorithm = readString(buffer);
-        var encodedKey = readBytes(buffer);
+        String algorithm = readString(buffer);
+        byte[] encodedKey = readBytes(buffer);
         try {
             this.key = KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(encodedKey));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
@@ -34,18 +34,18 @@ public class PublicKeyMessage implements Message {
     }
 
     private static byte[] readBytes(DataBuffer buffer) {
-        var bytes = new byte[buffer.getInt()];
+        byte[] bytes = new byte[buffer.getInt()];
         buffer.get(bytes);
         return bytes;
     }
 
     private static void writeString(DataBuffer buffer, String string) {
-        var bytes = string.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         writeBytes(buffer, bytes);
     }
 
     private static String readString(DataBuffer buffer) {
-        var bytes = readBytes(buffer);
+        byte[] bytes = readBytes(buffer);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

@@ -1,10 +1,10 @@
 package com.gamelibrary2d.splitscreen;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.objects.AbstractGameObjectWrapper;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.markers.Clearable;
+import com.gamelibrary2d.objects.AbstractGameObjectWrapper;
 import com.gamelibrary2d.objects.GameObject;
 
 public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<T> implements Clearable {
@@ -46,7 +46,7 @@ public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<
 
     @Override
     public void clear() {
-        var wrapped = getWrapped();
+        T wrapped = getWrapped();
         if (wrapped instanceof Clearable) {
             ((Clearable) wrapped).clear();
         }
@@ -54,7 +54,7 @@ public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<
 
     @Override
     public boolean isAutoClearing() {
-        var wrapped = getWrapped();
+        T wrapped = getWrapped();
         if (wrapped instanceof Clearable) {
             return ((Clearable) wrapped).isAutoClearing();
         }

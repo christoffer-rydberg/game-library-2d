@@ -33,7 +33,7 @@ public class ClientStateService {
     }
 
     public boolean allReady() {
-        for (var state : clientStates.values()) {
+        for (ClientState state : clientStates.values()) {
             if (!state.isReady()) {
                 return false;
             }
@@ -44,7 +44,7 @@ public class ClientStateService {
 
     public List<ServerPlayer> getPlayers() {
         List<ServerPlayer> players = new ArrayList<>();
-        for (var state : clientStates.values()) {
+        for (ClientState state : clientStates.values()) {
             players.addAll(state.getPlayers());
         }
         return players;

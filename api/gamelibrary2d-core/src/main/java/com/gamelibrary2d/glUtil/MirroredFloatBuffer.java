@@ -18,7 +18,7 @@ public class MirroredFloatBuffer extends AbstractMirroredBuffer {
     }
 
     public static MirroredFloatBuffer create(float[] data, int target, int usage, Disposer disposer) {
-        var buffer = new MirroredFloatBuffer(target, usage);
+        MirroredFloatBuffer buffer = new MirroredFloatBuffer(target, usage);
         buffer.allocate(data);
         disposer.registerDisposal(buffer);
         return buffer;

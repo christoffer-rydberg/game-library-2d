@@ -9,6 +9,7 @@ import com.gamelibrary2d.network.common.Message;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedEvent;
 import com.gamelibrary2d.network.common.events.CommunicatorDisconnectedListener;
 import com.gamelibrary2d.network.common.initialization.*;
+import com.gamelibrary2d.network.common.internal.CommunicationStep;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer;
 import com.gamelibrary2d.network.common.internal.CommunicatorInitializer.InitializationResult;
 import com.gamelibrary2d.network.common.internal.ConditionalCommunicationStep;
@@ -40,7 +41,7 @@ abstract class InternalAbstractServer implements Server {
     }
 
     void addConnectedCommunicator(Communicator communicator) {
-        var steps = new DefaultCommunicationSteps();
+        DefaultCommunicationSteps steps = new DefaultCommunicationSteps();
         steps.add((__, com) -> writeIdentifier(com, communicatorIdFactory));
         steps.add(this::connectedStep);
         communicator.configureAuthentication(steps);
@@ -73,7 +74,7 @@ abstract class InternalAbstractServer implements Server {
     @Override
     public void deinitialize(Communicator communicator) {
         communicators.remove(communicator);
-        var steps = new DefaultCommunicationSteps();
+        DefaultCommunicationSteps steps = new DefaultCommunicationSteps();
         try {
             configureClientInitialization(steps);
         } finally {
@@ -92,13 +93,13 @@ abstract class InternalAbstractServer implements Server {
     }
 
     private void onDisonnectedEvent(CommunicatorDisconnectedEvent event) {
-        var communicator = event.getCommunicator();
+        Communicator communicator = event.getCommunicator();
         invokeLater(() -> onDisconnected(communicator));
     }
 
     private PendingCommunicator removePending(Communicator communicator) {
         for (int i = 0; i < pendingCommunicators.size(); ++i) {
-            var pending = pendingCommunicators.get(i);
+            PendingCommunicator pending = pendingCommunicators.get(i);
             if (pending.communicator == communicator) {
                 return pendingCommunicators.remove(i);
             }
@@ -113,7 +114,7 @@ abstract class InternalAbstractServer implements Server {
             readAndHandleMessages(communicator);
             onDisconnected(communicator, false);
         } else {
-            var pending = removePending(communicator);
+            PendingCommunicator pending = removePending(communicator);
             if (pending != null) {
                 onDisconnected(communicator, true);
             } else {
@@ -149,7 +150,7 @@ abstract class InternalAbstractServer implements Server {
         // Iterating backwards allows deletion of the current
         // element when connection has been established.
         for (int i = pendingCommunicators.size() - 1; i >= 0; --i) {
-            var pending = pendingCommunicators.get(i);
+            PendingCommunicator pending = pendingCommunicators.get(i);
             try {
                 runCommunicationSteps(pending.communicator, pending.context, pending.initializer);
             } catch (IOException e) {
@@ -180,7 +181,7 @@ abstract class InternalAbstractServer implements Server {
             return true;
         }
 
-        var step = conditionalStep.step;
+        CommunicationStep step = conditionalStep.step;
         if (step instanceof ConsumerStep) {
             while (true) {
                 int remaining = incomingBuffer.remaining();
@@ -188,7 +189,7 @@ abstract class InternalAbstractServer implements Server {
                     return false;
                 }
 
-                var hasCompleted = ((ConsumerStep) step).run(context, communicator, incomingBuffer);
+                boolean hasCompleted = ((ConsumerStep) step).run(context, communicator, incomingBuffer);
                 if (hasCompleted) {
                     return true;
                 }
@@ -207,7 +208,7 @@ abstract class InternalAbstractServer implements Server {
 
     private void readIncoming() {
         for (int i = 0; i < communicators.size(); ++i) {
-            var communicator = communicators.get(i);
+            Communicator communicator = communicators.get(i);
             readAndHandleMessages(communicator);
         }
     }
@@ -258,7 +259,7 @@ abstract class InternalAbstractServer implements Server {
     }
 
     protected void sendToAll(Iterable<Communicator> communicators, DataBuffer outgoingBuffer) {
-        for (var communicator : communicators) {
+        for (Communicator communicator : communicators) {
             try {
                 outgoingBuffer.position(0);
                 communicator.sendUpdate(outgoingBuffer);

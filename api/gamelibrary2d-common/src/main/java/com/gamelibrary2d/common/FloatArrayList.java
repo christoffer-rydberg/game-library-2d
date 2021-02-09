@@ -66,7 +66,7 @@ public class FloatArrayList {
     public float remove(int index) {
         rangeCheck(index);
 
-        var value = data[index];
+        float value = data[index];
 
         int numMoved = size - index - 1;
         if (numMoved > 0) {

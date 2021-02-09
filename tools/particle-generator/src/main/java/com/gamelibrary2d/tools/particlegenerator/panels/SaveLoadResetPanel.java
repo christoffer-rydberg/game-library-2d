@@ -46,10 +46,10 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
     }
 
     private void addButton(String text, float posX, float posY, Action onClick) {
-        var content = new Label(text, new TextRenderer(Fonts.getDefaultFont()), Color.SOFT_BLUE);
+        Label content = new Label(text, new TextRenderer(Fonts.getDefaultFont()), Color.SOFT_BLUE);
         content.setAlignment(HorizontalTextAlignment.LEFT, VerticalTextAlignment.BASE_LINE);
 
-        var button = new Button<>(content, onClick);
+        Button<Label> button = new Button<>(content, onClick);
         button.setPosition(posX, posY);
         button.setBounds(content.calculateBounds());
         add(button);
@@ -189,13 +189,13 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         }
 
         int origin = random.nextInt(PositionParameters.SpawnArea.values().length);
-        var spawnArea = PositionParameters.SpawnArea.values()[origin];
+        PositionParameters.SpawnArea spawnArea = PositionParameters.SpawnArea.values()[origin];
         particleSystem.getPositioner().setSpawnArea(spawnArea);
 
         float count = round(random.nextFloat() * 750, 1);
         float countVar = round(random.nextFloat() * (count / 2f), 1);
 
-        var emitterParameters = particleSystem.getSettings().getEmitterParameters();
+        EmitterParameters emitterParameters = particleSystem.getSettings().getEmitterParameters();
 
         emitterParameters.setDefaultCount((int) count);
         emitterParameters.setDefaultCountVar((int) countVar);
@@ -204,7 +204,7 @@ public class SaveLoadResetPanel extends AbstractPanel<GameObject> {
         boolean localCenter = random.nextInt(2) == 1;
         particleSystem.getPositioner().setLocalCenter(localCenter);
 
-        var areaRandomizer = random.nextInt(3);
+        int areaRandomizer = random.nextInt(3);
         if (areaRandomizer == 0) {
             particleSystem.getPositioner().setSpawnAreaWidth(0);
             particleSystem.getPositioner().setSpawnAreaHeight(0);

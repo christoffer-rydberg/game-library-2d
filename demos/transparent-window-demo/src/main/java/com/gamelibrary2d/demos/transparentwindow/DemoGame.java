@@ -17,7 +17,7 @@ public class DemoGame extends AbstractGame {
 
     @Override
     public void start(Window window) throws InitializationException {
-        var glfwWindow = (GlfwWindow) window;
+        GlfwWindow glfwWindow = (GlfwWindow) window;
         glfwWindow.additionalWindowHint(GLFW_DECORATED, GLFW_FALSE);
         glfwWindow.additionalWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
         super.start(glfwWindow);

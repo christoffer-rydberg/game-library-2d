@@ -25,43 +25,43 @@ public class BounceHandler<T1 extends Obstacle, T2 extends Obstacle> implements 
     }
 
     private double getSpeedTowardsCollision(CollidableInfo obj, CollidableInfo other) {
-        var speedX = obj.getSpeedX();
-        var speedY = obj.getSpeedY();
-        var speed = Math.sqrt(speedX * speedX + speedY * speedY);
+        float speedX = obj.getSpeedX();
+        float speedY = obj.getSpeedY();
+        double speed = Math.sqrt(speedX * speedX + speedY * speedY);
 
-        var collisionAngle = Math.atan2(
+        double collisionAngle = Math.atan2(
                 other.getX() - obj.getX(),
                 other.getY() - obj.getY()
         );
 
-        var direction = Math.atan2(speedX, speedY);
+        double direction = Math.atan2(speedX, speedY);
 
         return (speed * Math.cos(collisionAngle - direction));
     }
 
     @Override
     public CollisionResult collision(CollidableInfo<T2> collided) {
-        var distX = collided.getX() - updated.getX();
-        var distY = collided.getY() - updated.getY();
-        var dist = Math.sqrt(distX * distX + distY * distY);
+        float distX = collided.getX() - updated.getX();
+        float distY = collided.getY() - updated.getY();
+        double dist = Math.sqrt(distX * distX + distY * distY);
 
-        var diameter = updated.getCollidable().getBounds().getWidth();
-        var otherDiameter = collided.getCollidable().getBounds().getWidth();
-        var isCollision = dist * 2 <= diameter + otherDiameter;
+        float diameter = updated.getCollidable().getBounds().getWidth();
+        float otherDiameter = collided.getCollidable().getBounds().getWidth();
+        boolean isCollision = dist * 2 <= diameter + otherDiameter;
         if (isCollision) {
-            var u1 = getSpeedTowardsCollision(updated, collided);
-            var u2 = -getSpeedTowardsCollision(collided, updated);
+            double u1 = getSpeedTowardsCollision(updated, collided);
+            double u2 = -getSpeedTowardsCollision(collided, updated);
             if (u1 > u2) {
-                var m1 = updated.getCollidable().getMass();
-                var m2 = collided.getCollidable().getMass();
-                var mTotal = m1 + m2;
+                float m1 = updated.getCollidable().getMass();
+                float m2 = collided.getCollidable().getMass();
+                float mTotal = m1 + m2;
 
-                var commonFactor = ((m1 - m2) / mTotal);
-                var v1 = commonFactor * u1 + (2 * m2 / mTotal) * u2;
-                var v2 = (2 * m1 / mTotal) * u1 - commonFactor * u2;
+                float commonFactor = ((m1 - m2) / mTotal);
+                double v1 = commonFactor * u1 + (2 * m2 / mTotal) * u2;
+                double v2 = (2 * m1 / mTotal) * u1 - commonFactor * u2;
 
-                var normalizedDistX = distX / dist;
-                var normalizedDistY = distY / dist;
+                double normalizedDistX = distX / dist;
+                double normalizedDistY = distY / dist;
 
                 updated.getCollidable().onPushed(
                         collided.getCollidable(),

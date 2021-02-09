@@ -1,5 +1,6 @@
 package com.gamelibrary2d.layers;
 
+import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.markers.NavigationAware;
@@ -15,7 +16,7 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     private final Deque<GameObject> previous = new ArrayDeque<>();
 
     public void navigateTo(GameObject content, boolean rememberPrevious) {
-        var previousContent = getContent();
+        GameObject previousContent = getContent();
         if (previousContent != content) {
             setContent(content);
             if (rememberPrevious && previousContent != null) {
@@ -50,9 +51,9 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
 
     @Override
     public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        var content = getContent();
+        GameObject content = getContent();
         if (content instanceof MouseAware) {
-            var projected = Projection.projectTo(this, projectedX, projectedY);
+            Point projected = Projection.projectTo(this, projectedX, projectedY);
             return ((MouseAware) content).mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
         }
 
@@ -61,9 +62,9 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
 
     @Override
     public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
-        var content = getContent();
+        GameObject content = getContent();
         if (content instanceof MouseAware) {
-            var projected = Projection.projectTo(this, projectedX, projectedY);
+            Point projected = Projection.projectTo(this, projectedX, projectedY);
             return ((MouseAware) content).mouseMove(x, y, projected.getX(), projected.getY());
         }
 
@@ -72,9 +73,9 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
 
     @Override
     public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        var content = getContent();
+        GameObject content = getContent();
         if (content instanceof MouseAware) {
-            var projected = Projection.projectTo(this, projectedX, projectedY);
+            Point projected = Projection.projectTo(this, projectedX, projectedY);
             ((MouseAware) content).mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
         }
     }
@@ -85,14 +86,14 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     }
 
     private void navigatedFrom(GameObject obj) {
-        var navigationAware = asNavigationAware(obj);
+        NavigationAware navigationAware = asNavigationAware(obj);
         if (navigationAware != null) {
             navigationAware.navigatedFrom(this);
         }
     }
 
     private void navigatedTo(GameObject obj) {
-        var navigationAware = asNavigationAware(obj);
+        NavigationAware navigationAware = asNavigationAware(obj);
         if (navigationAware != null) {
             navigationAware.navigatedTo(this);
         }

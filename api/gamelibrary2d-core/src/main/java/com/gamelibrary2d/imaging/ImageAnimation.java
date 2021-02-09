@@ -2,6 +2,7 @@ package com.gamelibrary2d.imaging;
 
 import com.gamelibrary2d.common.Rectangle;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,18 +15,18 @@ public class ImageAnimation {
             throw new IllegalStateException("An animation must contain at least one frame");
         }
 
-        this.frames = List.copyOf(frames);
+        this.frames = new ArrayList<>(frames);
         this.bounds = calculateBounds(frames);
     }
 
     private static Rectangle calculateBounds(Collection<ImageAnimationFrame> frames) {
         float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
         float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
-        for (var frame : frames) {
-            var lowerX = frame.getOffsetX();
-            var upperX = lowerX + frame.getImage().getWidth();
-            var lowerY = frame.getOffsetY();
-            var upperY = lowerY + frame.getImage().getHeight();
+        for (ImageAnimationFrame frame : frames) {
+            float lowerX = frame.getOffsetX();
+            float upperX = lowerX + frame.getImage().getWidth();
+            float lowerY = frame.getOffsetY();
+            float upperY = lowerY + frame.getImage().getHeight();
 
             xMin = Math.min(xMin, lowerX);
             yMin = Math.min(yMin, lowerY);

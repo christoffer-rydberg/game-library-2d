@@ -26,7 +26,7 @@ public class InputController {
 
     public void update() {
         for (int i = 0; i < bindings.size(); ++i) {
-            var input = bindings.get(i);
+            InputBinding input = bindings.get(i);
             if (input != null) {
                 input.updateState(tiltTreshold, releaseTreshold);
             }

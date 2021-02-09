@@ -22,6 +22,7 @@ import com.gamelibrary2d.widgets.Label;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class RenderingPanel extends AbstractPanel<GameObject> {
 
@@ -75,7 +76,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         try {
             File file = fileChooser.browse(FileSelectionMode.FILES_ONLY);
             if (file != null) {
-                var url = file.toURI().toURL();
+                URL url = file.toURI().toURL();
                 particleSystem.loadTexture(url);
                 return file.getName();
             }
@@ -120,48 +121,48 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
     }
 
     private Panel<GameObject> createSequentialPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
         PanelUtil.stack(panel, createQuadPanel(), 0f);
         return panel;
     }
 
     private Panel<GameObject> createEfficientPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
         PanelUtil.stack(panel, shapePanel, 0f);
         return panel;
     }
 
     private Panel<GameObject> createAcceleratedPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
         PanelUtil.stack(panel, shapePanel, 0f);
         return panel;
     }
 
     private Panel<GameObject> createQuadPanel() {
-        var panel = new DefaultPanel<>();
+        Panel<GameObject> panel = new DefaultPanel<>();
 
-        var widthElement = new PanelElement.Float(
+        PanelElement.Float widthElement = new PanelElement.Float(
                 "Width",
                 new FloatProperty(
                         particleSystem::getWidth,
                         particleSystem::setWidth)
         );
 
-        var heightElement = new PanelElement.Float(
+        PanelElement.Float heightElement = new PanelElement.Float(
                 "Height",
                 new FloatProperty(
                         particleSystem::getHeight,
                         particleSystem::setHeight)
         );
 
-        var textureButton = new Button<>(textureLabel, () -> {
-            var fileName = loadTexture();
+        Button<Label> textureButton = new Button<>(textureLabel, () -> {
+            String fileName = loadTexture();
             textureLabel.setText(fileName == null ? "None" : fileName);
         });
 
         textureButton.setBounds(textureLabel.calculateBounds());
 
-        var textureElement = new PanelElement.CustomElement("Texture", textureButton);
+        PanelElement.CustomElement textureElement = new PanelElement.CustomElement("Texture", textureButton);
 
         PanelUtil.stack(panel, widthElement, 0f);
         PanelUtil.stack(panel, heightElement);
@@ -234,7 +235,7 @@ public class RenderingPanel extends AbstractPanel<GameObject> {
         }
 
         private Panel<GameObject> createPointShapePanel() {
-            var panel = new DefaultPanel<>();
+            Panel<GameObject> panel = new DefaultPanel<>();
             PanelUtil.stack(panel, pointSize(), 0f);
             PanelUtil.stack(panel, pointSmoothing());
             return panel;

@@ -1,7 +1,5 @@
 package com.gamelibrary2d.renderers;
 
-import com.gamelibrary2d.resources.Animation;
-import com.gamelibrary2d.resources.AnimationFrame;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
@@ -9,10 +7,7 @@ import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.resources.DefaultTexture;
-import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.Surface;
-import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.resources.*;
 import com.gamelibrary2d.util.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
@@ -38,7 +33,7 @@ public class AnimationRenderer extends AbstractRenderer {
     }
 
     private boolean requiresBackgroundBuffering() {
-        for (var frame : animation.getFrames()) {
+        for (AnimationFrame frame : animation.getFrames()) {
             if (frame.getRenderToBackgroundHint())
                 return true;
         }
@@ -111,7 +106,7 @@ public class AnimationRenderer extends AbstractRenderer {
                 return previousFrame;
             }
 
-            var nextFrame = looping
+            int nextFrame = looping
                     ? (previousFrame + 1) % animation.getFrames().size()
                     : previousFrame + 1;
 
@@ -126,16 +121,16 @@ public class AnimationRenderer extends AbstractRenderer {
     }
 
     private int getFrameIndex(int previousIndex) {
-        var time = getParameters().get(ShaderParameters.TIME);
+        float time = getParameters().get(ShaderParameters.TIME);
         if (globalFrameDuration > 0f) {
-            var size = animation.getFrames().size();
-            var index = (int) (time / globalFrameDuration);
+            int size = animation.getFrames().size();
+            int index = (int) (time / globalFrameDuration);
             return looping ? index % size : Math.min(index, size - 1);
         } else {
             if (looping) {
-                var duration = animation.getDuration();
-                var roundTrips = (int) (time / duration);
-                var timeWithinAnimation = time - roundTrips * duration;
+                float duration = animation.getDuration();
+                int roundTrips = (int) (time / duration);
+                float timeWithinAnimation = time - roundTrips * duration;
                 return getFrameIndexFromAnimation(previousIndex, timeWithinAnimation);
             }
 
@@ -169,9 +164,9 @@ public class AnimationRenderer extends AbstractRenderer {
 
     @Override
     protected void onRender(ShaderProgram shaderProgram) {
-        var frameIndex = getFrameIndex();
+        int frameIndex = getFrameIndex();
 
-        var activeFrame = animation.getFrame(frameIndex);
+        AnimationFrame activeFrame = animation.getFrame(frameIndex);
         if (backgroundBuffer != null) {
             backgroundBuffer.render(shaderProgram, frameIndex);
 
@@ -202,20 +197,20 @@ public class AnimationRenderer extends AbstractRenderer {
         }
 
         private FrameRenderer[] createFrameRenderers() {
-            var size = animation.getFrames().size();
-            var frameRenderers = new FrameRenderer[size];
+            int size = animation.getFrames().size();
+            FrameRenderer[] frameRenderers = new FrameRenderer[size];
             for (int i = 0; i < size; ++i) {
-                var frame = animation.getFrame(i);
-                var frameSurface = frame.getSurface();
-                var frameTexture = frame.getTexture();
+                AnimationFrame frame = animation.getFrame(i);
+                Surface frameSurface = frame.getSurface();
+                Texture frameTexture = frame.getTexture();
 
-                var animationBounds = animation.getBounds();
-                var frameBounds = frameSurface.getBounds();
-                var textureWidth = frameTexture.getWidth();
-                var textureHeight = frameTexture.getHeight();
+                Rectangle animationBounds = animation.getBounds();
+                Rectangle frameBounds = frameSurface.getBounds();
+                float textureWidth = frameTexture.getWidth();
+                float textureHeight = frameTexture.getHeight();
 
-                var invertedScaleX = textureWidth / frameBounds.getWidth();
-                var invertedScaleY = textureHeight / frameBounds.getHeight();
+                float invertedScaleX = textureWidth / frameBounds.getWidth();
+                float invertedScaleY = textureHeight / frameBounds.getHeight();
 
                 frameRenderers[i] = new FrameRenderer(
                         frameSurface,
@@ -232,14 +227,14 @@ public class AnimationRenderer extends AbstractRenderer {
         private Texture createBackgroundTexture(Animation animation) {
             float xMin = Float.MAX_VALUE, yMin = Float.MAX_VALUE;
             float xMax = Float.MIN_VALUE, yMax = Float.MIN_VALUE;
-            for (var frame : animation.getFrames()) {
-                var bounds = frame.getBounds();
+            for (AnimationFrame frame : animation.getFrames()) {
+                Rectangle bounds = frame.getBounds();
 
-                var texture = frame.getTexture();
-                var width = texture.getWidth();
-                var height = texture.getHeight();
+                Texture texture = frame.getTexture();
+                float width = texture.getWidth();
+                float height = texture.getHeight();
 
-                var imageBounds = bounds.resize(width / bounds.getWidth(), height / bounds.getHeight());
+                Rectangle imageBounds = bounds.resize(width / bounds.getWidth(), height / bounds.getHeight());
                 xMin = Math.min(xMin, imageBounds.getLowerX());
                 yMin = Math.min(yMin, imageBounds.getLowerY());
                 xMax = Math.max(xMax, imageBounds.getUpperX());
@@ -255,7 +250,7 @@ public class AnimationRenderer extends AbstractRenderer {
         private void render(ShaderProgram shaderProgram, int currentFrame) {
             if (frameBuffer == null) {
                 // Create OpenGL resources when rendering for the first time
-                var texture = createBackgroundTexture(animation);
+                Texture texture = createBackgroundTexture(animation);
                 frameBuffer = FrameBuffer.create(texture, resourceDisposer);
                 frameBufferRenderer = new SurfaceRenderer(
                         Quad.create(animation.getBounds(), resourceDisposer),
@@ -264,12 +259,12 @@ public class AnimationRenderer extends AbstractRenderer {
             }
 
             // Prepare model matrix
-            var modelMatrix = ModelMatrix.instance();
+            ModelMatrix modelMatrix = ModelMatrix.instance();
             modelMatrix.pushMatrix();
             modelMatrix.clearMatrix();
 
             float alpha = shaderProgram.getParameter(ShaderParameters.ALPHA);
-            var blendMode = OpenGLUtils.getBlendMode();
+            BlendMode blendMode = OpenGLUtils.getBlendMode();
 
             // Disable blend mode
             OpenGLUtils.setBlendMode(BlendMode.TRANSPARENT);
@@ -295,7 +290,7 @@ public class AnimationRenderer extends AbstractRenderer {
             }
 
             for (int i = previousFrame; i <= currentFrame; ++i) {
-                var frame = animation.getFrame(i);
+                AnimationFrame frame = animation.getFrame(i);
 
                 if (frame.getRestoreBackgroundHint()) {
                     frameBuffer.clear();
@@ -340,7 +335,7 @@ public class AnimationRenderer extends AbstractRenderer {
             }
 
             void render(ShaderProgram shaderProgram) {
-                var modelMatrix = ModelMatrix.instance();
+                ModelMatrix modelMatrix = ModelMatrix.instance();
                 modelMatrix.pushMatrix();
                 modelMatrix.scalef(scaleX, scaleY, 0f);
                 modelMatrix.translatef(translationX, translationY, 0f);

@@ -19,18 +19,18 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
     public EmitterPanel(ParticleSystemModel particleSystem) {
         Font font = Fonts.getMenuFont();
 
-        var emitButtonConent = new Label();
+        Label emitButtonConent = new Label();
         emitButtonConent.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP);
         emitButtonConent.setTextRenderer(new TextRenderer(font));
         emitButtonConent.setColor(Color.SOFT_BLUE);
         emitButtonConent.setText("Emit");
 
-        var emitButton = new Button<>(emitButtonConent, particleSystem::emit);
+        Button<Label> emitButton = new Button<>(emitButtonConent, particleSystem::emit);
         emitButton.setBounds(emitButtonConent.calculateBounds());
         emitButton.setPosition(0, 0);
 
         emitSequentialButton = new ToggleButton();
-        var emitSequentialContent = emitSequentialButton.getContent();
+        Label emitSequentialContent = emitSequentialButton.getContent();
         emitSequentialContent.setText("Emit Sequential");
         emitSequentialContent.setTextRenderer(new TextRenderer(font));
         emitSequentialContent.setColor(Color.SOFT_BLUE);
@@ -39,13 +39,13 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         emitSequentialButton.setBounds(emitSequentialContent.calculateBounds());
         emitSequentialButton.setPosition(0, -50);
 
-        var emitAllContext = new Label();
+        Label emitAllContext = new Label();
         emitAllContext.setText("Emit All");
         emitAllContext.setTextRenderer(new TextRenderer(font));
         emitAllContext.setColor(Color.SOFT_BLUE);
         emitAllContext.setAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP);
 
-        var emitAllButton = new Button<>(emitAllContext, particleSystem::emitAll);
+        Button<Label> emitAllButton = new Button<>(emitAllContext, particleSystem::emitAll);
         emitAllButton.setBounds(emitAllContext.calculateBounds());
         emitAllButton.setPosition(0, -100);
 

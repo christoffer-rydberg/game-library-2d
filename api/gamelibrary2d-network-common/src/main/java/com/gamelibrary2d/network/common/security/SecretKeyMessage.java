@@ -19,9 +19,9 @@ public class SecretKeyMessage implements Message {
     }
 
     public SecretKeyMessage(DataBuffer buffer) {
-        var algorithm = readString(buffer);
+        String algorithm = readString(buffer);
         this.cipherTransformation = readString(buffer);
-        var encodedKey = readBytes(buffer);
+        byte[] encodedKey = readBytes(buffer);
         this.ivLength = buffer.getInt();
         this.key = new SecretKeySpec(encodedKey, 0, encodedKey.length, algorithm);
     }
@@ -32,18 +32,18 @@ public class SecretKeyMessage implements Message {
     }
 
     private static byte[] readBytes(DataBuffer buffer) {
-        var bytes = new byte[buffer.getInt()];
+        byte[] bytes = new byte[buffer.getInt()];
         buffer.get(bytes);
         return bytes;
     }
 
     private static void writeString(DataBuffer buffer, String string) {
-        var bytes = string.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         writeBytes(buffer, bytes);
     }
 
     private static String readString(DataBuffer buffer) {
-        var bytes = readBytes(buffer);
+        byte[] bytes = readBytes(buffer);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

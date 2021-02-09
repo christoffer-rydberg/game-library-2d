@@ -42,7 +42,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
 
         disposer.registerDisposal(this);
 
-        var context = new DefaultInitializationContext();
+        DefaultInitializationContext context = new DefaultInitializationContext();
         try {
             onInitialize(context);
         } catch (IOException e) {
@@ -69,7 +69,7 @@ public abstract class AbstractFrame extends AbstractLayer<Renderable> implements
             throw new InitializationException("Frame has not been initialized");
         }
 
-        var context = new DefaultInitializationContext(this.initializationContext);
+        DefaultInitializationContext context = new DefaultInitializationContext(this.initializationContext);
         handleLoad(context);
         return context;
     }

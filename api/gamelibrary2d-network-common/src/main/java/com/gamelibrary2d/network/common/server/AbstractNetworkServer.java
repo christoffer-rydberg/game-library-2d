@@ -32,7 +32,7 @@ public abstract class AbstractNetworkServer extends InternalAbstractServer {
 
     private void onConnected(SocketChannel channel) {
         invokeLater(() -> {
-            var endpoint = channel.socket().getInetAddress().getHostAddress();
+            String endpoint = channel.socket().getInetAddress().getHostAddress();
             if (!acceptConnection(endpoint)) {
                 networkService.disconnect(channel);
                 onConnectionFailed(endpoint, new IOException("Connection refused by server"));

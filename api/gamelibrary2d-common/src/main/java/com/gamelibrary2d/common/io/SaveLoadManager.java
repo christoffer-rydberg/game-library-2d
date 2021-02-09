@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.functional.Func;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 public class SaveLoadManager {
@@ -19,7 +20,7 @@ public class SaveLoadManager {
     }
 
     public <T> T load(File file, Func<DataBuffer, T> factory) throws IOException {
-        try (var stream = new FileInputStream(file)) {
+        try (InputStream stream = new FileInputStream(file)) {
             ioBuffer.clear();
             Read.bytes(stream, ioBuffer);
             ioBuffer.flip();
@@ -28,7 +29,7 @@ public class SaveLoadManager {
     }
 
     public <T> T load(URL url, Func<DataBuffer, T> factory) throws IOException {
-        try (var stream = url.openStream()) {
+        try (InputStream stream = url.openStream()) {
             ioBuffer.clear();
             Read.bytes(stream, ioBuffer);
             ioBuffer.flip();

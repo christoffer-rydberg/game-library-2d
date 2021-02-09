@@ -19,7 +19,7 @@ public class EnumWidget<T extends Enum<T>> extends AbstractWidget<Label> {
     }
 
     private void updateLabel() {
-        var value = property.get();
+        T value = property.get();
         if (cachedValue != value) {
             cachedValue = value;
             currentIndex = -1;
