@@ -50,34 +50,40 @@ public class MirroredIntBuffer extends AbstractMirroredBuffer {
 
     @Override
     protected void onAllocate(int target) {
-        if (ioBuffer == null || ioBuffer.capacity() != data.length) {
-            ioBuffer = BufferUtils.createIntBuffer(data.length);
-            ioBuffer.put(data);
-            ioBuffer.flip();
-            OpenGL.instance().glBufferData(target, ioBuffer, usage);
-        } else {
-            ioBuffer.clear();
-            ioBuffer.put(data);
-            ioBuffer.flip();
-            OpenGL.instance().glBufferSubData(target, 0, ioBuffer);
+        if (data.length > 0) {
+            if (ioBuffer == null || ioBuffer.capacity() != data.length) {
+                ioBuffer = BufferUtils.createIntBuffer(data.length);
+                ioBuffer.put(data);
+                ioBuffer.flip();
+                OpenGL.instance().glBufferData(target, ioBuffer, usage);
+            } else {
+                ioBuffer.clear();
+                ioBuffer.put(data);
+                ioBuffer.flip();
+                OpenGL.instance().glBufferSubData(target, 0, ioBuffer);
+            }
         }
     }
 
     @Override
     protected void onUpdateGPU(int target, int offset, int len) {
-        ioBuffer.clear();
-        ioBuffer.put(data, offset, len);
-        ioBuffer.flip();
-        OpenGL.instance().glBufferSubData(target, offset * Float.BYTES, ioBuffer);
+        if (len > 0) {
+            ioBuffer.clear();
+            ioBuffer.put(data, offset, len);
+            ioBuffer.flip();
+            OpenGL.instance().glBufferSubData(target, offset * Integer.BYTES, ioBuffer);
+        }
     }
 
     @Override
     protected void onUpdateCPU(int target, int offset, int len) {
-        ioBuffer.clear();
-        ioBuffer.limit(len);
-        OpenGL.instance().glGetBufferSubData(target, offset * Float.BYTES, ioBuffer);
-        for (int i = offset; i < len; ++i) {
-            data[i] = ioBuffer.get(i);
+        if (len > 0) {
+            ioBuffer.clear();
+            ioBuffer.limit(len);
+            OpenGL.instance().glGetBufferSubData(target, offset * Integer.BYTES, ioBuffer);
+            for (int i = offset; i < len; ++i) {
+                data[i] = ioBuffer.get(i);
+            }
         }
     }
 }

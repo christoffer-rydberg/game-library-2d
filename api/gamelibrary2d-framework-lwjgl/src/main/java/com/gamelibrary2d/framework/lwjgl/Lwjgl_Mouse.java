@@ -7,10 +7,6 @@ import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 
 public class Lwjgl_Mouse implements Mouse {
 
-    public static final int KEY_PRESS = GLFW.GLFW_PRESS;
-    public static final int KEY_RELEASE = GLFW.GLFW_RELEASE;
-    public static final int MOUSE_BUTTON_1 = GLFW.GLFW_MOUSE_BUTTON_1;
-    public static final int MOUSE_BUTTON_2 = GLFW.GLFW_MOUSE_BUTTON_2;
     private static Lwjgl_Mouse instance;
 
     private Lwjgl_Mouse() {

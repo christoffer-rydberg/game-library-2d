@@ -1,5 +1,3 @@
-#version 420
-
 in vData
 {
     vec4 color;

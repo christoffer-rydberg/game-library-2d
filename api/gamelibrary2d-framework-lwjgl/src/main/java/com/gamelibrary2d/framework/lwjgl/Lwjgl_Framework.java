@@ -25,12 +25,12 @@ public class Lwjgl_Framework implements Framework {
     }
 
     @Override
-    public Timer createTimer() {
-        return new Lwjgl_Timer();
+    public GameLoop createDefaultGameLoop() {
+        return new Lwjgl_GameLoop();
     }
 
     @Override
-    public ImageReader createImageReader() {
+    public ImageReader createDefaultImageReader() {
         return new Lwjgl_ImageReader();
     }
 }

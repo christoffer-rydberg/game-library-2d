@@ -2,11 +2,13 @@ package com.gamelibrary2d.framework;
 
 public interface Window {
 
+    void initialize();
+
+    void createCallBacks(CallbackHandler game);
+
+    void show();
+
     void setTitle(String string);
-
-    MouseCursorMode getMouseCursorMode();
-
-    void setMouseCursorMode(MouseCursorMode mouseCursorMode);
 
     int getHeight();
 
@@ -18,19 +20,7 @@ public interface Window {
 
     void dispose();
 
-    void initialize();
-
-    void create();
-
-    void show();
-
-    void hide();
-
-    void createCallBacks(CallbackHandler game);
-
     boolean isCloseRequested();
 
     void focus();
-
-    long getWindowHandle();
 }

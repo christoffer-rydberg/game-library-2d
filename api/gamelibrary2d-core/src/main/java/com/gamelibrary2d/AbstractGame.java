@@ -28,95 +28,76 @@ import java.util.Deque;
 public abstract class AbstractGame extends AbstractDisposer implements Game, CallbackHandler {
 
     private final EventPublisher<Frame> frameChangedPublisher = new DefaultEventPublisher<>();
-
+    /**
+     * Queue for code that will be invoked after the current update.
+     */
+    private final Deque<Runnable> invokeLater;
     /**
      * The OpenGL window used for rendering.
      */
     private Window window;
-
     /**
      * Last known X coordinate of mouse cursor.
      */
     private float cursorPosX;
-
     /**
      * Last known Y coordinate of mouse cursor.
      */
     private float cursorPosY;
-
     /**
      * True whenever the game window has cursor focus.
      */
     private boolean cursorFocus;
-
     /**
      * True while inside an update cycle. Used to determine if some actions, such as
      * changing frame, can be done instantly or if it should be delayed until after
      * the current cycle.
      */
     private boolean updating;
-
     /**
      * The current frame.
      */
     private Frame frame;
-
     /**
      * True if the current frame has not yet been updated, used so that the
      * deltaTime can be set to 0 for the first update (to avoid a very big initial
      * delta time).
      */
     private boolean frameNotUpdated;
-
     /**
      * The loading frame is displayed when loading a new frame.
      */
     private LoadingFrame loadingFrame;
-
     /**
      * The game loop is responsible for maintaining a steady frame rate.
      */
     private GameLoop gameLoop;
-
     /**
      * Speed factor each update, applied to the delta-time
      */
     private float speedFactor = 1;
 
-    /**
-     * Queue for code that will be invoked after the current update.
-     */
-    private Deque<Runnable> invokeLater;
-
     protected AbstractGame(Framework framework) {
         Runtime.initialize(framework);
+        invokeLater = new ArrayDeque<>();
     }
 
     @Override
-    public void start(Window window) throws InitializationException {
+    public void start(Window window, GameLoop gameLoop) throws InitializationException {
+        this.gameLoop = gameLoop;
         this.window = window;
-
         window.initialize();
-        window.create();
         window.createCallBacks(this);
-
         initializeOpenGLSettings();
-        createDefaultShaderProgram();
-
-        invokeLater = new ArrayDeque<>();
-        gameLoop = new GameLoop(this, window);
-
-        gameLoop.run(() -> {
+        createDefaultShaderPrograms();
+        gameLoop.initialize(this::update, this::dispose, window);
+        try {
             onStart();
-            window.show();
-        });
-
-        onExit();
-
-        // Dispose objects registered to this game
-        dispose();
-
-        Runtime.dispose();
+        } catch (IOException e) {
+            throw new InitializationException(e);
+        }
+        window.show();
+        gameLoop.start();
     }
 
     private void initializeOpenGLSettings() {
@@ -125,30 +106,15 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         // OpenGL.instance().glCullFace(OpenGL.GL_BACK);
     }
 
-    private void createDefaultShaderProgram() {
-        ShaderProgram defaultShaderProgram = ShaderProgram.create(this);
-        defaultShaderProgram.attachShader(DefaultShader.fromFile("shaders/Default.vertex", ShaderType.VERTEX, this));
-        defaultShaderProgram.attachShader(DefaultShader.fromFile("shaders/Default.fragment", ShaderType.FRAGMENT, this));
-        defaultShaderProgram.bindFragDataLocation(0, "fragColor"); // Optional, the shader only has one "out" variable
-        defaultShaderProgram.initialize();
-        defaultShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
-        ShaderProgram.setDefaultShaderProgram(defaultShaderProgram);
-
+    private void createComputeShaderPrograms() {
         ShaderProgram particleUpdaterProgram = ShaderProgram.create(this);
         particleUpdaterProgram
                 .attachShader(DefaultShader.fromFile("shaders/ParticleUpdater.compute", ShaderType.COMPUTE, this));
         particleUpdaterProgram.initialize();
         ShaderProgram.setDefaultParticleUpdaterProgram(particleUpdaterProgram);
+    }
 
-        ShaderProgram pointParticleShaderProgram = ShaderProgram.create(this);
-        pointParticleShaderProgram
-                .attachShader(DefaultShader.fromFile("shaders/PointParticle.vertex", ShaderType.VERTEX, this));
-        pointParticleShaderProgram
-                .attachShader(DefaultShader.fromFile("shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
-        pointParticleShaderProgram.initialize();
-        pointParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
-        ShaderProgram.setPointParticleShaderProgram(pointParticleShaderProgram);
-
+    private void createGeometryShaderPrograms() {
         ShaderProgram quadParticleShaderProgram = ShaderProgram.create(this);
         quadParticleShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/QuadParticle.geometry", ShaderType.GEOMETRY, this));
@@ -160,15 +126,6 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setQuadParticleShaderProgram(quadParticleShaderProgram);
 
-        ShaderProgram pointShaderProgram = ShaderProgram.create(this);
-        pointShaderProgram
-                .attachShader(DefaultShader.fromFile("shaders/Point.vertex", ShaderType.VERTEX, this));
-        pointShaderProgram
-                .attachShader(DefaultShader.fromFile("shaders/Point.fragment", ShaderType.FRAGMENT, this));
-        pointShaderProgram.initialize();
-        pointShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
-        ShaderProgram.setPointShaderProgram(pointShaderProgram);
-
         ShaderProgram quadShaderProgram = ShaderProgram.create(this);
         quadShaderProgram
                 .attachShader(DefaultShader.fromFile("shaders/Quad.geometry", ShaderType.GEOMETRY, this));
@@ -179,6 +136,57 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         quadShaderProgram.initialize();
         quadShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
         ShaderProgram.setQuadShaderProgram(quadShaderProgram);
+    }
+
+    private void createVersionSpecificShaderPrograms() {
+        OpenGL.OpenGLVersion supportedVersion = Runtime.getFramework().getOpenGL().getSupportedVersion();
+        switch (supportedVersion) {
+            case OPENGL_ES_3:
+                break;
+            case OPENGL_ES_3_1:
+                try {
+                    createGeometryShaderPrograms();
+                } catch (Exception e) {
+                    System.err.println("Failed to create one or more shader programs. The device might not support the OpenGL ES 3.1 geometry shader extension.");
+                    e.printStackTrace();
+                }
+            case OPENGL_ES_3_2:
+                createGeometryShaderPrograms();
+                break;
+            case OPENGL_CORE_430:
+                createGeometryShaderPrograms();
+                createComputeShaderPrograms();
+                break;
+        }
+    }
+
+    private void createDefaultShaderPrograms() {
+        ShaderProgram defaultShaderProgram = ShaderProgram.create(this);
+        defaultShaderProgram.attachShader(DefaultShader.fromFile("shaders/Default.vertex", ShaderType.VERTEX, this));
+        defaultShaderProgram.attachShader(DefaultShader.fromFile("shaders/Default.fragment", ShaderType.FRAGMENT, this));
+        defaultShaderProgram.initialize();
+        defaultShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        ShaderProgram.setDefaultShaderProgram(defaultShaderProgram);
+
+        ShaderProgram pointParticleShaderProgram = ShaderProgram.create(this);
+        pointParticleShaderProgram
+                .attachShader(DefaultShader.fromFile("shaders/PointParticle.vertex", ShaderType.VERTEX, this));
+        pointParticleShaderProgram
+                .attachShader(DefaultShader.fromFile("shaders/PointParticle.fragment", ShaderType.FRAGMENT, this));
+        pointParticleShaderProgram.initialize();
+        pointParticleShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        ShaderProgram.setPointParticleShaderProgram(pointParticleShaderProgram);
+
+        ShaderProgram pointShaderProgram = ShaderProgram.create(this);
+        pointShaderProgram
+                .attachShader(DefaultShader.fromFile("shaders/Point.vertex", ShaderType.VERTEX, this));
+        pointShaderProgram
+                .attachShader(DefaultShader.fromFile("shaders/Point.fragment", ShaderType.FRAGMENT, this));
+        pointShaderProgram.initialize();
+        pointShaderProgram.initializeMvp(window.getWidth(), window.getHeight());
+        ShaderProgram.setPointShaderProgram(pointShaderProgram);
+
+        createVersionSpecificShaderPrograms();
     }
 
     @Override
@@ -202,12 +210,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void exit() {
-        gameLoop.stop();
-    }
-
-    @Override
-    public float getFPS() {
-        return gameLoop.getFPS();
+        gameLoop.stop(this::onExit);
     }
 
     protected float getSpeedFactor() {
@@ -219,7 +222,6 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     }
 
     public void update(float deltaTime) {
-
         // Update cycle begins
         updating = true;
 
@@ -230,7 +232,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         update(currentFrame, deltaTime * speedFactor);
 
         OpenGL.instance().glClear(OpenGL.GL_COLOR_BUFFER_BIT);
-        renderFrame(currentFrame);
+        render(currentFrame);
 
         // Update cycle ends
         updating = false;
@@ -247,11 +249,12 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         }
     }
 
-    protected void renderFrame() {
-        renderFrame(frame);
+    @Override
+    public void render() {
+        render(frame);
     }
 
-    private void renderFrame(Frame frame) {
+    private void render(Frame frame) {
         window.render(frame, 1.0f);
     }
 
@@ -398,8 +401,13 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
     }
 
     @Override
-    public void onCursorEnterCallback(boolean cursorEnter) {
-        this.cursorFocus = cursorEnter;
+    public void onCursorEnterCallback() {
+        this.cursorFocus = true;
+    }
+
+    @Override
+    public void onCursorLeaveCallback() {
+        this.cursorFocus = false;
     }
 
     @Override
@@ -428,46 +436,5 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     protected abstract void onExit();
 
-    private static class GameLoop {
-        private final Game game;
-        private final Window window;
-        private final Timer timer;
 
-        private volatile boolean running;
-
-        GameLoop(Game game, Window window) {
-            this.game = game;
-            this.window = window;
-            timer = Timer.create();
-        }
-
-        void run(StartAction onStart) throws InitializationException {
-            running = true;
-
-            try {
-                onStart.invoke();
-            } catch (IOException e) {
-                throw new InitializationException(e);
-            }
-
-            timer.init();
-            while (running && !window.isCloseRequested()) {
-                game.update((float) timer.update());
-            }
-
-            running = false;
-        }
-
-        void stop() {
-            running = false;
-        }
-
-        float getFPS() {
-            return (float) timer.getUPS();
-        }
-
-        private interface StartAction {
-            void invoke() throws InitializationException, IOException;
-        }
-    }
 }

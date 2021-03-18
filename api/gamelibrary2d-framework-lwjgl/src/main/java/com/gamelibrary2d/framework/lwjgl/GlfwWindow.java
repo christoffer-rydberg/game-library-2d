@@ -1,7 +1,6 @@
 package com.gamelibrary2d.framework.lwjgl;
 
 import com.gamelibrary2d.framework.CallbackHandler;
-import com.gamelibrary2d.framework.MouseCursorMode;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
 import org.lwjgl.glfw.*;
@@ -39,8 +38,6 @@ public class GlfwWindow implements Window {
     private String title;
 
     private boolean initialized;
-
-    private boolean created;
 
     private MouseCursorMode mouseCursorMode = MouseCursorMode.NORMAL;
 
@@ -88,11 +85,87 @@ public class GlfwWindow implements Window {
     }
 
     @Override
+    public void initialize() {
+        if (!initialized) {
+            GLFWErrorCallback.createPrint(System.err).set();
+
+            if (!glfwInit()) {
+                throw new IllegalStateException("Unable to initialize GLFW");
+            }
+
+            glfwDefaultWindowHints();
+
+            long monitor = glfwGetPrimaryMonitor();
+            GLFWVidMode vidmode = glfwGetVideoMode(monitor);
+
+            if (fullScreen) {
+                int actualWidth = width <= 0 ? vidmode.width() : Math.min(width, vidmode.width());
+                int actualHeight = height <= 0 ? vidmode.height() : Math.min(height, vidmode.height());
+                onCreate(title, actualWidth, actualHeight, monitor);
+            } else {
+                boolean isWindowedFullscreen = width <= 0;
+
+                if (isWindowedFullscreen) {
+                    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+                    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+                    boolean isTransparentFrameBuffer = additionalWindowHints.stream()
+                            .filter(x -> x.hint == GLFW_TRANSPARENT_FRAMEBUFFER).reduce((first, second) -> second)
+                            .map(x -> x.value == GLFW_TRUE).orElse(false);
+
+                    if (isTransparentFrameBuffer) {
+                        // Transparent buffer does not work in full-screen. Make window smaller:
+                        onCreate(title, vidmode.width() - 1, vidmode.height(), NULL);
+                    } else {
+                        onCreate(title, vidmode.width(), vidmode.height(), NULL);
+                    }
+                } else {
+                    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+                    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+                    onCreate(title, width, height, NULL);
+
+                    // Center window
+                    int xPos = Math.max(0, (vidmode.width() - width) / 2);
+                    int yPos = Math.max(30, (vidmode.height() - height) / 2);
+                    glfwSetWindowPos(windowHandle, xPos, yPos);
+                }
+            }
+
+            focus();
+
+            initialized = true;
+        }
+    }
+
+    private void onCreate(String title, int width, int height, long monitor) {
+        for (WindowHint hint : additionalWindowHints)
+            glfwWindowHint(hint.hint, hint.value);
+
+        long windowId = glfwCreateWindow(width, height, title, monitor, NULL);
+        if (windowId == NULL) {
+            throw new RuntimeException("Failed to create the GLFW window");
+        }
+
+        windowWidth = width;
+        windowHeight = height;
+
+        windowHandle = windowId;
+        glfwMakeContextCurrent(windowId);
+
+        GL.createCapabilities();
+
+        if (SETUP_DEBUG_MESSAGE_CALLBACK)
+            debugProc = GLUtil.setupDebugMessageCallback();
+
+        // Enable v-sync
+        glfwSwapInterval(1);
+    }
+
+    @Override
     public void show() {
         glfwShowWindow(windowHandle);
     }
 
-    @Override
     public void hide() {
         glfwHideWindow(windowHandle);
     }
@@ -106,19 +179,17 @@ public class GlfwWindow implements Window {
     @Override
     public void render(Renderable renderable, float alpha) {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-        if (renderable != null)
+        if (renderable != null) {
             renderable.render(alpha);
+        }
         glfwSwapBuffers(windowHandle);
     }
 
-    @Override
     public MouseCursorMode getMouseCursorMode() {
         return mouseCursorMode;
     }
 
-    @Override
     public void setMouseCursorMode(MouseCursorMode mouseCursorMode) {
-
         if (this.mouseCursorMode == mouseCursorMode) {
             return;
         }
@@ -158,21 +229,6 @@ public class GlfwWindow implements Window {
         glfwPollEvents();
     }
 
-    @Override
-    public void initialize() {
-        if (!initialized) {
-            GLFWErrorCallback.createPrint(System.err).set();
-
-            if (!glfwInit()) {
-                throw new IllegalStateException("Unable to initialize GLFW");
-            }
-
-            glfwDefaultWindowHints();
-
-            initialized = true;
-        }
-    }
-
     public void clearAdditionalWindowHints() {
         additionalWindowHints.clear();
     }
@@ -191,79 +247,6 @@ public class GlfwWindow implements Window {
 
     public void focus() {
         glfwFocusWindow(windowHandle);
-    }
-
-    @Override
-    public void create() {
-        if (!initialized) {
-            throw new IllegalStateException("Not initialized");
-        }
-
-        if (!created) {
-            long monitor = glfwGetPrimaryMonitor();
-            GLFWVidMode vidmode = glfwGetVideoMode(monitor);
-
-            if (fullScreen) {
-                int actualWidth = width <= 0 ? vidmode.width() : Math.min(width, vidmode.width());
-                int actualHeight = height <= 0 ? vidmode.height() : Math.min(height, vidmode.height());
-                onCreate(title, actualWidth, actualHeight, monitor);
-            } else {
-                boolean isWindowedFullscreen = width <= 0;
-
-                if (isWindowedFullscreen) {
-                    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-                    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
-                    boolean isTransparentFrameBuffer = additionalWindowHints.stream()
-                            .filter(x -> x.hint == GLFW_TRANSPARENT_FRAMEBUFFER).reduce((first, second) -> second)
-                            .map(x -> x.value == GLFW_TRUE).orElse(false);
-
-                    if (isTransparentFrameBuffer) {
-                        // Transparent buffer does not work in full-screen. Make window smaller:
-                        onCreate(title, vidmode.width() - 1, vidmode.height(), NULL);
-                    } else {
-                        onCreate(title, vidmode.width(), vidmode.height(), NULL);
-                    }
-                } else {
-                    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-                    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-                    onCreate(title, width, height, NULL);
-
-                    // Center window
-                    int xPos = Math.max(0, (vidmode.width() - width) / 2);
-                    int yPos = Math.max(30, (vidmode.height() - height) / 2);
-                    glfwSetWindowPos(windowHandle, xPos, yPos);
-                }
-            }
-
-            focus();
-
-            created = true;
-        }
-    }
-
-    private void onCreate(String title, int width, int height, long monitor) {
-        for (WindowHint hint : additionalWindowHints)
-            glfwWindowHint(hint.hint, hint.value);
-
-        long windowId = glfwCreateWindow(width, height, title, monitor, NULL);
-        if (windowId == NULL) {
-            throw new RuntimeException("Failed to create the GLFW window");
-        }
-
-        windowWidth = width;
-        windowHeight = height;
-
-        windowHandle = windowId;
-        glfwMakeContextCurrent(windowId);
-
-        GL.createCapabilities();
-
-        if (SETUP_DEBUG_MESSAGE_CALLBACK)
-            debugProc = GLUtil.setupDebugMessageCallback();
-
-        // Enable v-sync
-        glfwSwapInterval(1);
     }
 
     @Override
@@ -294,7 +277,11 @@ public class GlfwWindow implements Window {
 
         glfwSetCursorEnterCallback(windowHandle, new GLFWCursorEnterCallback() {
             public void invoke(long window, boolean entered) {
-                game.onCursorEnterCallback(entered);
+                if (entered) {
+                    game.onCursorEnterCallback();
+                } else {
+                    game.onCursorLeaveCallback();
+                }
             }
         });
 
@@ -343,12 +330,6 @@ public class GlfwWindow implements Window {
         glfwTerminate();
 
         initialized = false;
-        created = false;
-    }
-
-    @Override
-    public long getWindowHandle() {
-        return windowHandle;
     }
 
     private static class WindowHint {

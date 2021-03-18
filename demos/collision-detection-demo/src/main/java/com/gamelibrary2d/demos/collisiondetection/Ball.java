@@ -6,9 +6,6 @@ import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.objects.AbstractGameObject;
 
 public class Ball extends AbstractGameObject<Renderable> implements Obstacle {
-    private final static float RADIUS = 16f;
-    private final static float FRICTION = 5f;
-    private final static float AIR_RESISTANCE_FACTOR = 0.047f;
     private final Point velocity = new Point();
     private float mass = 1f;
 
@@ -54,10 +51,10 @@ public class Ball extends AbstractGameObject<Renderable> implements Obstacle {
     private void updateVelocity(float deltaTime) {
         float speed2 = velocity.getX() * velocity.getX() + velocity.getY() * velocity.getY();
         if (speed2 > 0f) {
-            float airResistanceDeceleration = AIR_RESISTANCE_FACTOR * speed2 / RADIUS;
-            float totalDeceleration = airResistanceDeceleration + FRICTION;
+            final float deceleration = 500;
+
             double speed = Math.sqrt(speed2);
-            double newSpeed = speed - totalDeceleration * deltaTime;
+            double newSpeed = speed - deceleration * deltaTime;
             if (newSpeed <= 0) {
                 velocity.set(0, 0);
             } else {

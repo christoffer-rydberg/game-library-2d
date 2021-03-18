@@ -4,6 +4,7 @@ import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
+import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.resources.Shader;
 
@@ -37,7 +38,12 @@ public class ShaderProgram implements Disposable {
     }
 
     public static ShaderProgram getDefaultParticleUpdaterProgram() {
-        return defaultParticleUpdaterProgram;
+        if (defaultParticleUpdaterProgram == null) {
+            String openGlVersion = Runtime.getFramework().getOpenGL().getSupportedVersion().toString();
+            throw new RuntimeException(String.format("%s does not support support compute shaders", openGlVersion));
+        } else {
+            return defaultParticleUpdaterProgram;
+        }
     }
 
     public static void setDefaultParticleUpdaterProgram(ShaderProgram defaultParticleUpdaterProgram) {
@@ -53,7 +59,12 @@ public class ShaderProgram implements Disposable {
     }
 
     public static ShaderProgram getPointParticleShaderProgram() {
-        return pointParticleShaderProgram;
+        if (pointParticleShaderProgram == null) {
+            String openGlVersion = Runtime.getFramework().getOpenGL().getSupportedVersion().toString();
+            throw new RuntimeException(String.format("%s does not support support geometry shaders", openGlVersion));
+        } else {
+            return pointParticleShaderProgram;
+        }
     }
 
     public static void setPointParticleShaderProgram(ShaderProgram shaderProgram) {
@@ -61,7 +72,12 @@ public class ShaderProgram implements Disposable {
     }
 
     public static ShaderProgram getQuadParticleShaderProgram() {
-        return quadParticleShaderProgram;
+        if (quadParticleShaderProgram == null) {
+            String openGlVersion = Runtime.getFramework().getOpenGL().getSupportedVersion().toString();
+            throw new RuntimeException(String.format("%s does not support support geometry shaders", openGlVersion));
+        } else {
+            return quadParticleShaderProgram;
+        }
     }
 
     public static void setQuadParticleShaderProgram(ShaderProgram shaderProgram) {
@@ -115,7 +131,8 @@ public class ShaderProgram implements Disposable {
         // Check that the program was linked successfully.
         int status = OpenGL.instance().glGetProgrami(programId, OpenGL.GL_LINK_STATUS);
         if (status != OpenGL.GL_TRUE) {
-            throw new IllegalStateException(OpenGL.instance().glGetProgramInfoLog(programId));
+            String programInfoLog = OpenGL.instance().glGetProgramInfoLog(programId);
+            throw new IllegalStateException(programInfoLog);
         }
 
         initialized = true;
@@ -171,10 +188,6 @@ public class ShaderProgram implements Disposable {
 
     public void detachShader(Shader shader) {
         OpenGL.instance().glDetachShader(programId, shader.getId());
-    }
-
-    public void bindFragDataLocation(int location, String name) {
-        OpenGL.instance().glBindFragDataLocation(programId, location, name);
     }
 
     public int getAttributeLocation(CharSequence name) {

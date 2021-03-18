@@ -10,7 +10,7 @@ public interface Framework {
 
     OpenGL getOpenGL();
 
-    Timer createTimer();
+    GameLoop createDefaultGameLoop();
 
-    ImageReader createImageReader();
+    ImageReader createDefaultImageReader();
 }

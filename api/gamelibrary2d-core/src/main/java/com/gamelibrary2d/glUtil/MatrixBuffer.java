@@ -120,7 +120,7 @@ class MatrixBuffer {
     }
 
     FloatBuffer getFloatBuffer() {
-        buffer.position(0);
+        buffer.clear();
         buffer.put(current);
         buffer.flip();
         return buffer;

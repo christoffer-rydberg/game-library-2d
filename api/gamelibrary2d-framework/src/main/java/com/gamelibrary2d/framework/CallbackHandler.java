@@ -28,12 +28,14 @@ public interface CallbackHandler {
     void onCursorPosCallback(double xCoordinate, double yCoordinate);
 
     /**
-     * Callback listener for mouse cursor entering or leaving the game window.
-     *
-     * @param cursorEnter True if the cursor entered the window's area, or false if
-     *                    it left it.
+     * Callback listener for mouse cursor entering the game window.
      */
-    void onCursorEnterCallback(boolean cursorEnter);
+    void onCursorEnterCallback();
+
+    /**
+     * Callback listener for mouse cursor leaving the game window.
+     */
+    void onCursorLeaveCallback();
 
     /**
      * @param button The mouse button that was pressed or released.

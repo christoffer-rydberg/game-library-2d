@@ -7,6 +7,8 @@ import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.frames.LoadingFrame;
+import com.gamelibrary2d.framework.GameLoop;
+import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.markers.Updatable;
 
@@ -15,13 +17,19 @@ public interface Game extends Disposer, Updatable {
     /**
      * Starts the game inside the specified {@link Window}.
      */
-    void start(Window window) throws InitializationException;
+    void start(Window window, GameLoop gameLoop) throws InitializationException;
+
+    default void start(Window window) throws InitializationException {
+        start(window, Runtime.getFramework().createDefaultGameLoop());
+    }
 
     Window getWindow();
 
     void setViewPort(int x, int y, int width, int height);
 
     void setBackgroundColor(Color color);
+
+    void render();
 
     /**
      * Called each update tick in order to update and render the current frame.
@@ -66,11 +74,6 @@ public interface Game extends Disposer, Updatable {
      * Gets the current frame.
      */
     Frame getFrame();
-
-    /**
-     * @return The current frame rate.
-     */
-    float getFPS();
 
     /**
      * @return - True if the cursor overlaps the game, otherwise false.

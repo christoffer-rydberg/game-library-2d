@@ -72,14 +72,22 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
     }
 
     public static DefaultTexture create(URL url, Disposer disposer) throws IOException {
-        return create(url, Runtime.getFramework().createImageReader(), disposer);
+        return create(url, Runtime.getFramework().createDefaultImageReader(), disposer);
     }
 
     public static DefaultTexture create(URL url, ImageReader imageReader, Disposer disposer) throws IOException {
         try (InputStream stream = url.openStream()) {
-            Image img = imageReader.read(stream);
-            return create(img, disposer);
+            return create(stream, imageReader, disposer);
         }
+    }
+
+    public static DefaultTexture create(InputStream stream, Disposer disposer) throws IOException {
+        return create(stream, Runtime.getFramework().createDefaultImageReader(), disposer);
+    }
+
+    public static DefaultTexture create(InputStream stream, ImageReader imageReader, Disposer disposer) throws IOException {
+        Image img = imageReader.read(stream);
+        return create(img, disposer);
     }
 
     public static DefaultTexture create(Image image, Disposer disposer) {

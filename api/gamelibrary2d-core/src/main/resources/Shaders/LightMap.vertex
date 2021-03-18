@@ -1,5 +1,3 @@
-#version 130
-
 in vec2 position;
 in vec2 texcoord;
 
@@ -9,7 +7,7 @@ out vec2 textureCoordinate;
 flat out int alphaMapCols;
 flat out int alphaMapRows;
 
-uniform float parameters[];
+uniform float parameters[8];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

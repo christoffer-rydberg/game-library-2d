@@ -46,10 +46,6 @@ public class AnimationDemo {
     }
 
     public static void main(String[] args) throws InitializationException {
-        try {
-            new DemoGame().start(createWindow(args));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new DemoGame().start(createWindow(args));
     }
 }

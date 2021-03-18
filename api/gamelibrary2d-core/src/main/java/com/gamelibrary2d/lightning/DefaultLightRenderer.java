@@ -64,7 +64,7 @@ public class DefaultLightRenderer implements LightRenderer {
         ShaderProgram shaderProgram = ShaderProgram.create(disposer);
         shaderProgram.attachShader(DefaultShader.fromFile("shaders/LightMap.vertex", ShaderType.VERTEX, disposer));
         shaderProgram.attachShader(DefaultShader.fromFile("shaders/LightMap.fragment", ShaderType.FRAGMENT, disposer));
-        shaderProgram.bindFragDataLocation(0, "fragColor"); // Optional since the fragment shader only have one "out"
+
         // variable
         shaderProgram.initialize();
         shaderProgram.initializeMvp(windowWidth, windowHeight);

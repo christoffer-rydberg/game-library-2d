@@ -1,12 +1,10 @@
-#version 420
-
-uniform float parameters[];
+uniform float parameters[6];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-in layout (location = 0) vec2 position;
-in layout (location = 1) vec4 color; // rgba
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec4 color; // rgba
 
 out vec4 particleColor;
 

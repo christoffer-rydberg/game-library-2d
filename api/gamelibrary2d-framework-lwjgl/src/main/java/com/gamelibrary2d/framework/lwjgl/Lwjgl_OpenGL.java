@@ -205,11 +205,6 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glBindFragDataLocation(int programId, int colorNumber, String name) {
-        GL30.glBindFragDataLocation(programId, colorNumber, name);
-    }
-
-    @Override
     public void glDetachShader(int program, int shader) {
         GL20.glDetachShader(program, shader);
     }
@@ -373,5 +368,10 @@ public class Lwjgl_OpenGL implements OpenGL {
     @Override
     public void glBlendFuncSeparate(int sFactorRGB, int dFactorRGB, int sFactorAlpha, int dFactorAlpha) {
         GL30.glBlendFuncSeparate(sFactorRGB, dFactorRGB, sFactorAlpha, dFactorAlpha);
+    }
+
+    @Override
+    public OpenGLVersion getSupportedVersion() {
+        return OpenGLVersion.OPENGL_CORE_430;
     }
 }

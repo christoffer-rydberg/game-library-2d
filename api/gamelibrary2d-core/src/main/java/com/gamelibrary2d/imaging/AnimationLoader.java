@@ -81,7 +81,7 @@ public class AnimationLoader {
      */
     public static ImageAnimation load(Path folderPath, Pattern filePattern, float frameDuration) throws IOException {
         return load(
-                Runtime.getFramework().createImageReader(),
+                Runtime.getFramework().createDefaultImageReader(),
                 folderPath,
                 filePattern,
                 frameDuration

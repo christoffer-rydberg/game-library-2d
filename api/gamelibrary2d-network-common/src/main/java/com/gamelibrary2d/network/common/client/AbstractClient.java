@@ -161,7 +161,7 @@ public abstract class AbstractClient implements Client {
                 readMessages();
 
                 if (updateAction != null) {
-                    updateAction.invoke(deltaTime);
+                    updateAction.perform(deltaTime);
                 }
 
                 communicator.sendOutgoing();
@@ -169,7 +169,7 @@ public abstract class AbstractClient implements Client {
                 communicator.disconnect(e);
             }
         } else if (updateAction != null) {
-            updateAction.invoke(deltaTime);
+            updateAction.perform(deltaTime);
         }
     }
 

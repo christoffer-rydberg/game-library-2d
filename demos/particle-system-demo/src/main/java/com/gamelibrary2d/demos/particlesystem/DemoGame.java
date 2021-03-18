@@ -12,11 +12,6 @@ public class DemoGame extends AbstractGame {
     }
 
     @Override
-    public void start(Window window) throws InitializationException {
-        super.start(window);
-    }
-
-    @Override
     protected void onStart() throws InitializationException {
         setFrame(new DemoFrame(this));
     }

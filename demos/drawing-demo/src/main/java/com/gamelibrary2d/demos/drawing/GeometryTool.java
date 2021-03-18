@@ -21,7 +21,7 @@ public class GeometryTool implements Renderable, MouseAware {
         this.drawButton = drawButton;
         this.geometryFactory = geometryFactory;
         this.minNodeInterval = minNodeInterval;
-        this.prevNode = new Point(-minNodeInterval, -minNodeInterval);
+        this.prevNode = new Point();
     }
 
     public void addGeometryCreatedListener(EventListener<Geometry> listener) {
@@ -43,6 +43,8 @@ public class GeometryTool implements Renderable, MouseAware {
     public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
         if (drawButton == button) {
             inProgress = geometryFactory.create();
+            inProgress.nodes().add(projectedX, projectedY);
+            prevNode.set(projectedX, projectedY);
             return true;
         }
 

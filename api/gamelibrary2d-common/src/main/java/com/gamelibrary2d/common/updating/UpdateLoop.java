@@ -10,25 +10,27 @@ public class UpdateLoop {
     public UpdateLoop(UpdateAction updateAction, double ups) {
         this.updateAction = updateAction;
         this.ups = ups;
-        timer = new Timer();
+        timer = new DefaultTimer();
     }
 
     public void run() {
         running = true;
 
-        timer.init();
-
+        double prevTime = timer.getTime();
         while (!Thread.currentThread().isInterrupted() && running) {
-            updateAction.invoke((float) timer.update());
-            synch();
+            double startTime = timer.getTime();
+            double deltaTime = startTime - prevTime;
+            updateAction.perform((float) (deltaTime));
+            synch(startTime);
+            prevTime = startTime;
         }
 
         running = false;
     }
 
-    private void synch() {
-        double timePassed = timer.getTime() - timer.getPreviousLoopTime();
+    private void synch(double startTime) {
         double timeRequired = 1.0 / ups;
+        double timePassed = timer.getTime() - startTime;
         if (timePassed < timeRequired) {
             try {
                 Thread.sleep((long) ((timeRequired - timePassed) * 1000));
@@ -45,5 +47,4 @@ public class UpdateLoop {
     public boolean isRunning() {
         return running;
     }
-
 }

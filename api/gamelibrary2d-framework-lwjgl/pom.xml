@@ -10,8 +10,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>13</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lwjgl.version>3.2.3</lwjgl.version>
     </properties>
@@ -25,7 +23,7 @@
                 </os>
             </activation>
             <properties>
-                <platform>windows</platform>
+        <platform>windows</platform>
             </properties>
         </profile>
         <profile>
@@ -54,7 +52,7 @@
                 </os>
             </activation>
             <properties>
-                <platform>linux</platform>
+        <platform>linux</platform>
             </properties>
         </profile>
         <profile>
@@ -83,7 +81,7 @@
                 </os>
             </activation>
             <properties>
-                <platform>macos</platform>
+        <platform>macos</platform>
             </properties>
         </profile>
     </profiles>
@@ -183,6 +181,15 @@
                 <version>3.1.0</version>
                 <configuration>
                     <outputDirectory>${project.basedir}/../../jar/api/</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>8</release>
                 </configuration>
             </plugin>
         </plugins>

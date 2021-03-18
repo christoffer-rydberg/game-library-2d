@@ -92,7 +92,7 @@ public class DemoGame extends AbstractGame {
         SplashFrame splashFrame = new SplashFrame(this);
         setFrame(splashFrame);
         getWindow().show();
-        renderFrame();
+        render();
     }
 
     private void createGlobalResources() {
