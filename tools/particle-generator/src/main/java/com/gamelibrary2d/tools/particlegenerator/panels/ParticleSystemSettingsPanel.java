@@ -57,7 +57,7 @@ public class ParticleSystemSettingsPanel extends AbstractPanel<GameObject> imple
 
         static ResizeSlider create(ParticleSystemModel particleSystem, Disposer disposer) {
             Surface quad = Quad.create(Rectangle.create(32, 16), disposer);
-            Renderer handle = new SurfaceRenderer(quad, Textures.sliderHandle());
+            Renderer handle = new SurfaceRenderer<>(quad, Textures.sliderHandle());
             return new ResizeSlider(handle, particleSystem);
         }
     }

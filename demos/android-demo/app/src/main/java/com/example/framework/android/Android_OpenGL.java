@@ -93,21 +93,6 @@ public class Android_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glBegin(int i) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void glEnd() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void glVertex2f(float x, float y) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public void glMemoryBarrier(int barriers) {
         throw new RuntimeException("Not implemented");
     }

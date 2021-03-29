@@ -517,10 +517,14 @@ public class Rectangle {
 
         if (obj instanceof Rectangle) {
             Rectangle other = (Rectangle) obj;
-            return other.lowerX == lowerX && other.lowerY == lowerY && other.upperX == upperX && other.upperY == upperY;
+            return equals(other.lowerX, other.lowerY, other.upperX, other.upperY);
         }
 
         return false;
+    }
+
+    public boolean equals(float lowerX, float lowerY, float upperX, float upperY) {
+        return lowerX == this.lowerX && lowerY == this.lowerY && upperX == this.upperX && upperY == this.upperY;
     }
 
     @Override

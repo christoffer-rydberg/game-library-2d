@@ -33,7 +33,7 @@ public class SequentialRendererModel {
 
     public SequentialRendererModel(Disposer disposer, DefaultParticleSystem defaultParticleSystem, Rectangle bounds) {
         this.resourceDisposer = new DefaultDisposer(disposer);
-        this.surfaceRenderer = new SurfaceRenderer();
+        this.surfaceRenderer = new SurfaceRenderer<>();
         this.renderer = new SequentialParticleRenderer(defaultParticleSystem, surfaceRenderer);
         setBounds(bounds);
     }

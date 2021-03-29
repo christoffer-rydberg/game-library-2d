@@ -5,9 +5,8 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
-abstract class AbstractSurfaceRenderer extends AbstractRenderer implements TexturedRenderer {
-
-    private Surface surface;
+abstract class AbstractSurfaceRenderer<T extends Surface> extends AbstractRenderer implements TexturedRenderer {
+    private T surface;
     private Texture texture;
 
     protected AbstractSurfaceRenderer(ShaderParameters parameters) {
@@ -18,20 +17,20 @@ abstract class AbstractSurfaceRenderer extends AbstractRenderer implements Textu
         this(null, null);
     }
 
-    protected AbstractSurfaceRenderer(Surface surface) {
+    protected AbstractSurfaceRenderer(T surface) {
         this(surface, null);
     }
 
-    protected AbstractSurfaceRenderer(Surface surface, Texture texture) {
+    protected AbstractSurfaceRenderer(T surface, Texture texture) {
         setSurface(surface);
         setTexture(texture);
     }
 
-    public Surface getSurface() {
+    public T getSurface() {
         return surface;
     }
 
-    void setSurface(Surface surface) {
+    void setSurface(T surface) {
         this.surface = surface;
     }
 

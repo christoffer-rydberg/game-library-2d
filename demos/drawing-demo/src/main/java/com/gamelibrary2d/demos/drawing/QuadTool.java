@@ -1,25 +1,27 @@
 package com.gamelibrary2d.demos.drawing;
 
-import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.event.DefaultEventPublisher;
 import com.gamelibrary2d.common.event.EventListener;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.glUtil.Draw;
 import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.DynamicQuad;
 import com.gamelibrary2d.resources.Quad;
 
 public class QuadTool implements Renderable, MouseAware {
     private final EventPublisher<Quad> onCreated = new DefaultEventPublisher<>();
     private final Func<Rectangle, Quad> quadFactory;
+    private final SurfaceRenderer<DynamicQuad> inProgressRenderer;
     private final int drawButton;
 
     private QuadInProgress inProgress;
 
-    public QuadTool(int drawButton, Func<Rectangle, Quad> quadFactory) {
+    public QuadTool(int drawButton, DynamicQuad quadInProgress, Func<Rectangle, Quad> quadFactory) {
         this.drawButton = drawButton;
+        this.inProgressRenderer = new SurfaceRenderer<>(quadInProgress);
         this.quadFactory = quadFactory;
     }
 
@@ -67,7 +69,7 @@ public class QuadTool implements Renderable, MouseAware {
         }
     }
 
-    private static class QuadInProgress implements Renderable {
+    private class QuadInProgress implements Renderable {
         private final float x0;
         private final float y0;
         private float x1;
@@ -111,9 +113,10 @@ public class QuadTool implements Renderable, MouseAware {
         }
 
         public void render(float alpha) {
-            Draw.reset(); // Clean slate
-            Draw.setColor(Color.WHITE, alpha);
-            Draw.rectangle(getLowerX(), getLowerY(), getUpperX(), getUpperY());
+            inProgressRenderer.getSurface().setBounds(
+                    getLowerX(), getLowerY(), getUpperX(), getUpperY());
+
+            inProgressRenderer.render(alpha);
         }
     }
 }

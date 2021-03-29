@@ -252,7 +252,7 @@ public class AnimationRenderer extends AbstractRenderer {
                 // Create OpenGL resources when rendering for the first time
                 Texture texture = createBackgroundTexture(animation);
                 frameBuffer = FrameBuffer.create(texture, resourceDisposer);
-                frameBufferRenderer = new SurfaceRenderer(
+                frameBufferRenderer = new SurfaceRenderer<>(
                         Quad.create(animation.getBounds(), resourceDisposer),
                         texture);
                 frameRenderers = createFrameRenderers();

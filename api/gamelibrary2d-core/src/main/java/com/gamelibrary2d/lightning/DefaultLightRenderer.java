@@ -84,7 +84,7 @@ public class DefaultLightRenderer implements LightRenderer {
 
         ShaderParameters parameters = new ShaderParameters(new float[ShaderParameters.MIN_LENGTH + 2]);
         parameters.setColor(0, 0, 0, 1f);
-        renderer = new SurfaceRenderer(parameters);
+        renderer = new SurfaceRenderer<>(parameters);
         renderer.setShaderProgram(shaderProgram);
     }
 

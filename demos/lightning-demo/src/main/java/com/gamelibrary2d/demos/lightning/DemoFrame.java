@@ -37,7 +37,7 @@ class DemoFrame extends AbstractFrame {
         URL backgroundUrl = getUrl(image);
         Texture backgroundTexture = DefaultTexture.create(backgroundUrl, this);
         Surface backgroundQuad = Quad.create(bounds, this);
-        return new SurfaceRenderer(backgroundQuad, backgroundTexture);
+        return new SurfaceRenderer<>(backgroundQuad, backgroundTexture);
     }
 
     private Renderable createBackground(Window window) throws IOException {

@@ -78,7 +78,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     private GameObject createGameTitle() throws IOException {
         Texture texture = DefaultTexture.create(Images.MENU_TITLE, this);
         Surface surface = Quad.create(Rectangle.create(texture.getWidth(), texture.getHeight()), this);
-        Renderer renderer = new SurfaceRenderer(surface, texture);
+        Renderer renderer = new SurfaceRenderer<>(surface, texture);
         return new DefaultGameObject<>(renderer);
     }
 
@@ -91,7 +91,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
                 backgroundTexture.getHeight(),
                 this);
 
-        return new SurfaceRenderer(backgroundSurface, backgroundTexture);
+        return new SurfaceRenderer<>(backgroundSurface, backgroundTexture);
     }
 
     @Override
@@ -198,7 +198,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     private Button createButton(String text, Action onClick) {
-        Renderer background = new SurfaceRenderer(
+        Renderer background = new SurfaceRenderer<>(
                 Surfaces.button(),
                 Textures.button());
 

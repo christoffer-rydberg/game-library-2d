@@ -21,7 +21,7 @@ public class ContentMap {
         Map<Byte, Renderable> renderers = new HashMap<>();
         Surface surface = Quad.create(bounds, disposer);
         for (Byte key : textures.getKeys(primaryType)) {
-            Renderer renderer = new SurfaceRenderer(surface, textures.getTexture(primaryType, key));
+            Renderer renderer = new SurfaceRenderer<>(surface, textures.getTexture(primaryType, key));
             renderers.put(key, renderer);
         }
 

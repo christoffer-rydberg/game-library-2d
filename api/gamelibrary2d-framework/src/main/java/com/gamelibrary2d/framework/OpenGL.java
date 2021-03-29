@@ -65,12 +65,6 @@ public interface OpenGL {
         return Runtime.getFramework().getOpenGL();
     }
 
-    void glBegin(int i);
-
-    void glEnd();
-
-    void glVertex2f(float x, float y);
-
     void glBlendFunc(int sfactor, int dfactor);
 
     int glGenBuffers();

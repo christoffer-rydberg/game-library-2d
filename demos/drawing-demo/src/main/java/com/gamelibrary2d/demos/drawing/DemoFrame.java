@@ -13,6 +13,7 @@ import com.gamelibrary2d.renderers.LineRenderer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.DynamicQuad;
 import com.gamelibrary2d.resources.Quad;
 
 public class DemoFrame extends AbstractFrame {
@@ -33,10 +34,11 @@ public class DemoFrame extends AbstractFrame {
 
         QuadTool quadTool = new QuadTool(
                 Mouse.instance().mouseButton2(),
+                DynamicQuad.create(this),
                 r -> Quad.create(r, this));
 
         quadTool.addQuadCreatedListener(quad -> {
-            Renderer renderer = new SurfaceRenderer(quad);
+            Renderer renderer = new SurfaceRenderer<>(quad);
             randomizeColor(renderer.getParameters());
             objLayer.add(renderer);
         });

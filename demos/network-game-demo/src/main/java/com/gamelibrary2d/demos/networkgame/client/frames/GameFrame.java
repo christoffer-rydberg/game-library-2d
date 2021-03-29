@@ -133,7 +133,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private Renderable createBackground(Rectangle windowBounds, Rectangle gameBounds) {
         PictureFrame gameFrame = PictureFrame.create(windowBounds, gameBounds, Color.BLACK, this);
 
-        Renderer background = new SurfaceRenderer(
+        Renderer background = new SurfaceRenderer<>(
                 Surfaces.coverArea(
                         gameBounds,
                         backgroundTexture.getWidth(),

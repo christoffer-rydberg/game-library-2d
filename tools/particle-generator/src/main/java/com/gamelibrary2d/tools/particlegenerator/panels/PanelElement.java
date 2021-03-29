@@ -137,7 +137,7 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(FloatProperty property, Color backgroundColor) {
-            Renderer background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer<>(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );
@@ -205,7 +205,7 @@ public class PanelElement {
         }
 
         private GameObject createPropertyWidget(IntegerProperty property, Color backgroundColor) {
-            Renderer background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer<>(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );
@@ -279,7 +279,7 @@ public class PanelElement {
         public Enum(String parameterName, Class<T> enumType, GenericProperty<T> property) {
             GameObject label = createParameterLabel(parameterName);
 
-            Renderer background = new SurfaceRenderer(
+            Renderer background = new SurfaceRenderer<>(
                     Surfaces.propertyBaseLine(),
                     Textures.propertyBaseLine()
             );

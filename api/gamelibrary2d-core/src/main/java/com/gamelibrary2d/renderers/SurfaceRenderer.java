@@ -3,7 +3,7 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
 
-public class SurfaceRenderer extends AbstractSurfaceRenderer {
+public class SurfaceRenderer<T extends Surface> extends AbstractSurfaceRenderer<T> {
 
     public SurfaceRenderer() {
     }
@@ -12,11 +12,11 @@ public class SurfaceRenderer extends AbstractSurfaceRenderer {
         super(parameters);
     }
 
-    public SurfaceRenderer(Surface surface) {
+    public SurfaceRenderer(T surface) {
         super(surface);
     }
 
-    public SurfaceRenderer(Surface surface, Texture texture) {
+    public SurfaceRenderer(T surface, Texture texture) {
         super(surface, texture);
     }
 
@@ -31,12 +31,12 @@ public class SurfaceRenderer extends AbstractSurfaceRenderer {
     }
 
     @Override
-    public Surface getSurface() {
+    public T getSurface() {
         return super.getSurface();
     }
 
     @Override
-    public void setSurface(Surface surface) {
+    public void setSurface(T surface) {
         super.setSurface(surface);
     }
 }

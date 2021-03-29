@@ -52,7 +52,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
     private SpaceCraft createSpaceCraft(Quad quad, Texture texture) {
         RandomGenerator random = RandomInstance.get();
-        Renderer renderer = new SurfaceRenderer(quad, texture);
+        Renderer renderer = new SurfaceRenderer<>(quad, texture);
         renderer.getParameters().setColor(
                 random.nextFloat() * 0.5f + 0.5f,
                 random.nextFloat() * 0.5f + 0.5f,
@@ -124,7 +124,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
     private DefaultGameObject createBackgroundColor() {
         Surface quad = Quad.create(GAME_BOUNDS, this);
-        Renderer renderer = new SurfaceRenderer(quad);
+        Renderer renderer = new SurfaceRenderer<>(quad);
         renderer.getParameters().setColor(
                 BACKGROUND_COLOR.getR(),
                 BACKGROUND_COLOR.getG(),

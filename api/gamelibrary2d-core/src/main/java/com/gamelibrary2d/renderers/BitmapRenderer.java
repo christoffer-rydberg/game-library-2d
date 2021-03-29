@@ -34,7 +34,7 @@ public class BitmapRenderer {
         this.texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
         this.area = area;
         this.frameBuffer = FrameBuffer.create(texture, disposer);
-        this.frameBufferRenderer = new SurfaceRenderer(Quad.create(area, disposer), frameBuffer.getTexture());
+        this.frameBufferRenderer = new SurfaceRenderer<>(Quad.create(area, disposer), frameBuffer.getTexture());
     }
 
     /**

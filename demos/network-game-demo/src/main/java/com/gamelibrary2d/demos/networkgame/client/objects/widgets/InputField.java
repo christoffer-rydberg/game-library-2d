@@ -16,7 +16,7 @@ public class InputField extends AbstractWidget<TextField> {
     private final Renderer background;
 
     public InputField(String text) {
-        background = new SurfaceRenderer(
+        background = new SurfaceRenderer<>(
                 Surfaces.inputField(),
                 Textures.inputField());
 
