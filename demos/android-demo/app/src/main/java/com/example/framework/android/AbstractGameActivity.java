@@ -1,7 +1,6 @@
 package com.example.framework.android;
 
 import android.app.Activity;
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import com.gamelibrary2d.Game;
@@ -25,6 +24,7 @@ public abstract class AbstractGameActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DeviceUtil.lockOrientation(this);
         Game game = gameFactory.invoke(this);
         Android_Window window = new Android_Window(this);
         window.setRenderer(new GLSurfaceViewRenderer(game, window));
@@ -54,7 +54,7 @@ public abstract class AbstractGameActivity extends Activity {
 
         @Override
         public void onSurfaceChanged(GL10 unused, int width, int height) {
-            GLES20.glViewport(0, 0, width, height);
+
         }
 
         @Override
