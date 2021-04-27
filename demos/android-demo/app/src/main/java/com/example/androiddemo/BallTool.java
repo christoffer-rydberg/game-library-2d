@@ -4,22 +4,25 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.sound.SoundPlayer;
 
 public class BallTool implements Renderable, MouseAware {
     private final Line line;
     private final Renderable ballRenderer;
     private final BallCreatedListener ballCreatedListener;
+    private final SoundPlayer soundPlayer;
 
     private int drawButton = -1;
 
-    private BallTool(Line line, Renderable ballRenderer, BallCreatedListener ballCreatedListener) {
+    private BallTool(SoundPlayer soundPlayer, Line line, Renderable ballRenderer, BallCreatedListener ballCreatedListener) {
+        this.soundPlayer = soundPlayer;
         this.line = line;
         this.ballRenderer = ballRenderer;
         this.ballCreatedListener = ballCreatedListener;
     }
 
-    public static BallTool create(Disposer disposer, Renderable ball, BallCreatedListener ballCreatedListener) {
-        return new BallTool(Line.create(disposer), ball, ballCreatedListener);
+    public static BallTool create(SoundPlayer soundPlayer, Disposer disposer, Renderable ball, BallCreatedListener ballCreatedListener) {
+        return new BallTool(soundPlayer, Line.create(disposer), ball, ballCreatedListener);
     }
 
     private boolean isDrawing() {
@@ -73,6 +76,7 @@ public class BallTool implements Renderable, MouseAware {
             Ball ball = new Ball(ballRenderer, line.getStart().getX(), line.getStart().getY());
             ball.setSpeedAndDirection(speed, direction);
             ballCreatedListener.onBallCreated(ball);
+            soundPlayer.play("sounds/cow.ogg", 1f);
         }
     }
 

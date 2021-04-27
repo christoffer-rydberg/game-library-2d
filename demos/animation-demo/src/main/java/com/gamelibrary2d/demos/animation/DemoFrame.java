@@ -19,8 +19,6 @@ import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.util.io.FileChooser;
-import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.DefaultWidget;
 import com.gamelibrary2d.widgets.Label;
 

@@ -1,12 +1,13 @@
 package com.gamelibrary2d.demos.networkgame;
 
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ServerManager;
 import com.gamelibrary2d.exceptions.InitializationException;
-import com.gamelibrary2d.framework.Framework;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;
 import com.gamelibrary2d.framework.lwjgl.Lwjgl_Framework;
+import com.gamelibrary2d.sound.lwjgl.DefaultSoundManager;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -60,8 +61,12 @@ public class NetworkGameDemo {
     }
 
     public static void main(String[] args) throws InitializationException, NoSuchAlgorithmException {
-        Framework framework = new Lwjgl_Framework();
-        ServerManager serverManager = new ServerManager(createKeyPair());
-        new DemoGame(framework, serverManager).start(createWindow(args));
+        try (DefaultDisposer disposer = new DefaultDisposer()) {
+            new DemoGame(
+                    new Lwjgl_Framework(),
+                    ServerManager.create(createKeyPair(), disposer),
+                    DefaultSoundManager.create(disposer)).start(createWindow(args)
+            );
+        }
     }
 }

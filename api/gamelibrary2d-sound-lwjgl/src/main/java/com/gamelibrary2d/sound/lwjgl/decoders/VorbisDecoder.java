@@ -1,7 +1,7 @@
-package com.gamelibrary2d.sound.decoders;
+package com.gamelibrary2d.sound.lwjgl.decoders;
 
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.sound.SoundBuffer;
+import com.gamelibrary2d.sound.lwjgl.DefaultSoundBuffer;
 import org.lwjgl.stb.STBVorbisInfo;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
@@ -33,8 +33,7 @@ public class VorbisDecoder extends AbstractAudioDecoder {
         }
     }
 
-    public SoundBuffer decode(ByteBuffer audioData, Disposer disposer) {
-
+    public DefaultSoundBuffer decode(ByteBuffer audioData, Disposer disposer) {
         try (STBVorbisInfo info = STBVorbisInfo.malloc()) {
 
             // Create a vorbis memory handle
@@ -44,7 +43,7 @@ public class VorbisDecoder extends AbstractAudioDecoder {
             stb_vorbis_get_info(vorbisHandle, info);
 
             // Decode and create OpenAl buffer
-            SoundBuffer soundBuffer = decodeAndCreateOpenAlBuffer(vorbisHandle, info);
+            DefaultSoundBuffer soundBuffer = decodeAndCreateOpenAlBuffer(vorbisHandle, info);
 
             disposer.registerDisposal(soundBuffer);
 
@@ -59,7 +58,7 @@ public class VorbisDecoder extends AbstractAudioDecoder {
      * @param info         The Vorbis info.
      * @return Handle for the created OpenAl buffer.
      */
-    private SoundBuffer decodeAndCreateOpenAlBuffer(long vorbisHandle, STBVorbisInfo info) {
+    private DefaultSoundBuffer decodeAndCreateOpenAlBuffer(long vorbisHandle, STBVorbisInfo info) {
 
         // Create and populate PCM buffer.
         ShortBuffer pcm = MemoryUtil.memAllocShort(stb_vorbis_stream_length_in_samples(vorbisHandle) * info.channels());
@@ -75,6 +74,6 @@ public class VorbisDecoder extends AbstractAudioDecoder {
         MemoryUtil.memFree(pcm);
         stb_vorbis_close(vorbisHandle);
 
-        return new SoundBuffer(openAlHandle);
+        return new DefaultSoundBuffer(openAlHandle);
     }
 }

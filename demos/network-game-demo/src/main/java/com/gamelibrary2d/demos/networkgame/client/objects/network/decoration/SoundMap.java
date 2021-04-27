@@ -2,27 +2,25 @@ package com.gamelibrary2d.demos.networkgame.client.objects.network.decoration;
 
 import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
 import com.gamelibrary2d.sound.SoundManager;
-import com.gamelibrary2d.sound.decoders.AudioDecoder;
-import com.gamelibrary2d.sound.decoders.VorbisDecoder;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class SoundMap {
     private final SoundManager soundManager;
-    private final AudioDecoder decoder;
     private final Map<Byte, Map<Byte, URL>> sound = new HashMap<>();
-    private final Set<Byte> emptyKeySet = Collections.unmodifiableSet(new HashSet<>(0));
 
     public SoundMap(SoundManager soundManager) {
         this.soundManager = soundManager;
-        this.decoder = new VorbisDecoder();
     }
 
     private static Byte tryParseByte(String s) {
@@ -69,7 +67,7 @@ public class SoundMap {
                     Byte key = readFileNameAsByte(path);
                     if (key != null) {
                         URL url = path.toUri().toURL();
-                        soundManager.loadSoundBuffer(url, decoder);
+                        soundManager.loadBuffer(url, "ogg");
                         sound.put(key, url);
                     }
                 }

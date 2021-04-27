@@ -7,14 +7,44 @@ import java.nio.charset.StandardCharsets;
 
 public class Read {
 
-    public static void bytes(InputStream is, DataBuffer buffer) throws IOException {
+    public static int bytes(InputStream is, DataBuffer buffer) throws IOException {
+        int totalRead = 0;
         while (true) {
-            int readBytes = is.read(buffer.array(), buffer.position(), buffer.remaining());
-            if (readBytes == -1)
+            int read = is.read(buffer.array(), buffer.position(), buffer.remaining());
+            if (read == -1) {
                 break;
-            buffer.position(buffer.position() + readBytes);
+            }
+
+            totalRead += read;
+            buffer.position(buffer.position() + read);
+
             buffer.ensureRemaining(1);
         }
+
+        return totalRead;
+    }
+
+    public static int bytes(InputStream is, DataBuffer buffer, int size) throws IOException {
+        int totalRead = 0;
+        int remaining = size;
+        while (true) {
+            int read = is.read(buffer.array(), buffer.position(), Math.min(buffer.remaining(), remaining));
+            if (read == -1) {
+                break;
+            }
+
+            totalRead += read;
+            buffer.position(buffer.position() + read);
+
+            remaining -= read;
+            if (remaining == 0) {
+                break;
+            }
+
+            buffer.ensureRemaining(1);
+        }
+
+        return totalRead;
     }
 
     public static byte[] byteArray(InputStream is) throws IOException {

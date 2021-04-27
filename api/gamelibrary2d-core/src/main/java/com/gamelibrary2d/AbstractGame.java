@@ -97,7 +97,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
             throw new InitializationException(e);
         }
         window.show();
-        gameLoop.start();
+        gameLoop.start(this::onExit);
     }
 
     private void initializeOpenGLSettings() {
@@ -210,7 +210,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
 
     @Override
     public void exit() {
-        gameLoop.stop(this::onExit);
+        gameLoop.stop();
     }
 
     protected float getSpeedFactor() {

@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
-            <artifactId>gamelibrary2d-util</artifactId>
+            <artifactId>gamelibrary2d-sound-lwjgl</artifactId>
             <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>

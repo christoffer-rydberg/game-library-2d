@@ -18,6 +18,7 @@ import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.sound.SoundPlayer;
 import com.gamelibrary2d.updaters.InfiniteUpdater;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 
 public class DemoFrame extends AbstractFrame {
     private final AssetManager assets;
+    private final SoundPlayer soundPlayer;
     private final CollisionDetection collisionDetection;
     private final Rectangle gameArea;
     private final UpdatedHandler<Ball> restrictedAreaHandler;
@@ -34,8 +36,9 @@ public class DemoFrame extends AbstractFrame {
     private Renderer ballRenderer;
     private BallTool tool;
 
-    DemoFrame(Game game, AssetManager assets) {
+    DemoFrame(Game game, SoundPlayer soundPlayer, AssetManager assets) {
         this.assets = assets;
+        this.soundPlayer = soundPlayer;
         gameArea = new Rectangle(0, 0, game.getWindow().getWidth(), game.getWindow().getHeight());
         restrictedAreaHandler = new RestrictedAreaHandler<>(gameArea, Ball::accelerate);
         collisionDetection = new CollisionDetection(gameArea, 128, 10);
@@ -46,9 +49,9 @@ public class DemoFrame extends AbstractFrame {
         try (InputStream textureStream = assets.open("images/ball.png")) {
             Texture ballTexture = DefaultTexture.create(textureStream, this);
             ballSurface = Quad.create(Rectangle.create(32, 32), this);
-            ballRenderer = new SurfaceRenderer(ballSurface, ballTexture);
+            ballRenderer = new SurfaceRenderer<>(ballSurface, ballTexture);
             ballRenderer.getParameters().setColor(152f / 255f, 251f / 255f, 152f / 255f);
-            tool = BallTool.create(this, ballRenderer, this::addBall);
+            tool = BallTool.create(soundPlayer, this, ballRenderer, this::addBall);
         }
     }
 

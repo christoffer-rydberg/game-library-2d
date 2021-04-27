@@ -25,12 +25,6 @@
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
-            <artifactId>gamelibrary2d-util</artifactId>
-            <version>0.7.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-framework-lwjgl</artifactId>
             <version>0.7.0</version>
             <scope>compile</scope>

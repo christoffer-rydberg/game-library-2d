@@ -9,7 +9,7 @@ import com.gamelibrary2d.util.QuadShape;
 
 import java.nio.FloatBuffer;
 
-public class DynamicQuad extends InternalAbstractQuad {
+public class DynamicQuad extends InternalAbstractQuad implements Surface {
     private QuadShape shape;
     private Rectangle bounds;
     private FloatBuffer verticeBuffer;

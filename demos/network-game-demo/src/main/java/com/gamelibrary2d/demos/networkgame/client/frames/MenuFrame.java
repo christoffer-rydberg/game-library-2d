@@ -30,6 +30,8 @@ import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Surface;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.sound.MusicPlayer;
+import com.gamelibrary2d.sound.SoundPlayer;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
@@ -38,8 +40,6 @@ import com.gamelibrary2d.updates.PositionUpdate;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.StackOrientation;
 import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.util.sound.MusicPlayer;
-import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ import java.nio.charset.StandardCharsets;
 public class MenuFrame extends AbstractFrame implements KeyAware {
     private final DemoGame game;
     private final MusicPlayer musicPlayer;
-    private final SoundEffectPlayer soundPlayer;
+    private final SoundPlayer soundPlayer;
     private final SequentialUpdater introUpdater = new SequentialUpdater();
     private LayerObject<Renderable> menu;
     private Credits credits;
@@ -64,7 +64,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
     private boolean menuIsHidden = true;
 
-    public MenuFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
+    public MenuFrame(DemoGame game, MusicPlayer musicPlayer, SoundPlayer soundPlayer) {
         this.game = game;
         this.musicPlayer = musicPlayer;
         this.soundPlayer = soundPlayer;
@@ -169,7 +169,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
     @Override
     protected void onBegin() {
-        musicPlayer.play(Music.MENU, 1f, 10f, false);
+        musicPlayer.play(Music.MENU, 1f, false, 10f, false);
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.gamelibrary2d.framework.Window;
 public class Android_GameLoop implements GameLoop {
     private final Timer timer = new DefaultTimer();
     private UpdateAction updateAction;
+    private Action exitAction;
     private Action disposeAction;
     private double prevTime;
     private boolean initialized;
@@ -23,13 +24,14 @@ public class Android_GameLoop implements GameLoop {
     }
 
     @Override
-    public void start() {
+    public void start(Action onExit) {
+        this.exitAction = onExit;
         prevTime = timer.getTime();
         running = true;
     }
 
     @Override
-    public void stop(Action action) {
+    public void stop() {
         running = false;
     }
 
@@ -49,9 +51,15 @@ public class Android_GameLoop implements GameLoop {
         return disposeAction;
     }
 
+    Action getExitAction() {
+        return exitAction;
+    }
+
     void triggerUpdate() {
         double time = timer.getTime();
         updateAction.perform((float) (time - prevTime));
         prevTime = time;
     }
+
+
 }

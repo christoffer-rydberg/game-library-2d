@@ -7,7 +7,7 @@ public interface GameLoop {
 
     void initialize(UpdateAction updateAction, Action disposeAction, Window window);
 
-    void start();
+    void start(Action onExit);
 
-    void stop(Action onExit);
+    void stop();
 }

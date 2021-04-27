@@ -18,7 +18,7 @@
 	  <module>api/gamelibrary2d-network-common</module>
 	  <module>api/gamelibrary2d-network</module>
 	  <module>api/gamelibrary2d-sound</module>
-	  <module>api/gamelibrary2d-util</module>
+	  <module>api/gamelibrary2d-sound-lwjgl</module>
 	  <module>tools/particle-generator</module>
 	  <module>demos/animation-demo</module>
 	  <module>demos/drawing-demo</module>

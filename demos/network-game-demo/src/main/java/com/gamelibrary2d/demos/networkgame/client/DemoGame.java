@@ -5,6 +5,7 @@ import com.gamelibrary2d.demos.networkgame.client.frames.GameFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.LoadingFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.MenuFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
@@ -14,46 +15,33 @@ import com.gamelibrary2d.frames.Frame;
 import com.gamelibrary2d.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Framework;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
+import com.gamelibrary2d.sound.MusicPlayer;
 import com.gamelibrary2d.sound.SoundManager;
-import com.gamelibrary2d.sound.decoders.AudioDecoder;
-import com.gamelibrary2d.sound.decoders.VorbisDecoder;
-import com.gamelibrary2d.util.sound.MusicPlayer;
-import com.gamelibrary2d.util.sound.SoundEffectPlayer;
+import com.gamelibrary2d.sound.SoundPlayer;
 
 import java.io.IOException;
 
 public class DemoGame extends AbstractGame {
     private final ServerManager serverManager;
+    private final SoundManager soundManager;
 
     private Frame menuFrame;
     private LoadingFrame loadingFrame;
     private GameFrame gameFrame;
 
-    public DemoGame(Framework framework, ServerManager serverManager) {
+    public DemoGame(Framework framework, ServerManager serverManager, SoundManager soundManager) {
         super(framework);
         this.serverManager = serverManager;
+        this.soundManager = soundManager;
     }
 
     @Override
     protected void onStart() throws InitializationException, IOException {
         showSplashScreen();
-
-        SoundManager soundManager = initializeAudio();
-        MusicPlayer musicPlayer = MusicPlayer.create(soundManager, 10, this);
-        SoundEffectPlayer soundPlayer = SoundEffectPlayer.create(soundManager, 10);
-
         createGlobalResources();
-        initializeFrames(musicPlayer, soundPlayer);
+        initializeFrames();
         setLoadingFrame(loadingFrame);
         setFrame(menuFrame, FrameDisposal.DISPOSE);
-    }
-
-    private SoundManager initializeAudio() throws IOException {
-        SoundManager soundManager = SoundManager.create(this);
-        AudioDecoder decoder = new VorbisDecoder();
-        soundManager.loadSoundBuffer(Music.MENU, decoder);
-        soundManager.loadSoundBuffer(Music.GAME, decoder);
-        return soundManager;
     }
 
     private void loadDemoFrame(CommunicatorFactory communicatorFactory) {
@@ -101,20 +89,31 @@ public class DemoGame extends AbstractGame {
         Textures.create(this);
     }
 
-    private void initializeFrames(MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) throws InitializationException {
+    private void initializeFrames() throws InitializationException, IOException {
+        soundManager.loadBuffer(Music.MENU, "ogg");
+        soundManager.loadBuffer(Music.GAME, "ogg");
+
+        MusicPlayer musicPlayer = new MusicPlayer(
+                this,
+                soundManager,
+                10);
+
+        SoundPlayer soundPlayer = new SoundPlayer(
+                soundManager,
+                10);
+
         loadingFrame = new LoadingFrame(this);
         loadingFrame.initialize(this);
 
         menuFrame = new MenuFrame(this, musicPlayer, soundPlayer);
         menuFrame.initialize(this);
 
-        gameFrame = new GameFrame(this, musicPlayer, soundPlayer);
+        gameFrame = new GameFrame(this, musicPlayer, soundPlayer, new SoundMap(soundManager));
         gameFrame.initialize(this);
     }
 
     @Override
     protected void onExit() {
-        serverManager.stopHostedServer();
         gameFrame.disconnect();
     }
 }

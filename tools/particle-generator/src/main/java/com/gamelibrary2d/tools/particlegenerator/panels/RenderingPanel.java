@@ -16,8 +16,6 @@ import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.util.HorizontalTextAlignment;
 import com.gamelibrary2d.util.PointSmoothing;
 import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.util.io.FileChooser;
-import com.gamelibrary2d.util.io.FileSelectionMode;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.File;

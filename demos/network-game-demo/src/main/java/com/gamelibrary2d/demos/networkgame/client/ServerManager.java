@@ -2,6 +2,8 @@ package com.gamelibrary2d.demos.networkgame.client;
 
 import com.gamelibrary2d.common.concurrent.NotHandledException;
 import com.gamelibrary2d.common.concurrent.ResultHandlingFuture;
+import com.gamelibrary2d.common.disposal.Disposable;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.common.io.Write;
 import com.gamelibrary2d.common.updating.UpdateLoop;
@@ -24,13 +26,19 @@ import java.security.KeyPair;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public class ServerManager {
+public class ServerManager implements Disposable {
     private final KeyPair keyPair;
 
     private Thread serverThread;
 
-    public ServerManager(KeyPair keyPair) {
+    private ServerManager(KeyPair keyPair) {
         this.keyPair = keyPair;
+    }
+
+    public static ServerManager create(KeyPair keyPair, Disposer disposer) {
+        ServerManager sm = new ServerManager(keyPair);
+        disposer.registerDisposal(sm);
+        return sm;
     }
 
     public Future<Communicator> hostLocalServer() {
@@ -141,6 +149,11 @@ public class ServerManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void dispose() {
+        stopHostedServer();
     }
 
     private static class ServerResult {

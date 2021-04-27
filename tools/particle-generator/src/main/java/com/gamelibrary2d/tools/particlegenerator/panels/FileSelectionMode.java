@@ -1,4 +1,4 @@
-package com.gamelibrary2d.util.io;
+package com.gamelibrary2d.tools.particlegenerator.panels;
 
 public enum FileSelectionMode {
     FILES_ONLY,

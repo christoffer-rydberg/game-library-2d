@@ -1,188 +1,63 @@
 package com.gamelibrary2d.sound;
 
-import com.gamelibrary2d.common.disposal.AbstractDisposer;
-import com.gamelibrary2d.common.disposal.Disposable;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.sound.decoders.AudioDecoder;
-import org.lwjgl.openal.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import static org.lwjgl.openal.AL10.alDistanceModel;
-import static org.lwjgl.openal.ALC10.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
-public class SoundManager extends AbstractDisposer implements Disposable {
-
-    private final long device;
-    private final long context;
-    private final HashMap<URL, SoundBuffer> soundBufferMap;
-    private final List<SoundSource> soundSources;
-
-    private SoundListener listener;
-
-    private SoundManager(long device, long context) {
-        this.device = device;
-        this.context = context;
-        soundBufferMap = new HashMap<>();
-        soundSources = new ArrayList<>();
-    }
-
-    public static SoundManager create(Disposer disposer) {
-        long device = alcOpenDevice((ByteBuffer) null);
-        if (device == NULL) {
-            throw new IllegalStateException("Failed to open the default OpenAL device.");
-        }
-
-        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
-        long context = alcCreateContext(device, (IntBuffer) null);
-        if (context == NULL) {
-            throw new IllegalStateException("Failed to create OpenAL context.");
-        }
-
-        alcMakeContextCurrent(context);
-        AL.createCapabilities(deviceCaps);
-
-        SoundManager soundManager = new SoundManager(device, context);
-        disposer.registerDisposal(soundManager);
-        return soundManager;
-    }
+/**
+ * Manages the creation and disposal of sound resources needed by the framework.
+ * It also acts as a repository for {@link SoundBuffer sound buffers}.
+ */
+public interface SoundManager<T extends SoundBuffer> extends Disposer {
 
     /**
-     * Creates a new instance of {@link SoundSource}.
+     * Creates an array of {@link SoundSource sound sources}.
      *
-     * @param loop     Determines if the sound will play continuously, or if it will
-     *                 play only once and then stop.
-     * @param relative Determines if the speed and position of the sound source will
-     *                 be interpreted as relative to the velocity and position of
-     *                 the {@link SoundListener}.
-     * @return The created {@link SoundSource} instance.
+     * @param size The number of sources to create.
      */
-    public SoundSource createSoundSource(boolean loop, boolean relative) {
-        SoundSource source = SoundSource.create(loop, relative);
-        soundSources.add(source);
-        return source;
-    }
+    SoundSource<T>[] createSources(int size);
 
     /**
-     * Disposes the specified sound source. All sound sources will automatically be
-     * disposed when the {@link SoundManager} is disposed, however, this method can
-     * be used to dispose a sound source earlier. It will also remove the sound
-     * source from the {@link SoundManager}.
+     * Gets the {@link SoundBuffer} registered with the specified key.
      *
-     * @param source The sound source.
+     * @param key The key for the {@link SoundBuffer}.
      */
-    public void disposeSoundSource(SoundSource source) {
-        soundSources.remove(source);
-        source.dispose();
-    }
+    T getBuffer(Object key);
 
     /**
-     * Starts playing the specified {@link SoundSource}.
-     */
-    public void play(SoundSource soundSource) {
-        soundSource.play();
-    }
-
-    /**
-     * Stops playing the specified {@link SoundSource}.
-     */
-    public void stop(SoundSource soundSource) {
-        soundSource.stop();
-    }
-
-    /**
-     * Pauses the specified {@link SoundSource}.
-     */
-    public void pause(SoundSource soundSource) {
-        soundSource.pause();
-    }
-
-    /**
-     * Checks if a {@link SoundBuffer} exists for the specified URL. If not, the
-     * sound buffer is loaded, {@link #registerSoundBuffer(URL, SoundBuffer)
-     * registered} and returned. Otherwise, the already existing sound buffer is
-     * returned.
+     * Loads a sound resource into a {@link SoundBuffer}.
+     * The sound buffer will be available by invoking {@link #getBuffer}.
      *
-     * @param source  The URL of the audio data.
-     * @param decoder The decoder that will be used to decode the audio data.
-     * @return The created or retrieved {@link SoundBuffer}.
+     * @param key    The key when invoking {@link #getBuffer}.
+     * @param stream The sound resource stream.
+     * @param format The format of the sound resource.
      */
-    public SoundBuffer loadSoundBuffer(URL source, AudioDecoder decoder) throws IOException {
-        SoundBuffer soundBuffer = getSoundBuffer(source);
-        if (soundBuffer == null) {
-            soundBuffer = decoder.decode(source, this);
-            registerSoundBuffer(source, soundBuffer);
-        }
-        return soundBuffer;
-    }
+    void loadBuffer(Object key, InputStream stream, String format) throws IOException;
 
     /**
-     * Registers the specified {@link SoundBuffer}. Note that this method is
-     * automatically called when a {@link SoundBuffer} is created with the
-     * {@link #loadSoundBuffer} method.
+     * Loads a sound resource into a {@link SoundBuffer}.
+     * The sound buffer will be available by invoking {@link #getBuffer}.
      *
-     * @param identifier  The {@link URL} identifier.
-     * @param soundBuffer The sound buffer.
+     * @param key    The key when invoking {@link #getBuffer}.
+     * @param url    The URL of the sound resource.
+     * @param format The format of the sound resource.
      */
-    public void registerSoundBuffer(URL identifier, SoundBuffer soundBuffer) {
-        soundBufferMap.put(identifier, soundBuffer);
+    default void loadBuffer(Object key, URL url, String format) throws IOException {
+        try (InputStream stream = url.openStream()) {
+            loadBuffer(key, stream, format);
+        }
     }
 
     /**
-     * Retrieves a sound buffer registered to the specified {@link URL} identifier.
+     * Loads a sound resource into a {@link SoundBuffer}.
+     * The sound buffer will be available by invoking {@link #getBuffer}.
+     *
+     * @param url    The URL of the sound resource. This will also be the key when invoking {@link #getBuffer}.
+     * @param format The format of the sound resource.
      */
-    public SoundBuffer getSoundBuffer(URL identifier) {
-        return soundBufferMap.get(identifier);
-    }
-
-    /**
-     * Gets the attached {@link SoundListener}. The sound listener is automatically
-     * activated/deactivated when it is attached/detached to the sound manager.
-     */
-    public SoundListener getListener() {
-        return this.listener;
-    }
-
-    /**
-     * Setter for the {@link #getListener() attached sound listener}.
-     */
-    public void setListener(SoundListener listener) {
-        if (this.listener == listener) {
-            return;
-        }
-
-        if (this.listener != null) {
-            this.listener.setActive(false);
-        }
-
-        this.listener = listener;
-
-        if (this.listener != null) {
-            alDistanceModel(AL11.AL_EXPONENT_DISTANCE);
-            this.listener.setActive(true);
-        } else {
-            alDistanceModel(AL10.AL_NONE);
-        }
-    }
-
-    @Override
-    protected void onDispose() {
-        soundSources.clear();
-        soundBufferMap.clear();
-
-        if (context != NULL) {
-            alcDestroyContext(context);
-        }
-
-        if (device != NULL) {
-            alcCloseDevice(device);
-        }
+    default void loadBuffer(URL url, String format) throws IOException {
+        loadBuffer(url, url, format);
     }
 }

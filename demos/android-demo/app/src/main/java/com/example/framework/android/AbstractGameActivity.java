@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.exceptions.InitializationException;
 
@@ -24,6 +25,7 @@ public abstract class AbstractGameActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         DeviceUtil.lockOrientation(this);
         Game game = gameFactory.invoke(this);
         Android_Window window = new Android_Window(this);
@@ -65,6 +67,10 @@ public abstract class AbstractGameActivity extends Activity {
                 } else {
                     gameLoop.getDisposeAction().perform();
                     gameLoop.deinitialize();
+                    Action exitAction = gameLoop.getExitAction();
+                    if (exitAction != null) {
+                        exitAction.perform();
+                    }
                     // TODO: Exit game?
                 }
             }

@@ -9,7 +9,7 @@ import com.gamelibrary2d.util.QuadShape;
 
 import java.nio.FloatBuffer;
 
-public class Quad extends InternalAbstractQuad {
+public class Quad extends InternalAbstractQuad implements Surface {
     private static final Rectangle DEFAULT_TEXTURE_BOUNDS = new Rectangle(0, 0, 1, 1);
 
     private final Rectangle bounds;

@@ -22,6 +22,12 @@
         </dependency>
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
+            <artifactId>gamelibrary2d-sound</artifactId>
+            <version>0.7.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-framework</artifactId>
             <version>0.7.0</version>
             <scope>compile</scope>

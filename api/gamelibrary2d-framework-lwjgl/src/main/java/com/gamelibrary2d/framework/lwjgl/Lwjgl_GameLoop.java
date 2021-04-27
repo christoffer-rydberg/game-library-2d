@@ -28,7 +28,7 @@ public class Lwjgl_GameLoop implements GameLoop {
     }
 
     @Override
-    public void start() {
+    public void start(Action onExit) {
         double prevTime = timer.getTime();
         while (running.get() && !window.isCloseRequested()) {
             double startTime = timer.getTime();
@@ -39,9 +39,7 @@ public class Lwjgl_GameLoop implements GameLoop {
 
         running.set(false);
 
-        if (onExit != null) {
-            onExit.perform();
-        }
+        onExit.perform();
 
         disposeAction.perform();
 
@@ -49,9 +47,7 @@ public class Lwjgl_GameLoop implements GameLoop {
     }
 
     @Override
-    public void stop(Action onExit) {
-        if (running.compareAndSet(true, false)) {
-            this.onExit = onExit;
-        }
+    public void stop() {
+        running.set(false);
     }
 }

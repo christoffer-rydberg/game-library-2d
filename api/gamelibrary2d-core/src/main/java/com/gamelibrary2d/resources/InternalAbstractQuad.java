@@ -8,7 +8,7 @@ import com.gamelibrary2d.util.QuadShape;
 
 import java.nio.ByteBuffer;
 
-abstract class InternalAbstractQuad extends AbstractDisposable implements Surface {
+abstract class InternalAbstractQuad extends AbstractDisposable {
     private final static String POSITION_ATTRIBUTE = "position";
     private final static String VERTEX_COORDINATE_ATTRIBUTE = "coord";
     private final static String TEXTURE_COORDINATE_ATTRIBUTE = "texcoord";

@@ -28,14 +28,14 @@ import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Texture;
+import com.gamelibrary2d.sound.MusicPlayer;
+import com.gamelibrary2d.sound.SoundPlayer;
 import com.gamelibrary2d.updaters.DurationUpdater;
 import com.gamelibrary2d.updaters.InstantUpdater;
 import com.gamelibrary2d.updaters.ParallelUpdater;
 import com.gamelibrary2d.updaters.SequentialUpdater;
 import com.gamelibrary2d.updates.EmptyUpdate;
 import com.gamelibrary2d.updates.ScaleUpdate;
-import com.gamelibrary2d.util.sound.MusicPlayer;
-import com.gamelibrary2d.util.sound.SoundEffectPlayer;
 
 import java.awt.*;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private final Layer<ClientObject> objectLayer = new BasicLayer<>();
     private final Layer<Renderable> foregroundEffects = new BasicLayer<>();
 
-    private final SoundMap sounds;
+    private final SoundMap soundMap;
     private final EffectMap effects;
     private final TextureMap textures = new TextureMap();
     private final ContentMap content = new ContentMap();
@@ -60,11 +60,11 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private TimeLabel timeLabel;
     private GameSettings gameSettings;
 
-    public GameFrame(DemoGame game, MusicPlayer musicPlayer, SoundEffectPlayer soundPlayer) {
+    public GameFrame(DemoGame game, MusicPlayer musicPlayer, SoundPlayer soundPlayer, SoundMap soundMap) {
         this.game = game;
         this.musicPlayer = musicPlayer;
-        this.sounds = new SoundMap(soundPlayer.getSoundManager());
-        this.effects = new EffectMap(sounds, soundPlayer);
+        this.soundMap = soundMap;
+        this.effects = new EffectMap(this.soundMap, soundPlayer);
         setClient(new GameFrameClient(this));
     }
 
@@ -72,7 +72,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     protected void onInitialize(InitializationContext context) throws IOException {
         backgroundTexture = DefaultTexture.create(Images.GAME_BACKGROUND, this);
 
-        sounds.initialize();
+        soundMap.initialize();
         textures.initialize(this);
         effects.initialize(textures, this);
 
@@ -122,7 +122,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
 
     @Override
     protected void onBegin() {
-        musicPlayer.play(Music.GAME, 0.5f, 10f, false);
+        musicPlayer.play(Music.GAME, 0.5f, true, 10f, false);
     }
 
     @Override

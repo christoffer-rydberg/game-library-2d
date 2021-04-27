@@ -3,7 +3,7 @@ package com.gamelibrary2d.common.disposal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class DefaultDisposer implements Disposable, Disposer {
+public class DefaultDisposer implements Disposable, Disposer, AutoCloseable {
     private final Disposer parent;
     private final Deque<Disposable> registeredResources = new ArrayDeque<>();
 
@@ -18,6 +18,11 @@ public class DefaultDisposer implements Disposable, Disposer {
 
     public int size() {
         return registeredResources.size();
+    }
+
+    @Override
+    public void close() {
+        dispose();
     }
 
     @Override

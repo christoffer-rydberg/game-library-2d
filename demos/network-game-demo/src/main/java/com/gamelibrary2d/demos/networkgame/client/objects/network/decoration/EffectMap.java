@@ -15,7 +15,7 @@ import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.sound.SoundEffectPlayer;
+import com.gamelibrary2d.sound.SoundPlayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,14 +26,14 @@ import java.util.Map;
 
 public class EffectMap {
     private final SoundMap sounds;
-    private final SoundEffectPlayer soundPlayer;
+    private final SoundPlayer soundPlayer;
     private final SaveLoadManager saveLoadManager = new SaveLoadManager();
     private final List<ParticleSystemItem> particleSystems = new ArrayList<>();
     private final Map<Byte, Map<Byte, InstantEffect>> destroyedEffects = new HashMap<>();
     private final Map<Byte, Map<Byte, Factory<DurationEffect>>> updateEffects = new HashMap<>();
     private final EfficientParticleRenderer defaultRenderer = new EfficientParticleRenderer();
 
-    public EffectMap(SoundMap sounds, SoundEffectPlayer soundPlayer) {
+    public EffectMap(SoundMap sounds, SoundPlayer soundPlayer) {
         this.sounds = sounds;
         this.soundPlayer = soundPlayer;
     }

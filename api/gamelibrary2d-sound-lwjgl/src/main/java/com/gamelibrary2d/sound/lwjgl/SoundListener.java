@@ -1,4 +1,4 @@
-package com.gamelibrary2d.sound;
+package com.gamelibrary2d.sound.lwjgl;
 
 import com.gamelibrary2d.common.Point;
 
@@ -6,10 +6,10 @@ import static org.lwjgl.openal.AL10.*;
 
 /**
  * This class is used to specify the position, speed and orientation of the
- * sound listener. This works in conjunction with {@link SoundSource} instances,
+ * sound listener. This works in conjunction with {@link DefaultSoundSource} instances,
  * which are used to omit sound. The {@link SoundListener} is activated when
- * it's attached to the {@link SoundManager} by calling its
- * {@link SoundManager#setListener(SoundListener) setListener} method.
+ * it's attached to the {@link DefaultSoundManager} by calling its
+ * {@link DefaultSoundManager#setListener(SoundListener) setListener} method.
  */
 public class SoundListener {
 
@@ -94,7 +94,7 @@ public class SoundListener {
     }
 
     /**
-     * Internal method, invoked by {@link SoundManager} when the
+     * Internal method, invoked by {@link DefaultSoundManager} when the
      * {@link SoundListener} is attached/detached.
      *
      * @param active True if the sound listener is attached (active) and false if it is
