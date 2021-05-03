@@ -54,14 +54,15 @@ public class Lwjgl_Joystick implements Joystick {
     @Override
     public boolean isButtonPressed(int id, int button) {
         ByteBuffer buffer = GLFW.glfwGetJoystickButtons(id);
-        if (buffer == null || button >= buffer.limit())
+        if (buffer == null || button >= buffer.limit()) {
             return false;
-        return buffer.get(button) == GLFW.GLFW_PRESS;
+        } else {
+            return buffer.get(button) == GLFW.GLFW_PRESS;
+        }
     }
 
     @Override
     public int getTiltedAxis(int id, float threshold, int offset) {
-
         if (threshold < 0 || threshold > 1) {
             throw new IllegalArgumentException("Threshold must be between 0 and 1.");
         }
@@ -73,14 +74,17 @@ public class Lwjgl_Joystick implements Joystick {
                 if (Math.abs(buffer.get(i)) > threshold)
                     return i;
         }
+
         return -1;
     }
 
     public float getAxisValue(int id, int axis) {
         FloatBuffer buffer = GLFW.glfwGetJoystickAxes(id);
-        if (buffer == null)
-            return 0;
-        return axis < buffer.limit() ? buffer.get(axis) : 0;
+        if (buffer != null) {
+            return axis < buffer.limit() ? buffer.get(axis) : 0;
+        }
+
+        return 0;
     }
 
     @Override

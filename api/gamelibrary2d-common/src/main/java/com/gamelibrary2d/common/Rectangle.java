@@ -30,12 +30,6 @@ public class Rectangle {
      * @param upperY The y-coordinate of the upper right corner.
      */
     public Rectangle(float lowerX, float lowerY, float upperX, float upperY) {
-        if (lowerX > upperX) {
-            throw new IllegalStateException("The lower X coordinate cannot be higher than the upper X coordinate");
-        } else if (lowerY > upperY) {
-            throw new IllegalStateException("The lower Y coordinate cannot be higher than the upper Y coordinate");
-        }
-
         this.lowerX = lowerX;
         this.lowerY = lowerY;
         this.upperX = upperX;

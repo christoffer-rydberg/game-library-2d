@@ -1,6 +1,7 @@
 package com.example.sound.android;
 
 import android.media.MediaDataSource;
+import android.media.MediaFormat;
 import com.gamelibrary2d.common.disposal.AbstractDisposer;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
@@ -18,14 +19,17 @@ import java.util.HashMap;
 public class DefaultSoundManager extends AbstractDisposer implements SoundManager<DefaultSoundBuffer> {
     private final HashMap<Object, DefaultSoundBuffer> soundBuffers = new HashMap<>();
     private final HashMap<String, AudioDecoder> decoders = new HashMap<>();
+    private final AudioDecoder defaultDecoder = new DefaultAudioDecoder();
 
-    public DefaultSoundManager() {
-        putDecoder("ogg", new DefaultAudioDecoder("audio/vorbis"));
-        putDecoder("mp3", new DefaultAudioDecoder("audio/mp4a-latm"));
+    public static DefaultSoundManager create(Disposer disposer) {
+        DefaultSoundManager soundManager = new DefaultSoundManager();
+        disposer.registerDisposal(soundManager);
+        return soundManager;
     }
 
     public AudioDecoder getDecoder(String format) {
-        return decoders.get(format);
+        AudioDecoder decoder = decoders.get(format);
+        return decoder == null ? defaultDecoder : decoder;
     }
 
     public AudioDecoder putDecoder(String format, AudioDecoder decoder) {
@@ -57,11 +61,15 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
         }
 
         MediaDataSource source = new InternalArrayDataSource(Read.byteArray(stream));
-        DataBuffer buffer = new DynamicByteBuffer();
-        decoder.decode(source, new AudioDecoderOutputBuffer(buffer));
-        buffer.flip();
+        AudioDecoderOutputBuffer decoderOutput = new AudioDecoderOutputBuffer(new DynamicByteBuffer());
+        decoder.decode(source, decoderOutput);
+        decoderOutput.buffer.flip();
 
-        DefaultSoundBuffer soundBuffer = DefaultSoundBuffer.create(buffer.internalByteBuffer(), this);
+        DefaultSoundBuffer soundBuffer = DefaultSoundBuffer.create(
+                decoderOutput.buffer.internalByteBuffer(),
+                decoderOutput.mediaFormat,
+                this);
+
         soundBuffers.put(key, soundBuffer);
     }
 
@@ -72,9 +80,15 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
 
     static class AudioDecoderOutputBuffer implements AudioDecoder.Output {
         private final DataBuffer buffer;
+        private MediaFormat mediaFormat;
 
         public AudioDecoderOutputBuffer(DataBuffer buffer) {
             this.buffer = buffer;
+        }
+
+        @Override
+        public void initialize(MediaFormat mediaFormat) {
+            this.mediaFormat = mediaFormat;
         }
 
         @Override

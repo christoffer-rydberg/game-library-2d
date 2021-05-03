@@ -1,9 +1,7 @@
 package com.gamelibrary2d.framework;
 
-import java.nio.ByteBuffer;
-
 public interface Image {
-    ByteBuffer getData();
+    byte[] getData();
 
     int getWidth();
 

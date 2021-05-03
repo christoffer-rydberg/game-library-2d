@@ -4,6 +4,8 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
+import com.gamelibrary2d.demos.networkgame.client.ResourceManager;
+import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.ContentMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.EffectMap;
@@ -11,6 +13,7 @@ import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.Sou
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.TextureMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.PictureFrame;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
+import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.urls.Images;
 import com.gamelibrary2d.demos.networkgame.client.urls.Music;
@@ -25,7 +28,6 @@ import com.gamelibrary2d.network.AbstractNetworkFrame;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.resources.DefaultTexture;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.sound.MusicPlayer;
@@ -37,11 +39,12 @@ import com.gamelibrary2d.updaters.SequentialUpdater;
 import com.gamelibrary2d.updates.EmptyUpdate;
 import com.gamelibrary2d.updates.ScaleUpdate;
 
-import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private final DemoGame game;
+    private final ResourceManager resourceManager;
 
     private final DefaultLayerObject<Renderable> gameLayer = new DefaultLayerObject<>();
     private final Layer<Renderable> backgroundLayer = new BasicLayer<>();
@@ -51,7 +54,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
 
     private final SoundMap soundMap;
     private final EffectMap effects;
-    private final TextureMap textures = new TextureMap();
+    private final TextureMap textures;
     private final ContentMap content = new ContentMap();
 
     private final MusicPlayer musicPlayer;
@@ -60,24 +63,36 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private TimeLabel timeLabel;
     private GameSettings gameSettings;
 
-    public GameFrame(DemoGame game, MusicPlayer musicPlayer, SoundPlayer soundPlayer, SoundMap soundMap) {
+    public GameFrame(
+            DemoGame game,
+            ControllerFactory controllerFactory,
+            ResourceManager resourceManager,
+            MusicPlayer musicPlayer,
+            SoundPlayer soundPlayer,
+            SoundMap soundMap) {
+
         this.game = game;
+        this.resourceManager = resourceManager;
         this.musicPlayer = musicPlayer;
         this.soundMap = soundMap;
-        this.effects = new EffectMap(this.soundMap, soundPlayer);
-        setClient(new GameFrameClient(this));
+        this.effects = new EffectMap(resourceManager, soundMap, soundPlayer);
+        textures = new TextureMap(resourceManager);
+        setClient(new GameFrameClient(this, controllerFactory));
+    }
+
+    private DefaultTexture createTexture(InputStream s) throws IOException {
+        return DefaultTexture.create(s, this);
     }
 
     @Override
     protected void onInitialize(InitializationContext context) throws IOException {
-        backgroundTexture = DefaultTexture.create(Images.GAME_BACKGROUND, this);
+        backgroundTexture = resourceManager.load(Images.GAME_BACKGROUND, this::createTexture);
 
         soundMap.initialize();
         textures.initialize(this);
         effects.initialize(textures, this);
 
-        Font font = new java.awt.Font("Gabriola", java.awt.Font.BOLD, 64);
-        timeLabel = new TimeLabel(new TextRenderer(DefaultFont.create(font, this)));
+        timeLabel = new TimeLabel(new TextRenderer(Fonts.timer()));
         timeLabel.setPosition(game.getWindow().getWidth() / 2f, 9 * game.getWindow().getHeight() / 10f);
     }
 

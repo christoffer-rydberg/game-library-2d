@@ -1,5 +1,7 @@
 package com.gamelibrary2d.resources;
 
+import com.gamelibrary2d.framework.Image;
+
 public interface Texture {
 
     int getId();
@@ -7,6 +9,8 @@ public interface Texture {
     float getWidth();
 
     float getHeight();
+
+    Image loadImage();
 
     default void bind() {
         TextureUtil.bind(getId());

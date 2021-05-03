@@ -199,6 +199,7 @@ public class DefaultLightRenderer implements LightRenderer {
         // Upload texture data
         transparencyTexture.position(transparencyTexture.limit());
         transparencyTexture.flip();
+        OpenGL.instance().glPixelStorei(OpenGL.GL_UNPACK_ALIGNMENT, 1);
         OpenGL.instance().glTexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_R8, alphaMapCols, alphaMapRows, 0,
                 OpenGL.GL_RED, OpenGL.GL_UNSIGNED_BYTE, transparencyTexture);
 

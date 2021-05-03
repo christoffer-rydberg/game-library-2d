@@ -5,6 +5,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
+import com.gamelibrary2d.demos.networkgame.client.ResourceManager;
 import com.gamelibrary2d.demos.networkgame.client.Settings;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.Button;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.InputField;
@@ -43,11 +44,12 @@ import com.gamelibrary2d.util.VerticalTextAlignment;
 import com.gamelibrary2d.widgets.Label;
 
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class MenuFrame extends AbstractFrame implements KeyAware {
     private final DemoGame game;
+    private final ResourceManager resourceManager;
     private final MusicPlayer musicPlayer;
     private final SoundPlayer soundPlayer;
     private final SequentialUpdater introUpdater = new SequentialUpdater();
@@ -64,8 +66,9 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
     private boolean menuIsHidden = true;
 
-    public MenuFrame(DemoGame game, MusicPlayer musicPlayer, SoundPlayer soundPlayer) {
+    public MenuFrame(DemoGame game, ResourceManager resourceManager, MusicPlayer musicPlayer, SoundPlayer soundPlayer) {
         this.game = game;
+        this.resourceManager = resourceManager;
         this.musicPlayer = musicPlayer;
         this.soundPlayer = soundPlayer;
     }
@@ -75,15 +78,19 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
         obj.getPosition().subtract(obj.getBounds().getCenter());
     }
 
+    private DefaultTexture createTexture(InputStream s) throws IOException {
+        return DefaultTexture.create(s, this);
+    }
+
     private GameObject createGameTitle() throws IOException {
-        Texture texture = DefaultTexture.create(Images.MENU_TITLE, this);
+        Texture texture = resourceManager.load(Images.MENU_TITLE, this::createTexture);
         Surface surface = Quad.create(Rectangle.create(texture.getWidth(), texture.getHeight()), this);
         Renderer renderer = new SurfaceRenderer<>(surface, texture);
         return new DefaultGameObject<>(renderer);
     }
 
     private Renderable createBackground() throws IOException {
-        Texture backgroundTexture = DefaultTexture.create(Images.MENU_BACKGROUND, this);
+        Texture backgroundTexture = resourceManager.load(Images.MENU_BACKGROUND, this::createTexture);
 
         Surface backgroundSurface = Surfaces.coverArea(
                 new Rectangle(0, 0, game.getWindow().getWidth(), game.getWindow().getHeight()),
@@ -115,7 +122,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
 
         backgroundLayer = new DefaultLayerObject<>();
         menu = new DefaultLayerObject<>();
-        credits = new Credits(game.getWindow());
+        credits = new Credits(game.getWindow(), resourceManager);
     }
 
     @Override
@@ -293,13 +300,14 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
         private DefaultGameObject<Label> credits;
         private float speedFactor;
 
-        Credits(Window window) throws IOException {
+        Credits(Window window, ResourceManager resourceManager) throws IOException {
             this.window = window;
-            URL url = Credits.class.getResource("/credits.txt");
-            String text = Read.text(url, StandardCharsets.UTF_8);
-            Label label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
-            credits = new DefaultGameObject<>(label);
-            add(credits);
+            try (InputStream stream = resourceManager.open("credits.txt")) {
+                String text = Read.text(stream, StandardCharsets.UTF_8);
+                Label label = new Label(text, new TextRenderer(Fonts.button()), Color.SOFT_BLUE);
+                credits = new DefaultGameObject<>(label);
+                add(credits);
+            }
         }
 
         void setSpeedFactor(float speedFactor) {

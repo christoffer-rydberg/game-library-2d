@@ -441,4 +441,9 @@ public class Android_OpenGL implements OpenGL {
     public OpenGLVersion getSupportedVersion() {
         return supportedVersion;
     }
+
+    @Override
+    public void glGetTexImage(int target, int level, int format, int type, ByteBuffer pixels) {
+        throw new RuntimeException("Not implemented");
+    }
 }

@@ -1,7 +1,7 @@
 package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.common.io.SaveLoadManager;
+import com.gamelibrary2d.common.io.ResourceReader;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
@@ -72,7 +72,7 @@ public class DemoFrame extends AbstractFrame {
             fireSystem = DefaultParticleSystem.create(fireSystemSettings, this);
 
             // Example of particle system settings loaded from file:
-            ParticleSystemParameters explosionSystemSettings = new SaveLoadManager().load(
+            ParticleSystemParameters explosionSystemSettings = new ResourceReader().read(
                     getClass().getResource("/explosion.particle"),
                     ParticleSystemParameters::new);
 

@@ -2,6 +2,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames;
 
 import com.gamelibrary2d.common.io.BitParser;
 import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.*;
 import com.gamelibrary2d.demos.networkgame.common.*;
 import com.gamelibrary2d.network.common.Communicator;
@@ -19,13 +20,15 @@ import static com.gamelibrary2d.demos.networkgame.common.ServerMessages.*;
 
 public class GameFrameClient extends AbstractClient {
     private final GameFrame frame;
+    private final ControllerFactory controllerFactory;
     private final BitParser bitParser = new BitParser();
     private final Map<Integer, ClientObject> objects = new HashMap<>();
 
     private float serverUpdatesPerSecond;
 
-    public GameFrameClient(GameFrame frame) {
+    public GameFrameClient(GameFrame frame, ControllerFactory controllerFactory) {
         this.frame = frame;
+        this.controllerFactory = controllerFactory;
     }
 
     @Override
@@ -103,7 +106,7 @@ public class GameFrameClient extends AbstractClient {
             case ObjectTypes.PLAYER:
                 boolean isLocal = buffer.getBool();
                 if (isLocal) {
-                    return new LocalPlayer(primaryType, this, buffer);
+                    return new LocalPlayer(controllerFactory, primaryType, this, buffer);
                 } else {
                     return new RemotePlayer(primaryType, this, buffer);
                 }

@@ -1,16 +1,12 @@
 package com.example.sound.android;
 
-import android.media.AudioAttributes;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
+import android.media.*;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.sound.SoundSource;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultSoundSource implements SoundSource<DefaultSoundBuffer> {
-    private static final int streamRate = 22050;
     private static final int channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
     private static final int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private final AudioTrack track;
@@ -30,14 +26,16 @@ public class DefaultSoundSource implements SoundSource<DefaultSoundBuffer> {
 
         AudioAttributes attrs = attrsBuilder.build();
 
+        int nativeRate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC);
+
         AudioFormat audioFormat =
                 new AudioFormat.Builder()
-                        .setSampleRate(streamRate)
+                        .setSampleRate(nativeRate)
                         .setEncoding(DefaultSoundSource.audioFormat)
                         .build();
 
         int bufferSize = AudioTrack.getMinBufferSize(
-                streamRate,
+                nativeRate,
                 channelConfig,
                 DefaultSoundSource.audioFormat);
 
@@ -66,7 +64,6 @@ public class DefaultSoundSource implements SoundSource<DefaultSoundBuffer> {
             byte[] data = soundBuffer.getBytes();
 
             track.play();
-
             Thread thread = new Thread(() -> {
                 try {
                     do {
@@ -75,7 +72,7 @@ public class DefaultSoundSource implements SoundSource<DefaultSoundBuffer> {
                             int result = track.write(data, offset, data.length - offset, AudioTrack.WRITE_NON_BLOCKING);
                             if (result == 0) {
                                 try {
-                                    double bufferTimeCapacity = ((double) track.getBufferCapacityInFrames() / track.getSampleRate()) * 1000.0;
+                                    double bufferTimeCapacity = ((double) track.getBufferCapacityInFrames() / track.getPlaybackRate()) * 1000.0;
                                     Thread.sleep((long) bufferTimeCapacity / 2);
                                 } catch (InterruptedException e) {
                                     return;
@@ -133,6 +130,7 @@ public class DefaultSoundSource implements SoundSource<DefaultSoundBuffer> {
     @Override
     public void setSoundBuffer(DefaultSoundBuffer soundBuffer) {
         this.soundBuffer = soundBuffer;
+        track.setPlaybackRate(soundBuffer.getMediaFormat().getInteger(MediaFormat.KEY_SAMPLE_RATE));
     }
 
     @Override

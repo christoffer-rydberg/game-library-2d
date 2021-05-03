@@ -5,6 +5,7 @@ import com.gamelibrary2d.demos.networkgame.client.frames.GameFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.LoadingFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.MenuFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
+import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
@@ -20,17 +21,22 @@ import com.gamelibrary2d.sound.SoundManager;
 import com.gamelibrary2d.sound.SoundPlayer;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class DemoGame extends AbstractGame {
+    private final ControllerFactory controllerFactory;
     private final ServerManager serverManager;
     private final SoundManager soundManager;
+    private final ResourceManager resourceManager;
 
     private Frame menuFrame;
     private LoadingFrame loadingFrame;
     private GameFrame gameFrame;
 
-    public DemoGame(Framework framework, ServerManager serverManager, SoundManager soundManager) {
+    public DemoGame(Framework framework, ControllerFactory controllerFactory, ResourceManager resourceManager, ServerManager serverManager, SoundManager soundManager) {
         super(framework);
+        this.controllerFactory = controllerFactory;
+        this.resourceManager = resourceManager;
         this.serverManager = serverManager;
         this.soundManager = soundManager;
     }
@@ -83,15 +89,21 @@ public class DemoGame extends AbstractGame {
         render();
     }
 
-    private void createGlobalResources() {
-        Fonts.create(this);
+    private void createGlobalResources() throws IOException {
+        Fonts.create(resourceManager, this);
         Surfaces.create(this);
         Textures.create(this);
     }
 
+    private void loadSoundBuffer(String resource, String format) throws IOException {
+        try (InputStream stream = resourceManager.open(resource)) {
+            soundManager.loadBuffer(resource, stream, format);
+        }
+    }
+
     private void initializeFrames() throws InitializationException, IOException {
-        soundManager.loadBuffer(Music.MENU, "ogg");
-        soundManager.loadBuffer(Music.GAME, "ogg");
+        loadSoundBuffer(Music.MENU, "ogg");
+        loadSoundBuffer(Music.GAME, "ogg");
 
         MusicPlayer musicPlayer = new MusicPlayer(
                 this,
@@ -102,13 +114,13 @@ public class DemoGame extends AbstractGame {
                 soundManager,
                 10);
 
-        loadingFrame = new LoadingFrame(this);
+        loadingFrame = new LoadingFrame(this, resourceManager);
         loadingFrame.initialize(this);
 
-        menuFrame = new MenuFrame(this, musicPlayer, soundPlayer);
+        menuFrame = new MenuFrame(this, resourceManager, musicPlayer, soundPlayer);
         menuFrame.initialize(this);
 
-        gameFrame = new GameFrame(this, musicPlayer, soundPlayer, new SoundMap(soundManager));
+        gameFrame = new GameFrame(this, controllerFactory, resourceManager, musicPlayer, soundPlayer, new SoundMap(soundManager, resourceManager));
         gameFrame.initialize(this);
     }
 

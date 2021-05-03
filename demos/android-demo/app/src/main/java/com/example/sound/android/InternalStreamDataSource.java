@@ -20,11 +20,19 @@ class InternalStreamDataSource extends MediaDataSource {
 
     @Override
     public int readAt(long position, byte[] buffer, int offset, int size) throws IOException {
+        if (size == 0) {
+            return 0;
+        }
+
         int streamPosition = dataBuffer.position();
 
         int end = (int) position + size;
         if (streamPosition < end) {
-            streamPosition += Read.bytes(stream, dataBuffer, end - streamPosition);
+            int read = Read.bytes(stream, dataBuffer, end - streamPosition);
+            if (read == -1) {
+                return -1;
+            }
+            streamPosition += read;
         }
 
         dataBuffer.flip();

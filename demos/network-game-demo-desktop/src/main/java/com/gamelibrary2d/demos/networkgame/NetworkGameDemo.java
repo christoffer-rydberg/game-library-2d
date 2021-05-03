@@ -64,6 +64,8 @@ public class NetworkGameDemo {
         try (DefaultDisposer disposer = new DefaultDisposer()) {
             new DemoGame(
                     new Lwjgl_Framework(),
+                    KeyboardController::new,
+                    new DesktopResourceManager(),
                     ServerManager.create(createKeyPair(), disposer),
                     DefaultSoundManager.create(disposer)).start(createWindow(args)
             );

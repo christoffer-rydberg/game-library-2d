@@ -21,10 +21,14 @@ public class Read {
             buffer.ensureRemaining(1);
         }
 
-        return totalRead;
+        return totalRead == 0 ? -1 : totalRead;
     }
 
     public static int bytes(InputStream is, DataBuffer buffer, int size) throws IOException {
+        if (size == 0) {
+            return 0;
+        }
+
         int totalRead = 0;
         int remaining = size;
         while (true) {
@@ -44,7 +48,7 @@ public class Read {
             buffer.ensureRemaining(1);
         }
 
-        return totalRead;
+        return totalRead == 0 ? -1 : totalRead;
     }
 
     public static byte[] byteArray(InputStream is) throws IOException {

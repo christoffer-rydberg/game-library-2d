@@ -2,42 +2,41 @@ package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
+import com.gamelibrary2d.demos.networkgame.client.input.Controller;
+import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
+import com.gamelibrary2d.demos.networkgame.client.input.ControllerInputId;
 import com.gamelibrary2d.demos.networkgame.common.PlayerAcceleration;
-import com.gamelibrary2d.framework.Keyboard;
-import com.gamelibrary2d.input.InputBinding;
-import com.gamelibrary2d.input.InputController;
 
 public class LocalPlayer extends AbstractPlayer {
-    private final InputController controller;
+    private final Controller controller;
     private final PlayerAcceleration playerAcceleration;
 
-    public LocalPlayer(byte primaryType, GameFrameClient client, DataBuffer buffer) {
+    public LocalPlayer(ControllerFactory controllerFactory, byte primaryType, GameFrameClient client, DataBuffer buffer) {
         super(primaryType, client, buffer);
 
+        controller = controllerFactory.create();
         playerAcceleration = new PlayerAcceleration(client, getId());
 
-        InputBinding leftInput = InputBinding.keyboard(Keyboard.instance().keyLeft());
-        leftInput.onActive(() -> playerAcceleration.setLeftAcceleration(1f));
-        leftInput.onReleased(() -> playerAcceleration.setLeftAcceleration(0f));
+        controller.addBinding(
+                ControllerInputId.LEFT,
+                () -> playerAcceleration.setLeftAcceleration(1f),
+                () -> playerAcceleration.setLeftAcceleration(0f));
 
-        InputBinding rightInput = InputBinding.keyboard(Keyboard.instance().keyRight());
-        rightInput.onActive(() -> playerAcceleration.setRightAcceleration(1f));
-        rightInput.onReleased(() -> playerAcceleration.setRightAcceleration(0f));
+        controller.addBinding(
+                ControllerInputId.RIGHT,
+                () -> playerAcceleration.setRightAcceleration(1f),
+                () -> playerAcceleration.setRightAcceleration(0f));
 
-        InputBinding forwardInput = InputBinding.keyboard(Keyboard.instance().keyUp());
-        forwardInput.onActive(() -> playerAcceleration.setAcceleration(1f));
-        forwardInput.onReleased(() -> playerAcceleration.setAcceleration(0f));
-
-        controller = new InputController();
-        controller.getBindings().add(leftInput);
-        controller.getBindings().add(rightInput);
-        controller.getBindings().add(forwardInput);
+        controller.addBinding(
+                ControllerInputId.UP,
+                () -> playerAcceleration.setAcceleration(1f),
+                () -> playerAcceleration.setAcceleration(0f));
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        controller.update();
+        controller.update(deltaTime);
         playerAcceleration.updateServer();
     }
 }

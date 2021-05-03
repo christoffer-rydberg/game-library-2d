@@ -255,9 +255,14 @@ public class Lwjgl_OpenGL implements OpenGL {
     }
 
     @Override
-    public void glTexImage2D(int glTexture2d, int level, int internalformat, int width, int height, int border,
+    public void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border,
                              int format, int type, ByteBuffer pixels) {
-        GL11.glTexImage2D(glTexture2d, level, internalformat, width, height, border, format, type, pixels);
+        GL11.glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
+    }
+
+    @Override
+    public void glGetTexImage(int target, int level, int format, int type, ByteBuffer pixels) {
+        GL11.glGetTexImage(target, level, format, type, pixels);
     }
 
     @Override

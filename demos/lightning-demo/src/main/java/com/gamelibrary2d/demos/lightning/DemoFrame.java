@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.lightning;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.io.SaveLoadManager;
+import com.gamelibrary2d.common.io.ResourceReader;
 import com.gamelibrary2d.frames.AbstractFrame;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
@@ -59,7 +59,7 @@ class DemoFrame extends AbstractFrame {
     }
 
     private DefaultParticleSystem createParticleSystem() throws IOException {
-        ParticleSystemParameters params = new SaveLoadManager().load(getUrl("fire.particle"), ParticleSystemParameters::new);
+        ParticleSystemParameters params = new ResourceReader().read(getUrl("fire.particle"), ParticleSystemParameters::new);
         return DefaultParticleSystem.create(params, this);
     }
 

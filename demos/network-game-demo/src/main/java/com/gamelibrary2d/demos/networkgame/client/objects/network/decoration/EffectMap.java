@@ -3,7 +3,8 @@ package com.gamelibrary2d.demos.networkgame.client.objects.network.decoration;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.functional.Factory;
-import com.gamelibrary2d.common.io.SaveLoadManager;
+import com.gamelibrary2d.common.io.ResourceReader;
+import com.gamelibrary2d.demos.networkgame.client.ResourceManager;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.urls.Particles;
 import com.gamelibrary2d.demos.networkgame.common.ObjectTypes;
@@ -14,32 +15,29 @@ import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;
 import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleRenderer;
 import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
-import com.gamelibrary2d.util.BlendMode;
 import com.gamelibrary2d.sound.SoundPlayer;
+import com.gamelibrary2d.util.BlendMode;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EffectMap {
+    private final ResourceManager resourceManager;
     private final SoundMap sounds;
     private final SoundPlayer soundPlayer;
-    private final SaveLoadManager saveLoadManager = new SaveLoadManager();
+    private final ResourceReader resourceReader = new ResourceReader();
     private final List<ParticleSystemItem> particleSystems = new ArrayList<>();
     private final Map<Byte, Map<Byte, InstantEffect>> destroyedEffects = new HashMap<>();
     private final Map<Byte, Map<Byte, Factory<DurationEffect>>> updateEffects = new HashMap<>();
     private final EfficientParticleRenderer defaultRenderer = new EfficientParticleRenderer();
 
-    public EffectMap(SoundMap sounds, SoundPlayer soundPlayer) {
+    public EffectMap(ResourceManager resourceManager, SoundMap sounds, SoundPlayer soundPlayer) {
+        this.resourceManager = resourceManager;
         this.sounds = sounds;
         this.soundPlayer = soundPlayer;
-    }
-
-    private ParticleSystemParameters loadParameters(URL url) throws IOException {
-        return saveLoadManager.load(url, ParticleSystemParameters::new);
     }
 
     private DurationEffect createUpdateEffect(DefaultParticleSystem particleSystem) {
@@ -75,6 +73,10 @@ public class EffectMap {
         DefaultParticleSystem particleSystem = DefaultParticleSystem.create(params, renderer, initialCapacity, disposer);
         this.particleSystems.add(new ParticleSystemItem(particleSystem, scene));
         return particleSystem;
+    }
+
+    private ParticleSystemParameters loadParameters(String resource) throws IOException {
+        return resourceManager.load(resource, s -> resourceReader.read(s, ParticleSystemParameters::new));
     }
 
     private void initializePlayerEffects(Disposer disposer) throws IOException {
@@ -146,7 +148,7 @@ public class EffectMap {
                     Scene.FOREGROUND,
                     disposer);
 
-            URL soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
+            Object soundEffect = sounds.getDestroyedSound(ObjectTypes.OBSTACLE, key);
 
             destroyedEffects.put(key, obj -> {
                 Point position = obj.getPosition();

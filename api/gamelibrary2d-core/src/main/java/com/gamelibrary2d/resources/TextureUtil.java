@@ -6,6 +6,10 @@ public class TextureUtil {
 
     private static int currentId = 0;
 
+    public static int getBoundTextureId() {
+        return currentId;
+    }
+
     public static void bind(int id) {
         if (currentId != id) {
             OpenGL.instance().glBindTexture(OpenGL.GL_TEXTURE_2D, id);

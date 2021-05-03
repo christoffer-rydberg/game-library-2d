@@ -1,10 +1,7 @@
 package com.example.framework.android;
 
 import android.graphics.Bitmap;
-import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.Image;
-
-import java.nio.ByteBuffer;
 
 public class BitmapParser {
     private static int[] getArgb(Bitmap bitmap) {
@@ -28,17 +25,20 @@ public class BitmapParser {
 
     private static Image parseImage(int[] argb, int width, int height, boolean hasAlphaChannel) {
         int channels = hasAlphaChannel ? 4 : 3;
-        ByteBuffer buffer = BufferUtils.createByteBuffer(argb.length * channels);
+
+        int i = 0;
+        byte[] buffer = new byte[argb.length * channels];
         for (int pixel : argb) {
-            buffer.put((byte) ((pixel >> 16) & 0xFF)); // R
-            buffer.put((byte) ((pixel >> 8) & 0xFF));  // G
-            buffer.put((byte) (pixel & 0xFF));         // B
+            buffer[i] = (byte) ((pixel >> 16) & 0xFF);    // R
+            buffer[i + 1] = (byte) ((pixel >> 8) & 0xFF); // G
+            buffer[i + 2] = (byte) (pixel & 0xFF);        // B
             if (hasAlphaChannel) {
-                buffer.put((byte) ((pixel >> 24) & 0xFF)); // A
+                buffer[i + 3] = (byte) ((pixel >> 24) & 0xFF); // A
+                i += 4;
+            } else {
+                i += 3;
             }
         }
-
-        buffer.flip();
 
         return new DefaultImage(buffer, width, height, channels);
     }
@@ -50,19 +50,19 @@ public class BitmapParser {
     }
 
     private static class DefaultImage implements Image {
-        private final ByteBuffer data;
+        private final byte[] data;
         private final int width;
         private final int height;
         private final int channels;
 
-        DefaultImage(ByteBuffer data, int width, int height, int channels) {
+        DefaultImage(byte[] data, int width, int height, int channels) {
             this.data = data;
             this.width = width;
             this.height = height;
             this.channels = channels;
         }
 
-        public ByteBuffer getData() {
+        public byte[] getData() {
             return data;
         }
 

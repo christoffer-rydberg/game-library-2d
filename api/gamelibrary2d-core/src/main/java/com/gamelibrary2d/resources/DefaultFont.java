@@ -1,11 +1,15 @@
 package com.gamelibrary2d.resources;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
+import com.gamelibrary2d.common.io.DataBuffer;
+import com.gamelibrary2d.common.io.Serializable;
 import com.gamelibrary2d.framework.Image;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.imaging.BufferedImageParser;
+import com.gamelibrary2d.imaging.DefaultImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,19 +17,86 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultFont implements Font {
+public class DefaultFont implements Font, Serializable {
     private final Texture texture;
-    private final Map<Character, Surface> surfaces;
+    private final Map<Character, Quad> quads;
     private final int ascent;
     private final int descent;
     private final int height;
 
-    public DefaultFont(Texture texture, Map<Character, Surface> surfaces, int ascent, int descent, int height) {
+    public DefaultFont(Texture texture, Map<Character, Quad> quads, int ascent, int descent, int height) {
         this.texture = texture;
-        this.surfaces = Collections.unmodifiableMap(surfaces);
+        this.quads = Collections.unmodifiableMap(quads);
         this.ascent = ascent;
         this.descent = descent;
         this.height = height;
+    }
+
+    public static DefaultFont load(DataBuffer buffer, Disposer parentDisposer) {
+        int ascent = buffer.getInt();
+        int descent = buffer.getInt();
+        int height = buffer.getInt();
+
+        Disposer disposer = new DefaultDisposer(parentDisposer);
+
+        int numberOfQuads = buffer.getInt();
+        Map<Character, Quad> quads = new HashMap<>();
+        for (int i = 0; i < numberOfQuads; ++i) {
+            char character = (char) buffer.getInt();
+            Rectangle bounds = deserializeRectangle(buffer);
+            Rectangle textureBounds = deserializeRectangle(buffer);
+            quads.put(character, Quad.create(bounds, textureBounds, disposer));
+        }
+
+        int textureWidth = buffer.getInt();
+        int textureHeight = buffer.getInt();
+        int textureChannels = buffer.getInt();
+
+        byte[] bytes = new byte[buffer.getInt()];
+        buffer.get(bytes, 0, bytes.length);
+
+        Image image = new DefaultImage(bytes, textureWidth, textureHeight, textureChannels);
+
+        Texture texture = DefaultTexture.create(image, disposer);
+
+        return new DefaultFont(texture, quads, ascent, descent, height);
+    }
+
+    @Override
+    public void serialize(DataBuffer buffer) {
+        buffer.putInt(ascent);
+        buffer.putInt(descent);
+        buffer.putInt(height);
+
+        buffer.putInt(quads.size());
+        for (Character character : quads.keySet()) {
+            Quad quad = quads.get(character);
+            int charInt = (int) character;
+            buffer.putInt(charInt);
+            serializeRectangle(quad.getBounds(), buffer);
+            serializeRectangle(quad.getTextureBounds(), buffer);
+        }
+
+        Image textureImage = texture.loadImage();
+        buffer.putInt(textureImage.getWidth());
+        buffer.putInt(textureImage.getHeight());
+        buffer.putInt(textureImage.getChannels());
+
+        byte[] imageData = textureImage.getData();
+
+        buffer.putInt(imageData.length);
+        buffer.put(imageData);
+    }
+
+    private static Rectangle deserializeRectangle(DataBuffer buffer) {
+        return new Rectangle(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
+    }
+
+    private static void serializeRectangle(Rectangle rectangle, DataBuffer buffer) {
+        buffer.putFloat(rectangle.getLowerX());
+        buffer.putFloat(rectangle.getLowerY());
+        buffer.putFloat(rectangle.getUpperX());
+        buffer.putFloat(rectangle.getUpperY());
     }
 
     public static DefaultFont create(java.awt.Font font, Disposer disposer) {
@@ -51,7 +122,7 @@ public class DefaultFont implements Font {
         int height = ascent + descent;
 
         int currentTextureWidth = 0;
-        Map<Character, Surface> quads = new HashMap<>();
+        Map<Character, Quad> quads = new HashMap<>();
         for (int i = 0; i < charImages.length; ++i) {
             BufferedImage charImage = charImages[i];
             if (charImage == null) {
@@ -142,7 +213,7 @@ public class DefaultFont implements Font {
         ModelMatrix.instance().pushMatrix();
 
         for (int i = start; i < end; ++i) {
-            Surface quad = surfaces.get(text.charAt(i));
+            Quad quad = quads.get(text.charAt(i));
             if (quad == null)
                 continue;
 
@@ -162,8 +233,8 @@ public class DefaultFont implements Font {
         return texture;
     }
 
-    public Map<Character, Surface> getSurfaces() {
-        return surfaces;
+    public Map<Character, Quad> getQuads() {
+        return quads;
     }
 
     @Override
@@ -186,7 +257,7 @@ public class DefaultFont implements Font {
         float width = 0;
         int end = Math.min(offset + len, text.length());
         for (int i = offset; i < end; ++i) {
-            Surface surface = surfaces.get(text.charAt(i));
+            Surface surface = quads.get(text.charAt(i));
             if (surface != null) {
                 Rectangle bounds = surface.getBounds();
                 width += bounds.getWidth();

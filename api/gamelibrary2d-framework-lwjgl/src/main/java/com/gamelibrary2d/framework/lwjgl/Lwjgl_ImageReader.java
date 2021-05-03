@@ -50,24 +50,27 @@ public final class Lwjgl_ImageReader implements ImageReader {
                 throw new IOException("Failed to load image: " + STBImage.stbi_failure_reason());
             }
 
-            return new DefaultImage(image, width.get(0), height.get(0), channels.get(0));
+            byte[] data = new byte[image.remaining()];
+            image.get(data);
+
+            return new DefaultImage(data, width.get(0), height.get(0), channels.get(0));
         }
     }
 
     private static class DefaultImage implements Image {
-        private final ByteBuffer data;
+        private final byte[] data;
         private final int width;
         private final int height;
         private final int channels;
 
-        DefaultImage(ByteBuffer data, int width, int height, int channels) {
+        DefaultImage(byte[] data, int width, int height, int channels) {
             this.data = data;
             this.width = width;
             this.height = height;
             this.channels = channels;
         }
 
-        public ByteBuffer getData() {
+        public byte[] getData() {
             return data;
         }
 

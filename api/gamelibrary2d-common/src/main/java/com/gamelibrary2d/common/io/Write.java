@@ -3,6 +3,7 @@ package com.gamelibrary2d.common.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -57,9 +58,16 @@ public class Write {
         }
     }
 
+    public static void bytes(DataBuffer buffer, OutputStream stream) throws IOException {
+        int endPosition = buffer.position() + buffer.remaining();
+        stream.write(buffer.array(), buffer.position(), buffer.remaining());
+        buffer.position(endPosition);
+    }
+
     public static void bytes(DataBuffer buffer, File file, boolean overwrite) throws IOException {
-        bytes(buffer.array(), buffer.position(), buffer.limit(), file, overwrite);
-        buffer.position(buffer.limit());
+        int endPosition = buffer.position() + buffer.remaining();
+        bytes(buffer.array(), buffer.position(), buffer.remaining(), file, overwrite);
+        buffer.position(endPosition);
     }
 
     public static void text(String text, File file, Charset charset, boolean overwrite) throws IOException {

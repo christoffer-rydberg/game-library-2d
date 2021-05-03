@@ -1,27 +1,17 @@
 package com.gamelibrary2d.input;
 
 /**
- * Describes the current state of the input binding.
+ * Describes the current state of the input binding, e.g. if a button is pressed.
  */
 public enum InputState {
 
     /**
-     * The binding was activated.
+     * The input binding is active.
      */
     ACTIVE,
 
     /**
-     * The binding was released.
+     * The input binding is inactive.
      */
-    RELEASED,
-
-    /**
-     * The binding is unchanged (still active).
-     */
-    ACTIVE_UNCHANGED,
-
-    /**
-     * The binding is unchanged (still released).
-     */
-    RELEASED_UNCHANGED
+    INACTIVE
 }

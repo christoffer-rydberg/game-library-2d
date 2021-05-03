@@ -11,11 +11,15 @@ class InternalArrayDataSource extends MediaDataSource {
 
     @Override
     public int readAt(long position, byte[] buffer, int offset, int size) {
+        if (size == 0) {
+            return 0;
+        }
+
         int sourceOffset = (int) position;
         int remaining = data.length - sourceOffset;
         int length = Math.min(remaining, size);
 
-        if (length == 0) {
+        if (length <= 0) {
             return -1;
         }
 

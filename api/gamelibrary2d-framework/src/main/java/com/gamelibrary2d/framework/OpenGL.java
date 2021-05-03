@@ -22,6 +22,7 @@ public interface OpenGL {
     int GL_COMPILE_STATUS = 35713;
     int GL_LINK_STATUS = 35714;
     int GL_TEXTURE_2D = 3553;
+    int GL_PACK_ALIGNMENT = 3333;
     int GL_UNPACK_ALIGNMENT = 3317;
     int GL_RGBA8 = 32856;
     int GL_TEXTURE_WRAP_S = 10242;
@@ -159,8 +160,10 @@ public interface OpenGL {
 
     void glPixelStorei(int pname, int param);
 
-    void glTexImage2D(int glTexture2d, int level, int internalformat, int width, int height, int border, int format,
+    void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format,
                       int type, ByteBuffer pixels);
+
+    void glGetTexImage(int target, int level, int format, int type, ByteBuffer pixels);
 
     void glTexParameteri(int target, int pname, int param);
 

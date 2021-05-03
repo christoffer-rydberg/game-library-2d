@@ -27,6 +27,7 @@
 	  <module>demos/transparent-window-demo</module>
 	  <module>demos/network-demo</module>
 	  <module>demos/network-game-demo</module>
+	  <module>demos/network-game-demo-desktop</module>
 	  <module>demos/lightning-demo</module>
 	  <module>demos/split-screen-demo</module>
 	  <module>demos/collision-detection-demo</module>
