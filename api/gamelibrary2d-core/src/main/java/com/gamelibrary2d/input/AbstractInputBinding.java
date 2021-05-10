@@ -19,21 +19,22 @@ public abstract class AbstractInputBinding implements InputBinding {
 
     @Override
     public void update(float deltaTime) {
+        float prevValue = value;
         value = getValueFromSource();
         switch (state) {
             case ACTIVE:
-                if (Math.abs(value) >= inactiveThreshold) {
-                    onStateUnchanged(state, deltaTime);
+                if (Math.abs(value) > inactiveThreshold) {
+                    onStateUnchanged(state, prevValue, value, deltaTime);
                 } else {
                     state = InputState.INACTIVE;
-                    onStateChanged(state, deltaTime);
+                    onStateChanged(state, prevValue, value, deltaTime);
                 }
             case INACTIVE:
-                if (Math.abs(value) >= activeThreshold) {
+                if (Math.abs(value) > activeThreshold) {
                     state = InputState.ACTIVE;
-                    onStateChanged(state, deltaTime);
+                    onStateChanged(state, prevValue, value, deltaTime);
                 } else {
-                    onStateUnchanged(state, deltaTime);
+                    onStateUnchanged(state, prevValue, value, deltaTime);
                 }
         }
     }
@@ -64,15 +65,19 @@ public abstract class AbstractInputBinding implements InputBinding {
      * Invoked when the current {@link InputState} is unchanged since the last update.
      *
      * @param state     The current input state.
+     * @param prevValue The previous input value;
+     * @param newValue  The current input value;
      * @param deltaTime The time in seconds since the last update.
      */
-    protected abstract void onStateUnchanged(InputState state, float deltaTime);
+    protected abstract void onStateUnchanged(InputState state, float prevValue, float newValue, float deltaTime);
 
     /**
      * Invoked when the current {@link InputState} is changed since the last update.
      *
      * @param newState  The new input state.
+     * @param prevValue The previous input value;
+     * @param newValue  The current input value;
      * @param deltaTime The time in seconds since the last update.
      */
-    protected abstract void onStateChanged(InputState newState, float deltaTime);
+    protected abstract void onStateChanged(InputState newState, float prevValue, float newValue, float deltaTime);
 }

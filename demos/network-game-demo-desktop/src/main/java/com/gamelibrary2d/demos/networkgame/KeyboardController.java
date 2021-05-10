@@ -2,9 +2,11 @@ package com.gamelibrary2d.demos.networkgame;
 
 import com.gamelibrary2d.demos.networkgame.client.input.AbstractController;
 import com.gamelibrary2d.demos.networkgame.client.input.ControllerInputId;
+import com.gamelibrary2d.demos.networkgame.client.input.VirtualController;
 import com.gamelibrary2d.framework.Keyboard;
 
 public class KeyboardController extends AbstractController {
+    private final VirtualController virtualController = new VirtualController();
 
     private static int convertToKeyboardInputId(ControllerInputId id) {
         switch (id) {
@@ -21,12 +23,17 @@ public class KeyboardController extends AbstractController {
 
     @Override
     public float getValue(ControllerInputId id) {
-        int keyboardInputId = convertToKeyboardInputId(id);
-        return Keyboard.instance().isKeyDown(keyboardInputId) ? 1f : 0f;
+        float virtualValue = virtualController.getValue(id);
+        if (virtualValue == 0f) {
+            int keyboardInputId = convertToKeyboardInputId(id);
+            return Keyboard.instance().isKeyDown(keyboardInputId) ? 1f : 0f;
+        } else {
+            return virtualValue;
+        }
     }
 
     @Override
     public void setValue(ControllerInputId id, float value) {
-        throw new RuntimeException("Controller is readonly");
+        virtualController.setValue(id, value);
     }
 }

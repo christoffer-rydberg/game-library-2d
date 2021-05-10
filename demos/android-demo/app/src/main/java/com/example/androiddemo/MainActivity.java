@@ -3,10 +3,12 @@ package com.example.androiddemo;
 import android.app.Activity;
 import com.example.framework.android.AbstractGameActivity;
 import com.example.framework.android.Android_Framework;
+import com.example.framework.android.DeviceUtil;
 import com.example.sound.android.DefaultSoundManager;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ServerManager;
+import com.gamelibrary2d.demos.networkgame.client.input.VirtualController;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -40,5 +42,10 @@ public class MainActivity extends AbstractGameActivity {
         }
     }
 
-
+    @Override
+    protected void initialize() {
+        DeviceUtil.hideSystemUI(this);
+        DeviceUtil.lockOrientation(this, DeviceUtil.DeviceOrientation.LANDSCAPE);
+        super.initialize();
+    }
 }

@@ -3,6 +3,7 @@ package com.gamelibrary2d.demos.networkgame;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ServerManager;
+import com.gamelibrary2d.demos.networkgame.client.input.VirtualController;
 import com.gamelibrary2d.exceptions.InitializationException;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.framework.lwjgl.GlfwWindow;

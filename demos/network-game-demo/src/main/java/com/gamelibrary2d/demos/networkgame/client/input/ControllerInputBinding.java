@@ -1,21 +1,18 @@
 package com.gamelibrary2d.demos.networkgame.client.input;
 
-import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.input.AbstractInputBinding;
 import com.gamelibrary2d.input.InputState;
 
 class ControllerInputBinding extends AbstractInputBinding {
     private final ControllerInputId id;
     private final Controller controller;
-    private final Action onActivation;
-    private final Action onDeactivation;
+    private final InputChangedListener inputChangedListener;
 
-    ControllerInputBinding(Controller controller, ControllerInputId id, Action onActivation, Action onDeactivation) {
-        super(0.5f, 0.5f);
+    ControllerInputBinding(Controller controller, ControllerInputId id, InputChangedListener inputChangedListener) {
+        super(0f, 0f);
         this.id = id;
         this.controller = controller;
-        this.onActivation = onActivation;
-        this.onDeactivation = onDeactivation;
+        this.inputChangedListener = inputChangedListener;
     }
 
     @Override
@@ -23,20 +20,32 @@ class ControllerInputBinding extends AbstractInputBinding {
         return controller.getValue(id);
     }
 
-    @Override
-    protected void onStateUnchanged(InputState state, float deltaTime) {
-
+    private void updateInputValue(float prevValue, float newValue) {
+        if (prevValue != newValue) {
+            inputChangedListener.onInputChanged(newValue);
+        }
     }
 
     @Override
-    protected void onStateChanged(InputState newState, float deltaTime) {
+    protected void onStateUnchanged(InputState state, float prevValue, float newValue, float deltaTime) {
+        if (state == InputState.ACTIVE) {
+            updateInputValue(prevValue, newValue);
+        }
+    }
+
+    @Override
+    protected void onStateChanged(InputState newState, float prevValue, float newValue, float deltaTime) {
         switch (newState) {
             case ACTIVE:
-                onActivation.perform();
+                updateInputValue(prevValue, newValue);
                 break;
             case INACTIVE:
-                onDeactivation.perform();
+                updateInputValue(prevValue, 0f);
                 break;
         }
+    }
+
+    public interface InputChangedListener {
+        void onInputChanged(float value);
     }
 }

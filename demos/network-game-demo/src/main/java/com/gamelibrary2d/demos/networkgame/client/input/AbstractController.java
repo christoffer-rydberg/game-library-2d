@@ -1,6 +1,5 @@
 package com.gamelibrary2d.demos.networkgame.client.input;
 
-import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.input.InputBinding;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public abstract class AbstractController implements Controller {
     }
 
     @Override
-    public void addBinding(ControllerInputId id, Action onActivation, Action onDeactivation) {
-        bindings.add(new ControllerInputBinding(this, id, onActivation, onDeactivation));
+    public void addBinding(ControllerInputId id, ControllerInputBinding.InputChangedListener inputChangedListener) {
+        bindings.add(new ControllerInputBinding(this, id, inputChangedListener));
     }
 }

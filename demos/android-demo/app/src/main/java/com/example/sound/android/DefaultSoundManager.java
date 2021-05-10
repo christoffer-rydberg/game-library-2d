@@ -1,19 +1,13 @@
 package com.example.sound.android;
 
-import android.media.MediaDataSource;
-import android.media.MediaFormat;
 import com.gamelibrary2d.common.disposal.AbstractDisposer;
-import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.common.io.DynamicByteBuffer;
 import com.gamelibrary2d.common.io.Read;
 import com.gamelibrary2d.sound.SoundManager;
 import com.gamelibrary2d.sound.SoundSource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 public class DefaultSoundManager extends AbstractDisposer implements SoundManager<DefaultSoundBuffer> {
@@ -32,16 +26,19 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
         return decoder == null ? defaultDecoder : decoder;
     }
 
-    public AudioDecoder putDecoder(String format, AudioDecoder decoder) {
-        return decoders.put(format, decoder);
+    public void setDecoder(String format, AudioDecoder decoder) {
+        if (decoder == null) {
+            decoders.remove(format);
+        } else {
+            decoders.put(format, decoder);
+        }
     }
 
     @Override
     public SoundSource<DefaultSoundBuffer>[] createSources(int size) {
-        Disposer disposer = new DefaultDisposer(this);
         DefaultSoundSource[] sources = new DefaultSoundSource[size];
         for (int i = 0; i < size; ++i) {
-            DefaultSoundSource source = DefaultSoundSource.create(disposer);
+            DefaultSoundSource source = DefaultSoundSource.create(this);
             sources[i] = source;
         }
 
@@ -55,19 +52,9 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
 
     @Override
     public void loadBuffer(Object key, InputStream stream, String format) throws IOException {
-        AudioDecoder decoder = getDecoder(format);
-        if (decoder == null) {
-            throw new IOException(String.format("No decoder has been registered for the format '%s'", format));
-        }
-
-        MediaDataSource source = new InternalArrayDataSource(Read.byteArray(stream));
-        AudioDecoderOutputBuffer decoderOutput = new AudioDecoderOutputBuffer(new DynamicByteBuffer());
-        decoder.decode(source, decoderOutput);
-        decoderOutput.buffer.flip();
-
         DefaultSoundBuffer soundBuffer = DefaultSoundBuffer.create(
-                decoderOutput.buffer.internalByteBuffer(),
-                decoderOutput.mediaFormat,
+                Read.byteArray(stream),
+                format,
                 this);
 
         soundBuffers.put(key, soundBuffer);
@@ -76,29 +63,5 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
     @Override
     protected void onDispose() {
 
-    }
-
-    static class AudioDecoderOutputBuffer implements AudioDecoder.Output {
-        private final DataBuffer buffer;
-        private MediaFormat mediaFormat;
-
-        public AudioDecoderOutputBuffer(DataBuffer buffer) {
-            this.buffer = buffer;
-        }
-
-        @Override
-        public void initialize(MediaFormat mediaFormat) {
-            this.mediaFormat = mediaFormat;
-        }
-
-        @Override
-        public void write(ByteBuffer decodedData) {
-            buffer.put(decodedData);
-        }
-
-        @Override
-        public void finished() {
-
-        }
     }
 }

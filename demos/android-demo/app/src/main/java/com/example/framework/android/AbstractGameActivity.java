@@ -25,8 +25,10 @@ public abstract class AbstractGameActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initialize();
+    }
 
-        DeviceUtil.lockOrientation(this);
+    protected void initialize() {
         Game game = gameFactory.invoke(this);
         Android_Window window = new Android_Window(this);
         window.setRenderer(new GLSurfaceViewRenderer(game, window));

@@ -19,18 +19,19 @@ public class LocalPlayer extends AbstractPlayer {
 
         controller.addBinding(
                 ControllerInputId.LEFT,
-                () -> playerAcceleration.setLeftAcceleration(1f),
-                () -> playerAcceleration.setLeftAcceleration(0f));
+                playerAcceleration::setLeftAcceleration);
 
         controller.addBinding(
                 ControllerInputId.RIGHT,
-                () -> playerAcceleration.setRightAcceleration(1f),
-                () -> playerAcceleration.setRightAcceleration(0f));
+                playerAcceleration::setRightAcceleration);
 
         controller.addBinding(
                 ControllerInputId.UP,
-                () -> playerAcceleration.setAcceleration(1f),
-                () -> playerAcceleration.setAcceleration(0f));
+                playerAcceleration::setAcceleration);
+    }
+
+    public Controller getController() {
+        return controller;
     }
 
     @Override

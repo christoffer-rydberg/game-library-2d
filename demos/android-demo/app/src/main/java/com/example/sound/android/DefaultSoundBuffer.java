@@ -1,29 +1,25 @@
 package com.example.sound.android;
 
-import android.media.MediaFormat;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.sound.SoundBuffer;
 
-import java.nio.ByteBuffer;
-
 public class DefaultSoundBuffer implements SoundBuffer {
     private final byte[] buffer;
-    private final MediaFormat mediaFormat;
+    private final String format;
 
-    private DefaultSoundBuffer(ByteBuffer buffer, MediaFormat mediaFormat) {
-        this.buffer = new byte[buffer.remaining()];
-        this.mediaFormat = mediaFormat;
-        buffer.get(this.buffer);
+    private DefaultSoundBuffer(byte[] bytes, String format) {
+        this.buffer = bytes;
+        this.format = format;
     }
 
-    static DefaultSoundBuffer create(ByteBuffer audioData, MediaFormat format, Disposer disposer) {
-        DefaultSoundBuffer soundBuffer = new DefaultSoundBuffer(audioData, format);
+    static DefaultSoundBuffer create(byte[] bytes, String format, Disposer disposer) {
+        DefaultSoundBuffer soundBuffer = new DefaultSoundBuffer(bytes, format);
         disposer.registerDisposal(soundBuffer);
         return soundBuffer;
     }
 
-    MediaFormat getMediaFormat() {
-        return mediaFormat;
+    String getFormat() {
+        return format;
     }
 
     byte[] getBytes() {

@@ -16,13 +16,13 @@ public class DefaultAudioDecoder implements AudioDecoder {
         return extractor;
     }
 
-    private static MediaCodec initializeAndCreateDecoder(MediaExtractor extractor, Output output) throws IOException {
+    private static MediaCodec initializeAndCreateDecoder(MediaExtractor extractor, AudioSink sink) throws IOException {
         for (int i = 0; i < extractor.getTrackCount(); ++i) {
             MediaFormat mediaFormat = extractor.getTrackFormat(i);
             String mime = mediaFormat.getString(MediaFormat.KEY_MIME);
             if (mime.startsWith("audio/")) {
                 extractor.selectTrack(i);
-                output.initialize(mediaFormat);
+                sink.begin(mediaFormat);
                 MediaCodec decoder = MediaCodec.createDecoderByType(mime);
                 decoder.configure(mediaFormat, null, null, 0);
                 return decoder;
@@ -33,10 +33,10 @@ public class DefaultAudioDecoder implements AudioDecoder {
     }
 
     @Override
-    public void decode(MediaDataSource source, Output output) throws IOException {
+    public void decode(MediaDataSource source, AudioSink sink) throws IOException, InterruptedException {
         MediaExtractor extractor = createMediaExtractor(source);
 
-        MediaCodec decoder = initializeAndCreateDecoder(extractor, output);
+        MediaCodec decoder = initializeAndCreateDecoder(extractor, sink);
         decoder.start();
 
         long timeoutUs = 10000;
@@ -72,10 +72,10 @@ public class DefaultAudioDecoder implements AudioDecoder {
             int outPutIndex = decoder.dequeueOutputBuffer(outputInfo, timeoutUs);
             if (outPutIndex >= 0) {
                 ByteBuffer outputBuffer = decoder.getOutputBuffer(outPutIndex);
-                output.write(outputBuffer);
+                sink.write(outputBuffer);
                 decoder.releaseOutputBuffer(outPutIndex, false);
                 if ((outputInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    output.finished();
+                    sink.end();
                     extractor.release();
                     decoder.stop();
                     decoder.release();

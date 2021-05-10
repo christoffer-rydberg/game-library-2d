@@ -29,7 +29,7 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
     private DefaultSoundManager(long device, long context) {
         this.device = device;
         this.context = context;
-        putDecoder("ogg", new VorbisDecoder());
+        setDecoder("ogg", new VorbisDecoder());
     }
 
     public static DefaultSoundManager create(Disposer disposer) {
@@ -56,8 +56,8 @@ public class DefaultSoundManager extends AbstractDisposer implements SoundManage
         return decoders.get(format);
     }
 
-    public AudioDecoder putDecoder(String format, AudioDecoder decoder) {
-        return decoders.put(format, decoder);
+    public void setDecoder(String format, AudioDecoder decoder) {
+        decoders.put(format, decoder);
     }
 
     @Override

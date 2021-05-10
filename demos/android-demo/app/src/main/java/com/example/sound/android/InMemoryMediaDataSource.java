@@ -2,10 +2,10 @@ package com.example.sound.android;
 
 import android.media.MediaDataSource;
 
-class InternalArrayDataSource extends MediaDataSource {
+class InMemoryMediaDataSource extends MediaDataSource {
     private final byte[] data;
 
-    public InternalArrayDataSource(byte[] data) {
+    public InMemoryMediaDataSource(byte[] data) {
         this.data = data;
     }
 

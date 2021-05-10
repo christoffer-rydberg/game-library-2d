@@ -1,7 +1,4 @@
-package com.example.androiddemo;
-
-import com.gamelibrary2d.demos.networkgame.client.input.AbstractController;
-import com.gamelibrary2d.demos.networkgame.client.input.ControllerInputId;
+package com.gamelibrary2d.demos.networkgame.client.input;
 
 public class VirtualController extends AbstractController {
     private float left;

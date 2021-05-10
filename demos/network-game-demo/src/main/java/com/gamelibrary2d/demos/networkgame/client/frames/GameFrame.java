@@ -5,12 +5,15 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ResourceManager;
+import com.gamelibrary2d.demos.networkgame.client.input.Controller;
 import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
+import com.gamelibrary2d.demos.networkgame.client.objects.network.LocalPlayer;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.ContentMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.EffectMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.TextureMap;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.ControllerArea;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.PictureFrame;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
@@ -20,6 +23,7 @@ import com.gamelibrary2d.demos.networkgame.client.urls.Music;
 import com.gamelibrary2d.demos.networkgame.common.GameSettings;
 import com.gamelibrary2d.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.layers.BasicLayer;
 import com.gamelibrary2d.layers.DefaultLayerObject;
 import com.gamelibrary2d.layers.Layer;
@@ -29,6 +33,7 @@ import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultTexture;
+import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.sound.MusicPlayer;
 import com.gamelibrary2d.sound.SoundPlayer;
@@ -51,6 +56,8 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private final Layer<Renderable> backgroundEffects = new BasicLayer<>();
     private final Layer<ClientObject> objectLayer = new BasicLayer<>();
     private final Layer<Renderable> foregroundEffects = new BasicLayer<>();
+    private final Layer<Renderable> screenLayer = new BasicLayer<>();
+    private final Layer<Renderable> controllerLayer = new BasicLayer<>();
 
     private final SoundMap soundMap;
     private final EffectMap effects;
@@ -62,6 +69,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
     private Texture backgroundTexture;
     private TimeLabel timeLabel;
     private GameSettings gameSettings;
+    private Rectangle renderedGameBounds;
 
     public GameFrame(
             DemoGame game,
@@ -109,9 +117,12 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
         gameLayer.add(objectLayer);
         gameLayer.add(foregroundEffects);
 
+        screenLayer.add(controllerLayer);
+        screenLayer.add(timeLabel);
+
         add(backgroundLayer);
         add(gameLayer);
-        add(timeLabel);
+        add(screenLayer);
     }
 
     void applySettings(GameSettings gameSettings) {
@@ -119,20 +130,22 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
 
         float windowWidth = game.getWindow().getWidth();
         float windowHeight = game.getWindow().getHeight();
+
         Rectangle gameBounds = gameSettings.getGameBounds();
         float scale = Math.min(windowWidth / gameBounds.getWidth(), windowHeight / gameBounds.getHeight());
-        Rectangle scaledGameBounds = Rectangle.create(gameBounds.getWidth(), gameBounds.getHeight()).resize(scale);
+
+        renderedGameBounds = Rectangle
+                .create(gameBounds.getWidth(), gameBounds.getHeight()).resize(scale)
+                .move(windowWidth / 2f, windowHeight / 2f);
 
         gameLayer.setScale(scale, scale);
-        gameLayer.setPosition(
-                windowWidth / 2f + scaledGameBounds.getLowerX(),
-                windowHeight / 2f + scaledGameBounds.getLowerY());
+        gameLayer.setPosition(renderedGameBounds.getLowerX(), renderedGameBounds.getLowerY());
 
         content.initialize(gameSettings, textures, this);
 
         backgroundLayer.add(createBackground(
                 new Rectangle(0, 0, windowWidth, windowHeight),
-                scaledGameBounds.move(windowWidth / 2f, windowHeight / 2f)));
+                renderedGameBounds));
     }
 
     @Override
@@ -167,7 +180,56 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
         obj.destroy();
     }
 
+    private void addSpeedController(Controller controller) {
+        Window window = game.getWindow();
+
+        float leftMargin = renderedGameBounds.getLowerX();
+
+        Rectangle leftArea = new Rectangle(
+                0,
+                0,
+                leftMargin,
+                window.getHeight());
+
+        ControllerArea rotationController = new ControllerArea(
+                new SurfaceRenderer<>(Quad.create(leftArea, this)),
+                controller,
+                ControllerArea.SliderDirection.HORIZONTAL,
+                leftArea.getWidth() / 4f);
+
+        controllerLayer.add(rotationController);
+    }
+
+    private void addRotationController(Controller controller) {
+        Window window = game.getWindow();
+
+        float rightMargin = window.getWidth() - renderedGameBounds.getUpperX();
+
+        Rectangle rightArea = new Rectangle(
+                window.getWidth() - rightMargin,
+                0,
+                window.getWidth(),
+                window.getHeight());
+
+        ControllerArea speedController = new ControllerArea(
+                new SurfaceRenderer<>(Quad.create(rightArea, this)),
+                controller,
+                ControllerArea.SliderDirection.VERTICAL,
+                rightArea.getHeight() / 8f);
+
+        controllerLayer.add(speedController);
+    }
+
+    private void addVirtualController(Controller controller) {
+        addSpeedController(controller);
+        addRotationController(controller);
+    }
+
     void spawn(ClientObject obj) {
+        if (obj instanceof LocalPlayer) {
+            addVirtualController(((LocalPlayer) obj).getController());
+        }
+
         obj.setScale(0f);
         runUpdater(new DurationUpdater(1f, new ScaleUpdate(obj, 1f)));
 
@@ -205,6 +267,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
 
     public void gameEnded() {
         objectLayer.clear();
+        controllerLayer.clear();
         getClient().requestNewGame();
     }
 
