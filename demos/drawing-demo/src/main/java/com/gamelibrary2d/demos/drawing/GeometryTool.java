@@ -6,9 +6,9 @@ import com.gamelibrary2d.common.event.EventListener;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.common.functional.Factory;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 
-public class GeometryTool implements Renderable, MouseAware {
+public class GeometryTool implements Renderable, PointerAware {
     private final EventPublisher<Geometry> onCreated = new DefaultEventPublisher<>();
     private final Factory<Geometry> geometryFactory;
     private final int drawButton;
@@ -40,8 +40,8 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == button) {
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (drawButton == id) {
             inProgress = geometryFactory.create();
             inProgress.nodes().add(projectedX, projectedY);
             prevNode.set(projectedX, projectedY);
@@ -52,7 +52,7 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
         if (isDrawing()) {
             if (prevNode.getDistance(projectedX, projectedY) > minNodeInterval) {
                 inProgress.nodes().add(projectedX, projectedY);
@@ -65,8 +65,8 @@ public class GeometryTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == button) {
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (drawButton == id) {
             onCreated.publish(inProgress);
             inProgress = null;
         }

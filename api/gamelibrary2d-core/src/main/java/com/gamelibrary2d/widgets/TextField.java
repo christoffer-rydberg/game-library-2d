@@ -47,14 +47,14 @@ public class TextField extends Label implements Renderable, KeyAware, InputAware
     }
 
     @Override
-    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, boolean repeat) {
         if (key == Keyboard.instance().keyBackspace()) {
             removeLast();
         }
     }
 
     @Override
-    public void keyReleased(int key, int scanCode, int mods) {
+    public void keyUp(int key) {
 
     }
 }

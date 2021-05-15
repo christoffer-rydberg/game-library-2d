@@ -1,19 +1,18 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.FocusManager;
-import com.gamelibrary2d.MouseEventState;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.FocusAware;
 import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.markers.MouseWhenFocusedAware;
-import com.gamelibrary2d.objects.AbstractMouseAwareGameObject;
+import com.gamelibrary2d.markers.PointerWhenFocusedAware;
+import com.gamelibrary2d.objects.AbstractPointerAwareGameObject;
 
 public abstract class AbstractWidget<T extends Renderable>
-        extends AbstractMouseAwareGameObject<T> implements FocusAware, KeyAware, InputAware, MouseWhenFocusedAware {
+        extends AbstractPointerAwareGameObject<T> implements FocusAware, KeyAware, InputAware, PointerWhenFocusedAware {
 
     private boolean focused;
-    private boolean awareOfMouseEvent;
+    private boolean skipWhenFocusedAction;
 
     protected AbstractWidget() {
 
@@ -38,92 +37,92 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     @Override
-    public final void keyDown(int key, int scanCode, boolean repeat, int mods) {
+    public final void keyDown(int key, boolean repeat) {
         if (isEnabled()) {
-            onKeyDown(key, scanCode, repeat, mods);
+            onKeyDown(key, repeat);
         }
     }
 
-    protected void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
+    protected void onKeyDown(int key, boolean repeat) {
         T content = getContent();
         if (content instanceof KeyAware) {
-            ((KeyAware) (content)).keyDown(key, scanCode, repeat, mods);
+            ((KeyAware) (content)).keyDown(key, repeat);
         }
     }
 
     @Override
-    public final void keyReleased(int key, int scanCode, int mods) {
+    public final void keyUp(int key) {
         if (isEnabled()) {
-            onKeyReleased(key, scanCode, mods);
+            onKeyUp(key);
         }
     }
 
-    protected void onKeyReleased(int key, int scanCode, int mods) {
+    protected void onKeyUp(int key) {
         T content = getContent();
         if (content instanceof KeyAware) {
-            ((KeyAware) (content)).keyReleased(key, scanCode, mods);
+            ((KeyAware) (content)).keyUp(key);
         }
     }
 
-    protected final void mouseEventStarted(float x, float y) {
-        super.mouseEventStarted(x, y);
-        onMouseEventStarted(x, y);
+    protected final void pointerActionStarted(float x, float y) {
+        super.pointerActionStarted(x, y);
+        onPointerActionStarted(x, y);
     }
 
-    protected final void mouseEventFinished(float x, float y) {
-        super.mouseEventFinished(x, y);
-        onMouseEventFinished(x, y);
-        awareOfMouseEvent = focused;
-    }
-
-    /**
-     * Invoked before a mouse event is handled.
-     *
-     * @param x The x-coordinate of the mouse cursor projected to the parent container.
-     * @param y The y-coordinate of the mouse cursor projected to the parent container.
-     */
-    protected void onMouseEventStarted(float x, float y) {
-
+    protected final void pointerActionFinished(float x, float y) {
+        super.pointerActionFinished(x, y);
+        onPointerActionFinished(x, y);
+        skipWhenFocusedAction = focused;
     }
 
     /**
-     * Invoked after after a mouse event is handled.
+     * Invoked before a pointer action is handled.
      *
-     * @param x The x-coordinate of the mouse cursor projected to the parent container.
-     * @param y The y-coordinate of the mouse cursor projected to the parent container.
+     * @param x The x-coordinate of the pointer projected to the parent container.
+     * @param y The y-coordinate of the pointer projected to the parent container.
      */
-    protected void onMouseEventFinished(float x, float y) {
+    protected void onPointerActionStarted(float x, float y) {
+
+    }
+
+    /**
+     * Invoked after after a pointer action is handled.
+     *
+     * @param x The x-coordinate of the pointer projected to the parent container.
+     * @param y The y-coordinate of the pointer projected to the parent container.
+     */
+    protected void onPointerActionFinished(float x, float y) {
 
     }
 
     @Override
-    public final void mouseButtonDownWhenFocused(int button, int mods) {
-        if (!awareOfMouseEvent) {
-            onMouseButtonDownWhenFocused(button, mods);
+    public final void pointerDownWhenFocused(int id, int button) {
+        if (!skipWhenFocusedAction) {
+            onPointerDownWhenFocused(id, button);
         }
-        awareOfMouseEvent = false;
+
+        skipWhenFocusedAction = false;
     }
 
-    protected void onMouseButtonDownWhenFocused(int button, int mods) {
+    protected void onPointerDownWhenFocused(int id, int button) {
         FocusManager.unfocus(this, false);
     }
 
     @Override
-    public final void mouseButtonReleasedWhenFocused(int button, int mods) {
-        if (!awareOfMouseEvent) {
-            onMouseButtonReleasedWhenFocused(button, mods);
+    public final void pointerUpWhenFocused(int id, int button) {
+        if (!skipWhenFocusedAction) {
+            onPointerUpWhenFocused(id, button);
         }
 
-        awareOfMouseEvent = false;
+        skipWhenFocusedAction = false;
     }
 
-    protected void onMouseButtonReleasedWhenFocused(int button, int mods) {
+    protected void onPointerUpWhenFocused(int id, int button) {
         FocusManager.unfocus(this, false);
     }
 
     @Override
     public final void focused() {
-        awareOfMouseEvent = MouseEventState.isHandlingEvent();
         focused = true;
         onFocused();
     }
@@ -147,32 +146,32 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    protected void onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
         FocusManager.focus(this, false);
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    protected void onPointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         FocusManager.focus(this, false);
     }
 
     @Override
-    protected boolean isListeningToMouseHoverEvents() {
+    protected boolean isListeningToPointHoverEvents() {
         return false;
     }
 
     @Override
-    protected boolean isListeningToMouseDragEvents() {
+    protected boolean isListeningToPointDragEvents() {
         return false;
     }
 
     @Override
-    protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
+    protected void onPointerHover(int id, float x, float y, float projectedX, float projectedY) {
 
     }
 
     @Override
-    protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
+    protected void onPointerDrag(int id, float x, float y, float projectedX, float projectedY) {
 
     }
 }

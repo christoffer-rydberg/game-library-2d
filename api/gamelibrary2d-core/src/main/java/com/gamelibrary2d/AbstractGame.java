@@ -25,7 +25,7 @@ import java.util.Deque;
  * An abstract implementation of the Game interface. This is a general
  * implementation and can be used as base class for all games.
  */
-public abstract class AbstractGame extends AbstractDisposer implements Game, CallbackHandler {
+public abstract class AbstractGame extends AbstractDisposer implements Game {
 
     private final EventPublisher<Frame> frameChangedPublisher = new DefaultEventPublisher<>();
     /**
@@ -36,18 +36,11 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
      * The OpenGL window used for rendering.
      */
     private Window window;
+
     /**
-     * Last known X coordinate of mouse cursor.
+     * True whenever the game window has cursor focus, each index represents a pointer id.
      */
-    private float cursorPosX;
-    /**
-     * Last known Y coordinate of mouse cursor.
-     */
-    private float cursorPosY;
-    /**
-     * True whenever the game window has cursor focus.
-     */
-    private boolean cursorFocus;
+    private boolean[] pointerFocus = new boolean[10];
     /**
      * True while inside an update cycle. Used to determine if some actions, such as
      * changing frame, can be done instantly or if it should be delayed until after
@@ -87,7 +80,7 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         this.gameLoop = gameLoop;
         this.window = window;
         window.initialize();
-        window.createCallBacks(this);
+        window.setEventListener(new InternalWindowEventListener());
         initializeOpenGLSettings();
         createDefaultShaderPrograms();
         gameLoop.initialize(this::update, this::dispose, window);
@@ -199,8 +192,9 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         OpenGL.instance().glClearColor(color.getR(), color.getG(), color.getB(), color.getA());
     }
 
-    public boolean hasCursorFocus() {
-        return cursorFocus;
+    @Override
+    public boolean hasPointerFocus(int id) {
+        return id < pointerFocus.length && pointerFocus[id];
     }
 
     @Override
@@ -360,81 +354,90 @@ public abstract class AbstractGame extends AbstractDisposer implements Game, Cal
         invokeLater.addLast(runnable);
     }
 
-    @Override
-    public void onKeyCallback(int key, int scancode, int action, int mods) {
-        Frame frame = getFrame();
-        if (action == Keyboard.instance().actionPressed()) {
-            if (frame instanceof KeyAware)
-                ((KeyAware) frame).keyDown(key, scancode, false, mods);
-            FocusManager.keyDownEvent(key, scancode, false, mods);
-        } else if (action == Keyboard.instance().actionRepeat()) {
-            if (frame instanceof KeyAware)
-                ((KeyAware) frame).keyDown(key, scancode, true, mods);
-            FocusManager.keyDownEvent(key, scancode, true, mods);
-        } else {
-            if (frame instanceof KeyAware)
-                ((KeyAware) frame).keyReleased(key, scancode, mods);
-            FocusManager.keyReleaseEvent(key, scancode, mods);
-        }
-    }
-
-    @Override
-    public void onCharCallback(char charInput) {
-        if (frame instanceof InputAware)
-            ((InputAware) frame).charInput(charInput);
-        FocusManager.charInputEvent(charInput);
-    }
-
-    @Override
-    public void onCursorPosCallback(double xpos, double ypos) {
-        try {
-            MouseEventState.setHandlingEvent(true);
-            cursorPosX = (float) xpos;
-            cursorPosY = (float) ypos;
-            Frame frame = getFrame();
-            if (frame != null) {
-                frame.mouseMove(cursorPosX, cursorPosY, cursorPosX, cursorPosY);
-            }
-        } finally {
-            MouseEventState.setHandlingEvent(false);
-        }
-    }
-
-    @Override
-    public void onCursorEnterCallback() {
-        this.cursorFocus = true;
-    }
-
-    @Override
-    public void onCursorLeaveCallback() {
-        this.cursorFocus = false;
-    }
-
-    @Override
-    public void onMouseButtonCallback(int button, int action, int mods) {
-        try {
-            MouseEventState.setHandlingEvent(true);
-
-            if (action == Mouse.instance().actionPressed()) {
-                getFrame().mouseButtonDown(button, mods, cursorPosX, cursorPosY, cursorPosX, cursorPosY);
-                FocusManager.mouseButtonDownFinished(button, mods);
-            } else if (action == Mouse.instance().actionReleased()) {
-                getFrame().mouseButtonReleased(button, mods, cursorPosX, cursorPosY, cursorPosX, cursorPosY);
-                FocusManager.mouseButtonReleasedFinished(button, mods);
-            }
-        } finally {
-            MouseEventState.setHandlingEvent(false);
-        }
-    }
-
-    @Override
-    public void onScrollCallback(double xoffset, double yoffset) {
-
-    }
-
     protected abstract void onStart() throws InitializationException, IOException;
 
     protected abstract void onExit();
 
+    private class InternalWindowEventListener implements WindowEventListener {
 
+        @Override
+        public void onKeyAction(int key, KeyAction action) {
+            Frame frame = getFrame();
+            switch (action) {
+                case DOWN:
+                    if (frame instanceof KeyAware)
+                        ((KeyAware) frame).keyDown(key, false);
+                    FocusManager.keyDownEvent(key, false);
+                    break;
+                case DOWN_REPEAT:
+                    if (frame instanceof KeyAware)
+                        ((KeyAware) frame).keyDown(key, true);
+                    FocusManager.keyDownEvent(key, true);
+                    break;
+                case UP:
+                    if (frame instanceof KeyAware)
+                        ((KeyAware) frame).keyUp(key);
+                    FocusManager.keyUpEvent(key);
+                    break;
+            }
+        }
+
+        @Override
+        public void onCharInput(char charInput) {
+            if (frame instanceof InputAware)
+                ((InputAware) frame).charInput(charInput);
+            FocusManager.charInputEvent(charInput);
+        }
+
+        @Override
+        public void onPointerMove(int id, float posX, float posY) {
+            try {
+                FocusManager.onPointerActive();
+                Frame frame = getFrame();
+                if (frame != null) {
+                    frame.pointerMove(id, posX, posY, posX, posY);
+                }
+            } finally {
+                FocusManager.onPointerInactive();
+            }
+        }
+
+        @Override
+        public void onPointerEnter(int id) {
+            if (id < pointerFocus.length) {
+                pointerFocus[id] = true;
+            }
+        }
+
+        @Override
+        public void onPointerLeave(int id) {
+            if (id < pointerFocus.length) {
+                pointerFocus[id] = false;
+            }
+        }
+
+        @Override
+        public void onPointerAction(int id, int button, float posX, float posY, PointerAction action) {
+            try {
+                FocusManager.onPointerActive();
+                switch (action) {
+                    case DOWN:
+                        getFrame().pointerDown(id, button, posX, posY, posX, posY);
+                        FocusManager.pointerDownFinished(id, button);
+                        break;
+                    case UP:
+                        getFrame().pointerUp(id, button, posX, posY, posX, posY);
+                        FocusManager.pointerUpFinished(id, button);
+                        break;
+                }
+            } finally {
+                FocusManager.onPointerInactive();
+            }
+        }
+
+        @Override
+        public void onScroll(int id, float xOffset, float yOffset) {
+
+        }
+    }
 }

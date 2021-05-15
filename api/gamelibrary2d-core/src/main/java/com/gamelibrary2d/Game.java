@@ -76,9 +76,10 @@ public interface Game extends Disposer, Updatable {
     Frame getFrame();
 
     /**
-     * @return - True if the cursor overlaps the game, otherwise false.
+     * @param id - The pointer id.
+     * @return - True if the pointer is within the game area..
      */
-    boolean hasCursorFocus();
+    boolean hasPointerFocus(int id);
 
     /**
      * Exists the game after the current update cycle.

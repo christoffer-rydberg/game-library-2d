@@ -2,7 +2,7 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Clearable;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.markers.Parent;
 import com.gamelibrary2d.markers.Updatable;
 
@@ -11,7 +11,7 @@ import java.util.Comparator;
 /**
  * Defines a layer of {@link Renderable} objects.
  */
-public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Clearable, Updatable, MouseAware {
+public interface Layer<T extends Renderable> extends Parent<T>, Renderable, Clearable, Updatable, PointerAware {
 
     T get(int index);
 

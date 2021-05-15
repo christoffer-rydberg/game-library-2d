@@ -3,6 +3,8 @@ package com.gamelibrary2d.framework.lwjgl;
 import com.gamelibrary2d.framework.*;
 
 public class Lwjgl_Framework implements Framework {
+    private final Mouse mouse = new Lwjgl_Mouse();
+    private final Keyboard keyboard = new Lwjgl_Keyboard();
 
     @Override
     public Joystick getJoystick() {
@@ -11,12 +13,12 @@ public class Lwjgl_Framework implements Framework {
 
     @Override
     public Keyboard getKeyboard() {
-        return Lwjgl_Keyboard.instance();
+        return keyboard;
     }
 
     @Override
     public Mouse getMouse() {
-        return Lwjgl_Mouse.instance();
+        return mouse;
     }
 
     @Override

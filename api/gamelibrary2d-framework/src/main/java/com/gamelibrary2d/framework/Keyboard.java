@@ -6,12 +6,6 @@ public interface Keyboard {
         return Runtime.getFramework().getKeyboard();
     }
 
-    int actionPressed();
-
-    int actionReleased();
-
-    int actionRepeat();
-
     int keyEnter();
 
     int keyTab();

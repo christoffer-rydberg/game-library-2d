@@ -7,24 +7,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 
 public class Lwjgl_Mouse implements Mouse {
 
-    private static Lwjgl_Mouse instance;
-
-    private Lwjgl_Mouse() {
-        instance = this;
-    }
-
-    public static Lwjgl_Mouse instance() {
-        return instance != null ? instance : new Lwjgl_Mouse();
-    }
-
-    @Override
-    public int actionPressed() {
-        return GLFW.GLFW_PRESS;
-    }
-
-    @Override
-    public int actionReleased() {
-        return GLFW.GLFW_RELEASE;
+    Lwjgl_Mouse() {
     }
 
     @Override
@@ -39,6 +22,6 @@ public class Lwjgl_Mouse implements Mouse {
 
     @Override
     public boolean isButtonDown(int button) {
-        return GLFW.glfwGetMouseButton(glfwGetCurrentContext(), button) == actionPressed();
+        return GLFW.glfwGetMouseButton(glfwGetCurrentContext(), button) == GLFW.GLFW_PRESS;
     }
 }

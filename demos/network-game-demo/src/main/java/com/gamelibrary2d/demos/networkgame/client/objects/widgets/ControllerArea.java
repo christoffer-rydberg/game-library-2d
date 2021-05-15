@@ -17,7 +17,8 @@ public class ControllerArea extends AbstractAggregatingWidget<Layer> {
     private ComposableGameObject<Renderer> handle;
     private SliderDirection direction;
     private float max, step;
-    private int dragButton = -1;
+    private int pointerId = -1;
+    private int pointerButton = -1;
 
     public ControllerArea(Renderer handle, Controller controller, SliderDirection dir, float maxDistance) {
         this.handle = createHandle(handle);
@@ -69,28 +70,30 @@ public class ControllerArea extends AbstractAggregatingWidget<Layer> {
 
     private DefaultWidget<Renderer> createHandle(Renderer renderable) {
         DefaultWidget<Renderer> handleObj = new DefaultWidget<>(renderable);
-        handleObj.addMouseButtonDownListener(this::onHandleClicked);
-        handleObj.addMouseDragListener(this::onHandleDragged);
-        handleObj.addMouseButtonReleasedListener(this::onHandleReleased);
+        handleObj.addPointerDownListener(this::onHandleClicked);
+        handleObj.addPointerDragListener(this::onHandleDragged);
+        handleObj.addPointerUpListener(this::onHandleReleased);
         return handleObj;
     }
 
-    private void onHandleClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (dragButton < 0) {
-            dragButton = button;
+    private void onHandleClicked(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (pointerId < 0) {
+            pointerId = id;
+            pointerButton = button;
             dragOrigin.set(projectedX, projectedY);
         }
     }
 
-    private void onHandleReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (dragButton == button) {
-            dragButton = -1;
+    private void onHandleReleased(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (pointerId == id && pointerButton == button) {
+            pointerId = -1;
+            pointerButton = -1;
             setValue(0f);
         }
     }
 
-    private void onHandleDragged(float x, float y, float projectedX, float projectedY) {
-        if (dragButton >= 0) {
+    private void onHandleDragged(int id, float x, float y, float projectedX, float projectedY) {
+        if (pointerId == id) {
             setValue(getValueFromPosition(projectedX, projectedY));
         }
     }

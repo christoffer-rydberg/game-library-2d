@@ -15,9 +15,7 @@ public class Android_Framework implements Framework {
     }
 
     @Override
-    public Mouse getMouse() {
-        return Android_Mouse.instance();
-    }
+    public Mouse getMouse() { return null; }
 
     @Override
     public OpenGL getOpenGL() {

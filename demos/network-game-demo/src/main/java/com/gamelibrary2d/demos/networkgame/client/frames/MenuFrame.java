@@ -271,7 +271,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, boolean repeat) {
         if (key == Keyboard.instance().keyEscape()) {
             if (credits.isEnabled()) {
                 hideCredits();
@@ -286,7 +286,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void keyReleased(int key, int scanCode, int mods) {
+    public void keyUp(int key) {
         if (key == Keyboard.instance().keyEnter()) {
             if (credits.isEnabled()) {
                 credits.setSpeedFactor(1f);

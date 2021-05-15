@@ -105,10 +105,10 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (!super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY)) {
+    protected boolean onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (!super.onPointerDown(id, button, x, y, projectedX, projectedY)) {
             if (dragging == -1) {
-                dragging = button;
+                dragging = id;
                 particleSystem.setPosition(projectedX, projectedY);
                 return true;
             }
@@ -120,8 +120,8 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
-        if (!super.onMouseMove(x, y, projectedX, projectedY)) {
+    protected boolean onPointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        if (!super.onPointerMove(id, x, y, projectedX, projectedY)) {
             if (dragging != -1) {
                 particleSystem.setPosition(projectedX, projectedY);
                 return true;
@@ -134,15 +134,15 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (button == dragging) {
+    protected void onPointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (id == dragging) {
             dragging = -1;
         }
-        super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+        super.onPointerUp(id, button, x, y, projectedX, projectedY);
     }
 
     @Override
-    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, boolean repeat) {
         if (!repeat && key == Keyboard.instance().keyEscape()) {
             if (!interfaceHidden) {
                 remove(screenLayer);
@@ -155,7 +155,7 @@ public class ParticleFrame extends AbstractFrame implements KeyAware {
     }
 
     @Override
-    public void keyReleased(int key, int scanCode, int mods) {
+    public void keyUp(int key) {
 
     }
 }

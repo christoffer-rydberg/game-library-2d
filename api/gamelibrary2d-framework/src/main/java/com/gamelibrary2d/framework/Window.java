@@ -4,7 +4,7 @@ public interface Window {
 
     void initialize();
 
-    void createCallBacks(CallbackHandler game);
+    void setEventListener(WindowEventListener eventListener);
 
     void show();
 

@@ -6,12 +6,12 @@ import com.gamelibrary2d.common.event.EventListener;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.DynamicQuad;
 import com.gamelibrary2d.resources.Quad;
 
-public class QuadTool implements Renderable, MouseAware {
+public class QuadTool implements Renderable, PointerAware {
     private final EventPublisher<Quad> onCreated = new DefaultEventPublisher<>();
     private final Func<Rectangle, Quad> quadFactory;
     private final SurfaceRenderer<DynamicQuad> inProgressRenderer;
@@ -41,8 +41,8 @@ public class QuadTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == button) {
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (drawButton == id) {
             inProgress = new QuadInProgress(x, y);
             return true;
         }
@@ -51,7 +51,7 @@ public class QuadTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
         if (isDrawing()) {
             inProgress.update(x, y);
             return true;
@@ -61,8 +61,8 @@ public class QuadTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == button) {
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (drawButton == id) {
             Quad quad = quadFactory.invoke(inProgress.getBounds());
             onCreated.publish(quad);
             inProgress = null;

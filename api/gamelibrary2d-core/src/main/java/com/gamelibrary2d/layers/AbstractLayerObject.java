@@ -73,35 +73,35 @@ public abstract class AbstractLayerObject<T extends Renderable> extends Abstract
     }
 
     @Override
-    public final boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        return isEnabled() ? onMouseButtonDown(button, mods, x, y, projectedX, projectedY) : false;
+    public final boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onMouseButtonDown(id, button, x, y, projectedX, projectedY) : false;
     }
 
-    protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    protected boolean onMouseButtonDown(int id, int button, float x, float y, float projectedX, float projectedY) {
         Point projected = Projection.projectTo(this, projectedX, projectedY);
-        return getContent().mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
+        return getContent().pointerDown(id, button, x, y, projected.getX(), projected.getY());
     }
 
     @Override
-    public final boolean mouseMove(float x, float y, float projectedX, float projectedY) {
-        return isEnabled() ? onMouseMove(x, y, projectedX, projectedY) : false;
+    public final boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onMouseMove(id, x, y, projectedX, projectedY) : false;
     }
 
-    protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
+    protected boolean onMouseMove(int id, float x, float y, float projectedX, float projectedY) {
         Point projected = Projection.projectTo(this, projectedX, projectedY);
-        return getContent().mouseMove(x, y, projected.getX(), projected.getY());
+        return getContent().pointerMove(id, x, y, projected.getX(), projected.getY());
     }
 
     @Override
-    public final void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    public final void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+            onMouseButtonReleased(id, button, x, y, projectedX, projectedY);
         }
     }
 
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    protected void onMouseButtonReleased(int id, int button, float x, float y, float projectedX, float projectedY) {
         Point projected = Projection.projectTo(this, projectedX, projectedY);
-        getContent().mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
+        getContent().pointerUp(id, button, x, y, projected.getX(), projected.getY());
     }
 
     @Override

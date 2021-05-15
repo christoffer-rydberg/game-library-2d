@@ -13,7 +13,7 @@ public class Cursor extends AbstractCursor implements Updatable {
     private final SequentialParticleEmitter particleEmitter;
 
     Cursor(Game game, Renderer renderer, DefaultDynamicLightMap lightMap, DefaultParticleSystem particleSystem) {
-        super(game, renderer);
+        super(game, 0, renderer);
         this.lightMap = lightMap;
         this.particleEmitter = new SequentialParticleEmitter(particleSystem);
         particleEmitter.getParticleSystem().setUpdateListener((sys, par) -> {

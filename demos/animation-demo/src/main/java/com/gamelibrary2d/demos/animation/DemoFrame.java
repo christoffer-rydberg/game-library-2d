@@ -54,7 +54,7 @@ public class DemoFrame extends AbstractFrame {
         DefaultWidget<Label> loadButton = new DefaultWidget<>();
         loadButton.setContent(label);
         loadButton.setBounds(label.calculateBounds());
-        loadButton.addMouseButtonReleasedListener(this::onLoadButtonClicked);
+        loadButton.addPointerUpListener(this::onLoadButtonClicked);
 
         return loadButton;
     }
@@ -156,7 +156,7 @@ public class DemoFrame extends AbstractFrame {
         super.onUpdate(deltaTime);
     }
 
-    private void onLoadButtonClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    private void onLoadButtonClicked(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (loadingAnimation == null) {
             try {
                 loadingAnimation = selectAnimation();

@@ -2,7 +2,7 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.Clearable;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.markers.Updatable;
 
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     private final List<T> readonlyObjects = Collections.unmodifiableList(objects);
     private final List<Updatable> updatableObjects = new ArrayList<>();
     private final List<Clearable> clearableObjects = new ArrayList<>();
-    private final List<MouseAware> mouseAwareObjects = new ArrayList<>();
-    private final List<MouseAware> mouseAwareIterationList = new ArrayList<>();
+    private final List<PointerAware> pointerAwareObjects = new ArrayList<>();
+    private final List<PointerAware> pointerAwareIterationList = new ArrayList<>();
 
     private Comparator<T> renderOrderComparator;
 
@@ -61,8 +61,8 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
             updatableObjects.add((Updatable) obj);
         if (obj instanceof Clearable)
             clearableObjects.add((Clearable) obj);
-        if (obj instanceof MouseAware)
-            mouseAwareObjects.add((MouseAware) obj);
+        if (obj instanceof PointerAware)
+            pointerAwareObjects.add((PointerAware) obj);
     }
 
     @Override
@@ -85,15 +85,15 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
             updatableObjects.remove(obj);
         if (obj instanceof Clearable)
             clearableObjects.remove(obj);
-        if (obj instanceof MouseAware)
-            mouseAwareObjects.remove(obj);
+        if (obj instanceof PointerAware)
+            pointerAwareObjects.remove(obj);
     }
 
     @Override
     public void clear() {
         objects.clear();
         updatableObjects.clear();
-        mouseAwareObjects.clear();
+        pointerAwareObjects.clear();
         for (Clearable clearable : clearableObjects) {
             clear(clearable);
         }
@@ -122,59 +122,59 @@ public abstract class AbstractLayer<T extends Renderable> implements Layer<T> {
     }
 
     @Override
-    public final boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        return isEnabled() ? onMouseButtonDown(button, mods, x, y, projectedX, projectedY) : false;
+    public final boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onPointerDown(id, button, x, y, projectedX, projectedY) : false;
     }
 
-    protected boolean onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        mouseAwareIterationList.addAll(mouseAwareObjects);
-        for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.mouseButtonDown(button, mods, x, y, projectedX, projectedY)) {
-                mouseAwareIterationList.clear();
+    protected boolean onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        pointerAwareIterationList.addAll(pointerAwareObjects);
+        for (int i = pointerAwareIterationList.size() - 1; i >= 0; --i) {
+            PointerAware obj = pointerAwareIterationList.get(i);
+            if (obj.pointerDown(id, button, x, y, projectedX, projectedY)) {
+                pointerAwareIterationList.clear();
                 return true;
             }
         }
 
-        mouseAwareIterationList.clear();
+        pointerAwareIterationList.clear();
 
         return false;
     }
 
     @Override
-    public final boolean mouseMove(float x, float y, float projectedX, float projectedY) {
-        return isEnabled() ? onMouseMove(x, y, projectedX, projectedY) : false;
+    public final boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        return isEnabled() ? onPointerMove(id, x, y, projectedX, projectedY) : false;
     }
 
-    protected boolean onMouseMove(float x, float y, float projectedX, float projectedY) {
-        mouseAwareIterationList.addAll(mouseAwareObjects);
-        for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            MouseAware obj = mouseAwareIterationList.get(i);
-            if (obj.mouseMove(x, y, projectedX, projectedY)) {
-                mouseAwareIterationList.clear();
+    protected boolean onPointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        pointerAwareIterationList.addAll(pointerAwareObjects);
+        for (int i = pointerAwareIterationList.size() - 1; i >= 0; --i) {
+            PointerAware obj = pointerAwareIterationList.get(i);
+            if (obj.pointerMove(id, x, y, projectedX, projectedY)) {
+                pointerAwareIterationList.clear();
                 return true;
             }
         }
 
-        mouseAwareIterationList.clear();
+        pointerAwareIterationList.clear();
 
         return false;
     }
 
     @Override
-    public final void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    public final void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+            onPointerUp(id, button, x, y, projectedX, projectedY);
         }
     }
 
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        mouseAwareIterationList.addAll(mouseAwareObjects);
-        for (int i = mouseAwareIterationList.size() - 1; i >= 0; --i) {
-            mouseAwareIterationList.get(i).mouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+    protected void onPointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        pointerAwareIterationList.addAll(pointerAwareObjects);
+        for (int i = pointerAwareIterationList.size() - 1; i >= 0; --i) {
+            pointerAwareIterationList.get(i).pointerUp(id, button, x, y, projectedX, projectedY);
         }
 
-        mouseAwareIterationList.clear();
+        pointerAwareIterationList.clear();
     }
 
     @Override

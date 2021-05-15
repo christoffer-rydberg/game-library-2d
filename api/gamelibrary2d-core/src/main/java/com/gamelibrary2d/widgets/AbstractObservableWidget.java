@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractObservableWidget<T extends Renderable> extends AbstractWidget<T> {
-    private final List<MouseButtonDownListener> mouseButtonDownListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseHoverListener> mouseHoverListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseDragListener> mouseDragListeners = new CopyOnWriteArrayList<>();
-    private final List<MouseButtonReleasedListener> mouseButtonReleasedListeners = new CopyOnWriteArrayList<>();
+    private final List<PointerDownListener> pointerDownListeners = new CopyOnWriteArrayList<>();
+    private final List<PointerHoverListener> pointerHoverListeners = new CopyOnWriteArrayList<>();
+    private final List<PointerDragListener> pointerDragListeners = new CopyOnWriteArrayList<>();
+    private final List<PointerUpListener> pointerUpListeners = new CopyOnWriteArrayList<>();
     private final List<KeyDownListener> keyDownListeners = new CopyOnWriteArrayList<>();
-    private final List<KeyReleasedListener> keyReleasedListeners = new CopyOnWriteArrayList<>();
+    private final List<KeyUpListener> keyUpListeners = new CopyOnWriteArrayList<>();
     private final List<CharInputListener> charInputListeners = new CopyOnWriteArrayList<>();
     private final List<FocusChangedListener> focusChangedListeners = new CopyOnWriteArrayList<>();
 
@@ -24,40 +24,36 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
         super(content);
     }
 
-    public void removeMouseListener(MouseButtonDownListener listener) {
-        mouseButtonDownListeners.remove(listener);
+    public void addPointerDownListener(PointerDownListener listener) {
+        pointerDownListeners.add(listener);
     }
 
-    public void addMouseButtonDownListener(MouseButtonDownListener listener) {
-        mouseButtonDownListeners.add(listener);
+    public void removePointerDownListener(PointerDownListener listener) {
+        pointerDownListeners.remove(listener);
     }
 
-    public void removeMouseButtonDownListener(MouseButtonDownListener listener) {
-        mouseButtonDownListeners.remove(listener);
+    public void addPointerHoverListener(PointerHoverListener listener) {
+        pointerHoverListeners.add(listener);
     }
 
-    public void addMouseHoverListener(MouseHoverListener listener) {
-        mouseHoverListeners.add(listener);
+    public void removePointerHoverListener(PointerHoverListener listener) {
+        pointerHoverListeners.remove(listener);
     }
 
-    public void removeMouseHoverListener(MouseHoverListener listener) {
-        mouseHoverListeners.remove(listener);
+    public void addPointerDragListener(PointerDragListener listener) {
+        pointerDragListeners.add(listener);
     }
 
-    public void addMouseDragListener(MouseDragListener listener) {
-        mouseDragListeners.add(listener);
+    public void removePointerDragListener(PointerDragListener listener) {
+        pointerDragListeners.remove(listener);
     }
 
-    public void removeMouseDragListener(MouseDragListener listener) {
-        mouseDragListeners.remove(listener);
+    public void addPointerUpListener(PointerUpListener listener) {
+        pointerUpListeners.add(listener);
     }
 
-    public void addMouseButtonReleasedListener(MouseButtonReleasedListener listener) {
-        mouseButtonReleasedListeners.add(listener);
-    }
-
-    public void removeMouseButtonReleasedListener(MouseButtonReleasedListener listener) {
-        mouseButtonReleasedListeners.remove(listener);
+    public void removePointerUpListener(PointerUpListener listener) {
+        pointerUpListeners.remove(listener);
     }
 
     public void addKeyDownListener(KeyDownListener listener) {
@@ -68,12 +64,12 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
         keyDownListeners.remove(listener);
     }
 
-    public void addKeyReleasedListener(KeyReleasedListener listener) {
-        keyReleasedListeners.add(listener);
+    public void addKeyUpListener(KeyUpListener listener) {
+        keyUpListeners.add(listener);
     }
 
-    public void removeKeyReleasedListener(KeyReleasedListener listener) {
-        keyReleasedListeners.remove(listener);
+    public void removeKeyUpListener(KeyUpListener listener) {
+        keyUpListeners.remove(listener);
     }
 
     public void addCharInputListener(CharInputListener listener) {
@@ -93,42 +89,42 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     }
 
     @Override
-    protected boolean isListeningToMouseHoverEvents() {
-        return !mouseHoverListeners.isEmpty();
+    protected boolean isListeningToPointHoverEvents() {
+        return !pointerHoverListeners.isEmpty();
     }
 
     @Override
-    protected boolean isListeningToMouseDragEvents() {
-        return !mouseDragListeners.isEmpty();
+    protected boolean isListeningToPointDragEvents() {
+        return !pointerDragListeners.isEmpty();
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
-        for (MouseButtonDownListener listener : mouseButtonDownListeners) {
-            listener.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
+    protected void onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        super.onPointerDown(id, button, x, y, projectedX, projectedY);
+        for (PointerDownListener listener : pointerDownListeners) {
+            listener.onPointerDown(id, button, x, y, projectedX, projectedY);
         }
     }
 
     @Override
-    protected void onMouseHover(float x, float y, float projectedX, float projectedY) {
-        for (MouseHoverListener listener : mouseHoverListeners) {
-            listener.onMouseHover(x, y, projectedX, projectedY);
+    protected void onPointerHover(int id, float x, float y, float projectedX, float projectedY) {
+        for (PointerHoverListener listener : pointerHoverListeners) {
+            listener.onPointerHover(id, x, y, projectedX, projectedY);
         }
     }
 
     @Override
-    protected void onMouseDrag(float x, float y, float projectedX, float projectedY) {
-        for (MouseDragListener listener : mouseDragListeners) {
-            listener.onMouseDrag(x, y, projectedX, projectedY);
+    protected void onPointerDrag(int id, float x, float y, float projectedX, float projectedY) {
+        for (PointerDragListener listener : pointerDragListeners) {
+            listener.onPointerDrag(id, x, y, projectedX, projectedY);
         }
     }
 
     @Override
-    protected void onMouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        super.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
-        for (MouseButtonReleasedListener listener : mouseButtonReleasedListeners) {
-            listener.onMouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+    protected void onPointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        super.onPointerUp(id, button, x, y, projectedX, projectedY);
+        for (PointerUpListener listener : pointerUpListeners) {
+            listener.onPointerUp(id, button, x, y, projectedX, projectedY);
         }
     }
 
@@ -141,18 +137,18 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
     }
 
     @Override
-    public void onKeyDown(int key, int scanCode, boolean repeat, int mods) {
-        super.onKeyDown(key, scanCode, repeat, mods);
+    public void onKeyDown(int key, boolean repeat) {
+        super.onKeyDown(key, repeat);
         for (KeyDownListener listener : keyDownListeners) {
-            listener.onKeyDown(key, scanCode, repeat, mods);
+            listener.onKeyDown(key, repeat);
         }
     }
 
     @Override
-    public void onKeyReleased(int key, int scanCode, int mods) {
-        super.onKeyReleased(key, scanCode, mods);
-        for (KeyReleasedListener listener : keyReleasedListeners) {
-            listener.onKeyReleased(key, scanCode, mods);
+    public void onKeyUp(int key) {
+        super.onKeyUp(key);
+        for (KeyUpListener listener : keyUpListeners) {
+            listener.onKeyUp(key);
         }
     }
 

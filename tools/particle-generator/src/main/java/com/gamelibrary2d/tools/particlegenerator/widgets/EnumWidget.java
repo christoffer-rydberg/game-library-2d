@@ -41,8 +41,8 @@ public class EnumWidget<T extends Enum<T>> extends AbstractWidget<Label> {
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
+    protected void onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        super.onPointerDown(id, button, x, y, projectedX, projectedY);
         currentIndex = (currentIndex + 1) % values.length;
         cachedValue = values[currentIndex];
         property.set(cachedValue);

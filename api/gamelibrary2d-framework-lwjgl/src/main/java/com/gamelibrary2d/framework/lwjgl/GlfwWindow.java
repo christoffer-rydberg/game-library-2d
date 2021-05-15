@@ -1,8 +1,6 @@
 package com.gamelibrary2d.framework.lwjgl;
 
-import com.gamelibrary2d.framework.CallbackHandler;
-import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.framework.Window;
+import com.gamelibrary2d.framework.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -42,6 +40,15 @@ public class GlfwWindow implements Window {
     private MouseCursorMode mouseCursorMode = MouseCursorMode.NORMAL;
 
     private Callback debugProc;
+
+    /**
+     * Last known X coordinate of mouse cursor.
+     */
+    private float cursorPosX;
+    /**
+     * Last known Y coordinate of mouse cursor.
+     */
+    private float cursorPosY;
 
     protected GlfwWindow(String title, int width, int height, boolean fullScreen) {
         this.title = title;
@@ -249,51 +256,79 @@ public class GlfwWindow implements Window {
         glfwFocusWindow(windowHandle);
     }
 
+    private KeyAction getKeyAction(int action) {
+        switch (action) {
+            case GLFW_PRESS:
+                return KeyAction.DOWN;
+            case GLFW_RELEASE:
+                return KeyAction.UP;
+            case GLFW_REPEAT:
+                return KeyAction.DOWN_REPEAT;
+            default:
+                throw new IllegalStateException("Unexpected value: " + action);
+        }
+    }
+
+    private PointerAction getPointerAction(int action) {
+        switch (action) {
+            case GLFW_PRESS:
+                return PointerAction.DOWN;
+            case GLFW_RELEASE:
+                return PointerAction.UP;
+            default:
+                throw new IllegalStateException("Unexpected value: " + action);
+        }
+    }
+
     @Override
-    public void createCallBacks(CallbackHandler game) {
+    public void setEventListener(WindowEventListener eventListener) {
         glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
         glfwSetKeyCallback(windowHandle, new GLFWKeyCallback() {
             public void invoke(long window, int key, int scancode, int action, int mods) {
-                game.onKeyCallback(key, scancode, action, mods);
+                eventListener.onKeyAction(key, getKeyAction(action));
             }
         });
 
         glfwSetCharCallback(windowHandle, new GLFWCharCallback() {
             public void invoke(long window, int charInput) {
-                game.onCharCallback((char) charInput);
+                eventListener.onCharInput((char) charInput);
             }
         });
 
         glfwSetCursorPosCallback(windowHandle, new GLFWCursorPosCallback() {
-            public void invoke(long window, double xpos, double ypos) {
+            public void invoke(long window, double posX, double posY) {
+                cursorPosX = (float) posX;
+
                 // The GLFW mouse coordinates are relative to the
                 // upper left corner of the window with the Y-axis down.
                 // The y-value is flipped in order to get the position
                 // relative to the lower left corner, with the Y-axis up.
-                game.onCursorPosCallback(xpos, windowHeight - ypos);
+                cursorPosY = (float) (windowHeight - posY);
+
+                eventListener.onPointerMove(0, cursorPosX, cursorPosY);
             }
         });
 
         glfwSetCursorEnterCallback(windowHandle, new GLFWCursorEnterCallback() {
             public void invoke(long window, boolean entered) {
                 if (entered) {
-                    game.onCursorEnterCallback();
+                    eventListener.onPointerEnter(0);
                 } else {
-                    game.onCursorLeaveCallback();
+                    eventListener.onPointerLeave(0);
                 }
             }
         });
 
         glfwSetMouseButtonCallback(windowHandle, new GLFWMouseButtonCallback() {
             public void invoke(long window, int button, int action, int mods) {
-                game.onMouseButtonCallback(button, action, mods);
+                eventListener.onPointerAction(0, button, cursorPosX, cursorPosY, getPointerAction(action));
             }
         });
 
         glfwSetScrollCallback(windowHandle, new GLFWScrollCallback() {
-            public void invoke(long window, double xoffset, double yoffset) {
-                game.onScrollCallback(xoffset, yoffset);
+            public void invoke(long window, double xOffset, double yOffset) {
+                eventListener.onScroll(0, (float) xOffset, (float) yOffset);
             }
         });
 

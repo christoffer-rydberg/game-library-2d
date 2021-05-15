@@ -7,25 +7,52 @@ import java.util.List;
 
 public class FocusManager {
 
-    private static final List<Object> focusedObjects = new ArrayList<>();
+    private static final List<Object> focused = new ArrayList<>();
+
+    private static final List<Object> focusedByPointer = new ArrayList<>();
 
     private static final List<Object> iterationList = new ArrayList<>();
+
+    private static boolean pointerActive;
+
+    static void onPointerActive() {
+        pointerActive = true;
+    }
+
+    static void onPointerInactive() {
+        pointerActive = false;
+        focused.addAll(focusedByPointer);
+        focusedByPointer.clear();
+    }
+
+    public static boolean isFocused(Object obj) {
+        return focused.contains(obj) || focusedByPointer.contains(obj);
+    }
 
     public static void focus(Object obj, boolean replace) {
         if (replace) {
             replaceFocus(obj);
         }
 
-        if (!focusedObjects.contains(obj)) {
-            focusedObjects.add(obj);
+        if (!isFocused(obj)) {
+            if (pointerActive) {
+                focusedByPointer.add(obj);
+            } else {
+                focused.add(obj);
+            }
+
             if (obj instanceof FocusAware) {
                 ((FocusAware) obj).focused();
             }
         }
     }
 
+    private static boolean removeFocus(Object obj) {
+        return focused.remove(obj) || focusedByPointer.remove(obj);
+    }
+
     public static void unfocus(Object obj, boolean recursive) {
-        if (focusedObjects.remove(obj) && obj instanceof FocusAware) {
+        if (removeFocus(obj) && obj instanceof FocusAware) {
             ((FocusAware) obj).unfocused();
         }
 
@@ -41,31 +68,34 @@ public class FocusManager {
     }
 
     public static void clearFocus() {
-        List<Object> focused = new ArrayList<>(focusedObjects.size());
-        focused.addAll(focusedObjects);
-        for (int i = 0; i < focused.size(); ++i) {
-            unfocus(focused.get(i), false);
+        List<Object> iterationList = new ArrayList<>(FocusManager.focused.size() + focusedByPointer.size());
+        iterationList.addAll(focused);
+        iterationList.addAll(focusedByPointer);
+        for (int i = 0; i < iterationList.size(); ++i) {
+            unfocus(iterationList.get(i), false);
         }
     }
 
     private static void replaceFocus(Object obj) {
-        List<Object> focused = new ArrayList<>(focusedObjects.size());
-        focused.addAll(focusedObjects);
-        for (int i = 0; i < focused.size(); ++i) {
-            Object focusedObject = focused.get(i);
+        List<Object> iterationList = new ArrayList<>(FocusManager.focused.size() + focusedByPointer.size());
+        iterationList.addAll(focused);
+        iterationList.addAll(focusedByPointer);
+        for (int i = 0; i < iterationList.size(); ++i) {
+            Object focusedObject = iterationList.get(i);
             if (focusedObject != obj) {
-                unfocus(focused.get(i), false);
+                unfocus(iterationList.get(i), false);
             }
         }
     }
 
-    static void keyDownEvent(int key, int scanCode, boolean repeat, int mods) {
+    static void keyDownEvent(int key, boolean repeat) {
         try {
-            iterationList.addAll(focusedObjects);
+            iterationList.addAll(focused);
+            iterationList.addAll(focusedByPointer);
             for (int i = 0; i < iterationList.size(); ++i) {
                 Object obj = iterationList.get(i);
                 if (obj instanceof KeyAware) {
-                    ((KeyAware) obj).keyDown(key, scanCode, repeat, mods);
+                    ((KeyAware) obj).keyDown(key, repeat);
                 }
             }
         } finally {
@@ -73,13 +103,14 @@ public class FocusManager {
         }
     }
 
-    static void keyReleaseEvent(int key, int scanCode, int mods) {
+    static void keyUpEvent(int key) {
         try {
-            iterationList.addAll(focusedObjects);
+            iterationList.addAll(focused);
+            iterationList.addAll(focusedByPointer);
             for (int i = 0; i < iterationList.size(); ++i) {
                 Object obj = iterationList.get(i);
                 if (obj instanceof KeyAware) {
-                    ((KeyAware) obj).keyReleased(key, scanCode, mods);
+                    ((KeyAware) obj).keyUp(key);
                 }
             }
         } finally {
@@ -89,7 +120,8 @@ public class FocusManager {
 
     static void charInputEvent(char charInput) {
         try {
-            iterationList.addAll(focusedObjects);
+            iterationList.addAll(focused);
+            iterationList.addAll(focusedByPointer);
             for (int i = 0; i < iterationList.size(); ++i) {
                 Object obj = iterationList.get(i);
                 if (obj instanceof InputAware) {
@@ -101,16 +133,16 @@ public class FocusManager {
         }
     }
 
-    private static void onMouseButtonEventFinished(int button, int mods, boolean released) {
+    private static void onPointerActionFinished(int id, int button, boolean released) {
         try {
-            iterationList.addAll(focusedObjects);
+            iterationList.addAll(focused);
             for (int i = 0; i < iterationList.size(); ++i) {
                 Object obj = iterationList.get(i);
-                if (obj instanceof MouseWhenFocusedAware) {
+                if (obj instanceof PointerWhenFocusedAware) {
                     if (released) {
-                        ((MouseWhenFocusedAware) obj).mouseButtonReleasedWhenFocused(button, mods);
+                        ((PointerWhenFocusedAware) obj).pointerUpWhenFocused(id, button);
                     } else {
-                        ((MouseWhenFocusedAware) obj).mouseButtonDownWhenFocused(button, mods);
+                        ((PointerWhenFocusedAware) obj).pointerDownWhenFocused(id, button);
                     }
                 }
             }
@@ -119,11 +151,11 @@ public class FocusManager {
         }
     }
 
-    static void mouseButtonDownFinished(int button, int mods) {
-        onMouseButtonEventFinished(button, mods, false);
+    static void pointerDownFinished(int id, int button) {
+        onPointerActionFinished(id, button, false);
     }
 
-    static void mouseButtonReleasedFinished(int button, int mods) {
-        onMouseButtonEventFinished(button, mods, true);
+    static void pointerUpFinished(int id, int button) {
+        onPointerActionFinished(id, button, true);
     }
 }

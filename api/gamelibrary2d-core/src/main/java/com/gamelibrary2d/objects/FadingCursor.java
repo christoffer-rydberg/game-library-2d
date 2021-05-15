@@ -16,8 +16,8 @@ public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implem
 
     private float visibilityTimer;
 
-    public FadingCursor(Game game, T content) {
-        super(game, content);
+    public FadingCursor(Game game, int pointerId, T content) {
+        super(game, pointerId, content);
     }
 
     public float getVisibilityDuration() {

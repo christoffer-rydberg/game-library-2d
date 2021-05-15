@@ -63,8 +63,8 @@ public class Checkbox extends AbstractWidget {
     }
 
     @Override
-    protected void onMouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        super.onMouseButtonDown(button, mods, x, y, projectedX, projectedY);
+    protected void onPointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        super.onPointerDown(id, button, x, y, projectedX, projectedY);
         toggle();
     }
 

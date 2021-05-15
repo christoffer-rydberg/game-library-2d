@@ -7,29 +7,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 
 public class Lwjgl_Keyboard implements Keyboard {
 
-    private static Lwjgl_Keyboard instance;
-
-    private Lwjgl_Keyboard() {
-        instance = this;
-    }
-
-    public static Lwjgl_Keyboard instance() {
-        return instance != null ? instance : new Lwjgl_Keyboard();
-    }
-
-    @Override
-    public int actionPressed() {
-        return GLFW.GLFW_PRESS;
-    }
-
-    @Override
-    public int actionReleased() {
-        return GLFW.GLFW_RELEASE;
-    }
-
-    @Override
-    public int actionRepeat() {
-        return GLFW.GLFW_REPEAT;
+    Lwjgl_Keyboard() {
     }
 
     @Override
@@ -224,7 +202,7 @@ public class Lwjgl_Keyboard implements Keyboard {
 
     @Override
     public boolean isKeyDown(int key) {
-        return GLFW.glfwGetKey(glfwGetCurrentContext(), key) == actionPressed();
+        return GLFW.glfwGetKey(glfwGetCurrentContext(), key) == GLFW.GLFW_PRESS;
     }
 
     @Override

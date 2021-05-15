@@ -2,8 +2,8 @@ package com.gamelibrary2d.layers;
 
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.markers.Clearable;
-import com.gamelibrary2d.markers.MouseAware;
 import com.gamelibrary2d.markers.NavigationAware;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.objects.AbstractGameObject;
 import com.gamelibrary2d.objects.GameObject;
 import com.gamelibrary2d.util.Projection;
@@ -11,7 +11,7 @@ import com.gamelibrary2d.util.Projection;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class NavigationPanel extends AbstractGameObject<GameObject> implements MouseAware, Clearable {
+public class NavigationPanel extends AbstractGameObject<GameObject> implements PointerAware, Clearable {
 
     private final Deque<GameObject> previous = new ArrayDeque<>();
 
@@ -50,33 +50,33 @@ public class NavigationPanel extends AbstractGameObject<GameObject> implements M
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
         GameObject content = getContent();
-        if (content instanceof MouseAware) {
+        if (content instanceof PointerAware) {
             Point projected = Projection.projectTo(this, projectedX, projectedY);
-            return ((MouseAware) content).mouseButtonDown(button, mods, x, y, projected.getX(), projected.getY());
+            return ((PointerAware) content).pointerDown(id, button, x, y, projected.getX(), projected.getY());
         }
 
         return false;
     }
 
     @Override
-    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
         GameObject content = getContent();
-        if (content instanceof MouseAware) {
+        if (content instanceof PointerAware) {
             Point projected = Projection.projectTo(this, projectedX, projectedY);
-            return ((MouseAware) content).mouseMove(x, y, projected.getX(), projected.getY());
+            return ((PointerAware) content).pointerMove(id, x, y, projected.getX(), projected.getY());
         }
 
         return false;
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         GameObject content = getContent();
-        if (content instanceof MouseAware) {
+        if (content instanceof PointerAware) {
             Point projected = Projection.projectTo(this, projectedX, projectedY);
-            ((MouseAware) content).mouseButtonReleased(button, mods, x, y, projected.getX(), projected.getY());
+            ((PointerAware) content).pointerUp(id, button, x, y, projected.getX(), projected.getY());
         }
     }
 

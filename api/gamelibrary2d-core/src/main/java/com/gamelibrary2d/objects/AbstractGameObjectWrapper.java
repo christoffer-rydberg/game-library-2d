@@ -4,11 +4,11 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.markers.InputAware;
 import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.markers.Updatable;
 
 public class AbstractGameObjectWrapper<T extends GameObject>
-        implements GameObject, MouseAware, KeyAware, InputAware, Updatable {
+        implements GameObject, PointerAware, KeyAware, InputAware, Updatable {
 
     private T wrapped;
 
@@ -46,16 +46,16 @@ public class AbstractGameObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public void keyDown(int key, int scanCode, boolean repeat, int mods) {
+    public void keyDown(int key, boolean repeat) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).keyDown(key, scanCode, repeat, mods);
+            ((KeyAware) wrapped).keyDown(key, repeat);
         }
     }
 
     @Override
-    public void keyReleased(int key, int scanCode, int mods) {
+    public void keyUp(int key) {
         if (wrapped instanceof KeyAware) {
-            ((KeyAware) wrapped).keyReleased(key, scanCode, mods);
+            ((KeyAware) wrapped).keyUp(key);
         }
     }
 
@@ -85,25 +85,25 @@ public class AbstractGameObjectWrapper<T extends GameObject>
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).mouseButtonDown(button, mods, x, y, projectedX, projectedY);
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (wrapped instanceof PointerAware) {
+            return ((PointerAware) wrapped).pointerDown(id, button, x, y, projectedX, projectedY);
         }
         return false;
     }
 
     @Override
-    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
-        if (wrapped instanceof MouseAware) {
-            return ((MouseAware) wrapped).mouseMove(x, y, projectedX, projectedY);
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        if (wrapped instanceof PointerAware) {
+            return ((PointerAware) wrapped).pointerMove(id, x, y, projectedX, projectedY);
         }
         return false;
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (wrapped instanceof MouseAware) {
-            ((MouseAware) wrapped).mouseButtonReleased(button, mods, x, y, projectedX, projectedY);
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (wrapped instanceof PointerAware) {
+            ((PointerAware) wrapped).pointerUp(id, button, x, y, projectedX, projectedY);
         }
     }
 

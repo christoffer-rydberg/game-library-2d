@@ -19,7 +19,8 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     private float min;
     private float max;
     private float step;
-    private int dragButton = -1;
+    private int pointerId = -1;
+    private int pointerButton = -1;
     private float dragOriginX;
     private float dragOriginY;
 
@@ -99,15 +100,16 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
 
     private GameObject createHandle(Renderable renderable) {
         DefaultWidget<Renderable> handleObj = new DefaultWidget<>(renderable);
-        handleObj.addMouseButtonDownListener(this::onHandleClicked);
-        handleObj.addMouseDragListener(this::onHandleDragged);
-        handleObj.addMouseButtonReleasedListener(this::onHandleReleased);
+        handleObj.addPointerDownListener(this::onHandleClicked);
+        handleObj.addPointerDragListener(this::onHandleDragged);
+        handleObj.addPointerUpListener(this::onHandleReleased);
         return handleObj;
     }
 
-    private void onHandleClicked(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (dragButton < 0) {
-            dragButton = button;
+    private void onHandleClicked(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (pointerId < 0) {
+            pointerId = id;
+            pointerButton = button;
             dragOriginX = projectedX;
             dragOriginY = projectedY;
             for (DragBeginListener listener : dragBeginListeners) {
@@ -116,17 +118,18 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         }
     }
 
-    private void onHandleReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (dragButton == button) {
-            dragButton = -1;
+    private void onHandleReleased(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (pointerId == id && pointerButton == button) {
+            pointerId = -1;
+            pointerButton = -1;
             for (DragStopListener listener : dragStopListeners) {
                 listener.onDragStop(getValue());
             }
         }
     }
 
-    private void onHandleDragged(float x, float y, float projectedX, float projectedY) {
-        if (dragButton >= 0) {
+    private void onHandleDragged(int id, float x, float y, float projectedX, float projectedY) {
+        if (pointerId == id) {
             setValue(getValueFromPosition(projectedX, projectedY));
         }
     }

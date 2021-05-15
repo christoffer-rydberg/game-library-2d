@@ -7,10 +7,12 @@ import android.view.MotionEvent;
 import com.gamelibrary2d.framework.*;
 
 class Android_Window extends GLSurfaceView implements Window {
+    private static final int POINTER_DOWN = 0;
+    private static final int POINTER_MOVE = 1;
+    private static final int POINTER_UP = 2;
     private final Activity activity;
     private final MotionEventStash motionEventStash = new MotionEventStash(100);
-
-    private CallbackHandler callbackHandler;
+    private WindowEventListener eventListener;
 
     Android_Window(Activity activity) {
         super(activity);
@@ -75,13 +77,13 @@ class Android_Window extends GLSurfaceView implements Window {
     }
 
     @Override
-    public void createCallBacks(CallbackHandler callbackHandler) {
-        this.callbackHandler = callbackHandler;
+    public void setEventListener(WindowEventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        if (callbackHandler == null) {
+        if (eventListener == null) {
             return false;
         }
 
@@ -92,10 +94,12 @@ class Android_Window extends GLSurfaceView implements Window {
     @Override
     public void pollEvents() {
         motionEventStash.pollEvents();
-        motionEventStash.triggerEvents(callbackHandler);
+        motionEventStash.triggerEvents(eventListener);
     }
 
     private class MotionEventStash {
+        private final static int stride = 4;
+
         private final int[] stashedEvents;
         private final int[] polledEvents;
 
@@ -103,15 +107,39 @@ class Android_Window extends GLSurfaceView implements Window {
         private int polledPointer = 0;
 
         MotionEventStash(int capacity) {
-            stashedEvents = new int[3 * capacity];
-            polledEvents = new int[3 * capacity];
+            stashedEvents = new int[stride * capacity];
+            polledEvents = new int[stride * capacity];
+        }
+
+        private void stashEvent(MotionEvent e, int action, int index) {
+            stashedEvents[stashPointer] = action;
+            stashedEvents[stashPointer + 1] = e.getPointerId(index);
+            stashedEvents[stashPointer + 2] = (int) e.getX(index);
+            stashedEvents[stashPointer + 3] = (int) e.getY(index);
+            stashPointer += stride;
         }
 
         synchronized void stashEvent(MotionEvent e) {
-            stashedEvents[stashPointer] = e.getAction();
-            stashedEvents[stashPointer + 1] = (int) e.getX();
-            stashedEvents[stashPointer + 2] = (int) e.getY();
-            stashPointer += 3;
+            int action = e.getActionMasked();
+
+            switch (action) {
+                case MotionEvent.ACTION_MOVE:
+                    int count = e.getPointerCount();
+                    for (int i = 0; i < count; ++i) {
+                        stashEvent(e, POINTER_MOVE, i);
+                    }
+                    break;
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    stashEvent(e, POINTER_DOWN, e.getActionIndex());
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                case MotionEvent.ACTION_CANCEL: {
+                    stashEvent(e, POINTER_UP, e.getActionIndex());
+                    break;
+                }
+            }
         }
 
         synchronized void pollEvents() {
@@ -124,26 +152,29 @@ class Android_Window extends GLSurfaceView implements Window {
             return polledEvents[offset];
         }
 
-        private float getX(int offset) {
+        private int getPointerId(int offset) {
             return polledEvents[offset + 1];
         }
 
-        private float getY(int offset) {
-            return getHeight() - polledEvents[offset + 2];
+        private float getX(int offset) {
+            return polledEvents[offset + 2];
         }
 
-        void triggerEvents(CallbackHandler callbackHandler) {
-            for (int i = 0; i < polledPointer; i += 3) {
+        private float getY(int offset) {
+            return getHeight() - polledEvents[offset + 3];
+        }
+
+        void triggerEvents(WindowEventListener eventListener) {
+            for (int i = 0; i < polledPointer; i += stride) {
                 switch (getAction(i)) {
-                    case MotionEvent.ACTION_DOWN:
-                        callbackHandler.onCursorPosCallback(getX(i), getY(i));
-                        callbackHandler.onMouseButtonCallback(0, Mouse.instance().actionPressed(), 0);
+                    case POINTER_DOWN:
+                        eventListener.onPointerAction(getPointerId(i), 0, getX(i), getY(i), PointerAction.DOWN);
                         break;
-                    case MotionEvent.ACTION_MOVE:
-                        callbackHandler.onCursorPosCallback(getX(i), getY(i));
+                    case POINTER_MOVE:
+                        eventListener.onPointerMove(getPointerId(i), getX(i), getY(i));
                         break;
-                    case MotionEvent.ACTION_UP:
-                        callbackHandler.onMouseButtonCallback(0, Mouse.instance().actionReleased(), 0);
+                    case POINTER_UP:
+                        eventListener.onPointerAction(getPointerId(i), 0, getX(i), getY(i), PointerAction.UP);
                         break;
                 }
             }

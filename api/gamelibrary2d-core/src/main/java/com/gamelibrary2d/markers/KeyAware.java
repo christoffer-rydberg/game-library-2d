@@ -4,20 +4,16 @@ public interface KeyAware {
     /**
      * Handles key down events.
      *
-     * @param key      The keyboard key that was pressed or released.
-     * @param scanCode The system-specific scancode of the key.
-     * @param repeat   True if the key action is repeat.
-     * @param mods     Describes which modifier keys were held down.
+     * @param key    The keyboard key that was pressed.
+     * @param repeat True if the key action is repeat.
      */
-    void keyDown(int key, int scanCode, boolean repeat, int mods);
+    void keyDown(int key, boolean repeat);
 
     /**
-     * Handles key release events.
+     * Handles key up events.
      *
-     * @param key      The keyboard key that was pressed or released.
-     * @param scanCode The system-specific scancode of the key.
-     * @param mods     Describes which modifier keys were held down.
+     * @param key The keyboard key that was released.
      */
-    void keyReleased(int key, int scanCode, int mods);
+    void keyUp(int key);
 
 }

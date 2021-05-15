@@ -3,14 +3,15 @@ package com.gamelibrary2d.demos.collisiondetection;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.markers.MouseAware;
+import com.gamelibrary2d.markers.PointerAware;
 
-public class BallTool implements Renderable, MouseAware {
+public class BallTool implements Renderable, PointerAware {
     private final Line line;
     private final Renderable ballRenderer;
     private final BallCreatedListener ballCreatedListener;
 
-    private int drawButton = -1;
+    private int pointerId = -1;
+    private int pointerButton = -1;
 
     private BallTool(Line line, Renderable ballRenderer, BallCreatedListener ballCreatedListener) {
         this.line = line;
@@ -23,7 +24,7 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     private boolean isDrawing() {
-        return drawButton != -1;
+        return pointerId != -1;
     }
 
     @Override
@@ -41,9 +42,10 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseButtonDown(int button, int mods, float x, float y, float projectedX, float projectedY) {
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (!isDrawing()) {
-            drawButton = button;
+            pointerId = id;
+            pointerButton = button;
             line.getStart().set(projectedX, projectedY);
             line.getEnd().set(projectedX, projectedY);
             line.refresh();
@@ -54,7 +56,7 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public boolean mouseMove(float x, float y, float projectedX, float projectedY) {
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
         if (isDrawing()) {
             line.getEnd().set(projectedX, projectedY);
             line.refresh();
@@ -65,9 +67,10 @@ public class BallTool implements Renderable, MouseAware {
     }
 
     @Override
-    public void mouseButtonReleased(int button, int mods, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == button) {
-            drawButton = -1;
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (pointerId == id && pointerButton == button) {
+            pointerId = -1;
+            pointerButton = -1;
             float direction = line.getStart().getDirectionDegrees(line.getEnd());
             float speed = 2 * line.getStart().getDistance(line.getEnd());
             Ball ball = new Ball(ballRenderer, line.getStart().getX(), line.getStart().getY());
