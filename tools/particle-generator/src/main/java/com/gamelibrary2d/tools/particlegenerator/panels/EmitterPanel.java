@@ -30,7 +30,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         emitButton.setPosition(0, 0);
 
         emitSequentialButton = new ToggleButton();
-        Label emitSequentialContent = emitSequentialButton.getContent();
+        Label emitSequentialContent = emitSequentialButton.getComposition();
         emitSequentialContent.setText("Emit Sequential");
         emitSequentialContent.setTextRenderer(new TextRenderer(font));
         emitSequentialContent.setColor(Color.SOFT_BLUE);

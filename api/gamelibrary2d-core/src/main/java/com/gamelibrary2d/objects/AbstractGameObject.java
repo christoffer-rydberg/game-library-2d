@@ -2,44 +2,19 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.FocusManager;
 import com.gamelibrary2d.common.Point;
-import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.markers.Bounded;
 
-public abstract class AbstractGameObject<T extends Renderable> implements GameObject {
+public abstract class AbstractGameObject implements GameObject {
     private final Point position = new Point();
     private final Point scale = new Point(1, 1);
     private final Point scaleAndRotationCenter = new Point();
 
-    private T content;
     private float rotation;
     private float opacity = 1.0f;
     private boolean enabled = true;
-    private Rectangle bounds;
 
     public AbstractGameObject() {
 
-    }
-
-    public AbstractGameObject(T content) {
-        this.content = content;
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return bounds != null ? bounds : getContentBounds();
-    }
-
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
-    }
-
-    private Rectangle getContentBounds() {
-        if (content instanceof Bounded)
-            return ((Bounded) content).getBounds();
-        else
-            return Rectangle.EMPTY;
     }
 
     @Override
@@ -85,32 +60,18 @@ public abstract class AbstractGameObject<T extends Renderable> implements GameOb
         return scaleAndRotationCenter;
     }
 
-    protected T getContent() {
-        return content;
-    }
-
-    protected void setContent(T content) {
-        this.content = content;
-    }
-
     @Override
     public final void render(float alpha) {
-        if (enabled) {
-            onRender(alpha);
+        if (isEnabled()) {
+            onRenderUnprojected(alpha);
         }
     }
 
-    protected void onRender(float alpha) {
+    protected void onRenderUnprojected(float alpha) {
         ModelMatrix.instance().pushMatrix();
-        projectTo();
-        onRenderProjected(alpha * opacity);
+        applyProjection(ModelMatrix.instance());
+        onRender(alpha * opacity);
         ModelMatrix.instance().popMatrix();
-    }
-
-    protected void onRenderProjected(float alpha) {
-        if (content != null) {
-            content.render(alpha);
-        }
     }
 
     public boolean isEnabled() {
@@ -126,18 +87,20 @@ public abstract class AbstractGameObject<T extends Renderable> implements GameOb
         }
     }
 
-    private void projectTo() {
+    private void applyProjection(ModelMatrix matrix) {
         float centerX = getScaleAndRotationCenter().getX();
         float centerY = getScaleAndRotationCenter().getY();
 
-        ModelMatrix.instance().translatef(position.getX() + centerX, position.getY() + centerY, 0);
+        matrix.translatef(position.getX() + centerX, position.getY() + centerY, 0);
 
-        ModelMatrix.instance().rotatef(-getRotation(), 0, 0, 1);
+        matrix.rotatef(-getRotation(), 0, 0, 1);
 
-        ModelMatrix.instance().scalef(scale.getX(), scale.getY(), 1.0f);
+        matrix.scalef(scale.getX(), scale.getY(), 1.0f);
 
         if (centerX != 0 && centerY != 0) {
-            ModelMatrix.instance().translatef(-centerX, -centerY, 0);
+            matrix.translatef(-centerX, -centerY, 0);
         }
     }
+
+    protected abstract void onRender(float alpha);
 }

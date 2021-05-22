@@ -1,6 +1,7 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.network;
 
 import com.gamelibrary2d.common.Point;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
 import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
@@ -8,11 +9,12 @@ import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.Ins
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.interpolation.InterpolatableAngle;
 import com.gamelibrary2d.interpolation.PositionInterpolator;
+import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractGameObject;
 
 public abstract class AbstractClientObject
-        extends AbstractGameObject<Renderable> implements ClientObject, Updatable {
+        extends AbstractGameObject implements ClientObject, Updatable {
 
     private final int id;
     private final byte primaryType;
@@ -26,6 +28,8 @@ public abstract class AbstractClientObject
     private DurationEffect updateEffect;
     private InstantEffect destroyedEffect;
     private boolean accelerating;
+
+    private Renderable composition;
 
     protected AbstractClientObject(byte primaryType, GameFrameClient client, DataBuffer buffer) {
         this.primaryType = primaryType;
@@ -51,8 +55,13 @@ public abstract class AbstractClientObject
     }
 
     @Override
-    public void setContent(Renderable content) {
-        super.setContent(content);
+    public Renderable getComposition() {
+        return composition;
+    }
+
+    @Override
+    public void setComposition(Renderable composition) {
+        this.composition = composition;
     }
 
     @Override
@@ -95,9 +104,8 @@ public abstract class AbstractClientObject
             updateEffect.onUpdate(this, deltaTime);
         }
 
-        Object content = getContent();
-        if (content instanceof Updatable) {
-            ((Updatable) content).update(deltaTime);
+        if (composition instanceof Updatable) {
+            ((Updatable) composition).update(deltaTime);
         }
     }
 
@@ -123,5 +131,20 @@ public abstract class AbstractClientObject
     @Override
     public void setGoalRotation(float rotation) {
 
+    }
+
+    @Override
+    protected void onRender(float alpha) {
+        if (composition != null) {
+            composition.render(alpha);
+        }
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        if (composition instanceof Bounded)
+            return ((Bounded) composition).getBounds();
+        else
+            return Rectangle.EMPTY;
     }
 }

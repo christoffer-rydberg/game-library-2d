@@ -20,8 +20,8 @@ public abstract class AbstractObservableWidget<T extends Renderable> extends Abs
 
     }
 
-    protected AbstractObservableWidget(T content) {
-        super(content);
+    protected AbstractObservableWidget(T composition) {
+        super(composition);
     }
 
     public void addPointerDownListener(PointerDownListener listener) {

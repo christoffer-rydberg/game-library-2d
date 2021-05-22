@@ -1,6 +1,7 @@
 package com.gamelibrary2d.resources;
 
 import com.gamelibrary2d.framework.Image;
+import com.gamelibrary2d.glUtil.OpenGLState;
 
 public interface Texture {
 
@@ -12,12 +13,11 @@ public interface Texture {
 
     Image loadImage();
 
-    default void bind() {
-        TextureUtil.bind(getId());
+    default int bind() {
+        return OpenGLState.bindTexture(getId());
     }
 
     default void unbind() {
-        TextureUtil.unbind(getId());
+        OpenGLState.unbindTexture(getId());
     }
-
 }

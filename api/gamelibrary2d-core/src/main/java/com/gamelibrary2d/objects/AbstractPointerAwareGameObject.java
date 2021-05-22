@@ -4,22 +4,18 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.PointerAware;
-import com.gamelibrary2d.renderers.BitmapRenderer;
+import com.gamelibrary2d.renderers.FrameBufferRenderer;
 import com.gamelibrary2d.util.Projection;
 
-public abstract class AbstractPointerAwareGameObject<T extends Renderable> extends AbstractGameObject<T> implements PointerAware {
+public abstract class AbstractPointerAwareGameObject extends AbstractGameObject implements PointerAware {
+    private final Point projectionOutput = new Point();
     private final PointerInteractionsArray pointerInteractions = new PointerInteractionsArray(10);
-    private BitmapRenderer bitmapRenderer;
+    private FrameBufferRenderer frameBufferRenderer;
     private DefaultDisposer disposer;
 
     protected AbstractPointerAwareGameObject() {
 
-    }
-
-    protected AbstractPointerAwareGameObject(T content) {
-        super(content);
     }
 
     public void setEnabled(boolean enabled) {
@@ -33,7 +29,7 @@ public abstract class AbstractPointerAwareGameObject<T extends Renderable> exten
         if (this.disposer != null) {
             this.disposer.dispose();
             this.disposer = null;
-            bitmapRenderer = null;
+            frameBufferRenderer = null;
         }
     }
 
@@ -52,12 +48,12 @@ public abstract class AbstractPointerAwareGameObject<T extends Renderable> exten
         Rectangle bounds = getBounds();
         if (bounds.contains(x, y)) {
             if (pixelDetectionEnabled()) {
-                if (bitmapRenderer == null || !bitmapRenderer.getArea().equals(bounds)) {
+                if (frameBufferRenderer == null || !frameBufferRenderer.getArea().equals(bounds)) {
                     disposer.dispose();
-                    bitmapRenderer = BitmapRenderer.create(bounds, disposer);
+                    frameBufferRenderer = FrameBufferRenderer.create(bounds, disposer);
                 }
-                bitmapRenderer.render(() -> onRenderProjected(1f));
-                return bitmapRenderer.isVisible(x, y);
+                frameBufferRenderer.render(this::onRender, 1f);
+                return frameBufferRenderer.isVisible(x, y);
             } else {
                 return true;
             }
@@ -69,10 +65,10 @@ public abstract class AbstractPointerAwareGameObject<T extends Renderable> exten
     @Override
     public final boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
-            Point projected = Projection.projectTo(this, projectedX, projectedY);
-            if (isPixelVisible(projected.getX(), projected.getY()) && pointerInteractions.setActive(id, id)) {
+            Projection.projectTo(this, projectedX, projectedY, projectionOutput);
+            if (isPixelVisible(projectionOutput.getX(), projectionOutput.getY()) && pointerInteractions.setActive(id, id)) {
                 pointerActionStarted(projectedX, projectedY);
-                onPointerDown(id, button, x, y, projected.getX(), projected.getY());
+                onPointerDown(id, button, x, y, projectionOutput.getX(), projectionOutput.getY());
                 pointerActionFinished(projectedX, projectedY);
                 return true;
             }
@@ -87,16 +83,16 @@ public abstract class AbstractPointerAwareGameObject<T extends Renderable> exten
     public final boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
         if (isEnabled()) {
             if (pointerInteractions.hasActiveButtons(id) && isListeningToPointDragEvents()) {
-                Point projected = Projection.projectTo(this, projectedX, projectedY);
+                Projection.projectTo(this, projectedX, projectedY, projectionOutput);
                 pointerActionStarted(projectedX, projectedY);
-                onPointerDrag(id, x, y, projected.getX(), projected.getY());
+                onPointerDrag(id, x, y, projectionOutput.getX(), projectionOutput.getY());
                 pointerActionFinished(projectedX, projectedY);
                 return true;
             } else if (isListeningToPointHoverEvents()) {
-                Point projected = Projection.projectTo(this, projectedX, projectedY);
-                if (isPixelVisible(projected.getX(), projected.getY())) {
+                Projection.projectTo(this, projectedX, projectedY, projectionOutput);
+                if (isPixelVisible(projectionOutput.getX(), projectionOutput.getY())) {
                     pointerActionStarted(projectedX, projectedY);
-                    onPointerHover(id, x, y, projected.getX(), projected.getY());
+                    onPointerHover(id, x, y, projectionOutput.getX(), projectionOutput.getY());
                     pointerActionFinished(projectedX, projectedY);
                     return true;
                 }
@@ -110,9 +106,9 @@ public abstract class AbstractPointerAwareGameObject<T extends Renderable> exten
     public final void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (isEnabled() && pointerInteractions.isActive(id, id)) {
             pointerInteractions.setInactive(id, id);
-            Point projected = Projection.projectTo(this, projectedX, projectedY);
+            Projection.projectTo(this, projectedX, projectedY, projectionOutput);
             pointerActionStarted(projectedX, projectedY);
-            onPointerUp(id, button, x, y, projected.getX(), projected.getY());
+            onPointerUp(id, button, x, y, projectionOutput.getX(), projectionOutput.getY());
             pointerActionFinished(projectedX, projectedY);
         }
     }

@@ -52,7 +52,7 @@ public class DemoFrame extends AbstractFrame {
         label.setText("Click here to load an animation");
 
         DefaultWidget<Label> loadButton = new DefaultWidget<>();
-        loadButton.setContent(label);
+        loadButton.setComposition(label);
         loadButton.setBounds(label.calculateBounds());
         loadButton.addPointerUpListener(this::onLoadButtonClicked);
 
@@ -142,7 +142,7 @@ public class DemoFrame extends AbstractFrame {
                                     .restrict(game.getWindow().getWidth(), game.getWindow().getHeight()),
                             animationDisposer);
 
-                    animatedObject.setContent(new AnimationRenderer(animation, true, animationDisposer));
+                    animatedObject.setComposition(new AnimationRenderer(animation, true, animationDisposer));
 
                     loadingAnimation = null;
                 } catch (InterruptedException | ExecutionException e) {

@@ -5,20 +5,29 @@ import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.ShaderParameters;
 
-public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject<T> implements ComposableGameObject<T>, Updatable {
+public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject implements ComposableGameObject<T>, Updatable {
     private float animationTime;
+    private T composition;
+    private Rectangle bounds;
 
     public AnimatedGameObject() {
 
     }
 
-    public AnimatedGameObject(T renderer) {
-        super(renderer);
+    public AnimatedGameObject(T composition) {
+        this.composition = composition;
     }
 
-    public AnimatedGameObject(T renderer, Rectangle bounds) {
-        super(renderer);
-        setBounds(bounds);
+    public AnimatedGameObject(T composition, Rectangle bounds) {
+        this.composition = composition;
+        this.bounds = bounds;
+    }
+
+    @Override
+    protected void onRender(float alpha) {
+        if (this.composition != null) {
+            composition.render(alpha);
+        }
     }
 
     protected float getAnimationTime() {
@@ -27,9 +36,8 @@ public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject<T
 
     protected void setAnimationTime(float time) {
         this.animationTime = time;
-        Renderer renderer = getContent();
-        if (renderer != null) {
-            renderer.getParameters().set(ShaderParameters.TIME, time);
+        if (composition != null) {
+            composition.getParameters().set(ShaderParameters.TIME, time);
         }
     }
 
@@ -45,11 +53,20 @@ public class AnimatedGameObject<T extends Renderer> extends AbstractGameObject<T
     }
 
     @Override
-    public T getContent() {
-        return super.getContent();
+    public T getComposition() {
+        return composition;
     }
 
-    public void setContent(T content) {
-        super.setContent(content);
+    public void setComposition(T renderer) {
+        this.composition = renderer;
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : composition.getBounds();
+    }
+
+    public void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
     }
 }

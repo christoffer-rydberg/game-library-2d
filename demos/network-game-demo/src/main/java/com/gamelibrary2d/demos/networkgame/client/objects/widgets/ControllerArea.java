@@ -1,35 +1,46 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.widgets;
 
 import com.gamelibrary2d.common.Point;
+import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.demos.networkgame.client.input.Controller;
 import com.gamelibrary2d.demos.networkgame.client.input.ControllerInputId;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.layers.BasicLayer;
-import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.objects.ComposableGameObject;
+import com.gamelibrary2d.markers.PointerAware;
 import com.gamelibrary2d.renderers.Renderer;
-import com.gamelibrary2d.widgets.AbstractAggregatingWidget;
-import com.gamelibrary2d.widgets.DefaultWidget;
+import com.gamelibrary2d.renderers.SurfaceRenderer;
+import com.gamelibrary2d.resources.Quad;
 
-public class ControllerArea extends AbstractAggregatingWidget<Layer> {
-    private final Point dragOrigin = new Point();
+public class ControllerArea implements Renderable, PointerAware {
+    private final Line line;
+    private final Renderer background;
     private final Controller controller;
-    private ComposableGameObject<Renderer> handle;
-    private SliderDirection direction;
-    private float max, step;
+    private final SliderDirection direction;
+    private final float max, step;
     private int pointerId = -1;
     private int pointerButton = -1;
 
-    public ControllerArea(Renderer handle, Controller controller, SliderDirection dir, float maxDistance) {
-        this.handle = createHandle(handle);
-        this.handle.getContent().getParameters().setColor(0, 0, 0, 1f);
+    private ControllerArea(Line line, Renderer background, Controller controller, SliderDirection dir, float maxDistance) {
+        this.line = line;
+        this.background = background;
         this.controller = controller;
         this.direction = dir;
         this.max = maxDistance;
         this.step = 1f;
-        Layer<Renderable> content = new BasicLayer<>();
-        content.add(this.handle);
-        setContent(content);
+        setBackgroundColor(0, 0, 0, 1f);
+    }
+
+    public static ControllerArea create(Rectangle bounds, Controller controller, SliderDirection dir, float maxDistance, Disposer disposer) {
+        return new ControllerArea(
+                Line.create(disposer),
+                new SurfaceRenderer<>(Quad.create(bounds, disposer)),
+                controller,
+                dir,
+                maxDistance);
+    }
+
+    private void setBackgroundColor(float r, float g, float b, float a) {
+        this.background.getParameters().setColor(r, g, b, a);
     }
 
     public void setValue(float value) {
@@ -39,11 +50,11 @@ public class ControllerArea extends AbstractAggregatingWidget<Layer> {
                 if (controllerValue < 0) {
                     controller.setValue(ControllerInputId.RIGHT, 0f);
                     controller.setValue(ControllerInputId.LEFT, Math.abs(controllerValue));
-                    handle.getContent().getParameters().setColor(0, Math.abs(controllerValue), 0, 1f);
+                    setBackgroundColor(0, Math.abs(controllerValue), 0, 1f);
                 } else {
                     controller.setValue(ControllerInputId.LEFT, 0f);
                     controller.setValue(ControllerInputId.RIGHT, controllerValue);
-                    handle.getContent().getParameters().setColor(0, 0, Math.abs(controllerValue), 1f);
+                    setBackgroundColor(0, 0, Math.abs(controllerValue), 1f);
                 }
 
                 break;
@@ -51,50 +62,73 @@ public class ControllerArea extends AbstractAggregatingWidget<Layer> {
             case VERTICAL: {
                 float controllerValue = Math.max(0f, Math.min(max, value)) / max;
                 controller.setValue(ControllerInputId.UP, controllerValue);
-                handle.getContent().getParameters().setColor(0, controllerValue, 0, 1f);
+                setBackgroundColor(0, controllerValue, 0, 1f);
                 break;
             }
         }
     }
 
     private float getValueFromPosition(float x, float y) {
+        Point origin = line.getStart();
         switch (direction) {
             case HORIZONTAL:
-                return (handle.getPosition().getX() + x - dragOrigin.getX()) / step;
+                return (x - origin.getX()) / step;
             case VERTICAL:
-                return (handle.getPosition().getY() + y - dragOrigin.getY()) / step;
+                return (y - origin.getY()) / step;
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }
     }
 
-    private DefaultWidget<Renderer> createHandle(Renderer renderable) {
-        DefaultWidget<Renderer> handleObj = new DefaultWidget<>(renderable);
-        handleObj.addPointerDownListener(this::onHandleClicked);
-        handleObj.addPointerDragListener(this::onHandleDragged);
-        handleObj.addPointerUpListener(this::onHandleReleased);
-        return handleObj;
-    }
-
-    private void onHandleClicked(int id, int button, float x, float y, float projectedX, float projectedY) {
-        if (pointerId < 0) {
-            pointerId = id;
-            pointerButton = button;
-            dragOrigin.set(projectedX, projectedY);
+    @Override
+    public void render(float alpha) {
+        background.render(alpha);
+        if (pointerId >= 0) {
+            line.render(alpha);
         }
     }
 
-    private void onHandleReleased(int id, int button, float x, float y, float projectedX, float projectedY) {
+    @Override
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (background.getBounds().contains(projectedX, projectedY)) {
+            if (pointerId < 0) {
+                pointerId = id;
+                pointerButton = button;
+                line.getStart().set(projectedX, projectedY);
+                line.getEnd().set(projectedX, projectedY);
+                line.refresh();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        if (background.getBounds().contains(projectedX, projectedY)) {
+            if (pointerId == id) {
+                line.getEnd().set(projectedX, projectedY);
+                line.refresh();
+                setValue(getValueFromPosition(projectedX, projectedY));
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
         if (pointerId == id && pointerButton == button) {
+            float direction = line.getStart().getDirectionDegrees(line.getEnd());
+            float speed = 2 * line.getStart().getDistance(line.getEnd());
+
             pointerId = -1;
             pointerButton = -1;
             setValue(0f);
-        }
-    }
-
-    private void onHandleDragged(int id, float x, float y, float projectedX, float projectedY) {
-        if (pointerId == id) {
-            setValue(getValueFromPosition(projectedX, projectedY));
         }
     }
 

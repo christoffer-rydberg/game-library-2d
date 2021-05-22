@@ -1,6 +1,7 @@
 package com.gamelibrary2d.demos.lightning;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.lightning.DefaultDynamicLightMap;
 import com.gamelibrary2d.markers.Updatable;
 import com.gamelibrary2d.objects.AbstractCursor;
@@ -9,11 +10,13 @@ import com.gamelibrary2d.particle.systems.DefaultParticleSystem;
 import com.gamelibrary2d.renderers.Renderer;
 
 public class Cursor extends AbstractCursor implements Updatable {
+    private final Renderer renderer;
     private final DefaultDynamicLightMap lightMap;
     private final SequentialParticleEmitter particleEmitter;
 
     Cursor(Game game, Renderer renderer, DefaultDynamicLightMap lightMap, DefaultParticleSystem particleSystem) {
-        super(game, 0, renderer);
+        super(game, 0);
+        this.renderer = renderer;
         this.lightMap = lightMap;
         this.particleEmitter = new SequentialParticleEmitter(particleSystem);
         particleEmitter.getParticleSystem().setUpdateListener((sys, par) -> {
@@ -35,5 +38,17 @@ public class Cursor extends AbstractCursor implements Updatable {
     @Override
     protected void onInteracted() {
 
+    }
+
+    @Override
+    protected void onRender(float alpha, boolean hasWindowFocus) {
+        if (hasWindowFocus) {
+            renderer.render(alpha);
+        }
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return renderer.getBounds();
     }
 }

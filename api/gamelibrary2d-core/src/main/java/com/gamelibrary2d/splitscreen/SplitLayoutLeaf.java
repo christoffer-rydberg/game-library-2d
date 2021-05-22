@@ -1,19 +1,20 @@
 package com.gamelibrary2d.splitscreen;
 
 import com.gamelibrary2d.common.Rectangle;
+import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.common.disposal.ResourceContainer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.renderers.BitmapRenderer;
+import com.gamelibrary2d.renderers.RenderCache;
 
 public class SplitLayoutLeaf<T> implements SplitLayout {
     private final InternalTargetSettings internalTargetSettings;
     private final T param;
     private final PrepareUpdateAction<T> prepareUpdate;
     private final PrepareRenderAction<T> prepareRender;
-    private final ResourceContainer<BitmapRenderer> areaRenderer = new ResourceContainer<>();
 
+    private Disposer disposer;
+    private RenderCache renderer;
     private GameObject target;
 
     /**
@@ -22,11 +23,13 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
      * @param target        The target view of the {@link SplitLayer}.
      * @param prepareRender Preparation action performed before rendering.
      * @param param         Parameter used in preparation actions.
+     * @param disposer      Disposer used for internal resources.
      */
     public SplitLayoutLeaf(GameObject target,
                            PrepareRenderAction<T> prepareRender,
-                           T param) {
-        this(target, null, prepareRender, param);
+                           T param,
+                           Disposer disposer) {
+        this(target, null, prepareRender, param, disposer);
     }
 
     /**
@@ -35,11 +38,13 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
      * @param target        The target view of the {@link SplitLayer}.
      * @param prepareUpdate Preparation action performed before updating.
      * @param param         Parameter used in preparation actions.
+     * @param disposer      Disposer used for internal resources.
      */
     public SplitLayoutLeaf(GameObject target,
                            PrepareUpdateAction<T> prepareUpdate,
-                           T param) {
-        this(target, prepareUpdate, null, param);
+                           T param,
+                           Disposer disposer) {
+        this(target, prepareUpdate, null, param, disposer);
     }
 
     /**
@@ -49,25 +54,31 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
      * @param prepareUpdate Preparation action performed before updating.
      * @param prepareRender Preparation action performed before rendering.
      * @param param         Parameter used in preparation actions.
+     * @param disposer      Disposer used for internal resources.
      */
     public SplitLayoutLeaf(GameObject target,
                            PrepareUpdateAction<T> prepareUpdate,
                            PrepareRenderAction<T> prepareRender,
-                           T param) {
+                           T param,
+                           Disposer disposer) {
+        this.disposer = new DefaultDisposer();
         this.target = target;
         this.param = param;
         this.prepareUpdate = prepareUpdate;
         this.prepareRender = prepareRender;
         this.internalTargetSettings = new InternalTargetSettings();
+        this.disposer = new DefaultDisposer(disposer);
         updateSettingsFromTarget();
     }
 
     @Override
-    public void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer) {
+    public void update(GameObject target, Rectangle viewArea, float deltaTime) {
         this.target = target;
-        if (!areaRenderer.hasResource() || !areaRenderer.getResource().getArea().equals(viewArea)) {
-            areaRenderer.createResource(d -> BitmapRenderer.create(viewArea, d), disposer);
+        if (renderer == null || !renderer.getBounds().equals(viewArea)) {
+            disposer.dispose();
+            renderer = RenderCache.create(this::renderAction, viewArea, disposer);
         }
+
         updateTargetFromSettings();
         if (prepareUpdate != null)
             prepareUpdate.invoke(param, viewArea, deltaTime);
@@ -77,19 +88,18 @@ public class SplitLayoutLeaf<T> implements SplitLayout {
     @Override
     public void render(float alpha) {
         updateTargetFromSettings();
-        BitmapRenderer areaRenderer = this.areaRenderer.getResource();
-        if (prepareRender != null)
-            prepareRender.invoke(param, areaRenderer.getArea());
-        areaRenderer.render(this::renderAction);
-        areaRenderer.renderFrameBuffer(alpha);
+        if (prepareRender != null) {
+            prepareRender.invoke(param, renderer.getBounds());
+        }
+        renderer.render(alpha);
         updateSettingsFromTarget();
     }
 
-    private void renderAction() {
+    private void renderAction(float alpha) {
         ModelMatrix.instance().pushMatrix();
-        Rectangle renderArea = areaRenderer.getResource().getArea();
+        Rectangle renderArea = renderer.getBounds();
         ModelMatrix.instance().translatef(renderArea.getLowerX(), renderArea.getLowerY(), 0);
-        target.render(1f);
+        target.render(alpha);
         ModelMatrix.instance().popMatrix();
     }
 

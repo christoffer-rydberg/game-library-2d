@@ -3,10 +3,7 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.glUtil.FrameBuffer;
-import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.glUtil.OpenGLUtils;
-import com.gamelibrary2d.glUtil.ShaderProgram;
+import com.gamelibrary2d.glUtil.*;
 import com.gamelibrary2d.resources.*;
 import com.gamelibrary2d.util.BlendMode;
 
@@ -251,7 +248,7 @@ public class AnimationRenderer extends AbstractRenderer {
             if (frameBuffer == null) {
                 // Create OpenGL resources when rendering for the first time
                 Texture texture = createBackgroundTexture(animation);
-                frameBuffer = FrameBuffer.create(texture, resourceDisposer);
+                frameBuffer = DefaultFrameBuffer.create(texture, resourceDisposer);
                 frameBufferRenderer = new SurfaceRenderer<>(
                         Quad.create(animation.getBounds(), resourceDisposer),
                         texture);
@@ -282,32 +279,33 @@ public class AnimationRenderer extends AbstractRenderer {
         }
 
         private void renderToFrameBuffer(ShaderProgram shaderProgram, int currentFrame) {
-            frameBuffer.bind();
-
-            if (currentFrame < previousFrame) {
-                frameBuffer.clear();
-                previousFrame = 0;
-            }
-
-            for (int i = previousFrame; i <= currentFrame; ++i) {
-                AnimationFrame frame = animation.getFrame(i);
-
-                if (frame.getRestoreBackgroundHint()) {
+            int previousFbo = frameBuffer.bind();
+            try {
+                if (currentFrame < previousFrame) {
                     frameBuffer.clear();
+                    previousFrame = 0;
                 }
 
-                if (frame.getRenderToBackgroundHint()) {
-                    if (shaderProgram.setParameter(ShaderParameters.ALPHA, 1f)) {
-                        shaderProgram.applyParameters();
+                for (int i = previousFrame; i <= currentFrame; ++i) {
+                    AnimationFrame frame = animation.getFrame(i);
+
+                    if (frame.getRestoreBackgroundHint()) {
+                        frameBuffer.clear();
                     }
-                    frame.getTexture().bind();
 
-                    frameRenderers[i].render(shaderProgram);
+                    if (frame.getRenderToBackgroundHint()) {
+                        if (shaderProgram.setParameter(ShaderParameters.ALPHA, 1f)) {
+                            shaderProgram.applyParameters();
+                        }
+
+                        frame.getTexture().bind();
+                        frameRenderers[i].render(shaderProgram);
+                    }
                 }
+                previousFrame = currentFrame;
+            } finally {
+                OpenGLState.bindFrameBuffer(previousFbo);
             }
-            previousFrame = currentFrame;
-
-            frameBuffer.unbind(true);
         }
 
         void dispose() {

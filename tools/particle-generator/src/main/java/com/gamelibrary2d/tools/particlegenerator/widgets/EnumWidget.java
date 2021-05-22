@@ -1,5 +1,6 @@
 package com.gamelibrary2d.tools.particlegenerator.widgets;
 
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.tools.particlegenerator.properties.GenericProperty;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
@@ -14,7 +15,7 @@ public class EnumWidget<T extends Enum<T>> extends AbstractWidget<Label> {
     public EnumWidget(Class<T> enumType, Label label, GenericProperty<T> property) {
         this.values = enumType.getEnumConstants();
         this.property = property;
-        setContent(label);
+        setComposition(label);
         updateLabel();
     }
 
@@ -30,14 +31,14 @@ public class EnumWidget<T extends Enum<T>> extends AbstractWidget<Label> {
                 }
             }
 
-            getContent().setText(value.toString());
+            getComposition().setText(value.toString());
         }
     }
 
     @Override
-    public void onRender(float alpha) {
+    public void onRenderUnprojected(float alpha) {
         updateLabel();
-        super.onRender(alpha);
+        super.onRenderUnprojected(alpha);
     }
 
     @Override
@@ -46,6 +47,11 @@ public class EnumWidget<T extends Enum<T>> extends AbstractWidget<Label> {
         currentIndex = (currentIndex + 1) % values.length;
         cachedValue = values[currentIndex];
         property.set(cachedValue);
-        getContent().setText(cachedValue.toString());
+        getComposition().setText(cachedValue.toString());
+    }
+
+    @Override
+    public void setBounds(Rectangle bounds) {
+        super.setBounds(bounds);
     }
 }

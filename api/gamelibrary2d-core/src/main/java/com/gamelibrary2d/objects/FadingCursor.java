@@ -1,10 +1,14 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.markers.Bounded;
 import com.gamelibrary2d.markers.Updatable;
 
-public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implements Updatable {
+public class FadingCursor<T extends Renderable> extends AbstractCursor implements Updatable {
+
+    private final T renderable;
 
     private float visibilityDuration = 5f;
 
@@ -16,8 +20,11 @@ public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implem
 
     private float visibilityTimer;
 
-    public FadingCursor(Game game, int pointerId, T content) {
-        super(game, pointerId, content);
+    private Rectangle bounds;
+
+    public FadingCursor(Game game, int pointerId, T renderable) {
+        super(game, pointerId);
+        this.renderable = renderable;
     }
 
     public float getVisibilityDuration() {
@@ -72,6 +79,13 @@ public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implem
     }
 
     @Override
+    protected void onRender(float alpha, boolean hasWindowFocus) {
+        if (hasWindowFocus) {
+            renderable.render(alpha);
+        }
+    }
+
+    @Override
     public final void update(float deltaTime) {
         if (isEnabled()) {
             onUpdate(deltaTime);
@@ -110,5 +124,21 @@ public class FadingCursor<T extends Renderable> extends AbstractCursor<T> implem
 
     private float getFadeOutFactor() {
         return 1f - (fadeOutTime - visibilityTimer) / fadeOutTime;
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : getRenderableBounds();
+    }
+
+    public void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
+    }
+
+    private Rectangle getRenderableBounds() {
+        if (renderable instanceof Bounded)
+            return ((Bounded) renderable).getBounds();
+        else
+            return Rectangle.EMPTY;
     }
 }

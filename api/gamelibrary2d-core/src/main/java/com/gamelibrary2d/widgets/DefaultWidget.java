@@ -1,5 +1,6 @@
 package com.gamelibrary2d.widgets;
 
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.objects.ComposableGameObject;
 
@@ -11,18 +12,18 @@ public final class DefaultWidget<T extends Renderable> extends AbstractObservabl
 
     }
 
-    public DefaultWidget(T content) {
-        super(content);
+    public DefaultWidget(T composition) {
+        super(composition);
     }
 
     @Override
-    public T getContent() {
-        return super.getContent();
+    public T getComposition() {
+        return super.getComposition();
     }
 
     @Override
-    public void setContent(T content) {
-        super.setContent(content);
+    public void setComposition(T composition) {
+        super.setComposition(composition);
     }
 
     public Renderable getBackground() {
@@ -42,15 +43,20 @@ public final class DefaultWidget<T extends Renderable> extends AbstractObservabl
     }
 
     @Override
-    protected void onRenderProjected(float alpha) {
+    protected void onRender(float alpha) {
         if (background != null) {
             background.render(alpha);
         }
 
-        super.onRenderProjected(alpha);
+        super.onRender(alpha);
 
         if (foreground != null) {
             foreground.render(alpha);
         }
+    }
+
+    @Override
+    public void setBounds(Rectangle bounds) {
+        super.setBounds(bounds);
     }
 }

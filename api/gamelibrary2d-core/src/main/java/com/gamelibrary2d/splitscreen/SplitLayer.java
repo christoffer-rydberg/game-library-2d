@@ -1,21 +1,17 @@
 package com.gamelibrary2d.splitscreen;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.DefaultDisposer;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.markers.Clearable;
 import com.gamelibrary2d.objects.AbstractGameObjectWrapper;
 import com.gamelibrary2d.objects.GameObject;
 
 public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<T> implements Clearable {
     private final Rectangle renderArea;
-    private final Disposer layoutDisposer;
     private SplitLayout layout;
 
-    public SplitLayer(SplitLayout layout, Rectangle renderArea, Disposer disposer) {
+    public SplitLayer(SplitLayout layout, Rectangle renderArea) {
         this.layout = layout;
         this.renderArea = renderArea;
-        this.layoutDisposer = new DefaultDisposer(disposer);
     }
 
     public T getTarget() {
@@ -27,15 +23,12 @@ public class SplitLayer<T extends GameObject> extends AbstractGameObjectWrapper<
     }
 
     public void setLayout(SplitLayout layout) {
-        if (this.layout != layout) {
-            layoutDisposer.dispose();
-            this.layout = layout;
-        }
+        this.layout = layout;
     }
 
     @Override
     public void update(float deltaTime) {
-        layout.update(getTarget(), renderArea, deltaTime, layoutDisposer);
+        layout.update(getTarget(), renderArea, deltaTime);
         super.update(deltaTime);
     }
 

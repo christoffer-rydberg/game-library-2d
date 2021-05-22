@@ -6,7 +6,7 @@ import com.gamelibrary2d.objects.GameObject;
 
 public interface SplitLayout {
 
-    void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer);
+    void update(GameObject target, Rectangle viewArea, float deltaTime);
 
     void render(float alpha);
 }

@@ -1,7 +1,6 @@
 package com.gamelibrary2d.splitscreen;
 
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.objects.GameObject;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class SplitLayoutBranch implements SplitLayout {
         return layouts;
     }
 
-    public void update(GameObject target, Rectangle viewArea, float deltaTime, Disposer disposer) {
+    public void update(GameObject target, Rectangle viewArea, float deltaTime) {
         float childWidth = orientation == SplitOrientation.VERTICAL
                 ? viewArea.getWidth()
                 : viewArea.getWidth() / layouts.size() - margin;
@@ -49,7 +48,7 @@ public class SplitLayoutBranch implements SplitLayout {
                     xMin + childWidth,
                     yMin + childHeight);
 
-            layouts.get(i).update(target, childArea, deltaTime, disposer);
+            layouts.get(i).update(target, childArea, deltaTime);
         }
     }
 

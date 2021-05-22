@@ -87,7 +87,7 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-        if (animationObj.getContent().isAnimationFinished()) {
+        if (animationObj.getComposition().isAnimationFinished()) {
             game.exit();
         }
     }

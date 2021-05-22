@@ -329,7 +329,7 @@ public class MenuFrame extends AbstractFrame implements KeyAware {
             setSpeedFactor(1f);
 
             credits.setPosition(window.getWidth() / 2f, 0);
-            float height = credits.getContent().calculateBounds().getHeight();
+            float height = credits.getComposition().calculateBounds().getHeight();
             float windowHeight = window.getHeight();
 
             updater.clear();

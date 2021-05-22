@@ -22,25 +22,25 @@ public class InputField extends AbstractWidget<TextField> {
 
         background.getParameters().setColor(Settings.INPUT_FIELD_COLOR);
 
-        TextField content = new TextField(text, new TextRenderer(Fonts.inputField()));
-        content.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
-        setContent(content);
+        TextField textField = new TextField(text, new TextRenderer(Fonts.inputField()));
+        textField.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
+        setComposition(textField);
 
         setBounds(background.getBounds());
     }
 
     public int getIntValue() {
-        return Integer.parseInt(getContent().getText());
+        return Integer.parseInt(getComposition().getText());
     }
 
     public String getStringValue() {
-        return getContent().getText();
+        return getComposition().getText();
     }
 
     @Override
-    protected void onRenderProjected(float alpha) {
+    protected void onRender(float alpha) {
         background.render(alpha);
-        super.onRenderProjected(alpha);
+        super.onRender(alpha);
     }
 
 }

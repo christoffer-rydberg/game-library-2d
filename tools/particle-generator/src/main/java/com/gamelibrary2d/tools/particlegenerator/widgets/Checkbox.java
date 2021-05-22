@@ -27,7 +27,7 @@ public class Checkbox extends AbstractWidget {
         this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = null;
         this.onUnchecked = null;
-        setContent(renderer);
+        setComposition(renderer);
     }
 
     public Checkbox(Box box, LineRenderer lineRenderer, Font font, BooleanProperty checked, Action onChecked, Action onUnchecked) {
@@ -35,7 +35,7 @@ public class Checkbox extends AbstractWidget {
         this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = onChecked;
         this.onUnchecked = onUnchecked;
-        setContent(renderer);
+        setComposition(renderer);
     }
 
     private void updateCheckbox() {
@@ -57,9 +57,9 @@ public class Checkbox extends AbstractWidget {
     }
 
     @Override
-    public void onRender(float alpha) {
+    public void onRenderUnprojected(float alpha) {
         updateCheckbox();
-        super.onRender(alpha);
+        super.onRenderUnprojected(alpha);
     }
 
     @Override

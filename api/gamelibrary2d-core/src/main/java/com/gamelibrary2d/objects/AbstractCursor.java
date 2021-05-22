@@ -1,24 +1,20 @@
 package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.markers.PointerAware;
 
-public abstract class AbstractCursor<T extends Renderable> extends AbstractGameObject<T> implements PointerAware {
+public abstract class AbstractCursor extends AbstractGameObject implements PointerAware {
     private final Game game;
     private final int pointerId;
 
-    public AbstractCursor(Game game, int pointerId, T content) {
-        super(content);
+    public AbstractCursor(Game game, int pointerId) {
         this.game = game;
         this.pointerId = pointerId;
     }
 
     @Override
-    protected void onRenderProjected(float alpha) {
-        if (game.hasPointerFocus(pointerId)) {
-            super.onRenderProjected(alpha);
-        }
+    protected void onRender(float alpha) {
+        onRender(alpha, game.hasPointerFocus(pointerId));
     }
 
     @Override
@@ -48,4 +44,6 @@ public abstract class AbstractCursor<T extends Renderable> extends AbstractGameO
     }
 
     protected abstract void onInteracted();
+
+    protected abstract void onRender(float alpha, boolean hasWindowFocus);
 }

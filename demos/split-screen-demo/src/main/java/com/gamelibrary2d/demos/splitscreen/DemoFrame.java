@@ -101,7 +101,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
         if (size == 1) {
             SpaceCraft spaceCraft = spaceCrafts.get(0);
             spacecraftLayer.setPosition(spaceCraft.getPosition());
-            return new SplitLayoutLeaf<>(spacecraftLayer, this::prepareView, spaceCraft);
+            return new SplitLayoutLeaf<>(spacecraftLayer, this::prepareView, spaceCraft, this);
         }
 
         SplitOrientation flippedOrientation = orientation == SplitOrientation.HORIZONTAL
@@ -150,7 +150,7 @@ class DemoFrame extends AbstractFrame implements KeyAware {
 
         if (spaceCrafts.size() > 0) {
             Rectangle viewArea = new Rectangle(0, 0, window.getWidth(), window.getHeight());
-            SplitLayer<GameObject> splitLayer = new SplitLayer<>(createSplitLayout(spaceCrafts), viewArea, this);
+            SplitLayer<GameObject> splitLayer = new SplitLayer<>(createSplitLayout(spaceCrafts), viewArea);
             splitLayer.setTarget(spacecraftLayer);
             add(splitLayer);
             this.view = splitLayer;

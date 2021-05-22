@@ -1,25 +1,25 @@
 package com.gamelibrary2d.widgets;
 
 import com.gamelibrary2d.FocusManager;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.FocusAware;
-import com.gamelibrary2d.markers.InputAware;
-import com.gamelibrary2d.markers.KeyAware;
-import com.gamelibrary2d.markers.PointerWhenFocusedAware;
+import com.gamelibrary2d.markers.*;
 import com.gamelibrary2d.objects.AbstractPointerAwareGameObject;
 
 public abstract class AbstractWidget<T extends Renderable>
-        extends AbstractPointerAwareGameObject<T> implements FocusAware, KeyAware, InputAware, PointerWhenFocusedAware {
+        extends AbstractPointerAwareGameObject implements FocusAware, KeyAware, InputAware, PointerWhenFocusedAware {
 
+    private T composition;
     private boolean focused;
     private boolean skipWhenFocusedAction;
+    private Rectangle bounds;
 
     protected AbstractWidget() {
 
     }
 
-    protected AbstractWidget(T content) {
-        super(content);
+    protected AbstractWidget(T composition) {
+        this.composition = composition;
     }
 
     @Override
@@ -30,9 +30,8 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onCharInput(char charInput) {
-        T content = getContent();
-        if (content instanceof InputAware) {
-            ((InputAware) (content)).charInput(charInput);
+        if (composition instanceof InputAware) {
+            ((InputAware) (composition)).charInput(charInput);
         }
     }
 
@@ -44,9 +43,8 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onKeyDown(int key, boolean repeat) {
-        T content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).keyDown(key, repeat);
+        if (composition instanceof KeyAware) {
+            ((KeyAware) (composition)).keyDown(key, repeat);
         }
     }
 
@@ -58,9 +56,8 @@ public abstract class AbstractWidget<T extends Renderable>
     }
 
     protected void onKeyUp(int key) {
-        T content = getContent();
-        if (content instanceof KeyAware) {
-            ((KeyAware) (content)).keyUp(key);
+        if (composition instanceof KeyAware) {
+            ((KeyAware) (composition)).keyUp(key);
         }
     }
 
@@ -173,5 +170,36 @@ public abstract class AbstractWidget<T extends Renderable>
     @Override
     protected void onPointerDrag(int id, float x, float y, float projectedX, float projectedY) {
 
+    }
+
+    protected T getComposition() {
+        return composition;
+    }
+
+    protected void setComposition(T composition) {
+        this.composition = composition;
+    }
+
+    @Override
+    protected void onRender(float alpha) {
+        if (composition != null) {
+            composition.render(alpha);
+        }
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : getCompositionBounds();
+    }
+
+    protected void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
+    }
+
+    private Rectangle getCompositionBounds() {
+        if (composition instanceof Bounded)
+            return ((Bounded) composition).getBounds();
+        else
+            return Rectangle.EMPTY;
     }
 }

@@ -1,6 +1,7 @@
 package com.gamelibrary2d.tools.particlegenerator.widgets;
 
 import com.gamelibrary2d.common.Color;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.objects.ComposableGameObject;
 import com.gamelibrary2d.widgets.AbstractWidget;
 import com.gamelibrary2d.widgets.Label;
@@ -10,7 +11,7 @@ public class ToggleButton extends AbstractWidget<Label> implements ComposableGam
     private Color defaultColor;
 
     public ToggleButton() {
-        setContent(new Label());
+        setComposition(new Label());
     }
 
     public boolean isToggled() {
@@ -20,10 +21,10 @@ public class ToggleButton extends AbstractWidget<Label> implements ComposableGam
     public void setToggled(boolean toggled) {
         this.toggled = toggled;
         if (toggled) {
-            defaultColor = getContent().getColor();
-            getContent().setColor(Color.GREEN);
+            defaultColor = getComposition().getColor();
+            getComposition().setColor(Color.GREEN);
         } else {
-            getContent().setColor(defaultColor);
+            getComposition().setColor(defaultColor);
         }
     }
 
@@ -34,12 +35,17 @@ public class ToggleButton extends AbstractWidget<Label> implements ComposableGam
     }
 
     @Override
-    public Label getContent() {
-        return super.getContent();
+    public Label getComposition() {
+        return super.getComposition();
     }
 
     @Override
-    public void setContent(Label content) {
-        super.setContent(content);
+    public void setComposition(Label composition) {
+        super.setComposition(composition);
+    }
+
+    @Override
+    public void setBounds(Rectangle bounds) {
+        super.setBounds(bounds);
     }
 }

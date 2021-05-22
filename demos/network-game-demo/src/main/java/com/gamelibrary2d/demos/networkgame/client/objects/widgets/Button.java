@@ -17,16 +17,16 @@ public class Button extends AbstractWidget<Label> {
     public Button(Label label, Renderable background, Rectangle bounds, Action onClick) {
         this.background = background;
         this.onClick = onClick;
-        setContent(label);
+        setComposition(label);
         setBounds(bounds);
     }
 
     @Override
-    protected void onRenderProjected(float alpha) {
+    protected void onRender(float alpha) {
         if (background != null) {
             background.render(alpha);
         }
-        super.onRenderProjected(alpha);
+        super.onRender(alpha);
     }
 
     @Override

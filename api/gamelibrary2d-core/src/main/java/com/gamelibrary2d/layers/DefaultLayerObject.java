@@ -20,9 +20,9 @@ public class DefaultLayerObject<T extends Renderable> extends AbstractLayerObjec
     }
 
     @Override
-    public void onRenderProjected(float alpha) {
+    public void onRender(float alpha) {
         background.render(alpha);
-        super.onRenderProjected(alpha);
+        super.onRender(alpha);
         foreground.render(alpha);
         if (overlay != null) {
             overlay.render(alpha);

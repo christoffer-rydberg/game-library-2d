@@ -2,8 +2,11 @@ package com.gamelibrary2d.objects;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
+import com.gamelibrary2d.markers.Bounded;
 
-public final class DefaultGameObject<T extends Renderable> extends AbstractGameObject<T> implements ComposableGameObject<T> {
+public final class DefaultGameObject<T extends Renderable> extends AbstractGameObject implements ComposableGameObject<T> {
+    private T composition;
+    private Rectangle bounds;
     private Renderable background;
     private Renderable foreground;
 
@@ -11,8 +14,8 @@ public final class DefaultGameObject<T extends Renderable> extends AbstractGameO
 
     }
 
-    public DefaultGameObject(T content) {
-        super(content);
+    public DefaultGameObject(T composition) {
+        this.composition = composition;
     }
 
     public Renderable getBackground() {
@@ -32,30 +35,42 @@ public final class DefaultGameObject<T extends Renderable> extends AbstractGameO
     }
 
     @Override
-    public void setBounds(Rectangle bounds) {
-        super.setBounds(bounds);
+    public T getComposition() {
+        return composition;
+    }
+
+    public void setComposition(T composition) {
+        this.composition = composition;
     }
 
     @Override
-    public T getContent() {
-        return super.getContent();
-    }
-
-    @Override
-    public void setContent(T content) {
-        super.setContent(content);
-    }
-
-    @Override
-    protected void onRenderProjected(float alpha) {
+    protected void onRender(float alpha) {
         if (background != null) {
             background.render(alpha);
         }
 
-        super.onRenderProjected(alpha);
+        if (composition != null) {
+            composition.render(alpha);
+        }
 
         if (foreground != null) {
             foreground.render(alpha);
         }
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : getCompositionBounds();
+    }
+
+    public void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
+    }
+
+    private Rectangle getCompositionBounds() {
+        if (composition instanceof Bounded)
+            return ((Bounded) composition).getBounds();
+        else
+            return Rectangle.EMPTY;
     }
 }

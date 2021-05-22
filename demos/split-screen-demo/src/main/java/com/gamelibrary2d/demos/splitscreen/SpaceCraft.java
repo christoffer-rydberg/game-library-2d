@@ -27,7 +27,7 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
         if (distDecimals < 0) {
             distDecimals += 1f;
         }
-        
+
         return distDecimals * width + min;
     }
 
@@ -39,7 +39,7 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
     }
 
     @Override
-    protected void onRenderProjected(float alpha) {
+    protected void onRender(float alpha) {
         renderer.render(alpha);
     }
 
@@ -48,5 +48,10 @@ public class SpaceCraft extends AbstractGameObject implements Updatable {
         setRotation(delta.getAngleDegrees());
         getPosition().add(delta.getX() * deltaTime, delta.getY() * deltaTime);
         wrap(area, getPosition());
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return renderer.getBounds();
     }
 }

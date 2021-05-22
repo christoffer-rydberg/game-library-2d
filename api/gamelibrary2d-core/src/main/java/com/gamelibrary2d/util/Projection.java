@@ -4,33 +4,33 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.objects.Transformable;
 
 public class Projection {
-    // TODO: Don't reuse the same instance and update below documentation.
-    private final static Point point = new Point();
 
     /**
-     * Projects the specified coordinates to the "self" coordinate system of the {@link Transformable}.
-     * NOTE: This method always returns the same {@link Point} instance. This is not thread safe and it is not safe to
-     * store the return value (as it will change whenever this method is called). This is a temporary optimization
-     * while awaiting Java value types (which hopefully will happen any year now).
+     * Projects the input coordinates to the "self" coordinate system of the {@link Transformable} target.
      */
-    public static Point projectTo(Transformable ref, float x, float y) {
-        point.set(x, y);
+    public static void projectTo(Transformable target, float inputX, float inputY, Point output) {
+        output.set(inputX, inputY);
 
-        float rotationAndScaleCenterX = ref.getPosition().getX() + ref.getScaleAndRotationCenter().getX();
-        float rotationAndScaleCenterY = ref.getPosition().getY() + ref.getScaleAndRotationCenter().getY();
+        float rotationAndScaleCenterX = target.getPosition().getX() + target.getScaleAndRotationCenter().getX();
+        float rotationAndScaleCenterY = target.getPosition().getY() + target.getScaleAndRotationCenter().getY();
 
-        if (ref.getRotation() != 0) {
-            point.rotate(-ref.getRotation(), rotationAndScaleCenterX, rotationAndScaleCenterY);
+        if (target.getRotation() != 0) {
+            output.rotate(-target.getRotation(), rotationAndScaleCenterX, rotationAndScaleCenterY);
         }
 
-        if (ref.getScale().getX() != 1 || ref.getScale().getY() != 1) {
-            point.setX(rotationAndScaleCenterX + ((point.getX() - rotationAndScaleCenterX) / ref.getScale().getX()));
-            point.setY(rotationAndScaleCenterY + ((point.getY() - rotationAndScaleCenterY) / ref.getScale().getY()));
+        if (target.getScale().getX() != 1 || target.getScale().getY() != 1) {
+            output.setX(rotationAndScaleCenterX + ((output.getX() - rotationAndScaleCenterX) / target.getScale().getX()));
+            output.setY(rotationAndScaleCenterY + ((output.getY() - rotationAndScaleCenterY) / target.getScale().getY()));
         }
 
-        point.setX(point.getX() - ref.getPosition().getX());
-        point.setY(point.getY() - ref.getPosition().getY());
+        output.setX(output.getX() - target.getPosition().getX());
+        output.setY(output.getY() - target.getPosition().getY());
+    }
 
-        return point;
+    /**
+     * Projects the input coordinates to the "self" coordinate system of the {@link Transformable} target.
+     */
+    public static void projectTo(Transformable target, Point input, Point output) {
+        projectTo(target, input.getX(), input.getY(), output);
     }
 }

@@ -13,7 +13,7 @@ import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.DefaultShader;
 import com.gamelibrary2d.resources.Quad;
-import com.gamelibrary2d.resources.TextureUtil;
+import com.gamelibrary2d.glUtil.OpenGLState;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class DefaultLightRenderer implements LightRenderer {
 
         // Generate and bind a texture id for the alpha map
         textureId = OpenGL.instance().glGenTextures();
-        TextureUtil.bind(textureId);
+        OpenGLState.bindTexture(textureId);
 
         // Setup the ST coordinate system
         OpenGL.instance().glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_CLAMP_TO_EDGE);
@@ -194,7 +194,7 @@ public class DefaultLightRenderer implements LightRenderer {
 
     private void render(Point position, float alpha) {
         // Bind alpha map texture
-        TextureUtil.bind(textureId);
+        OpenGLState.bindTexture(textureId);
 
         // Upload texture data
         transparencyTexture.position(transparencyTexture.limit());

@@ -33,7 +33,6 @@ import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.DefaultTexture;
-import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
 import com.gamelibrary2d.sound.MusicPlayer;
 import com.gamelibrary2d.sound.SoundPlayer;
@@ -191,11 +190,12 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
                 leftMargin,
                 window.getHeight());
 
-        ControllerArea rotationController = new ControllerArea(
-                new SurfaceRenderer<>(Quad.create(leftArea, this)),
+        ControllerArea rotationController = ControllerArea.create(
+                leftArea,
                 controller,
                 ControllerArea.SliderDirection.HORIZONTAL,
-                leftArea.getWidth() / 4f);
+                leftArea.getWidth() / 4f,
+                this);
 
         controllerLayer.add(rotationController);
     }
@@ -211,11 +211,12 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
                 window.getWidth(),
                 window.getHeight());
 
-        ControllerArea speedController = new ControllerArea(
-                new SurfaceRenderer<>(Quad.create(rightArea, this)),
+        ControllerArea speedController = ControllerArea.create(
+                rightArea,
                 controller,
                 ControllerArea.SliderDirection.VERTICAL,
-                rightArea.getHeight() / 8f);
+                rightArea.getHeight() / 8f,
+                this);
 
         controllerLayer.add(speedController);
     }
@@ -233,7 +234,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
         obj.setScale(0f);
         runUpdater(new DurationUpdater(1f, new ScaleUpdate(obj, 1f)));
 
-        obj.setContent(content.get(obj));
+        obj.setComposition(content.get(obj));
         obj.setUpdateEffect(effects.getUpdate(obj));
         obj.setDestroyedEffect(effects.getDestroyed(obj));
 

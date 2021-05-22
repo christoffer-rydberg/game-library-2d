@@ -1,20 +1,22 @@
 package com.gamelibrary2d.tools.particlegenerator.widgets;
 
+import com.gamelibrary2d.common.Point;
+import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.layers.BasicLayer;
-import com.gamelibrary2d.layers.Layer;
-import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.widgets.AbstractAggregatingWidget;
+import com.gamelibrary2d.markers.PointerAware;
+import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.util.Projection;
 import com.gamelibrary2d.widgets.DefaultWidget;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Slider extends AbstractAggregatingWidget<Layer> {
+public class Slider extends AbstractGameObject implements PointerAware {
+    private final Point projectionOutput = new Point();
     private final List<DragBeginListener> dragBeginListeners = new CopyOnWriteArrayList<>();
     private final List<DragStopListener> dragStopListeners = new CopyOnWriteArrayList<>();
     private final List<ValueChangedListener> valueChangedListeners = new CopyOnWriteArrayList<>();
-    private GameObject handle;
+    private DefaultWidget<Renderable> handle;
     private SliderDirection direction;
     private float min;
     private float max;
@@ -23,6 +25,7 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
     private int pointerButton = -1;
     private float dragOriginX;
     private float dragOriginY;
+    private Rectangle bounds;
 
     public Slider(Renderable handle, SliderDirection direction, float min, float max, float step) {
         this.handle = createHandle(handle);
@@ -30,9 +33,6 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         this.min = min;
         this.max = max;
         this.step = step;
-        Layer<Renderable> content = new BasicLayer<>();
-        content.add(this.handle);
-        setContent(content);
     }
 
     public Slider(Renderable handle, SliderDirection direction) {
@@ -98,12 +98,40 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         }
     }
 
-    private GameObject createHandle(Renderable renderable) {
+    private DefaultWidget<Renderable> createHandle(Renderable renderable) {
         DefaultWidget<Renderable> handleObj = new DefaultWidget<>(renderable);
         handleObj.addPointerDownListener(this::onHandleClicked);
         handleObj.addPointerDragListener(this::onHandleDragged);
         handleObj.addPointerUpListener(this::onHandleReleased);
         return handleObj;
+    }
+
+    @Override
+    public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (isEnabled()) {
+            Projection.projectTo(this, projectedX, projectedY, projectionOutput);
+            return handle.pointerDown(id, button, x, y, projectionOutput.getX(), projectionOutput.getY());
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean pointerMove(int id, float x, float y, float projectedX, float projectedY) {
+        if (isEnabled()) {
+            Projection.projectTo(this, projectedX, projectedY, projectionOutput);
+            return handle.pointerMove(id, x, y, projectionOutput.getX(), projectionOutput.getY());
+        }
+
+        return false;
+    }
+
+    @Override
+    public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
+        if (isEnabled()) {
+            Projection.projectTo(this, projectedX, projectedY, projectionOutput);
+            handle.pointerUp(id, button, x, y, projectionOutput.getX(), projectionOutput.getY());
+        }
     }
 
     private void onHandleClicked(int id, int button, float x, float y, float projectedX, float projectedY) {
@@ -132,6 +160,20 @@ public class Slider extends AbstractAggregatingWidget<Layer> {
         if (pointerId == id) {
             setValue(getValueFromPosition(projectedX, projectedY));
         }
+    }
+
+    @Override
+    protected void onRender(float alpha) {
+        handle.render(alpha);
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return bounds != null ? bounds : handle.getBounds();
+    }
+
+    protected void setBounds(Rectangle bounds) {
+        this.bounds = bounds;
     }
 
     public enum SliderDirection {

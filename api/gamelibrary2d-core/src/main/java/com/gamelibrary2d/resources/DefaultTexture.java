@@ -7,8 +7,10 @@ import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.Runtime;
 import com.gamelibrary2d.framework.*;
+import com.gamelibrary2d.glUtil.DefaultFrameBuffer;
 import com.gamelibrary2d.glUtil.FrameBuffer;
 import com.gamelibrary2d.glUtil.ModelMatrix;
+import com.gamelibrary2d.glUtil.OpenGLState;
 import com.gamelibrary2d.imaging.DefaultImage;
 
 import java.io.IOException;
@@ -98,13 +100,11 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
 
     public static DefaultTexture create(Renderable r, float alpha, Rectangle area, Disposer disposer) {
         Disposer frameBufferDisposer = new DefaultDisposer();
+        DefaultTexture texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
+        FrameBuffer frameBuffer = DefaultFrameBuffer.create(texture, frameBufferDisposer);
+        int previousFbo = frameBuffer.bind();
 
         try {
-            DefaultTexture texture = DefaultTexture.create((int) area.getWidth(), (int) area.getHeight(), disposer);
-            FrameBuffer frameBuffer = FrameBuffer.create(texture, frameBufferDisposer);
-
-            frameBuffer.bind();
-
             // Fix for incorrect alpha blending. See:
             // https://community.khronos.org/t/alpha-blending-issues-when-drawing-frame-buffer-into-default-buffer/73958/3
             OpenGL.instance().glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,10 +114,10 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
             ModelMatrix.instance().translatef(-area.getLowerX(), -area.getLowerY(), 0);
             r.render(alpha);
             ModelMatrix.instance().popMatrix();
-            frameBuffer.unbind(true);
 
             return texture;
         } finally {
+            OpenGLState.bindFrameBuffer(previousFbo);
             frameBufferDisposer.dispose();
         }
     }
@@ -159,10 +159,8 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
 
     @Override
     public Image loadImage() {
-        int bound = TextureUtil.getBoundTextureId();
+        int previous = bind();
         try {
-            bind();
-
             ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * channels);
 
             OpenGL.instance().glPixelStorei(GL_PACK_ALIGNMENT, getAlignment(channels));
@@ -177,7 +175,7 @@ public class DefaultTexture extends AbstractDisposable implements Texture {
             buffer.get(pixels);
             return new DefaultImage(pixels, width, height, channels);
         } finally {
-            TextureUtil.bind(bound);
+            OpenGLState.bindTexture(previous);
         }
     }
 
