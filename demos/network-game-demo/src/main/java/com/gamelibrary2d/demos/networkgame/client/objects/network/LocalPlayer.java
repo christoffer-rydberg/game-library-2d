@@ -11,11 +11,18 @@ public class LocalPlayer extends AbstractPlayer {
     private final Controller controller;
     private final PlayerAcceleration playerAcceleration;
 
+    private float acceleration;
+    private float accelerationLimit = 1f;
+
     public LocalPlayer(ControllerFactory controllerFactory, byte primaryType, GameFrameClient client, DataBuffer buffer) {
         super(primaryType, client, buffer);
 
         controller = controllerFactory.create();
         playerAcceleration = new PlayerAcceleration(client, getId());
+
+        controller.addBinding(
+                ControllerInputId.UP,
+                this::setAcceleration);
 
         controller.addBinding(
                 ControllerInputId.LEFT,
@@ -24,14 +31,20 @@ public class LocalPlayer extends AbstractPlayer {
         controller.addBinding(
                 ControllerInputId.RIGHT,
                 playerAcceleration::setRightAcceleration);
-
-        controller.addBinding(
-                ControllerInputId.UP,
-                playerAcceleration::setAcceleration);
     }
 
     public Controller getController() {
         return controller;
+    }
+
+    private void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+        playerAcceleration.setAcceleration(Math.min(accelerationLimit, acceleration));
+    }
+
+    public void setAccelerationLimit(float accelerationLimit) {
+        this.accelerationLimit = accelerationLimit;
+        playerAcceleration.setAcceleration(Math.min(accelerationLimit, acceleration));
     }
 
     @Override

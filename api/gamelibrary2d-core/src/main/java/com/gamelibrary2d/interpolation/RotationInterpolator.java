@@ -14,7 +14,7 @@ public class RotationInterpolator implements Updatable {
 
     public void setGoal(float goal, float time) {
         rotation.setAngle(target.getRotation());
-        rotation.interpolate(goal, time);
+        rotation.beginInterpolation(goal, time);
     }
 
     public void abort() {

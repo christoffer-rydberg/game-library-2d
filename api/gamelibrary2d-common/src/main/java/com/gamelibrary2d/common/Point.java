@@ -1,7 +1,6 @@
 package com.gamelibrary2d.common;
 
 public class Point {
-
     private float x;
     private float y;
 
@@ -55,6 +54,29 @@ public class Point {
     public void set(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Moves the point the along the specified angle.
+     *
+     * @param distance The distance to move the point.
+     * @param radians  The clockwise angle from the positive y-axis in radians.
+     */
+    public void offsetRadians(float distance, float radians) {
+        float dirX = (float) Math.cos(radians - Math.PI / 2);
+        float dirY = (float) -Math.sin(radians - Math.PI / 2);
+        set(x + dirX * distance, y + dirY * distance);
+    }
+
+    /**
+     * Moves the point the along the specified angle.
+     *
+     * @param distance The distance to move the point.
+     * @param degrees  The clockwise angle from the positive y-axis in degrees.
+     */
+    public void offsetDegrees(float distance, float degrees) {
+        float radians = (float) (degrees * Math.PI / 180.0);
+        offsetRadians(distance, radians);
     }
 
     public void lerp(Point p0, Point p1, float alpha) {
@@ -137,7 +159,7 @@ public class Point {
     /**
      * Rotates the point clockwise around the given center point.
      *
-     * @param angle   The angle in degrees.
+     * @param angle   The clockwise rotation angle in degrees.
      * @param centerX The X-coordinate of the center point.
      * @param centerY The Y-coordinate of the center point.
      */
@@ -148,7 +170,7 @@ public class Point {
     /**
      * Rotates the point clockwise around the given center point.
      *
-     * @param angle   The angle in radians.
+     * @param angle   The clockwise rotation angle in radians.
      * @param centerX The X-coordinate of the center point.
      * @param centerY The Y-coordinate of the center point.
      */
@@ -169,7 +191,7 @@ public class Point {
     /**
      * Rotates the point clockwise.
      *
-     * @param angle The angle in radians.
+     * @param angle The clockwise rotation angle in radians.
      */
     public void rotateRadian(double angle) {
         double sin = Math.sin(angle);

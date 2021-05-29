@@ -5,7 +5,6 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
 import com.gamelibrary2d.demos.networkgame.client.ResourceManager;
-import com.gamelibrary2d.demos.networkgame.client.input.Controller;
 import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.ClientObject;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.LocalPlayer;
@@ -13,8 +12,9 @@ import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.Con
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.EffectMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.TextureMap;
-import com.gamelibrary2d.demos.networkgame.client.objects.widgets.ControllerArea;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.AccelerationArea;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.PictureFrame;
+import com.gamelibrary2d.demos.networkgame.client.objects.widgets.RotationArea;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.TimeLabel;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
@@ -179,7 +179,7 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
         obj.destroy();
     }
 
-    private void addSpeedController(Controller controller) {
+    private void addRotationController(LocalPlayer player) {
         Window window = game.getWindow();
 
         float leftMargin = renderedGameBounds.getLowerX();
@@ -190,17 +190,17 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
                 leftMargin,
                 window.getHeight());
 
-        ControllerArea rotationController = ControllerArea.create(
+        RotationArea rotationController = RotationArea.create(
+                RotationArea.RotationMode.TOWARD_DIRECTION,
                 leftArea,
-                controller,
-                ControllerArea.SliderDirection.HORIZONTAL,
+                player,
                 leftArea.getWidth() / 4f,
                 this);
 
         controllerLayer.add(rotationController);
     }
 
-    private void addRotationController(Controller controller) {
+    private void addAccelerationController(LocalPlayer player) {
         Window window = game.getWindow();
 
         float rightMargin = window.getWidth() - renderedGameBounds.getUpperX();
@@ -211,24 +211,23 @@ public class GameFrame extends AbstractNetworkFrame<GameFrameClient> {
                 window.getWidth(),
                 window.getHeight());
 
-        ControllerArea speedController = ControllerArea.create(
+        AccelerationArea accelerationController = AccelerationArea.create(
                 rightArea,
-                controller,
-                ControllerArea.SliderDirection.VERTICAL,
+                player,
                 rightArea.getHeight() / 8f,
                 this);
 
-        controllerLayer.add(speedController);
+        controllerLayer.add(accelerationController);
     }
 
-    private void addVirtualController(Controller controller) {
-        addSpeedController(controller);
-        addRotationController(controller);
+    private void addVirtualController(LocalPlayer player) {
+        addAccelerationController(player);
+        addRotationController(player);
     }
 
     void spawn(ClientObject obj) {
         if (obj instanceof LocalPlayer) {
-            addVirtualController(((LocalPlayer) obj).getController());
+            addVirtualController(((LocalPlayer) obj));
         }
 
         obj.setScale(0f);

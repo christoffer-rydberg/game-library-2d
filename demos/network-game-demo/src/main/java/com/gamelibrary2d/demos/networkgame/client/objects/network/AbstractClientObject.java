@@ -125,7 +125,7 @@ public abstract class AbstractClientObject
 
     @Override
     public void setGoalDirection(float direction) {
-        this.direction.interpolate(direction, 1f / client.getServerUpdatesPerSecond());
+        this.direction.beginInterpolation(direction, 1f / client.getServerUpdatesPerSecond());
     }
 
     @Override

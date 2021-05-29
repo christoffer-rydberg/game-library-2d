@@ -13,7 +13,7 @@ import com.gamelibrary2d.network.common.Communicator;
 
 public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
     public final static float MAX_SPEED = 100f;
-    public final static float ACCELERATION = 200f;
+    public final static float MAX_ACCELERATION = 200f;
 
     private final DemoGameLogic gameLogic;
 
@@ -21,7 +21,7 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
 
     private float acceleration;
     private float rotationAcceleration;
-    private Point accelerationVector = new Point(0, ACCELERATION);
+    private Point accelerationVector = new Point();
 
     public ServerPlayer(DemoGameLogic gameLogic, Communicator communicator, Rectangle bounds) {
         super(ObjectTypes.PLAYER);
@@ -30,11 +30,15 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
         this.setBounds(bounds);
     }
 
+    private void updateAccelerationVector() {
+        accelerationVector.set(0f, acceleration);
+        accelerationVector.rotate(getRotation());
+    }
+
     @Override
     public void setRotation(float rotation) {
         super.setRotation(rotation);
-        accelerationVector.set(0f, ACCELERATION);
-        accelerationVector.rotate(rotation);
+        updateAccelerationVector();
     }
 
     @Override
@@ -62,8 +66,8 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
         if (isAccelerating()) {
             Point velocity = getVelocity();
             velocity.add(
-                    accelerationVector.getX() * deltaTime,
-                    accelerationVector.getY() * deltaTime);
+                    accelerationVector.getX() * MAX_ACCELERATION * deltaTime,
+                    accelerationVector.getY() * MAX_ACCELERATION * deltaTime);
 
             float speed = velocity.getLength();
             if (speed > MAX_SPEED) {
@@ -99,6 +103,7 @@ public class ServerPlayer extends AbstractDemoServerObject implements Obstacle {
 
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
+        updateAccelerationVector();
     }
 
     public void setRotationAcceleration(float rotationAcceleration) {

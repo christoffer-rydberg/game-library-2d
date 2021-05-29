@@ -1,15 +1,14 @@
 package com.gamelibrary2d.interpolation;
 
+import com.gamelibrary2d.common.FloatUtils;
 import com.gamelibrary2d.markers.Updatable;
 
 public class InterpolatableAngle implements Updatable {
+    private float angle;
     private float angle0;
     private float angle1;
-
     private float timer;
     private float endTime = -1f;
-
-    private float angle;
 
     public InterpolatableAngle() {
 
@@ -18,6 +17,7 @@ public class InterpolatableAngle implements Updatable {
     public InterpolatableAngle(float angle) {
         this.angle = angle;
     }
+
 
     public float getAngle() {
         return angle;
@@ -28,21 +28,11 @@ public class InterpolatableAngle implements Updatable {
         stopInterpolation();
     }
 
-    public void interpolate(float goal, float time) {
-        angle0 = this.angle;
-        angle1 = goal;
-
-        // Always take the shortest way to reach the correct rotation
-        while (angle1 - angle0 < -180) {
-            angle1 += 360;
-        }
-
-        while (angle1 - angle0 > 180) {
-            angle1 -= 360;
-        }
-
+    public void beginInterpolation(float goal, float duration) {
         timer = 0;
-        endTime = time;
+        endTime = duration;
+        angle0 = angle;
+        angle1 = angle + FloatUtils.normalizeDegrees(goal - angle);
     }
 
     public void stopInterpolation() {
