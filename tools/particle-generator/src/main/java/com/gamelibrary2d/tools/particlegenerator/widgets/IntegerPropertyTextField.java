@@ -3,7 +3,7 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.tools.particlegenerator.properties.IntegerProperty;
-import com.gamelibrary2d.widgets.TextField;
+import com.gamelibrary2d.components.widgets.TextField;
 
 public class IntegerPropertyTextField extends TextField {
     private static final Color VALID = Color.WHITE;

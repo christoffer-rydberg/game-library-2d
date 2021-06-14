@@ -36,11 +36,11 @@ public class FrameBufferRenderer {
         return area;
     }
 
-    public void render(Renderable renderable, float alpha) {
-        render(renderable, alpha, true);
+    public void render(Renderable content, float alpha) {
+        render(content, alpha, true);
     }
 
-    public void render(Renderable renderable, float alpha, boolean clear) {
+    public void render(Renderable content, float alpha, boolean clear) {
         int previousFbo = frameBuffer.bind();
         try {
             if (clear) {
@@ -54,7 +54,7 @@ public class FrameBufferRenderer {
             ModelMatrix.instance().pushMatrix();
             ModelMatrix.instance().clearMatrix();
             ModelMatrix.instance().translatef(-area.getLowerX(), -area.getLowerY(), 0);
-            renderable.render(alpha);
+            content.render(alpha);
             ModelMatrix.instance().popMatrix();
         } finally {
             OpenGLState.bindFrameBuffer(previousFbo);

@@ -16,7 +16,7 @@ public interface Window {
 
     void pollEvents();
 
-    void render(Renderable renderable, float alpha);
+    void render(Renderable content, float alpha);
 
     void dispose();
 

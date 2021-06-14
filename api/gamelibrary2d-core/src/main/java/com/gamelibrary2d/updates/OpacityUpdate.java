@@ -1,14 +1,14 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.denotations.Opacifiable;
 
-public class OpacityUpdate extends AbstractAttributeUpdate {
+public class OpacityUpdate<T extends Opacifiable> extends AbstractAttributeUpdate<T> {
 
     private final float originalDeltaOpacity;
 
     private float deltaOpacity;
 
-    public OpacityUpdate(GameObject target, float deltaOpacity) {
+    public OpacityUpdate(T target, float deltaOpacity) {
         super(target);
         this.originalDeltaOpacity = deltaOpacity;
         this.deltaOpacity = deltaOpacity;
@@ -20,7 +20,7 @@ public class OpacityUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    public void makeRelative(GameObject target) {
+    public void makeRelative(T target) {
         deltaOpacity = originalDeltaOpacity - getTarget().getOpacity() + target.getOpacity();
     }
 

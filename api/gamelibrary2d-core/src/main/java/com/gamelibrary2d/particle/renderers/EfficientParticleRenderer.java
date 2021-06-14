@@ -9,7 +9,7 @@ import com.gamelibrary2d.glUtil.ShaderProgram;
 import com.gamelibrary2d.renderers.AbstractArrayRenderer;
 import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.util.PointSmoothing;
+import com.gamelibrary2d.resources.PointSmoothing;
 
 import java.nio.FloatBuffer;
 

@@ -6,7 +6,7 @@ import com.gamelibrary2d.common.event.EventListener;
 import com.gamelibrary2d.common.event.EventPublisher;
 import com.gamelibrary2d.common.functional.Func;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.PointerAware;
+import com.gamelibrary2d.components.denotations.PointerAware;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.DynamicQuad;
 import com.gamelibrary2d.resources.Quad;

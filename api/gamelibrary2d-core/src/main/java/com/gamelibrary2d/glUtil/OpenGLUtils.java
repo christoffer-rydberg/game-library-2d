@@ -1,7 +1,7 @@
 package com.gamelibrary2d.glUtil;
 
 import com.gamelibrary2d.framework.OpenGL;
-import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.resources.BlendMode;
 
 public class OpenGLUtils {
 

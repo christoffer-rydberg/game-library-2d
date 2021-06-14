@@ -3,20 +3,20 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.widgets.AbstractWidget;
+import com.gamelibrary2d.components.widgets.AbstractWidget;
 
 public class Button<T extends Renderable> extends AbstractWidget<T> {
 
     private final Action onClick;
 
     public Button(T content, Action onClick) {
-        super.setComposition(content);
+        super.setContent(content);
         this.onClick = onClick;
     }
 
     @Override
-    public T getComposition() {
-        return super.getComposition();
+    public T getContent() {
+        return super.getContent();
     }
 
     @Override

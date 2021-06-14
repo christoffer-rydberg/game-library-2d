@@ -1,6 +1,6 @@
 package com.gamelibrary2d.input;
 
-import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 /**
  * Defines a binding to an input, such as a key on the keyboard or a button on the joystick.

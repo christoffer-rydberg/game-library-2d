@@ -5,15 +5,15 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.components.denotations.Bounded;
 import com.gamelibrary2d.renderers.LineRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.AbstractWidget;
-import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.AbstractWidget;
+import com.gamelibrary2d.components.widgets.Label;
 
 public class Checkbox extends AbstractWidget {
     private final BooleanProperty checked;
@@ -27,7 +27,7 @@ public class Checkbox extends AbstractWidget {
         this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = null;
         this.onUnchecked = null;
-        setComposition(renderer);
+        setContent(renderer);
     }
 
     public Checkbox(Box box, LineRenderer lineRenderer, Font font, BooleanProperty checked, Action onChecked, Action onUnchecked) {
@@ -35,7 +35,7 @@ public class Checkbox extends AbstractWidget {
         this.renderer = new CheckboxRenderer(box, lineRenderer, font);
         this.onChecked = onChecked;
         this.onUnchecked = onUnchecked;
-        setComposition(renderer);
+        setContent(renderer);
     }
 
     private void updateCheckbox() {

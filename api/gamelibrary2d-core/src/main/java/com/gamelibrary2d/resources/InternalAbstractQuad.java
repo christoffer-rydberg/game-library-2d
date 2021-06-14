@@ -4,7 +4,6 @@ import com.gamelibrary2d.common.disposal.AbstractDisposable;
 import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.QuadShape;
 
 import java.nio.ByteBuffer;
 

@@ -7,10 +7,10 @@ import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.AbstractWidget;
-import com.gamelibrary2d.widgets.TextField;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.AbstractWidget;
+import com.gamelibrary2d.components.widgets.TextField;
 
 public class InputField extends AbstractWidget<TextField> {
     private final Renderer background;
@@ -24,17 +24,17 @@ public class InputField extends AbstractWidget<TextField> {
 
         TextField textField = new TextField(text, new TextRenderer(Fonts.inputField()));
         textField.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
-        setComposition(textField);
+        setContent(textField);
 
         setBounds(background.getBounds());
     }
 
     public int getIntValue() {
-        return Integer.parseInt(getComposition().getText());
+        return Integer.parseInt(getContent().getText());
     }
 
     public String getStringValue() {
-        return getComposition().getText();
+        return getContent().getText();
     }
 
     @Override

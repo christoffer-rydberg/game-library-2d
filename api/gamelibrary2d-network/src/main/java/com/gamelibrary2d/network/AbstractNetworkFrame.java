@@ -1,8 +1,8 @@
 package com.gamelibrary2d.network;
 
 import com.gamelibrary2d.exceptions.InitializationException;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.network.common.client.Client;
 import com.gamelibrary2d.network.common.exceptions.NetworkAuthenticationException;
 import com.gamelibrary2d.network.common.exceptions.NetworkConnectionException;

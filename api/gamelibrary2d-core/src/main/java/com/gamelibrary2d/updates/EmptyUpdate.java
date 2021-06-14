@@ -1,6 +1,6 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 /**
  * The purpose of this update is to do nothing at all. This can be useful when

@@ -1,17 +1,17 @@
 package com.gamelibrary2d.tools.particlegenerator.panels;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.layers.AbstractPanel;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.containers.AbstractPanel;
+import com.gamelibrary2d.components.objects.GameObject;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
 import com.gamelibrary2d.tools.particlegenerator.widgets.ToggleButton;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.Label;
 
 public class EmitterPanel extends AbstractPanel<GameObject> {
     private final ToggleButton emitSequentialButton;
@@ -30,7 +30,7 @@ public class EmitterPanel extends AbstractPanel<GameObject> {
         emitButton.setPosition(0, 0);
 
         emitSequentialButton = new ToggleButton();
-        Label emitSequentialContent = emitSequentialButton.getComposition();
+        Label emitSequentialContent = emitSequentialButton.getContent();
         emitSequentialContent.setText("Emit Sequential");
         emitSequentialContent.setTextRenderer(new TextRenderer(font));
         emitSequentialContent.setColor(Color.SOFT_BLUE);

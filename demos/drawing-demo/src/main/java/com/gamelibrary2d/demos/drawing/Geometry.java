@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.drawing;
 
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.glUtil.PositionBuffer;
-import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.components.objects.AbstractGameObject;
 import com.gamelibrary2d.renderers.ArrayRenderer;
 
 public class Geometry extends AbstractGameObject {

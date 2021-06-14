@@ -2,8 +2,8 @@ package com.gamelibrary2d.demos.particlesystem;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.io.ResourceReader;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.particle.SequentialParticleEmitter;
 import com.gamelibrary2d.particle.parameters.EmitterParameters;
 import com.gamelibrary2d.particle.parameters.ParticleParameters;

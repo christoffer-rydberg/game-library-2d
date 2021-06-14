@@ -5,7 +5,7 @@ import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.*;
 import com.gamelibrary2d.resources.*;
-import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.resources.BlendMode;
 
 public class AnimationRenderer extends AbstractRenderer {
     private final Disposer disposer;

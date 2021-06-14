@@ -1,10 +1,10 @@
 package com.gamelibrary2d.tools.particlegenerator.panels;
 
-import com.gamelibrary2d.layers.AbstractPanel;
-import com.gamelibrary2d.layers.DefaultPanel;
-import com.gamelibrary2d.layers.Panel;
-import com.gamelibrary2d.markers.Parent;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.containers.AbstractPanel;
+import com.gamelibrary2d.components.containers.DefaultPanel;
+import com.gamelibrary2d.components.containers.Panel;
+import com.gamelibrary2d.components.denotations.Parent;
+import com.gamelibrary2d.components.objects.GameObject;
 import com.gamelibrary2d.particle.parameters.ParticleParameters;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
 import com.gamelibrary2d.tools.particlegenerator.properties.BooleanProperty;

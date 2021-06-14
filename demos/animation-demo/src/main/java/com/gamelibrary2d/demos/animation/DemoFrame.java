@@ -5,22 +5,22 @@ import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.DefaultDisposer;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.imaging.AnimationLoader;
 import com.gamelibrary2d.imaging.ImageAnimation;
 import com.gamelibrary2d.imaging.StandardAnimationFormats;
-import com.gamelibrary2d.objects.AnimatedGameObject;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.objects.AnimatedGameObject;
+import com.gamelibrary2d.components.objects.GameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.DefaultFont;
 import com.gamelibrary2d.resources.Font;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.DefaultWidget;
-import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.DefaultWidget;
+import com.gamelibrary2d.components.widgets.Label;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class DemoFrame extends AbstractFrame {
         label.setText("Click here to load an animation");
 
         DefaultWidget<Label> loadButton = new DefaultWidget<>();
-        loadButton.setComposition(label);
+        loadButton.setContent(label);
         loadButton.setBounds(label.calculateBounds());
         loadButton.addPointerUpListener(this::onLoadButtonClicked);
 
@@ -142,7 +142,7 @@ public class DemoFrame extends AbstractFrame {
                                     .restrict(game.getWindow().getWidth(), game.getWindow().getHeight()),
                             animationDisposer);
 
-                    animatedObject.setComposition(new AnimationRenderer(animation, true, animationDisposer));
+                    animatedObject.setContent(new AnimationRenderer(animation, true, animationDisposer));
 
                     loadingAnimation = null;
                 } catch (InterruptedException | ExecutionException e) {

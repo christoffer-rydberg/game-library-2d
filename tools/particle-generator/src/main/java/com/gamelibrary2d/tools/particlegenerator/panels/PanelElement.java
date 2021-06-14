@@ -3,10 +3,9 @@ package com.gamelibrary2d.tools.particlegenerator.panels;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.layers.AbstractPanel;
-import com.gamelibrary2d.objects.ComposableGameObject;
-import com.gamelibrary2d.objects.DefaultGameObject;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.containers.AbstractPanel;
+import com.gamelibrary2d.components.objects.DefaultGameObject;
+import com.gamelibrary2d.components.objects.GameObject;
 import com.gamelibrary2d.renderers.*;
 import com.gamelibrary2d.resources.Font;
 import com.gamelibrary2d.tools.particlegenerator.ParticleGenerator;
@@ -19,11 +18,11 @@ import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.resources.Surfaces;
 import com.gamelibrary2d.tools.particlegenerator.resources.Textures;
 import com.gamelibrary2d.tools.particlegenerator.widgets.*;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.DefaultWidget;
-import com.gamelibrary2d.widgets.Label;
-import com.gamelibrary2d.widgets.TextField;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.DefaultWidget;
+import com.gamelibrary2d.components.widgets.Label;
+import com.gamelibrary2d.components.widgets.TextField;
 
 public class PanelElement {
     private static final Color BASE_LINE_COLOR = Color.SOFT_BLUE;
@@ -96,7 +95,7 @@ public class PanelElement {
         }
 
         public Float(String parameterName, FloatProperty parameter, FloatProperty variance) {
-            ComposableGameObject<Label> label = createParameterLabel(parameterName);
+            DefaultGameObject<Label> label = createParameterLabel(parameterName);
 
             GameObject parameterWidget = createPropertyWidget(parameter, BASE_LINE_COLOR);
             parameterWidget.setPosition(-parameterWidget.getBounds().getLowerX(), 1f);

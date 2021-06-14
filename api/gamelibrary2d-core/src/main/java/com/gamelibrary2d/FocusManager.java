@@ -1,6 +1,6 @@
 package com.gamelibrary2d;
 
-import com.gamelibrary2d.markers.*;
+import com.gamelibrary2d.components.denotations.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,14 +2,13 @@ package com.gamelibrary2d.demos.transparentwindow;
 
 import com.gamelibrary2d.Game;
 import com.gamelibrary2d.common.Rectangle;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.framework.Window;
 import com.gamelibrary2d.imaging.AnimationLoader;
 import com.gamelibrary2d.imaging.ImageAnimation;
 import com.gamelibrary2d.imaging.StandardAnimationFormats;
-import com.gamelibrary2d.objects.AnimatedGameObject;
-import com.gamelibrary2d.objects.ComposableGameObject;
+import com.gamelibrary2d.components.objects.AnimatedGameObject;
 import com.gamelibrary2d.renderers.AnimationRenderer;
 import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.AnimationFrame;
@@ -23,7 +22,7 @@ import java.util.List;
 public class DemoFrame extends AbstractFrame {
 
     private final Game game;
-    private ComposableGameObject<AnimationRenderer> animationObj;
+    private AnimatedGameObject<AnimationRenderer> animationObj;
 
     DemoFrame(Game game) {
         this.game = game;
@@ -87,7 +86,7 @@ public class DemoFrame extends AbstractFrame {
     @Override
     protected void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-        if (animationObj.getComposition().isAnimationFinished()) {
+        if (animationObj.getContent().isAnimationFinished()) {
             game.exit();
         }
     }

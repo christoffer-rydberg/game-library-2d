@@ -184,10 +184,10 @@ public class GlfwWindow implements Window {
     }
 
     @Override
-    public void render(Renderable renderable, float alpha) {
+    public void render(Renderable content, float alpha) {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-        if (renderable != null) {
-            renderable.render(alpha);
+        if (content != null) {
+            content.render(alpha);
         }
         glfwSwapBuffers(windowHandle);
     }

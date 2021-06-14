@@ -1,20 +1,19 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.denotations.Transformable;
 
-public class ScaleUpdate extends AbstractAttributeUpdate {
-
+public class ScaleUpdate<T extends Transformable> extends AbstractAttributeUpdate<T> {
     private final float originalDeltaX;
     private final float originalDeltaY;
 
     private float deltaX;
     private float deltaY;
 
-    public ScaleUpdate(GameObject target, float deltaScale) {
+    public ScaleUpdate(T target, float deltaScale) {
         this(target, deltaScale, deltaScale);
     }
 
-    public ScaleUpdate(GameObject target, float deltaX, float deltaY) {
+    public ScaleUpdate(T target, float deltaX, float deltaY) {
         super(target);
         this.originalDeltaX = deltaX;
         this.originalDeltaY = deltaY;
@@ -29,7 +28,7 @@ public class ScaleUpdate extends AbstractAttributeUpdate {
     }
 
     @Override
-    public void makeRelative(GameObject target) {
+    public void makeRelative(T target) {
         deltaX = originalDeltaX - getTarget().getScale().getX() + target.getScale().getX();
         deltaY = originalDeltaY - getTarget().getScale().getY() + target.getScale().getY();
     }

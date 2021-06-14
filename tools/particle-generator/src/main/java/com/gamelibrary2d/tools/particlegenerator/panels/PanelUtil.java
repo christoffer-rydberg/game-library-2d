@@ -1,8 +1,8 @@
 package com.gamelibrary2d.tools.particlegenerator.panels;
 
-import com.gamelibrary2d.layers.Panel;
-import com.gamelibrary2d.objects.GameObject;
-import com.gamelibrary2d.util.StackOrientation;
+import com.gamelibrary2d.components.containers.Panel;
+import com.gamelibrary2d.components.objects.GameObject;
+import com.gamelibrary2d.resources.StackOrientation;
 
 public class PanelUtil {
 

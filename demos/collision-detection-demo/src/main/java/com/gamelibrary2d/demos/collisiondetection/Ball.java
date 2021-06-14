@@ -4,8 +4,8 @@ import com.gamelibrary2d.collision.Obstacle;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.Bounded;
-import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.components.denotations.Bounded;
+import com.gamelibrary2d.components.objects.AbstractGameObject;
 
 public class Ball extends AbstractGameObject implements Obstacle {
     private final Renderable renderer;

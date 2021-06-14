@@ -1,10 +1,10 @@
 package com.gamelibrary2d.tools.particlegenerator.panels;
 
 import com.gamelibrary2d.common.Color;
-import com.gamelibrary2d.layers.AbstractPanel;
-import com.gamelibrary2d.layers.DefaultPanel;
-import com.gamelibrary2d.layers.Panel;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.containers.AbstractPanel;
+import com.gamelibrary2d.components.containers.DefaultPanel;
+import com.gamelibrary2d.components.containers.Panel;
+import com.gamelibrary2d.components.objects.GameObject;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
 import com.gamelibrary2d.renderers.TextRenderer;
 import com.gamelibrary2d.tools.particlegenerator.models.ParticleSystemModel;
@@ -12,11 +12,11 @@ import com.gamelibrary2d.tools.particlegenerator.properties.FloatProperty;
 import com.gamelibrary2d.tools.particlegenerator.properties.GenericProperty;
 import com.gamelibrary2d.tools.particlegenerator.resources.Fonts;
 import com.gamelibrary2d.tools.particlegenerator.widgets.Button;
-import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.HorizontalTextAlignment;
-import com.gamelibrary2d.util.PointSmoothing;
-import com.gamelibrary2d.util.VerticalTextAlignment;
-import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.resources.BlendMode;
+import com.gamelibrary2d.resources.HorizontalTextAlignment;
+import com.gamelibrary2d.resources.PointSmoothing;
+import com.gamelibrary2d.resources.VerticalTextAlignment;
+import com.gamelibrary2d.components.widgets.Label;
 
 import java.io.File;
 import java.io.IOException;

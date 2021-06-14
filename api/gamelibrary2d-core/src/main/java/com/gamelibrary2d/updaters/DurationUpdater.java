@@ -1,6 +1,6 @@
 package com.gamelibrary2d.updaters;
 
-import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 public class DurationUpdater implements Updater {
     private final Updatable update;

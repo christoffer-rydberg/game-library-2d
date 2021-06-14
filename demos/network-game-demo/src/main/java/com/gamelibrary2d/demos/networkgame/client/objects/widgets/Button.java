@@ -3,8 +3,8 @@ package com.gamelibrary2d.demos.networkgame.client.objects.widgets;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.widgets.AbstractWidget;
-import com.gamelibrary2d.widgets.Label;
+import com.gamelibrary2d.components.widgets.AbstractWidget;
+import com.gamelibrary2d.components.widgets.Label;
 
 public class Button extends AbstractWidget<Label> {
     private final Action onClick;
@@ -17,7 +17,7 @@ public class Button extends AbstractWidget<Label> {
     public Button(Label label, Renderable background, Rectangle bounds, Action onClick) {
         this.background = background;
         this.onClick = onClick;
-        setComposition(label);
+        setContent(label);
         setBounds(bounds);
     }
 

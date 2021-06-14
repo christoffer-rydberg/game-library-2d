@@ -1,12 +1,11 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 /**
- * Updates one or more attributes of a {@link GameObject}.
+ * Updates one or more attributes of the generic target.
  */
-public interface AttributeUpdate extends Updatable {
+public interface AttributeUpdate<T> extends Updatable {
 
     /**
      * Invoke this method before the update is applied in order to
@@ -18,5 +17,5 @@ public interface AttributeUpdate extends Updatable {
      * Invoke this method before the update is applied in order to
      * interpret the update's parameters as values relative to the specified object.
      */
-    void makeRelative(GameObject obj);
+    void makeRelative(T obj);
 }

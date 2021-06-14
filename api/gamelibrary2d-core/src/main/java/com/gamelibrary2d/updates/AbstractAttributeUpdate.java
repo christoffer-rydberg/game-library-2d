@@ -1,16 +1,14 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.objects.GameObject;
+abstract class AbstractAttributeUpdate<T> implements AttributeUpdate<T> {
 
-abstract class AbstractAttributeUpdate implements AttributeUpdate {
+    private final T target;
 
-    private final GameObject target;
-
-    protected AbstractAttributeUpdate(GameObject target) {
+    protected AbstractAttributeUpdate(T target) {
         this.target = target;
     }
 
-    public GameObject getTarget() {
+    public T getTarget() {
         return target;
     }
 

@@ -2,13 +2,13 @@ package com.gamelibrary2d.demos.drawing;
 
 import com.gamelibrary2d.common.random.RandomGenerator;
 import com.gamelibrary2d.common.random.RandomInstance;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.framework.Mouse;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.PositionBuffer;
-import com.gamelibrary2d.layers.BasicLayer;
-import com.gamelibrary2d.layers.Layer;
+import com.gamelibrary2d.components.containers.BasicLayer;
+import com.gamelibrary2d.components.containers.Layer;
 import com.gamelibrary2d.renderers.LineRenderer;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.ShaderParameters;

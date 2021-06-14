@@ -1,12 +1,12 @@
 package com.gamelibrary2d.demos.shaderparticlesystem;
 
 import com.gamelibrary2d.Game;
-import com.gamelibrary2d.frames.AbstractFrame;
-import com.gamelibrary2d.frames.InitializationContext;
+import com.gamelibrary2d.components.frames.AbstractFrame;
+import com.gamelibrary2d.components.frames.InitializationContext;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.framework.Window;
-import com.gamelibrary2d.layers.DefaultLayerObject;
-import com.gamelibrary2d.layers.LayerObject;
+import com.gamelibrary2d.components.containers.DefaultLayerObject;
+import com.gamelibrary2d.components.containers.LayerObject;
 import com.gamelibrary2d.particle.systems.ParticleSystem;
 
 import javax.imageio.ImageIO;

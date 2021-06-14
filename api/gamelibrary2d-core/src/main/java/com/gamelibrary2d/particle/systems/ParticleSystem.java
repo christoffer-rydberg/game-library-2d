@@ -1,7 +1,7 @@
 package com.gamelibrary2d.particle.systems;
 
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 public interface ParticleSystem extends Updatable, Renderable {
 

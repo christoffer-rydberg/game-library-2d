@@ -14,8 +14,8 @@ import com.gamelibrary2d.renderers.SurfaceRenderer;
 import com.gamelibrary2d.resources.Animation;
 import com.gamelibrary2d.resources.Quad;
 import com.gamelibrary2d.resources.Texture;
-import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.QuadShape;
+import com.gamelibrary2d.resources.BlendMode;
+import com.gamelibrary2d.resources.QuadShape;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

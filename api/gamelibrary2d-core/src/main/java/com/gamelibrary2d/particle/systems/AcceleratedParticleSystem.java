@@ -6,7 +6,7 @@ import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.framework.OpenGL;
 import com.gamelibrary2d.glUtil.*;
-import com.gamelibrary2d.markers.Clearable;
+import com.gamelibrary2d.components.denotations.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.parameters.EmitterParameters;
 import com.gamelibrary2d.particle.parameters.ParticleParameters;

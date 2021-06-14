@@ -1,8 +1,8 @@
 package com.gamelibrary2d.updates;
 
-import com.gamelibrary2d.objects.GameObject;
+import com.gamelibrary2d.components.denotations.Transformable;
 
-public class PositionUpdate extends AbstractAttributeUpdate {
+public class PositionUpdate<T extends Transformable> extends AbstractAttributeUpdate<T> {
 
     private final float originalDeltaX;
     private final float originalDeltaY;
@@ -10,7 +10,7 @@ public class PositionUpdate extends AbstractAttributeUpdate {
     private float deltaX;
     private float deltaY;
 
-    public PositionUpdate(GameObject target, float deltaX, float deltaY) {
+    public PositionUpdate(T target, float deltaX, float deltaY) {
         super(target);
         this.originalDeltaX = deltaX;
         this.originalDeltaY = deltaY;
@@ -24,7 +24,8 @@ public class PositionUpdate extends AbstractAttributeUpdate {
         deltaY = originalDeltaY - getTarget().getPosition().getY();
     }
 
-    public void makeRelative(GameObject target) {
+    @Override
+    public void makeRelative(T target) {
         deltaX = originalDeltaX - getTarget().getPosition().getX() + target.getPosition().getX();
         deltaY = originalDeltaY - getTarget().getPosition().getY() + target.getPosition().getY();
     }

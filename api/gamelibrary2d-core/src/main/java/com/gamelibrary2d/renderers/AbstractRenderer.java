@@ -3,7 +3,7 @@ package com.gamelibrary2d.renderers;
 import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.resources.BlendMode;
 
 public abstract class AbstractRenderer implements Renderer {
     private final ShaderParameters parameters;

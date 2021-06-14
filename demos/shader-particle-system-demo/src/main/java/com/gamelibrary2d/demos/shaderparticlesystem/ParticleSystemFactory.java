@@ -10,8 +10,8 @@ import com.gamelibrary2d.particle.renderers.EfficientParticleRenderer;
 import com.gamelibrary2d.particle.renderers.ParticleShape;
 import com.gamelibrary2d.particle.systems.CustomParticleSystem;
 import com.gamelibrary2d.resources.DefaultShader;
-import com.gamelibrary2d.util.BlendMode;
-import com.gamelibrary2d.util.PointSmoothing;
+import com.gamelibrary2d.resources.BlendMode;
+import com.gamelibrary2d.resources.PointSmoothing;
 
 import java.awt.image.BufferedImage;
 

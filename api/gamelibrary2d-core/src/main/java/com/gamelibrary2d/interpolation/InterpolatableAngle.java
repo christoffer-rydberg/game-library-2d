@@ -1,7 +1,7 @@
 package com.gamelibrary2d.interpolation;
 
 import com.gamelibrary2d.common.FloatUtils;
-import com.gamelibrary2d.markers.Updatable;
+import com.gamelibrary2d.components.denotations.Updatable;
 
 public class InterpolatableAngle implements Updatable {
     private float angle;

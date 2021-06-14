@@ -4,9 +4,9 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.objects.ComposableGameObject;
+import com.gamelibrary2d.components.objects.GameObject;
 
-public interface ClientObject extends ComposableGameObject<Renderable> {
+public interface ClientObject extends GameObject {
 
     int getId();
 
@@ -24,7 +24,7 @@ public interface ClientObject extends ComposableGameObject<Renderable> {
 
     float getDirection();
 
-    void setComposition(Renderable composition);
+    void setContent(Renderable content);
 
     void setUpdateEffect(DurationEffect updateEffect);
 

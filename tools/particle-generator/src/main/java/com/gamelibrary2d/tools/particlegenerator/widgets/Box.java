@@ -3,7 +3,7 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.glUtil.PositionBuffer;
-import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.components.denotations.Bounded;
 import com.gamelibrary2d.renderers.LineRenderer;
 
 public class Box implements Bounded {

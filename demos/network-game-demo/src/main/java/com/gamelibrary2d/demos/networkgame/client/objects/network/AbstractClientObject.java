@@ -3,15 +3,15 @@ package com.gamelibrary2d.demos.networkgame.client.objects.network;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.io.DataBuffer;
-import com.gamelibrary2d.demos.networkgame.client.frames.GameFrameClient;
+import com.gamelibrary2d.demos.networkgame.client.frames.game.GameFrameClient;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.DurationEffect;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.InstantEffect;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.interpolation.InterpolatableAngle;
 import com.gamelibrary2d.interpolation.PositionInterpolator;
-import com.gamelibrary2d.markers.Bounded;
-import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.objects.AbstractGameObject;
+import com.gamelibrary2d.components.denotations.Bounded;
+import com.gamelibrary2d.components.denotations.Updatable;
+import com.gamelibrary2d.components.objects.AbstractGameObject;
 
 public abstract class AbstractClientObject
         extends AbstractGameObject implements ClientObject, Updatable {
@@ -29,7 +29,7 @@ public abstract class AbstractClientObject
     private InstantEffect destroyedEffect;
     private boolean accelerating;
 
-    private Renderable composition;
+    private Renderable content;
 
     protected AbstractClientObject(byte primaryType, GameFrameClient client, DataBuffer buffer) {
         this.primaryType = primaryType;
@@ -54,14 +54,13 @@ public abstract class AbstractClientObject
         return secondaryType;
     }
 
-    @Override
-    public Renderable getComposition() {
-        return composition;
+    public Renderable getContent() {
+        return content;
     }
 
     @Override
-    public void setComposition(Renderable composition) {
-        this.composition = composition;
+    public void setContent(Renderable content) {
+        this.content = content;
     }
 
     @Override
@@ -104,8 +103,8 @@ public abstract class AbstractClientObject
             updateEffect.onUpdate(this, deltaTime);
         }
 
-        if (composition instanceof Updatable) {
-            ((Updatable) composition).update(deltaTime);
+        if (content instanceof Updatable) {
+            ((Updatable) content).update(deltaTime);
         }
     }
 
@@ -135,15 +134,15 @@ public abstract class AbstractClientObject
 
     @Override
     protected void onRender(float alpha) {
-        if (composition != null) {
-            composition.render(alpha);
+        if (content != null) {
+            content.render(alpha);
         }
     }
 
     @Override
     public Rectangle getBounds() {
-        if (composition instanceof Bounded)
-            return ((Bounded) composition).getBounds();
+        if (content instanceof Bounded)
+            return ((Bounded) content).getBounds();
         else
             return Rectangle.EMPTY;
     }

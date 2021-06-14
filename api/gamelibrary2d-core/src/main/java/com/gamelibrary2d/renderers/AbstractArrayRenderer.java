@@ -5,7 +5,7 @@ import com.gamelibrary2d.glUtil.ModelMatrix;
 import com.gamelibrary2d.glUtil.OpenGLBuffer;
 import com.gamelibrary2d.glUtil.OpenGLUtils;
 import com.gamelibrary2d.glUtil.ShaderProgram;
-import com.gamelibrary2d.util.BlendMode;
+import com.gamelibrary2d.resources.BlendMode;
 
 public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements ArrayRenderer<T> {
     private final DrawMode drawMode;

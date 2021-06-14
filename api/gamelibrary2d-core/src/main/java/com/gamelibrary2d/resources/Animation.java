@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.imaging.ImageAnimation;
 import com.gamelibrary2d.imaging.ImageAnimationFrame;
-import com.gamelibrary2d.markers.Bounded;
+import com.gamelibrary2d.components.denotations.Bounded;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package com.gamelibrary2d.interpolation;
 
-import com.gamelibrary2d.markers.Updatable;
-import com.gamelibrary2d.objects.Transformable;
+import com.gamelibrary2d.components.denotations.Updatable;
+import com.gamelibrary2d.components.denotations.Transformable;
 
 public class PositionInterpolator implements Updatable {
     private final Transformable target;

@@ -4,7 +4,7 @@ import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.common.random.RandomInstance;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.markers.Clearable;
+import com.gamelibrary2d.components.denotations.Clearable;
 import com.gamelibrary2d.particle.ParticleUpdateListener;
 import com.gamelibrary2d.particle.parameters.EmitterParameters;
 import com.gamelibrary2d.particle.parameters.ParticleSystemParameters;

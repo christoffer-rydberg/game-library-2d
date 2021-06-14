@@ -3,10 +3,10 @@ package com.gamelibrary2d.tools.particlegenerator.widgets;
 import com.gamelibrary2d.common.Point;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.framework.Renderable;
-import com.gamelibrary2d.markers.PointerAware;
-import com.gamelibrary2d.objects.AbstractGameObject;
-import com.gamelibrary2d.util.Projection;
-import com.gamelibrary2d.widgets.DefaultWidget;
+import com.gamelibrary2d.components.denotations.PointerAware;
+import com.gamelibrary2d.components.objects.AbstractGameObject;
+import com.gamelibrary2d.Projection;
+import com.gamelibrary2d.components.widgets.DefaultWidget;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -98,8 +98,8 @@ public class Slider extends AbstractGameObject implements PointerAware {
         }
     }
 
-    private DefaultWidget<Renderable> createHandle(Renderable renderable) {
-        DefaultWidget<Renderable> handleObj = new DefaultWidget<>(renderable);
+    private DefaultWidget<Renderable> createHandle(Renderable content) {
+        DefaultWidget<Renderable> handleObj = new DefaultWidget<>(content);
         handleObj.addPointerDownListener(this::onHandleClicked);
         handleObj.addPointerDragListener(this::onHandleDragged);
         handleObj.addPointerUpListener(this::onHandleReleased);

@@ -3,7 +3,7 @@ package com.gamelibrary2d.demos.collisiondetection;
 import com.gamelibrary2d.common.disposal.Disposer;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.glUtil.ModelMatrix;
-import com.gamelibrary2d.markers.PointerAware;
+import com.gamelibrary2d.components.denotations.PointerAware;
 
 public class BallTool implements Renderable, PointerAware {
     private final Line line;
