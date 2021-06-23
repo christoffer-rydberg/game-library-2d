@@ -41,7 +41,7 @@ public class GeometryTool implements Renderable, PointerAware {
 
     @Override
     public boolean pointerDown(int id, int button, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == id) {
+        if (drawButton == button) {
             inProgress = geometryFactory.create();
             inProgress.nodes().add(projectedX, projectedY);
             prevNode.set(projectedX, projectedY);
@@ -66,7 +66,7 @@ public class GeometryTool implements Renderable, PointerAware {
 
     @Override
     public void pointerUp(int id, int button, float x, float y, float projectedX, float projectedY) {
-        if (drawButton == id) {
+        if (drawButton == button) {
             onCreated.publish(inProgress);
             inProgress = null;
         }

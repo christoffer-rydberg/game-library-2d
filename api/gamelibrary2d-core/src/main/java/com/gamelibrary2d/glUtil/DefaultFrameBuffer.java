@@ -11,10 +11,9 @@ public class DefaultFrameBuffer implements FrameBuffer {
     private final Texture texture;
     private final ByteBuffer pixelReadBuffer = ByteBuffer.allocateDirect(4);
 
-    private DefaultFrameBuffer(int id, Texture texture, Disposer disposer) {
+    private DefaultFrameBuffer(int id, Texture texture) {
         this.id = id;
         this.texture = texture;
-        disposer.registerDisposal(this);
     }
 
     public static DefaultFrameBuffer create(Texture texture, Disposer disposer) {
@@ -31,7 +30,11 @@ public class DefaultFrameBuffer implements FrameBuffer {
         openGl.glBindRenderbuffer(OpenGL.GL_RENDERBUFFER, 0);
         openGl.glBindFramebuffer(OpenGL.GL_FRAMEBUFFER, 0);
 
-        return new DefaultFrameBuffer(fbo, texture, disposer);
+        DefaultFrameBuffer frameBuffer = new DefaultFrameBuffer(fbo, texture);
+
+        disposer.registerDisposal(frameBuffer);
+
+        return frameBuffer;
     }
 
     @Override

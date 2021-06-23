@@ -12,7 +12,7 @@ public class DemoGame extends AbstractGame {
 
     @Override
     protected void onStart() throws InitializationException {
-        setFrame(new DemoFrame());
+        setFrame(new DemoFrame(this));
     }
 
     @Override
