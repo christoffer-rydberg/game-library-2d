@@ -6,7 +6,7 @@
 
     <groupId>com.gamelibrary2d</groupId>
     <artifactId>gamelibrary2d-sound-lwjgl</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>com.gamelibrary2d</groupId>
             <artifactId>gamelibrary2d-sound</artifactId>
-            <version>0.7.0</version>
+            <version>0.8.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
