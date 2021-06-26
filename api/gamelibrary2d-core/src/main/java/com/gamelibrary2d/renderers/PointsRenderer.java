@@ -61,12 +61,6 @@ public class PointsRenderer extends AbstractArrayRenderer<PositionBuffer> {
     }
 
     @Override
-    protected void renderCleanup() {
-        OpenGL.instance().glPointSize(1f);
-        OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
-    }
-
-    @Override
     protected ShaderProgram getShaderProgram() {
         return ShaderProgram.getPointShaderProgram();
     }

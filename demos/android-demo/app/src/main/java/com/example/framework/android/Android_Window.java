@@ -1,10 +1,13 @@
 package com.example.framework.android;
 
 import android.app.Activity;
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 import com.gamelibrary2d.framework.*;
+
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 
 class Android_Window extends GLSurfaceView implements Window {
     private static final int POINTER_DOWN = 0;
@@ -45,9 +48,10 @@ class Android_Window extends GLSurfaceView implements Window {
     }
 
     @Override
-    public void render(Renderable renderable, float alpha) {
-        if (renderable != null) {
-            renderable.render(alpha);
+    public void render(Renderable content, float alpha) {
+        GLES20.glClear(GL_COLOR_BUFFER_BIT);
+        if (content != null) {
+            content.render(alpha);
         }
     }
 

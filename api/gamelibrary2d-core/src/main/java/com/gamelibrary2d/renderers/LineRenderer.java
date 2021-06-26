@@ -30,11 +30,6 @@ public class LineRenderer extends AbstractArrayRenderer<PositionBuffer> {
     }
 
     @Override
-    protected void renderCleanup() {
-        OpenGL.instance().glLineWidth(1f);
-    }
-
-    @Override
     protected ShaderProgram getShaderProgram() {
         return ShaderProgram.getPointShaderProgram();
     }

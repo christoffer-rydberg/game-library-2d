@@ -79,9 +79,7 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
         OpenGL.instance().glDrawArrays(drawMode, offset, len);
 
         // Cleanup
-        renderCleanup();
         array.unbind();
-        OpenGLUtils.setBlendMode(BlendMode.NONE);
     }
 
     protected void applyParameters(float alpha) {
@@ -100,8 +98,6 @@ public abstract class AbstractArrayRenderer<T extends OpenGLBuffer> implements A
     protected abstract ShaderProgram getShaderProgram();
 
     protected abstract void renderPrepare(ShaderProgram shaderProgram);
-
-    protected abstract void renderCleanup();
 
     protected enum DrawMode {
         POINTS,

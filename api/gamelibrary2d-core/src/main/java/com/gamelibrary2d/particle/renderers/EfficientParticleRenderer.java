@@ -83,11 +83,6 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
         }
 
         super.render(alpha, buffer, offset, len);
-
-        OpenGL.instance().glDisable(OpenGL.GL_POINT_SMOOTH);
-        if (particleShape == ParticleShape.QUAD && texture != null) {
-            texture.unbind();
-        }
     }
 
     @Override
@@ -122,11 +117,6 @@ public class EfficientParticleRenderer extends AbstractArrayRenderer<OpenGLBuffe
                     throw new IllegalStateException("Unexpected value: " + pointSmoothing);
             }
         }
-    }
-
-    @Override
-    protected void renderCleanup() {
-
     }
 
     @Override

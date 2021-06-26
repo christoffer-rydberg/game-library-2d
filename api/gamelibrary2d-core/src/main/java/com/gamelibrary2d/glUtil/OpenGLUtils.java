@@ -26,26 +26,28 @@ public class OpenGLUtils {
         OpenGL openGL = OpenGL.instance();
 
         switch (blendMode) {
-
             case NONE:
                 openGL.glDisable(OpenGL.GL_BLEND);
                 break;
 
             case TRANSPARENT:
-                if (!blendEnabled)
+                if (!blendEnabled) {
                     openGL.glEnable(OpenGL.GL_BLEND);
+                }
                 openGL.glBlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
                 break;
 
             case ADDITIVE:
-                if (!blendEnabled)
+                if (!blendEnabled) {
                     openGL.glEnable(OpenGL.GL_BLEND);
+                }
                 openGL.glBlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE);
                 break;
 
             case MASKED:
-                if (!blendEnabled)
+                if (!blendEnabled) {
                     openGL.glEnable(OpenGL.GL_BLEND);
+                }
                 openGL.glBlendFunc(OpenGL.GL_ZERO, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
                 break;
         }

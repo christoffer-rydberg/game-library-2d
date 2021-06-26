@@ -84,13 +84,6 @@ public class QuadsRenderer extends AbstractArrayRenderer<PositionBuffer> {
     }
 
     @Override
-    protected void renderCleanup() {
-        if (texture != null) {
-            texture.unbind();
-        }
-    }
-
-    @Override
     protected ShaderProgram getShaderProgram() {
         return ShaderProgram.getQuadShaderProgram();
     }

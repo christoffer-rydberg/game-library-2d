@@ -40,7 +40,6 @@ public abstract class AbstractOpenGLBuffer extends AbstractDisposable implements
     public void unbind() {
         OpenGL openGL = OpenGL.instance();
         openGL.glBindBuffer(target, 0);
-        openGL.glBindVertexArray(0);
         bound = false;
     }
 

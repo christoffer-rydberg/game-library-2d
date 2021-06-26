@@ -9,13 +9,14 @@ import com.gamelibrary2d.renderers.ShaderParameters;
 import com.gamelibrary2d.resources.Shader;
 
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShaderProgram implements Disposable {
 
     private final static String PARAMETERS_ATTRIBUTE = "parameters";
-
+    private final static int LOCATION_NOT_FOUND = Integer.MIN_VALUE;
     private static int activeProgram;
-
     private static ShaderProgram defaultShaderProgram;
     private static ShaderProgram defaultParticleUpdaterProgram;
     private static ShaderProgram pointParticleShaderProgram;
@@ -27,6 +28,8 @@ public class ShaderProgram implements Disposable {
     private int programId;
     private int uniModel;
     private int parametersLocation;
+    private Map<CharSequence, Integer> uniformLocations = new HashMap<>();
+    private Map<CharSequence, Integer> attributeLocations = new HashMap<>();
 
     private ShaderProgram(Disposer disposer) {
         programId = OpenGL.instance().glCreateProgram();
@@ -191,11 +194,23 @@ public class ShaderProgram implements Disposable {
     }
 
     public int getAttributeLocation(CharSequence name) {
-        return OpenGL.instance().glGetAttribLocation(programId, name);
+        int location = attributeLocations.getOrDefault(name, LOCATION_NOT_FOUND);
+        if (location == LOCATION_NOT_FOUND) {
+            location = OpenGL.instance().glGetAttribLocation(programId, name);
+            attributeLocations.put(name, location);
+        }
+
+        return location;
     }
 
     public int getUniformLocation(CharSequence name) {
-        return OpenGL.instance().glGetUniformLocation(programId, name);
+        int location = uniformLocations.getOrDefault(name, LOCATION_NOT_FOUND);
+        if (location == LOCATION_NOT_FOUND) {
+            location = OpenGL.instance().glGetUniformLocation(programId, name);
+            uniformLocations.put(name, location);
+        }
+
+        return location;
     }
 
     public float getParameter(int index) {

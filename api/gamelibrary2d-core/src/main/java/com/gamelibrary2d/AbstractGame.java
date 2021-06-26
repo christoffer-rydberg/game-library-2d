@@ -225,7 +225,6 @@ public abstract class AbstractGame extends AbstractDisposer implements Game {
 
         update(currentFrame, deltaTime * speedFactor);
 
-        OpenGL.instance().glClear(OpenGL.GL_COLOR_BUFFER_BIT);
         render(currentFrame);
 
         // Update cycle ends

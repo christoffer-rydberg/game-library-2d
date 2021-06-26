@@ -17,7 +17,6 @@ public class Lwjgl_GameLoop implements GameLoop {
     private UpdateAction updateAction;
     private Action disposeAction;
     private Window window;
-    private volatile Action onExit;
 
     @Override
     public void initialize(UpdateAction updateAction, Action disposeAction, Window window) {
