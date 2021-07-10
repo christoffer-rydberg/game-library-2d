@@ -3,7 +3,7 @@ package com.gamelibrary2d.demos.networkgame.client.resources;
 import com.gamelibrary2d.common.Color;
 import com.gamelibrary2d.common.Rectangle;
 import com.gamelibrary2d.common.disposal.Disposer;
-import com.gamelibrary2d.demos.networkgame.client.Settings;
+import com.gamelibrary2d.demos.networkgame.client.settings.Dimensions;
 import com.gamelibrary2d.framework.Renderable;
 import com.gamelibrary2d.renderers.Renderer;
 import com.gamelibrary2d.renderers.SurfaceRenderer;
@@ -15,9 +15,9 @@ public class Textures {
     private static Texture button;
     private static Texture inputField;
 
-    public static void create(Disposer disposer) {
+    public static void create(Dimensions dimensions, Disposer disposer) {
         button = createQuadStackTexture(
-                Settings.BUTTON_SIZE,
+                dimensions.getButtonSize(),
                 Color.WHITE.divide(10),
                 Color.WHITE,
                 10,

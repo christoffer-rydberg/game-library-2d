@@ -2,7 +2,7 @@ package com.gamelibrary2d.demos.networkgame.client.frames.menu;
 
 import com.gamelibrary2d.common.functional.Action;
 import com.gamelibrary2d.demos.networkgame.client.DemoGame;
-import com.gamelibrary2d.demos.networkgame.client.Settings;
+import com.gamelibrary2d.demos.networkgame.client.settings.Colors;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.Button;
 import com.gamelibrary2d.demos.networkgame.client.objects.widgets.InputField;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
@@ -41,7 +41,7 @@ class MenuPanel extends AbstractPointerAwareComposedGameObject<NavigationPanel> 
                 Surfaces.button(),
                 Textures.button());
 
-        background.getParameters().setColor(Settings.BUTTON_COLOR);
+        background.getParameters().setColor(Colors.BUTTON_COLOR);
 
         Label label = new Label(text, new TextRenderer(Fonts.button()));
         label.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);

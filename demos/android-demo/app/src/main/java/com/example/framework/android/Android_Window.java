@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import com.gamelibrary2d.framework.*;
 
@@ -15,12 +16,19 @@ class Android_Window extends GLSurfaceView implements Window {
     private static final int POINTER_UP = 2;
     private final Activity activity;
     private final MotionEventStash motionEventStash = new MotionEventStash(100);
+    private final double physicalWidth;
+    private final double physicalHeight;
     private WindowEventListener eventListener;
 
     Android_Window(Activity activity) {
         super(activity);
         this.activity = activity;
         setEGLContextClientVersion(3);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        physicalWidth = (getWidth() / dm.xdpi) * 25.4;
+        physicalHeight = (getHeight() / dm.ydpi) * 25.4;
     }
 
     OpenGL.OpenGLVersion getSupportedOpenGLVersion() {
@@ -73,6 +81,31 @@ class Android_Window extends GLSurfaceView implements Window {
     @Override
     public void focus() {
 
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return true;
+    }
+
+    @Override
+    public int getMonitorWidth() {
+        return super.getWidth();
+    }
+
+    @Override
+    public int getMonitorHeight() {
+        return super.getHeight();
+    }
+
+    @Override
+    public double getPhysicalWidth() {
+        return physicalWidth;
+    }
+
+    @Override
+    public double getPhysicalHeight() {
+        return physicalHeight;
     }
 
     @Override

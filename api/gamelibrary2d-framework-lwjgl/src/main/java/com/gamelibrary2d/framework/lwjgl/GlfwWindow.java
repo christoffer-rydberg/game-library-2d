@@ -1,5 +1,6 @@
 package com.gamelibrary2d.framework.lwjgl;
 
+import com.gamelibrary2d.common.io.BufferUtils;
 import com.gamelibrary2d.framework.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -7,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Callback;
 
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,18 +22,19 @@ public class GlfwWindow implements Window {
     public static boolean SETUP_DEBUG_MESSAGE_CALLBACK = false;
 
     private final int width;
-
     private final int height;
-
     private final boolean fullScreen;
-
     private final List<WindowHint> additionalWindowHints = new ArrayList<>();
+    private int windowWidth;
+    private int windowHeight;
+    private int monitorWidth;
+    private int monitorHeight;
+    private int physicalWidth;
+    private int physicalHeight;
 
     private long windowHandle;
 
-    private int windowWidth;
-
-    private int windowHeight;
+    private long monitor;
 
     private String title;
 
@@ -102,12 +105,15 @@ public class GlfwWindow implements Window {
 
             glfwDefaultWindowHints();
 
-            long monitor = glfwGetPrimaryMonitor();
-            GLFWVidMode vidmode = glfwGetVideoMode(monitor);
+            monitor = glfwGetPrimaryMonitor();
+            GLFWVidMode videoMode = glfwGetVideoMode(monitor);
+
+            this.monitorWidth = videoMode.width();
+            this.monitorHeight = videoMode.height();
 
             if (fullScreen) {
-                int actualWidth = width <= 0 ? vidmode.width() : Math.min(width, vidmode.width());
-                int actualHeight = height <= 0 ? vidmode.height() : Math.min(height, vidmode.height());
+                int actualWidth = width <= 0 ? monitorWidth : Math.min(width, monitorWidth);
+                int actualHeight = height <= 0 ? monitorHeight : Math.min(height, monitorHeight);
                 onCreate(title, actualWidth, actualHeight, monitor);
             } else {
                 boolean isWindowedFullscreen = width <= 0;
@@ -122,9 +128,9 @@ public class GlfwWindow implements Window {
 
                     if (isTransparentFrameBuffer) {
                         // Transparent buffer does not work in full-screen. Make window smaller:
-                        onCreate(title, vidmode.width() - 1, vidmode.height(), NULL);
+                        onCreate(title, videoMode.width() - 1, videoMode.height(), NULL);
                     } else {
-                        onCreate(title, vidmode.width(), vidmode.height(), NULL);
+                        onCreate(title, videoMode.width(), videoMode.height(), NULL);
                     }
                 } else {
                     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -132,8 +138,8 @@ public class GlfwWindow implements Window {
                     onCreate(title, width, height, NULL);
 
                     // Center window
-                    int xPos = Math.max(0, (vidmode.width() - width) / 2);
-                    int yPos = Math.max(30, (vidmode.height() - height) / 2);
+                    int xPos = Math.max(0, (videoMode.width() - width) / 2);
+                    int yPos = Math.max(30, (videoMode.height() - height) / 2);
                     glfwSetWindowPos(windowHandle, xPos, yPos);
                 }
             }
@@ -166,6 +172,13 @@ public class GlfwWindow implements Window {
 
         // Enable v-sync
         glfwSwapInterval(1);
+
+        IntBuffer x = BufferUtils.createIntBuffer(1);
+        IntBuffer y = BufferUtils.createIntBuffer(1);
+        glfwGetMonitorPhysicalSize(this.monitor, x, y);
+
+        physicalWidth = x.get(0);
+        physicalHeight = y.get(0);
     }
 
     @Override
@@ -218,6 +231,10 @@ public class GlfwWindow implements Window {
         this.mouseCursorMode = mouseCursorMode;
     }
 
+    public boolean isFullScreen() {
+        return fullScreen;
+    }
+
     @Override
     public int getHeight() {
         return windowHeight;
@@ -226,6 +243,26 @@ public class GlfwWindow implements Window {
     @Override
     public int getWidth() {
         return windowWidth;
+    }
+
+    @Override
+    public double getPhysicalWidth() {
+        return physicalWidth;
+    }
+
+    @Override
+    public double getPhysicalHeight() {
+        return physicalHeight;
+    }
+
+    @Override
+    public int getMonitorWidth() {
+        return monitorWidth;
+    }
+
+    @Override
+    public int getMonitorHeight() {
+        return monitorHeight;
     }
 
     @Override

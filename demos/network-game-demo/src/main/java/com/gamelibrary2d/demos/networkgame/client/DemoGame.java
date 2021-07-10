@@ -1,19 +1,20 @@
 package com.gamelibrary2d.demos.networkgame.client;
 
 import com.gamelibrary2d.AbstractGame;
-import com.gamelibrary2d.demos.networkgame.client.frames.game.GameFrame;
+import com.gamelibrary2d.components.frames.Frame;
+import com.gamelibrary2d.components.frames.FrameDisposal;
 import com.gamelibrary2d.demos.networkgame.client.frames.LoadingFrame;
-import com.gamelibrary2d.demos.networkgame.client.frames.menu.MenuFrame;
 import com.gamelibrary2d.demos.networkgame.client.frames.SplashFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.game.GameFrame;
+import com.gamelibrary2d.demos.networkgame.client.frames.menu.MenuFrame;
 import com.gamelibrary2d.demos.networkgame.client.input.ControllerFactory;
 import com.gamelibrary2d.demos.networkgame.client.objects.network.decoration.SoundMap;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
+import com.gamelibrary2d.demos.networkgame.client.settings.Dimensions;
 import com.gamelibrary2d.demos.networkgame.client.urls.Music;
 import com.gamelibrary2d.exceptions.InitializationException;
-import com.gamelibrary2d.components.frames.Frame;
-import com.gamelibrary2d.components.frames.FrameDisposal;
 import com.gamelibrary2d.framework.Framework;
 import com.gamelibrary2d.network.common.client.CommunicatorFactory;
 import com.gamelibrary2d.sound.MusicPlayer;
@@ -90,9 +91,10 @@ public class DemoGame extends AbstractGame {
     }
 
     private void createGlobalResources() throws IOException {
+        Dimensions dimensions = new Dimensions(getWindow());
         Fonts.create(resourceManager, this);
-        Surfaces.create(this);
-        Textures.create(this);
+        Surfaces.create(dimensions, this);
+        Textures.create(dimensions, this);
     }
 
     private void loadSoundBuffer(String resource, String format) throws IOException {

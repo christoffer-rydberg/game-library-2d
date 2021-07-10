@@ -1,6 +1,6 @@
 package com.gamelibrary2d.demos.networkgame.client.objects.widgets;
 
-import com.gamelibrary2d.demos.networkgame.client.Settings;
+import com.gamelibrary2d.demos.networkgame.client.settings.Colors;
 import com.gamelibrary2d.demos.networkgame.client.resources.Fonts;
 import com.gamelibrary2d.demos.networkgame.client.resources.Surfaces;
 import com.gamelibrary2d.demos.networkgame.client.resources.Textures;
@@ -20,7 +20,7 @@ public class InputField extends AbstractWidget<TextField> {
                 Surfaces.inputField(),
                 Textures.inputField());
 
-        background.getParameters().setColor(Settings.INPUT_FIELD_COLOR);
+        background.getParameters().setColor(Colors.INPUT_FIELD_COLOR);
 
         TextField textField = new TextField(text, new TextRenderer(Fonts.inputField()));
         textField.setAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.CENTER);
